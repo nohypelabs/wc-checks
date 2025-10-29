@@ -17,11 +17,14 @@ import {
 import { BottomNav } from '../components/mobile/BottomNav';
 import { Sidebar } from '../components/mobile/Sidebar';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
+import { SkeletonStats, SkeletonActivity } from '../components/ui/Skeleton';
+import { useHaptic } from '../hooks/useHaptic';
 
 export const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const haptic = useHaptic();
 
   // ✅ WAIT for auth to complete AND user to exist
   const isAuthReady = !authLoading && !!user?.id;
@@ -213,7 +216,10 @@ export const Dashboard = () => {
       {/* Main Content */}
       <main className="p-5 space-y-5">
         {/* Stats Cards - 2x2 Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        {statsLoading ? (
+          <SkeletonStats />
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
           <div className="bg-white rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50">
             <p className="text-3xl font-bold text-gray-900">{dashboardStats.total}</p>
             <p className="text-xs text-gray-500 mt-1">Total</p>
@@ -231,12 +237,16 @@ export const Dashboard = () => {
             <p className="text-xs text-gray-500 mt-1">Rata-rata</p>
           </div>
         </div>
+        )}
 
         {/* Primary Action - Big Button with 3D Shadow */}
         <button
-          onClick={() => navigate('/scan')}
+          onClick={() => {
+            haptic.medium();
+            navigate('/scan');
+          }}
           type="button"
-          className="w-full bg-white rounded-3xl p-6 shadow-[0_12px_40px_rgb(0,0,0,0.12)] active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-gray-100"
+          className="w-full bg-white rounded-3xl p-6 shadow-[0_12px_40px_rgb(0,0,0,0.12)] active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 active:scale-98 transition-all border border-gray-100"
         >
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -301,16 +311,22 @@ export const Dashboard = () => {
         {/* Quick Actions - Simple Cards */}
         <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => navigate('/locations')}
-            className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-gray-50"
+            onClick={() => {
+              haptic.light();
+              navigate('/locations');
+            }}
+            className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-gray-50"
           >
             <MapPin className="w-7 h-7 text-blue-600 mb-3" />
             <p className="font-semibold text-gray-900 text-sm">Lokasi</p>
           </button>
 
           <button
-            onClick={() => navigate('/reports')}
-            className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-gray-50"
+            onClick={() => {
+              haptic.light();
+              navigate('/reports');
+            }}
+            className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-gray-50"
           >
             <Calendar className="w-7 h-7 text-blue-600 mb-3" />
             <p className="font-semibold text-gray-900 text-sm">Laporan</p>
@@ -318,7 +334,14 @@ export const Dashboard = () => {
         </div>
 
         {/* Recent Activity - Minimal */}
-        {dashboardStats.recent && dashboardStats.recent.length > 0 && (
+        {statsLoading ? (
+          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-gray-900">Terbaru</h2>
+            </div>
+            <SkeletonActivity />
+          </div>
+        ) : dashboardStats.recent && dashboardStats.recent.length > 0 && (
           <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-gray-900">Terbaru</h2>
@@ -386,7 +409,7 @@ export const Dashboard = () => {
         )}
 
         {/* Empty State - Simple */}
-        {dashboardStats.total === 0 && (
+        {!statsLoading && dashboardStats.total === 0 && (
           <div className="text-center py-12 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50">
             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <QrCode className="w-10 h-10 text-gray-300" />
