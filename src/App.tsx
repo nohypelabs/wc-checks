@@ -51,8 +51,17 @@ const BuildingsManager = lazy(() =>
 const AdminDashboard = lazy(() =>
   import('./pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard }))
 );
-const QRCodeGenerator = lazy(() => 
+const QRCodeGenerator = lazy(() =>
   import('./pages/admin/QRCodeGenerator').then(module => ({ default: module.QRCodeGenerator }))
+);
+const SettingsPage = lazy(() =>
+  import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage }))
+);
+const HelpPage = lazy(() =>
+  import('./pages/HelpPage').then(module => ({ default: module.HelpPage }))
+);
+const AboutPage = lazy(() =>
+  import('./pages/AboutPage').then(module => ({ default: module.AboutPage }))
 );
 
 // QueryClient with logging
@@ -186,9 +195,21 @@ function AppContent() {
           path="/admin/buildings"
           element={user ? <BuildingsManager /> : <Navigate to="/login" replace />}
         />
-        <Route 
-          path="/profile" 
-          element={user ? <ProfilePage /> : <Navigate to="/login" replace />} 
+        <Route
+          path="/profile"
+          element={user ? <ProfilePage /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/settings"
+          element={user ? <SettingsPage /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/help"
+          element={user ? <HelpPage /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/about"
+          element={user ? <AboutPage /> : <Navigate to="/login" replace />}
         />
 
         {/* Admin Routes */}

@@ -34,7 +34,20 @@ export const Dashboard = () => {
 
       const { data: inspections, error: fetchError } = await supabase
         .from('inspection_records')
-        .select('id, overall_status, inspection_date, responses')
+        .select(`
+          id,
+          overall_status,
+          inspection_date,
+          inspection_time,
+          responses,
+          location_id,
+          locations (
+            id,
+            name,
+            floor,
+            building
+          )
+        `)
         .eq('user_id', user.id)
         .order('inspection_date', { ascending: false })
         .limit(50);
@@ -47,6 +60,7 @@ export const Dashboard = () => {
           todayCount: 0,
           completed: 0,
           avgScore: 0,
+          weeklyBreakdown: { excellent: 0, good: 0, fair: 0, poor: 0, total: 0 },
           recent: [],
         };
       }
@@ -98,6 +112,27 @@ export const Dashboard = () => {
           )
         : 0;
 
+      // Weekly insights - breakdown by status
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
+
+      const weeklyInspections = inspections?.filter(i =>
+        i.inspection_date >= oneWeekAgoStr
+      ) || [];
+
+      const weeklyBreakdown = {
+        excellent: weeklyInspections.filter(i => i.overall_status === 'excellent').length,
+        good: weeklyInspections.filter(i => i.overall_status === 'good').length,
+        fair: weeklyInspections.filter(i => i.overall_status === 'fair').length,
+        poor: weeklyInspections.filter(i =>
+          i.overall_status !== 'excellent' &&
+          i.overall_status !== 'good' &&
+          i.overall_status !== 'fair'
+        ).length,
+        total: weeklyInspections.length,
+      };
+
       const recentData = inspections?.slice(0, 3) || [];
 
       return {
@@ -105,6 +140,7 @@ export const Dashboard = () => {
         todayCount,
         completed,
         avgScore,
+        weeklyBreakdown,
         recent: recentData,
       };
     },
@@ -122,6 +158,7 @@ export const Dashboard = () => {
     todayCount: 0,
     completed: 0,
     avgScore: 0,
+    weeklyBreakdown: { excellent: 0, good: 0, fair: 0, poor: 0, total: 0 },
     recent: [],
   };
 
@@ -213,6 +250,54 @@ export const Dashboard = () => {
           </div>
         </button>
 
+        {/* Quick Insights - Weekly Performance */}
+        {dashboardStats.weeklyBreakdown.total > 0 && (
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-5 border border-blue-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-gray-900">Performa Minggu Ini</h3>
+              <span className="text-sm text-gray-600">{dashboardStats.weeklyBreakdown.total} inspeksi</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {dashboardStats.weeklyBreakdown.excellent > 0 && (
+                <div className="bg-white/70 rounded-xl p-3 flex items-center gap-2">
+                  <div className="text-xl">✅</div>
+                  <div>
+                    <div className="text-lg font-bold text-green-600">{dashboardStats.weeklyBreakdown.excellent}</div>
+                    <div className="text-xs text-gray-600">Sangat Baik</div>
+                  </div>
+                </div>
+              )}
+              {dashboardStats.weeklyBreakdown.good > 0 && (
+                <div className="bg-white/70 rounded-xl p-3 flex items-center gap-2">
+                  <div className="text-xl">👍</div>
+                  <div>
+                    <div className="text-lg font-bold text-blue-600">{dashboardStats.weeklyBreakdown.good}</div>
+                    <div className="text-xs text-gray-600">Baik</div>
+                  </div>
+                </div>
+              )}
+              {dashboardStats.weeklyBreakdown.fair > 0 && (
+                <div className="bg-white/70 rounded-xl p-3 flex items-center gap-2">
+                  <div className="text-xl">🟡</div>
+                  <div>
+                    <div className="text-lg font-bold text-yellow-600">{dashboardStats.weeklyBreakdown.fair}</div>
+                    <div className="text-xs text-gray-600">Cukup</div>
+                  </div>
+                </div>
+              )}
+              {dashboardStats.weeklyBreakdown.poor > 0 && (
+                <div className="bg-white/70 rounded-xl p-3 flex items-center gap-2">
+                  <div className="text-xl">⚠️</div>
+                  <div>
+                    <div className="text-lg font-bold text-red-600">{dashboardStats.weeklyBreakdown.poor}</div>
+                    <div className="text-xs text-gray-600">Perlu Perbaikan</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Quick Actions - Simple Cards */}
         <div className="grid grid-cols-2 gap-3">
           <button
@@ -245,30 +330,57 @@ export const Dashboard = () => {
               </button>
             </div>
             <div className="space-y-3">
-              {dashboardStats.recent.slice(0, 3).map((inspection: any) => (
-                <div
-                  key={inspection.id}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    {inspection.overall_status === 'completed' ||
-                     inspection.overall_status === 'excellent' ||
-                     inspection.overall_status === 'good' ? (
-                      <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+              {dashboardStats.recent.slice(0, 3).map((inspection: any) => {
+                const location = inspection.locations;
+                const locationName = location?.name || 'Lokasi tidak diketahui';
+                const locationDetail = location?.floor
+                  ? `${location.building || ''} • ${location.floor}`.trim().replace(/^• /, '')
+                  : location?.building || '';
+
+                // Format time nicely
+                const isToday = inspection.inspection_date === new Date().toISOString().split('T')[0];
+                const timeDisplay = isToday && inspection.inspection_time
+                  ? inspection.inspection_time.substring(0, 5) // HH:MM
+                  : inspection.inspection_date;
+
+                return (
+                  <div
+                    key={inspection.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/reports?inspection=${inspection.id}`)}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {inspection.overall_status === 'completed' ||
+                       inspection.overall_status === 'excellent' ||
+                       inspection.overall_status === 'good' ? (
+                        <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <CheckCircle2 className="w-5 h-5 text-green-600" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Clock className="w-5 h-5 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{locationName}</p>
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <span>{isToday ? 'Hari ini' : inspection.inspection_date}</span>
+                          {inspection.inspection_time && (
+                            <>
+                              <span>•</span>
+                              <span>{timeDisplay}</span>
+                            </>
+                          )}
+                        </div>
+                        {locationDetail && (
+                          <p className="text-xs text-gray-400 truncate">{locationDetail}</p>
+                        )}
                       </div>
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center">
-                        <Clock className="w-5 h-5 text-gray-400" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Inspeksi</p>
-                      <p className="text-xs text-gray-500">{inspection.inspection_date}</p>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
