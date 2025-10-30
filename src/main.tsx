@@ -55,40 +55,42 @@ const checkVersionAndClearCache = async () => {
   return false; // Continue normal startup
 };
 
-// Run version check first
-const shouldReload = await checkVersionAndClearCache();
-if (shouldReload) {
-  // Stop here, page will reload
-  throw new Error('Reloading to clear cache...');
-}
-
-// Validate storage before rendering app
-authStorage.validateOnStartup();
-
-// Register PWA service worker - WITH EMERGENCY DISABLE
-// Add ?disable-sw to URL to disable service worker
-const urlParams = new URLSearchParams(window.location.search);
-const disableSW = urlParams.get('disable-sw') === 'true';
-
-if (disableSW) {
-  console.log('🛑 Service worker disabled via URL parameter');
-  // Unregister all service workers
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((registration) => registration.unregister());
-    });
+// Run version check and app initialization
+(async () => {
+  const shouldReload = await checkVersionAndClearCache();
+  if (shouldReload) {
+    // Stop here, page will reload
+    return;
   }
-  sessionStorage.clear(); // Clear any stuck states
-} else if (import.meta.env.PROD) {
-  registerServiceWorker();
-  initInstallPrompt();
-  console.log('🚀 PWA features enabled (honest messaging)');
-} else {
-  console.log('⚠️ PWA features disabled in development mode');
-}
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+  // Validate storage before rendering app
+  authStorage.validateOnStartup();
+
+  // Register PWA service worker - WITH EMERGENCY DISABLE
+  // Add ?disable-sw to URL to disable service worker
+  const urlParams = new URLSearchParams(window.location.search);
+  const disableSW = urlParams.get('disable-sw') === 'true';
+
+  if (disableSW) {
+    console.log('🛑 Service worker disabled via URL parameter');
+    // Unregister all service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => registration.unregister());
+      });
+    }
+    sessionStorage.clear(); // Clear any stuck states
+  } else if (import.meta.env.PROD) {
+    registerServiceWorker();
+    initInstallPrompt();
+    console.log('🚀 PWA features enabled (honest messaging)');
+  } else {
+    console.log('⚠️ PWA features disabled in development mode');
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+})();
