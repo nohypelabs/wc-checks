@@ -193,8 +193,8 @@ export const InspectionDetailModal = ({
             </div>
           </div>
 
-          {/* Content - Extra bottom padding to avoid bottomnav overlap */}
-          <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 pt-6 pb-24 space-y-6">
+          {/* Content - Scrollable area */}
+          <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 pt-6 pb-6 space-y-6">
             {/* Metadata - Modern cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Date & Time Card */}
@@ -366,6 +366,9 @@ export const InspectionDetailModal = ({
                 </div>
               </div>
             )}
+
+            {/* Bottom spacer - prevents content from sticking to BottomNav */}
+            <div className="h-20" />
           </div>
         </div>
       </div>
