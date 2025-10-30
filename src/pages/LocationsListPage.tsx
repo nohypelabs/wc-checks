@@ -21,10 +21,11 @@ import {
 interface Location {
   id: string;
   name: string;
-  building: string | null;
+  building: string | null; // Building name from join
   floor: string | null;
   code: string | null;
   is_active: boolean;
+  building_id: string | null;
 }
 
 export const LocationsListPage = () => {
@@ -55,10 +56,18 @@ export const LocationsListPage = () => {
 
       const { data, error } = await supabase
         .from('locations')
-        .select('id, name, building, floor, code, is_active')
+        .select(`
+          id,
+          name,
+          floor,
+          code,
+          is_active,
+          building_id,
+          buildings!building_id (
+            name
+          )
+        `)
         .eq('is_active', true)
-        .order('building', { ascending: true })
-        .order('floor', { ascending: true })
         .order('name', { ascending: true });
 
       console.log('🔵 Database query result', {
@@ -71,7 +80,17 @@ export const LocationsListPage = () => {
         console.error('❌ Database error:', error);
         throw error;
       }
-      return data || [];
+
+      // Transform data to flatten building name
+      return (data || []).map((loc: any) => ({
+        id: loc.id,
+        name: loc.name,
+        floor: loc.floor,
+        code: loc.code,
+        is_active: loc.is_active,
+        building_id: loc.building_id,
+        building: loc.buildings?.name || null,
+      })) as Location[];
     },
     enabled: isReady,
     staleTime: 2 * 60 * 1000, // Cache 2 minutes

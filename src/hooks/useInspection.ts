@@ -91,8 +91,21 @@ export const useInspection = (inspectionId?: string) => {
       if (!locationId) throw new Error('Location ID is required');
 
       const { data, error } = await supabase
-        .from('locations_with_details')
-        .select('*')
+        .from('locations')
+        .select(`
+          id,
+          name,
+          floor,
+          area,
+          code,
+          building_id,
+          organization_id,
+          qr_code,
+          is_active,
+          buildings!building_id (
+            name
+          )
+        `)
         .eq('id', locationId)
         .single();
 
@@ -100,8 +113,22 @@ export const useInspection = (inspectionId?: string) => {
         logger.error('Failed to fetch location', error);
         throw new Error(`Failed to fetch location: ${error.message}`);
       }
-      
-      return data as LocationWithDetails;
+
+      // Transform data to flatten building name
+      const transformed: LocationWithDetails = {
+        id: data.id,
+        name: data.name,
+        floor: data.floor,
+        area: data.area,
+        code: data.code,
+        building_id: data.building_id,
+        organization_id: data.organization_id,
+        qr_code: data.qr_code,
+        is_active: data.is_active,
+        building: (data as any).buildings?.name || null,
+      };
+
+      return transformed;
     },
     enabled: !!locationId,
   });

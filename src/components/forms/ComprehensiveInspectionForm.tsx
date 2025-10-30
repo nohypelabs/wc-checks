@@ -342,20 +342,20 @@ const handleSubmit = async () => {
       duration_seconds: durationSeconds,
     });
 
-    // Success
+    // Success - redirect immediately to dashboard
     toast.success(
       genZMode
-        ? `🎉 Sukses! Score: ${currentScore}`
-        : `✅ Inspection saved! Score: ${currentScore}`,
+        ? `🎉 Sukses! Score: ${currentScore} - Redirect ke dashboard...`
+        : `✅ Inspection saved! Score: ${currentScore} - Redirecting...`,
       { id: toastId, duration: 2000 }
     );
 
-    // Navigate back to dashboard (with cleanup-safe timeout)
-    navigationTimeoutRef.current = setTimeout(() => {
-      if (isMountedRef.current) {
-        navigate('/', { replace: true });
-      }
-    }, 1500);
+    // Navigate to dashboard immediately (no timeout blocking)
+    // User wants to see updated stats and reports
+    // Using small timeout to let toast display briefly
+    setTimeout(() => {
+      navigate('/', { replace: true });
+    }, 500);
 
   } catch (error: any) {
     console.error('❌ Submission error:', error);
