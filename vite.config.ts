@@ -8,8 +8,8 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // ❌ OFFLINE MODE DISABLED: App requires network for auth, upload, and database
-      // Only cache static assets to save bandwidth, but NEVER work offline
+      // ⚠️ NETWORK-ONLY APP: Requires internet for auth, upload, and database
+      // Cache static assets to save bandwidth, but app won't work offline
       workbox: {
         // ⚠️ IMPORTANT: Don't cache HTML! Only truly static assets
         // HTML caching causes offline mode issues
