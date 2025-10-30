@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CustomToaster } from './lib/toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
-import { NetworkStatus } from './components/NetworkStatus';
 import { useAuth } from './hooks/useAuth';
 import { logger } from './lib/logger';
 import './App.css';
@@ -248,7 +247,6 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <ErrorBoundary>
-          <NetworkStatus />
           <AppContent />
           <DebugPanel />
           <CustomToaster />
