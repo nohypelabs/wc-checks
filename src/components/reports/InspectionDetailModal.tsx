@@ -136,12 +136,12 @@ export const InspectionDetailModal = ({
 
       {/* Modal with scale animation - Proper spacing from all edges */}
       <div
-        className="fixed left-4 right-4 top-4 bottom-20 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh] overflow-hidden animate-scaleIn"
+        className="fixed left-4 right-4 top-4 bottom-20 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh] animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col">
           {/* Header - Dynamic gradient based on score */}
-          <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-6 text-white relative overflow-hidden`}>
+          <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-6 text-white relative overflow-hidden rounded-t-3xl flex-shrink-0`}>
             {/* Animated background pattern */}
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse" />
@@ -194,7 +194,7 @@ export const InspectionDetailModal = ({
           </div>
 
           {/* Content - Scrollable area */}
-          <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 pt-6 pb-6 space-y-6">
+          <div className="overflow-y-auto flex-1 px-6 pt-6 pb-6 space-y-6 rounded-b-3xl">
             {/* Metadata - Modern cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Date & Time Card */}
