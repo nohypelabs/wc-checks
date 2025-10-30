@@ -31,24 +31,28 @@ export const UserManagement = () => {
   // Security check: Only level 90+ (super_admin/system_admin) can access
   useEffect(() => {
     const checkSuperAdmin = async () => {
+      console.log('[UserManagement] Starting access check for user:', user?.id);
+
       if (!user?.id) {
+        console.log('[UserManagement] No user ID - redirecting to login');
         navigate('/login');
         return;
       }
 
+      console.log('[UserManagement] Calling getUserRoleLevel...');
       const level = await getUserRoleLevel(user.id);
-      console.log('[UserManagement] Access check - User level:', level);
+      console.log('[UserManagement] Got level:', level, 'typeof:', typeof level);
 
-      if (level < 90) {
-        // Not a super_admin or system_admin - redirect
-        console.log('[UserManagement] Access denied - level too low');
+      if (level < 100) {
+        console.log('[UserManagement] Level < 100 - ACCESS DENIED - redirecting to home');
         navigate('/');
         return;
       }
 
-      console.log('[UserManagement] Access granted - level', level);
+      console.log('[UserManagement] Level >= 100 - ACCESS GRANTED');
       setIsSuperAdmin(true);
       setCheckingAccess(false);
+      console.log('[UserManagement] State updated: isSuperAdmin=true, checkingAccess=false');
     };
 
     checkSuperAdmin();
@@ -92,7 +96,10 @@ export const UserManagement = () => {
     return 'bg-gray-100 text-gray-600 border-gray-300';
   };
 
+  console.log('[UserManagement] Render state:', { checkingAccess, isSuperAdmin });
+
   if (checkingAccess) {
+    console.log('[UserManagement] Showing loading screen - checking access...');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -104,8 +111,11 @@ export const UserManagement = () => {
   }
 
   if (!isSuperAdmin) {
+    console.log('[UserManagement] Not superadmin - will redirect');
     return null; // Will redirect
   }
+
+  console.log('[UserManagement] Rendering main content');
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
