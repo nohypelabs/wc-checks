@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './App.css'
 import { authStorage } from './lib/authStorage.ts';
-import { registerServiceWorker, initInstallPrompt } from './lib/pwa.ts';
+import { registerServiceWorker } from './lib/pwa.ts';
 
 // 🚨 VERSION CHECK: Force hard reload if version changed
 const APP_VERSION = '2.0.0'; // Increment this to force cache clear
@@ -81,8 +81,7 @@ if (disableSW) {
   sessionStorage.clear(); // Clear any stuck states
 } else if (import.meta.env.PROD) {
   registerServiceWorker();
-  initInstallPrompt();
-  console.log('🚀 PWA features enabled');
+  console.log('🚀 Service worker enabled (no install prompt)');
 } else {
   console.log('⚠️ PWA features disabled in development mode');
 }
