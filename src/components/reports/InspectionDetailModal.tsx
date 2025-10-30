@@ -1,8 +1,10 @@
 // src/components/reports/InspectionDetailModal.tsx
+import { useState } from 'react';
 import { X, MapPin, Clock, User, Camera, FileText, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
+import { PhotoReviewModal } from './PhotoReviewModal';
 
 interface InspectionDetailModalProps {
   isOpen: boolean;
@@ -89,6 +91,9 @@ export const InspectionDetailModal = ({
   onClose,
   inspection,
 }: InspectionDetailModalProps) => {
+  const [photoReviewOpen, setPhotoReviewOpen] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+
   if (!isOpen || !inspection) return null;
 
   const responses = inspection.responses as any;
@@ -100,6 +105,11 @@ export const InspectionDetailModal = ({
   const inspectionMode = responses?.inspection_mode || 'professional';
 
   const formattedDate = format(new Date(inspection.inspection_date), 'EEEE, MMMM d, yyyy');
+
+  const handlePhotoClick = (index: number) => {
+    setSelectedPhotoIndex(index);
+    setPhotoReviewOpen(true);
+  };
 
   return (
     <>
@@ -287,19 +297,23 @@ export const InspectionDetailModal = ({
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 place-items-center">
                   {inspection.photo_urls.map((url, idx) => (
-                    <a
+                    <button
                       key={idx}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full aspect-square rounded-xl overflow-hidden hover:opacity-80 hover:scale-105 transition-all shadow-md hover:shadow-xl"
+                      onClick={() => handlePhotoClick(idx)}
+                      className="w-full aspect-square rounded-xl overflow-hidden hover:opacity-80 hover:scale-105 transition-all shadow-md hover:shadow-xl cursor-pointer group relative"
                     >
                       <img
                         src={url}
                         alt={`Foto ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
-                    </a>
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Camera className="w-8 h-8 text-white drop-shadow-lg" />
+                        </div>
+                      </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -320,6 +334,14 @@ export const InspectionDetailModal = ({
           </div>
         </div>
       </div>
+
+      {/* Photo Review Modal */}
+      <PhotoReviewModal
+        isOpen={photoReviewOpen}
+        onClose={() => setPhotoReviewOpen(false)}
+        photos={inspection.photo_urls || []}
+        initialIndex={selectedPhotoIndex}
+      />
     </>
   );
 };
