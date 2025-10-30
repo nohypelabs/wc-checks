@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
 import { Tables, TablesInsert } from '../../types/database.types';
-import { Plus, Edit2, Trash2, MapPin, QrCode, Search, MoreVertical, Copy, User, ShieldAlert, Menu } from 'lucide-react';
+import { Plus, Edit2, Trash2, MapPin, QrCode, Search, MoreVertical, Copy, User, ShieldAlert, Menu, CheckSquare, Square, Download, BarChart3, X, Check, Power, PowerOff } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { QRCodeGenerator } from './QRCodeGenerator';
@@ -39,6 +39,8 @@ export const LocationsManager = () => {
   const [qrLocations, setQrLocations] = useState<Location[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Fetch locations
   const { data: locations, isLoading } = useQuery({
@@ -118,6 +120,130 @@ export const LocationsManager = () => {
     navigator.clipboard.writeText(url);
     toast.success('URL copied!');
     setOpenMenuId(null);
+  };
+
+  // Bulk selection handlers
+  const toggleSelection = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredLocations?.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredLocations?.map(l => l.id) || []));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  // Bulk operations
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from('locations')
+        .delete()
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['locations'] });
+      toast.success(`Deleted ${selectedIds.size} locations`);
+      clearSelection();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete locations');
+    },
+  });
+
+  const bulkToggleActiveMutation = useMutation({
+    mutationFn: async ({ ids, isActive }: { ids: string[]; isActive: boolean }) => {
+      const { error } = await supabase
+        .from('locations')
+        .update({ is_active: isActive })
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['locations'] });
+      toast.success(`${variables.isActive ? 'Activated' : 'Deactivated'} ${selectedIds.size} locations`);
+      clearSelection();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update locations');
+    },
+  });
+
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) {
+      toast.error('No locations selected');
+      return;
+    }
+    if (window.confirm(`Delete ${selectedIds.size} locations? This cannot be undone.`)) {
+      bulkDeleteMutation.mutate(Array.from(selectedIds));
+    }
+  };
+
+  const handleBulkActivate = (isActive: boolean) => {
+    if (selectedIds.size === 0) {
+      toast.error('No locations selected');
+      return;
+    }
+    bulkToggleActiveMutation.mutate({ ids: Array.from(selectedIds), isActive });
+  };
+
+  const exportToCSV = () => {
+    if (!locations || locations.length === 0) {
+      toast.error('No locations to export');
+      return;
+    }
+
+    const headers = ['Name', 'Code', 'Building', 'Floor', 'Area', 'Active', 'Created At'];
+    const rows = locations.map(loc => [
+      loc.name,
+      loc.code || '',
+      loc.building || '',
+      loc.floor || '',
+      loc.area || '',
+      loc.is_active ? 'Yes' : 'No',
+      new Date(loc.created_at!).toLocaleDateString(),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `locations-export-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    toast.success('Exported to CSV');
+  };
+
+  // Analytics data
+  const analytics = {
+    total: locations?.length || 0,
+    active: locations?.filter(l => l.is_active).length || 0,
+    inactive: locations?.filter(l => !l.is_active).length || 0,
+    byBuilding: locations?.reduce((acc, loc) => {
+      const building = loc.building || 'No Building';
+      acc[building] = (acc[building] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>) || {},
   };
 
   // Loading states
@@ -258,12 +384,135 @@ export const LocationsManager = () => {
                 <QrCode className="w-5 h-5" />
                 <span>Bulk QR</span>
               </Button>
+
+              <Button
+                variant="outline"
+                onClick={exportToCSV}
+                className="flex items-center justify-center space-x-2"
+              >
+                <Download className="w-5 h-5" />
+                <span>Export CSV</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => setShowAnalytics(!showAnalytics)}
+                className="flex items-center justify-center space-x-2"
+              >
+                <BarChart3 className="w-5 h-5" />
+                <span>Analytics</span>
+              </Button>
             </div>
           </div>
         </Card>
 
+        {/* Analytics Dashboard */}
+        {showAnalytics && (
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-900">Analytics</h3>
+              <button
+                onClick={() => setShowAnalytics(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-blue-50 rounded-xl p-3">
+                <p className="text-xs text-blue-600 mb-1">Total</p>
+                <p className="text-2xl font-bold text-blue-900">{analytics.total}</p>
+              </div>
+              <div className="bg-green-50 rounded-xl p-3">
+                <p className="text-xs text-green-600 mb-1">Active</p>
+                <p className="text-2xl font-bold text-green-900">{analytics.active}</p>
+              </div>
+              <div className="bg-red-50 rounded-xl p-3">
+                <p className="text-xs text-red-600 mb-1">Inactive</p>
+                <p className="text-2xl font-bold text-red-900">{analytics.inactive}</p>
+              </div>
+            </div>
+
+            {/* By Building */}
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">By Building</p>
+              <div className="space-y-2">
+                {Object.entries(analytics.byBuilding).map(([building, count]) => (
+                  <div key={building} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+                    <span className="text-sm text-gray-700">{building}</span>
+                    <span className="font-semibold text-gray-900">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Bulk Selection Bar */}
+        {selectedIds.size > 0 && (
+          <Card className="bg-blue-50 border-blue-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckSquare className="w-5 h-5 text-blue-600" />
+                <span className="font-semibold text-blue-900">{selectedIds.size} selected</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleBulkActivate(true)}
+                  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+                  title="Activate selected"
+                >
+                  <Power className="w-5 h-5 text-green-600" />
+                </button>
+                <button
+                  onClick={() => handleBulkActivate(false)}
+                  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+                  title="Deactivate selected"
+                >
+                  <PowerOff className="w-5 h-5 text-orange-600" />
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+                  title="Delete selected"
+                >
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </button>
+                <button
+                  onClick={clearSelection}
+                  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+                  title="Clear selection"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Locations List - MOBILE OPTIMIZED */}
         <div className="space-y-3">
+          {/* Select All */}
+          {filteredLocations && filteredLocations.length > 0 && (
+            <div className="flex items-center gap-2 px-4">
+              <button
+                onClick={toggleSelectAll}
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                {selectedIds.size === filteredLocations.length ? (
+                  <CheckSquare className="w-5 h-5 text-blue-600" />
+                ) : (
+                  <Square className="w-5 h-5" />
+                )}
+                <span>
+                  {selectedIds.size === filteredLocations.length ? 'Deselect All' : 'Select All'}
+                </span>
+              </button>
+            </div>
+          )}
+
           {filteredLocations?.length === 0 ? (
             <Card>
               <div className="text-center py-8 text-gray-500">
@@ -274,8 +523,20 @@ export const LocationsManager = () => {
           ) : (
             filteredLocations?.map((location) => (
               <Card key={location.id} className="relative">
+                {/* Checkbox */}
+                <button
+                  onClick={() => toggleSelection(location.id)}
+                  className="absolute top-4 left-4 z-10 p-1 hover:bg-gray-100 rounded transition-colors"
+                >
+                  {selectedIds.has(location.id) ? (
+                    <CheckSquare className="w-5 h-5 text-blue-600" />
+                  ) : (
+                    <Square className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+
                 {/* Main Content */}
-                <div className="pr-10">
+                <div className="pl-12 pr-10">
                   {/* Header */}
                   <div className="flex items-start space-x-3 mb-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
@@ -285,11 +546,22 @@ export const LocationsManager = () => {
                       <h3 className="font-semibold text-gray-900 truncate">
                         {location.name}
                       </h3>
-                      {location.code && (
-                        <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-                          {location.code}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2 mt-1">
+                        {location.code && (
+                          <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                            {location.code}
+                          </span>
+                        )}
+                        {location.is_active ? (
+                          <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                            Inactive
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
