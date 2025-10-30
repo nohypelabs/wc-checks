@@ -27,31 +27,19 @@ const clearAllCaches = async (): Promise<void> => {
 
 /**
  * Register service worker for PWA functionality
- * 🚨 AGGRESSIVE CACHE CLEARING: Unregister old SW + clear all caches
+ * ✅ NORMAL MODE: Just register SW, no aggressive cleanup
+ * (Aggressive cleanup only happens on version changes in main.tsx)
  */
 export const registerServiceWorker = async (): Promise<void> => {
   if ('serviceWorker' in navigator) {
     try {
-      console.log('🔄 Starting fresh service worker registration...');
+      console.log('🔄 Registering service worker...');
 
-      // 🚨 STEP 1: Unregister ALL old service workers first
-      console.log('🗑️ Unregistering old service workers...');
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (const registration of registrations) {
-        await registration.unregister();
-        console.log('  ✅ Unregistered:', registration.scope);
-      }
-
-      // 🚨 STEP 2: Clear ALL caches (prevents offline mode issues)
-      await clearAllCaches();
-
-      // 🚨 STEP 3: Wait a moment for cleanup to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // 🚨 STEP 4: Register NEW service worker
-      console.log('📝 Registering NEW service worker...');
+      // ✅ Just register service worker normally
+      // No unregistering, no cache clearing (that's for version changes only!)
       const registration = await navigator.serviceWorker.register('/service-worker.js', {
         scope: '/',
+        updateViaCache: 'none', // Always check for SW updates
       });
 
       console.log('✅ Service worker registered:', registration.scope);
