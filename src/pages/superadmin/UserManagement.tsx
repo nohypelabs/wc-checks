@@ -23,7 +23,7 @@ export const UserManagement = () => {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
 
-  const { data: users, isLoading: usersLoading } = useUsers();
+  const { data: users, isLoading: usersLoading, error: usersError } = useUsers();
   const { data: roles } = useRoles();
   const assignRoleMutation = useAssignRole();
   const toggleStatusMutation = useToggleUserStatus();
@@ -31,7 +31,11 @@ export const UserManagement = () => {
   // Security check: Only level 90+ (super_admin/system_admin) can access
   useEffect(() => {
     const checkSuperAdmin = async () => {
+      console.log('[UserManagement] Starting security check...');
+      console.log('[UserManagement] user?.id:', user?.id);
+
       if (!user?.id) {
+        console.log('[UserManagement] No user ID - redirecting to login');
         navigate('/login');
         return;
       }
@@ -47,12 +51,25 @@ export const UserManagement = () => {
       }
 
       console.log('[UserManagement] Access granted - level', level);
+      console.log('[UserManagement] Setting isSuperAdmin = true, checkingAccess = false');
       setIsSuperAdmin(true);
       setCheckingAccess(false);
     };
 
     checkSuperAdmin();
   }, [user, navigate]);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('[UserManagement] State update:', {
+      checkingAccess,
+      isSuperAdmin,
+      usersLoading,
+      hasUsers: !!users,
+      userCount: users?.length,
+      usersError: usersError ? 'YES' : 'NO'
+    });
+  }, [checkingAccess, isSuperAdmin, usersLoading, users, usersError]);
 
   // Filter users
   const filteredUsers = users?.filter((u) => {
@@ -93,6 +110,7 @@ export const UserManagement = () => {
   };
 
   if (checkingAccess) {
+    console.log('[UserManagement] Rendering: Checking access screen');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -104,8 +122,11 @@ export const UserManagement = () => {
   }
 
   if (!isSuperAdmin) {
+    console.log('[UserManagement] Rendering: null (not superadmin, will redirect)');
     return null; // Will redirect
   }
+
+  console.log('[UserManagement] Rendering: Main UI');
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">

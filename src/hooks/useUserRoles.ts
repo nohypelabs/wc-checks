@@ -23,13 +23,20 @@ export function useUsers() {
   return useQuery({
     queryKey: ['users-with-roles'],
     queryFn: async () => {
+      console.log('[useUsers] Fetching users...');
+
       // Fetch all users first
       const { data: users, error: usersError } = await supabase
         .from('users')
         .select('id, email, full_name, phone, is_active, created_at, last_login_at')
         .order('created_at', { ascending: false });
 
-      if (usersError) throw usersError;
+      if (usersError) {
+        console.error('[useUsers] Error fetching users:', usersError);
+        throw usersError;
+      }
+
+      console.log('[useUsers] Fetched', users?.length, 'users');
 
       // Fetch all user_roles with roles
       const { data: userRoles, error: rolesError } = await supabase
@@ -43,10 +50,15 @@ export function useUsers() {
           )
         `);
 
-      if (rolesError) throw rolesError;
+      if (rolesError) {
+        console.error('[useUsers] Error fetching user roles:', rolesError);
+        throw rolesError;
+      }
+
+      console.log('[useUsers] Fetched', userRoles?.length, 'user roles');
 
       // Combine the data
-      return users.map((user: any) => {
+      const combined = users.map((user: any) => {
         const userRole = userRoles?.find((ur: any) => ur.user_id === user.id);
         return {
           id: user.id,
@@ -59,6 +71,9 @@ export function useUsers() {
           role: userRole?.roles || null,
         };
       }) as UserWithRole[];
+
+      console.log('[useUsers] Combined data ready:', combined.length, 'users with roles');
+      return combined;
     },
   });
 }

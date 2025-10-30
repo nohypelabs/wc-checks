@@ -125,16 +125,16 @@ const NotFoundPage = () => (
 function AppContent() {
   const { user, loading } = useAuth();
 
-  // 🐛 DEBUG: Log auth state
-  console.log('🔍 AppContent render:', { loading, hasUser: !!user, userId: user?.id });
+  // DEBUG: Log auth state
+  console.log('[AppContent] render:', JSON.stringify({ loading, hasUser: !!user, userId: user?.id }));
 
-  // ✅ WAIT for auth to load before routing
+  // WAIT for auth to load before routing
   if (loading) {
-    console.log('⏳ Showing AuthLoader - waiting for auth...');
+    console.log('[AppContent] Showing AuthLoader - waiting for auth...');
     return <AuthLoader />;
   }
 
-  console.log('✅ Auth loaded, rendering routes');
+  console.log('[AppContent] Auth loaded, rendering routes');
 
   return (
     <Suspense fallback={<PageLoader />}>
