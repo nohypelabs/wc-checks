@@ -102,15 +102,18 @@ export const UserManagement = () => {
     return 'bg-gray-100 text-gray-600 border-gray-300';
   };
 
-  console.log('[UserManagement] Render state:', { checkingAccess, isSuperAdmin });
+  console.log('[UserManagement] Render state:', { checkingAccess, isSuperAdmin, authLoading, hasUser: !!user });
 
-  if (checkingAccess) {
-    console.log('[UserManagement] Showing loading screen - checking access...');
+  // Wait for auth to finish loading OR access check
+  if (authLoading || checkingAccess) {
+    console.log('[UserManagement] Showing loading screen - auth or access check in progress');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking access...</p>
+          <p className="text-gray-600">
+            {authLoading ? 'Loading authentication...' : 'Checking access...'}
+          </p>
         </div>
       </div>
     );
