@@ -49,7 +49,8 @@ export const compressImage = async (file: File): Promise<File> => {
 // src/lib/cloudinary.ts - FIXED WITH BATCH UPLOAD
 
 /**
- * Upload single file to Cloudinary
+ * Upload single file to Cloudinary - MOBILE OPTIMIZED
+ * Includes timeout for slow mobile networks
  */
 export const uploadToCloudinary = async (file: File): Promise<string> => {
   const formData = new FormData();
@@ -58,33 +59,53 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
   formData.append('folder', CLOUDINARY_FOLDER);
 
   try {
+    // Mobile-friendly timeout: 60 seconds for slow 3G/4G
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+    console.log(`📤 Uploading ${file.name} (${(file.size / 1024).toFixed(0)}KB)...`);
+    const startTime = Date.now();
+
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
       {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       }
     );
+
+    clearTimeout(timeoutId);
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`✅ Uploaded ${file.name} in ${elapsed}s`);
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error?.message || 'Upload failed');
 
     return data.secure_url;
-  } catch (error) {
-    console.error('Cloudinary upload error:', error);
-    throw new Error('Failed to upload photo');
+  } catch (error: any) {
+    console.error(`❌ Upload error for ${file.name}:`, error);
+
+    // Better error messages for mobile users
+    if (error.name === 'AbortError') {
+      throw new Error('Upload timeout (slow connection). Please try again.');
+    }
+
+    throw new Error(error.message || 'Failed to upload photo');
   }
 };
 
 /**
- * Batch upload with concurrency limit and progress tracking
+ * Batch upload with concurrency limit and progress tracking - MOBILE OPTIMIZED
  * Uses Promise.allSettled to continue uploading even if some files fail
+ * Reduced concurrency for mobile network stability
  */
 export const batchUploadToCloudinary = async (
   files: File[],
   onProgress?: (current: number, total: number) => void
 ): Promise<string[]> => {
-  const CONCURRENT_UPLOADS = 3; // Upload 3 at a time
+  const CONCURRENT_UPLOADS = 2; // ✅ Upload 2 at a time (reduced for mobile stability)
   const results: string[] = [];
   const failedFiles: Array<{ fileName: string; error: string }> = [];
   let completed = 0;

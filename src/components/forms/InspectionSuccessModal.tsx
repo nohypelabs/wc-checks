@@ -41,10 +41,10 @@ export const InspectionSuccessModal = ({
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fadeIn" />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] animate-fadeIn" />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn overflow-hidden">
           {/* Success Icon & Score */}
           <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-8 text-center relative overflow-hidden`}>
