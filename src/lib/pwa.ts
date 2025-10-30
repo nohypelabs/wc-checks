@@ -3,12 +3,38 @@
 let deferredPrompt: any = null;
 
 /**
+ * Clear all service worker caches (for fresh start)
+ */
+const clearAllCaches = async (): Promise<void> => {
+  if ('caches' in window) {
+    try {
+      const cacheNames = await caches.keys();
+      console.log(`🗑️ Clearing ${cacheNames.length} cache(s)...`);
+
+      await Promise.all(
+        cacheNames.map(cacheName => {
+          console.log(`  - Deleting cache: ${cacheName}`);
+          return caches.delete(cacheName);
+        })
+      );
+
+      console.log('✅ All caches cleared');
+    } catch (error) {
+      console.error('❌ Error clearing caches:', error);
+    }
+  }
+};
+
+/**
  * Register service worker for PWA functionality
  */
 export const registerServiceWorker = async (): Promise<void> => {
   if ('serviceWorker' in navigator) {
     try {
       console.log('🔄 Registering service worker...');
+
+      // Clear old caches on startup (prevents offline mode issues)
+      await clearAllCaches();
 
       const registration = await navigator.serviceWorker.register('/service-worker.js', {
         scope: '/',
@@ -180,13 +206,18 @@ export const getInstallInstructions = (): string => {
 };
 
 /**
- * Clear service worker cache
+ * Clear service worker cache (aggressive - clears ALL caches)
  */
 export const clearServiceWorkerCache = async (): Promise<void> => {
+  // Method 1: Tell service worker to clear
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
-    console.log('🗑️ Service worker cache cleared');
   }
+
+  // Method 2: Clear caches directly
+  await clearAllCaches();
+
+  console.log('🗑️ Service worker caches cleared');
 };
 
 /**

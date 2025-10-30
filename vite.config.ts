@@ -8,39 +8,50 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // OPTIMIZED: Aggressive caching for static assets, network-first for API
+      // ❌ OFFLINE MODE DISABLED: App requires network for auth, upload, and database
+      // Only cache static assets to save bandwidth, but NEVER work offline
       workbox: {
-        // Cache all static assets (JS, CSS)
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // ⚠️ IMPORTANT: Don't cache HTML! Only truly static assets
+        // HTML caching causes offline mode issues
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'], // NO HTML!
+
+        // Clear old caches on activation
+        cleanupOutdatedCaches: true,
 
         runtimeCaching: [
-          // 1. Static JS/CSS files - CacheFirst (long cache, save bandwidth)
+          // 1. HTML pages - NetworkOnly (NEVER cache, always fresh)
+          {
+            urlPattern: /\.html$/i,
+            handler: 'NetworkOnly',
+          },
+
+          // 2. Static JS/CSS files - NetworkFirst with fallback (save bandwidth, but require network)
           {
             urlPattern: /\.(?:js|css)$/i,
-            handler: 'CacheFirst',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'static-assets',
+              networkTimeoutSeconds: 10, // Wait max 10s for network
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
               },
+              plugins: [
+                {
+                  // If network fails, show error instead of serving stale cache
+                  cacheWillUpdate: async ({ response }) => {
+                    // Only cache successful responses
+                    if (response && response.status === 200) {
+                      return response;
+                    }
+                    return null;
+                  },
+                },
+              ],
             },
           },
 
-          // 2. Google Fonts - CacheFirst (1 year)
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-              },
-            },
-          },
-
-          // 3. Font files - CacheFirst (1 year)
+          // 3. Font files - CacheFirst (safe to cache forever)
           {
             urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/i,
             handler: 'CacheFirst',
@@ -53,7 +64,7 @@ export default defineConfig(({ mode }) => ({
             },
           },
 
-          // 4. Images (local) - CacheFirst (30 days)
+          // 4. Images (local) - CacheFirst (safe to cache)
           {
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
             handler: 'CacheFirst',
@@ -66,12 +77,13 @@ export default defineConfig(({ mode }) => ({
             },
           },
 
-          // 5. Cloudinary images - StaleWhileRevalidate (show cached, update in background)
+          // 5. Cloudinary images - NetworkFirst (always try fresh, fallback to cache)
           {
             urlPattern: /^https:\/\/res\.cloudinary\.com\/.*/i,
-            handler: 'StaleWhileRevalidate',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'cloudinary-images',
+              networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
@@ -82,32 +94,16 @@ export default defineConfig(({ mode }) => ({
             },
           },
 
-          // 6. Supabase API - NetworkFirst (always try fresh, fallback to cache)
+          // 6. Supabase API - NetworkOnly (NEVER cache API responses)
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 5,
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 5, // 5 minutes
-              },
-            },
+            handler: 'NetworkOnly',
           },
 
-          // 7. Everything else - NetworkFirst (minimal cache)
+          // 7. Everything else - NetworkOnly (require network)
           {
             urlPattern: /.*/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'runtime-cache',
-              networkTimeoutSeconds: 3,
-              expiration: {
-                maxEntries: 30,
-                maxAgeSeconds: 60 * 2, // 2 minutes
-              },
-            },
+            handler: 'NetworkOnly',
           },
         ],
       },
