@@ -134,20 +134,24 @@ export const InspectionDetailModal = ({
         onClick={onClose}
       />
 
-      {/* Modal with scale animation */}
-      <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-2xl mx-auto z-50 max-h-[90vh] overflow-hidden animate-scaleIn">
+      {/* Modal with scale animation - Higher z-index than backdrop */}
+      <div
+        className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-2xl mx-auto z-[60] max-h-[90vh] overflow-hidden animate-scaleIn"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           {/* Header - Dynamic gradient based on score */}
           <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-6 text-white relative overflow-hidden`}>
             {/* Animated background pattern */}
-            <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full blur-2xl animate-pulse delay-700" />
             </div>
 
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all z-10 active:scale-95"
+              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all z-20 active:scale-95"
+              type="button"
             >
               <X className="w-5 h-5" />
             </button>
@@ -189,8 +193,8 @@ export const InspectionDetailModal = ({
             </div>
           </div>
 
-          {/* Content */}
-          <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-6 space-y-6">
+          {/* Content - Extra bottom padding to not stick to bottomnav */}
+          <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 pt-6 pb-12 space-y-6">
             {/* Metadata - Modern cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Date & Time Card */}
