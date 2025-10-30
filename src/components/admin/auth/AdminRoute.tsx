@@ -14,29 +14,32 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
   const { user, profile, loading: authLoading } = useAuth();
 
   // Fetch user role from user_roles table
-  const { data: userRole, isLoading: roleLoading } = useQuery({
+  const { data: userRole, isLoading: roleLoading, error: roleError } = useQuery({
     queryKey: ['user-role', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
 
+      console.log('🔍 [AdminRoute] Fetching role for user:', user.id);
+
       const { data, error } = await supabase
         .from('user_roles')
         .select(`
-          role_id,
-          roles (
+          roles!user_roles_role_id_fkey (
+            id,
             name,
             level,
-            display_name
+            description
           )
         `)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user role:', error);
+        console.error('❌ [AdminRoute] Error fetching user role:', error);
         return null;
       }
 
+      console.log('✅ [AdminRoute] Role data:', data?.roles);
       return data?.roles;
     },
     enabled: !!user?.id
@@ -45,16 +48,25 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
   // Audit logging
   useEffect(() => {
     if (!authLoading && !roleLoading && user) {
-      console.log(`🛡️ Admin access check:`, {
+      const isAdminLevel = typeof userRole?.level === 'number' && userRole?.level >= 80;
+      console.log(`🛡️ [AdminRoute] Admin access check:`, {
         user: profile?.full_name || user.email,
         userId: user.id,
-        roleName: userRole?.name,
-        roleLevel: userRole?.level,
-        isAdmin: typeof userRole?.level === 'number' && userRole?.level >= 80,
+        roleName: userRole?.name || 'NO ROLE',
+        roleLevel: userRole?.level ?? 'NULL',
+        isAdmin: isAdminLevel,
+        hasError: !!roleError,
         timestamp: new Date().toISOString()
       });
+
+      if (!userRole) {
+        console.warn('⚠️ [AdminRoute] No role found for user');
+      }
+      if (roleError) {
+        console.error('❌ [AdminRoute] Role query error:', roleError);
+      }
     }
-  }, [authLoading, roleLoading, user, profile, userRole]);
+  }, [authLoading, roleLoading, user, profile, userRole, roleError]);
 
   // Loading state
   if (authLoading || roleLoading) {
@@ -94,7 +106,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
                 {profile?.full_name || user.email}
               </p>
               <p className="text-xs text-gray-600">
-                Role: {userRole?.display_name || 'User'} (Level: {userRole?.level || 'N/A'})
+                Role: {userRole?.name || 'User'} (Level: {userRole?.level || 'N/A'})
               </p>
             </div>
           </div>
