@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft, Save, CheckCircle2, AlertCircle, Camera } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import {
   InspectionComponent,
   ComponentRating,
@@ -530,9 +531,20 @@ const handleSubmit = async () => {
                   `}
                 >
                   <div className="flex items-center space-x-3">
-                    <span className="text-2xl">
-                      {component.iconGenZ}
-                    </span>
+                    {genZMode ? (
+                      <span className="text-2xl">{component.iconGenZ}</span>
+                    ) : (
+                      (() => {
+                        const IconComponent = component.icon ? (Icons as any)[component.icon] : null;
+                        return IconComponent ? (
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                            <IconComponent className="w-5 h-5 text-blue-600" />
+                          </div>
+                        ) : (
+                          <span className="text-2xl">{component.iconGenZ}</span>
+                        );
+                      })()
+                    )}
                     <span className="font-medium text-gray-900">
                       {genZMode ? component.labelGenZ : component.label}
                     </span>
