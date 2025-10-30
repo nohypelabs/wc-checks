@@ -8,8 +8,11 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // DISABLED: Offline mode - app needs to be online for login, upload, database
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Only cache fonts, not the app itself
+        globPatterns: [],
+        // Network-first strategy: Always try online, only cache fonts
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -22,13 +25,53 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          // Network-first for everything else (always online)
+          {
+            urlPattern: /.*/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'runtime-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 5, // 5 minutes only
+              },
+            },
+          },
+        ],
+      },
+      // Keep manifest for PWA installability
+      manifest: {
+        name: 'WC Check - Toilet Monitoring System',
+        short_name: 'WC Check',
+        description: 'Professional toilet monitoring and inspection system',
+        theme_color: '#2563eb',
+        background_color: '#ffffff',
+        display: 'standalone',
+        orientation: 'portrait',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
         ],
       },
     }),
   ],
 
   build: {
-    chunkSizeWarningLimit: 500,
+    // Increased limit: React is inherently large, 782KB is acceptable for main vendor
+    chunkSizeWarningLimit: 1000,
     
     rollupOptions: {
       output: {
