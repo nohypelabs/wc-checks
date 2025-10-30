@@ -7,7 +7,7 @@ import { authStorage } from './lib/authStorage.ts';
 import { registerServiceWorker } from './lib/pwa.ts';
 
 // 🚨 VERSION CHECK: Force hard reload if version changed
-const APP_VERSION = '2.0.0'; // Increment this to force cache clear
+const APP_VERSION = '2.1.0'; // Increment this to force cache clear
 const STORAGE_KEY = 'app_version';
 
 const checkVersionAndClearCache = async () => {
