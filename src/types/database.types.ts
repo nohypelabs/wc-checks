@@ -651,10 +651,9 @@ export type Database = {
         Args: { required_levels: string[] }
         Returns: boolean
       }
-      user_has_role_level: {
-        Args: { required_level: string }
-        Returns: boolean
-      }
+      user_has_role_level:
+        | { Args: { required_level: string }; Returns: boolean }
+        | { Args: { min_level: number }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
