@@ -134,9 +134,9 @@ export const InspectionDetailModal = ({
         onClick={onClose}
       />
 
-      {/* Modal with scale animation - Higher z-index than backdrop */}
+      {/* Modal with scale animation - Proper spacing from all edges */}
       <div
-        className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-2xl mx-auto z-[60] max-h-[90vh] overflow-hidden animate-scaleIn"
+        className="fixed left-4 right-4 top-4 bottom-20 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh] overflow-hidden animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
