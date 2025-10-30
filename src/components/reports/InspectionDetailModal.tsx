@@ -193,8 +193,8 @@ export const InspectionDetailModal = ({
             </div>
           </div>
 
-          {/* Content - Extra bottom padding to not stick to bottomnav */}
-          <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 pt-6 pb-12 space-y-6">
+          {/* Content - Extra bottom padding to avoid bottomnav overlap */}
+          <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 pt-6 pb-24 space-y-6">
             {/* Metadata - Modern cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Date & Time Card */}
