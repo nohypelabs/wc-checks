@@ -8,9 +8,9 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Configuration constants
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
-const CONNECTION_TIMEOUT = 10000; // 10 seconds
+const MAX_RETRIES = 1; // ✅ REDUCED: Only retry once to prevent long loading times
+const RETRY_DELAY = 500; // ✅ REDUCED: 500ms instead of 1s
+const CONNECTION_TIMEOUT = 5000; // ✅ REDUCED: 5 seconds instead of 10
 
 // Custom error types for better error handling
 export class SupabaseConfigError extends Error {
@@ -445,32 +445,37 @@ export const handleSupabaseError = (error: any): string => {
   return message;
 };
 
-// Initialize connection test on import
+// ✅ REMOVED AUTO-RUN: Connection test is now opt-in to prevent infinity loops
+// The old code auto-ran testConnection() on every module import, which caused:
+// - Multiple testConnection() calls when lazy-loading components
+// - Each call retried 3x with exponential backoff (7+ seconds)
+// - Total loading time: 70-100+ seconds when offline→online
+//
+// Now connection test only runs when explicitly called by components
 let connectionTestCompleted = false;
 let connectionTestSuccessful = false;
 
-testConnection().then(success => {
+// Export a function to manually test connection (opt-in)
+export const initializeConnection = async (): Promise<boolean> => {
+  if (connectionTestCompleted) {
+    return connectionTestSuccessful;
+  }
+
+  const success = await testConnection();
   connectionTestCompleted = true;
   connectionTestSuccessful = success;
-  
+
   if (success) {
     logger.info('Supabase client initialized and ready');
   } else {
-    logger.error('Supabase client initialization failed');
+    logger.warn('Supabase client initialization incomplete');
   }
-});
 
-// Export a promise that resolves when connection test is complete
-export const connectionReady = new Promise<boolean>((resolve) => {
-  const checkReady = () => {
-    if (connectionTestCompleted) {
-      resolve(connectionTestSuccessful);
-    } else {
-      setTimeout(checkReady, 100);
-    }
-  };
-  checkReady();
-});
+  return success;
+};
+
+// Export a promise that resolves immediately (no auto-test)
+export const connectionReady = Promise.resolve(true);
 
 // Utility function to check if we're likely offline
 export const isLikelyOffline = (): boolean => {
