@@ -16,8 +16,17 @@ import { BottomNav } from '../../components/mobile/BottomNav';
 import { format } from 'date-fns';
 
 export const UserManagement = () => {
+  console.log('🔵 [UserManagement] COMPONENT RENDER START');
+
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth(); // ← ADD loading
+  const { user, loading: authLoading } = useAuth();
+
+  console.log('🔵 [UserManagement] Auth state:', {
+    hasUser: !!user,
+    userId: user?.id,
+    authLoading,
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -30,17 +39,24 @@ export const UserManagement = () => {
 
   // Security check: Only level 100 (superadmin) can access
   useEffect(() => {
+    console.log('🟢 [UserManagement] useEffect TRIGGERED');
+
     const checkSuperAdmin = async () => {
-      // Wait for auth to finish loading
+      // Wait for auth to finish loading AND user to be loaded
       if (authLoading) {
         console.log('[UserManagement] Auth still loading, waiting...');
+        return;
+      }
+
+      if (!user) {
+        console.log('[UserManagement] User object not loaded yet, waiting...');
         return;
       }
 
       console.log('[UserManagement] Starting access check for user:', user?.id);
 
       if (!user?.id) {
-        console.log('[UserManagement] No user ID - redirecting to login');
+        console.log('🔴 [UserManagement] No user ID - redirecting to login');
         navigate('/login');
         return;
       }
@@ -50,12 +66,12 @@ export const UserManagement = () => {
       console.log('[UserManagement] Got level:', level, 'typeof:', typeof level);
 
       if (level < 100) {
-        console.log('[UserManagement] Level < 100 - ACCESS DENIED - redirecting to home');
+        console.log('🔴 [UserManagement] Level < 100 - ACCESS DENIED - redirecting to home');
         navigate('/');
         return;
       }
 
-      console.log('[UserManagement] Level >= 100 - ACCESS GRANTED');
+      console.log('✅ [UserManagement] Level >= 100 - ACCESS GRANTED');
       setIsSuperAdmin(true);
       setCheckingAccess(false);
       console.log('[UserManagement] State updated: isSuperAdmin=true, checkingAccess=false');
@@ -102,17 +118,22 @@ export const UserManagement = () => {
     return 'bg-gray-100 text-gray-600 border-gray-300';
   };
 
-  console.log('[UserManagement] Render state:', { checkingAccess, isSuperAdmin, authLoading, hasUser: !!user });
+  console.log('🔵 [UserManagement] Render state:', {
+    authLoading,
+    checkingAccess,
+    isSuperAdmin,
+    hasUser: !!user,
+  });
 
-  // Wait for auth to finish loading OR access check
-  if (authLoading || checkingAccess) {
-    console.log('[UserManagement] Showing loading screen - auth or access check in progress');
+  // Wait for auth to finish loading, user to be loaded, OR access check
+  if (authLoading || !user || checkingAccess) {
+    console.log('⏳ [UserManagement] Showing loading screen - waiting for auth/user/access check');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {authLoading ? 'Loading authentication...' : 'Checking access...'}
+            {authLoading ? 'Loading authentication...' : !user ? 'Loading user...' : 'Checking access...'}
           </p>
         </div>
       </div>
@@ -120,11 +141,11 @@ export const UserManagement = () => {
   }
 
   if (!isSuperAdmin) {
-    console.log('[UserManagement] Not superadmin - will redirect');
+    console.log('🔴 [UserManagement] Not superadmin - will redirect (returning null)');
     return null; // Will redirect
   }
 
-  console.log('[UserManagement] Rendering main content');
+  console.log('✅ [UserManagement] Rendering main content');
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
