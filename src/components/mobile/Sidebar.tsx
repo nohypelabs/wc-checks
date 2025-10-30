@@ -1,4 +1,5 @@
 // src/components/mobile/Sidebar.tsx
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   X,
@@ -11,9 +12,11 @@ import {
   HelpCircle,
   Info,
   BarChart3,
+  Users,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
+import { getUserRoleLevel } from '../../hooks/useUserRoles';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -25,6 +28,18 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  // Check if user is superadmin (level 100)
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      if (user?.id) {
+        const level = await getUserRoleLevel(user.id);
+        setIsSuperAdmin(level >= 100);
+      }
+    };
+    checkSuperAdmin();
+  }, [user?.id]);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -53,6 +68,10 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { icon: Shield, label: 'Organisasi', path: '/admin/organizations', description: 'Kelola organisasi' },
     { icon: Building2, label: 'Gedung', path: '/admin/buildings', description: 'Kelola gedung' },
     { icon: MapPin, label: 'Kelola Lokasi', path: '/admin/locations', description: 'CRUD lokasi admin' },
+  ];
+
+  const superAdminMenuItems = [
+    { icon: Users, label: 'User Management', path: '/superadmin/user-management', description: 'Manage users & roles' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -152,6 +171,45 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                       w-full flex items-center gap-3 p-4 rounded-xl transition-all
                       ${active
                         ? 'bg-purple-50 text-purple-600 shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    <Icon className={`w-5 h-5 ${active ? 'text-purple-600' : 'text-gray-400'}`} />
+                    <div className="flex-1 text-left">
+                      <div className="font-medium">{item.label}</div>
+                      {item.description && (
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          {item.description}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </>
+          )}
+
+          {/* Superadmin Section */}
+          {isSuperAdmin && (
+            <>
+              <div className="pt-4 pb-2">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4">
+                  Superadmin
+                </div>
+              </div>
+              {superAdminMenuItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => handleNavigate(item.path)}
+                    className={`
+                      w-full flex items-center gap-3 p-4 rounded-xl transition-all
+                      ${active
+                        ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 shadow-sm border border-purple-200'
                         : 'text-gray-700 hover:bg-gray-50'
                       }
                     `}
