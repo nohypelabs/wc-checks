@@ -19,7 +19,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
     queryFn: async () => {
       if (!user?.id) return null;
 
-      console.log('🔍 [AdminRoute] Fetching role for user:', user.id);
+      console.log('[AdminRoute] Fetching role for user:', user.id);
 
       const { data, error } = await supabase
         .from('user_roles')
@@ -35,11 +35,11 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
         .maybeSingle();
 
       if (error) {
-        console.error('❌ [AdminRoute] Error fetching user role:', error);
+        console.error('[AdminRoute] ERROR fetching user role:', error);
         return null;
       }
 
-      console.log('✅ [AdminRoute] Role data:', data?.roles);
+      console.log('[AdminRoute] Role data:', data?.roles);
       return data?.roles;
     },
     enabled: !!user?.id
@@ -49,7 +49,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
   useEffect(() => {
     if (!authLoading && !roleLoading && user) {
       const isAdminLevel = typeof userRole?.level === 'number' && userRole?.level >= 80;
-      console.log(`🛡️ [AdminRoute] Admin access check:`, {
+      console.log('[AdminRoute] Admin access check:', {
         user: profile?.full_name || user.email,
         userId: user.id,
         roleName: userRole?.name || 'NO ROLE',
@@ -60,10 +60,10 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
       });
 
       if (!userRole) {
-        console.warn('⚠️ [AdminRoute] No role found for user');
+        console.warn('[AdminRoute] WARNING: No role found for user');
       }
       if (roleError) {
-        console.error('❌ [AdminRoute] Role query error:', roleError);
+        console.error('[AdminRoute] ERROR: Role query error:', roleError);
       }
     }
   }, [authLoading, roleLoading, user, profile, userRole, roleError]);
@@ -87,10 +87,21 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
 
   // Check if user is admin (level >= 80)
   // Level 100: System Admin, 90: Super Admin, 80: Admin
+  console.log('[AdminRoute] BEFORE isAdmin check:', {
+    userRole,
+    'userRole?.level': userRole?.level,
+    'typeof level': typeof userRole?.level,
+    'level >= 80': userRole?.level >= 80,
+  });
+
   const isAdmin = typeof userRole?.level === 'number' && userRole?.level >= 80;
+
+  console.log('[AdminRoute] isAdmin result:', isAdmin);
 
   // Not authorized - Enhanced with profile info
   if (!isAdmin) {
+    console.log('[AdminRoute] ACCESS DENIED - Showing error page');
+    console.log('[AdminRoute] userRole at denial:', JSON.stringify(userRole, null, 2));
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
