@@ -34,7 +34,6 @@ export function useUsers() {
           created_at,
           last_login_at,
           user_roles (
-            role_id,
             roles (
               id,
               name,
