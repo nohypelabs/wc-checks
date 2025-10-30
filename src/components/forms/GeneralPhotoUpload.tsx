@@ -48,7 +48,7 @@ export const GeneralPhotoUpload = ({
       console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
-      const watermarkedFile = new File([watermarkedBlob], file.name, { type: 'image/jpeg' });
+      const watermarkedFile = new File([watermarkedBlob], file.name.replace(/\.\w+$/, '.webp'), { type: 'image/webp' });
 
       const photoMetadata: PhotoWithMetadata = {
         file: watermarkedFile,
@@ -109,7 +109,7 @@ export const GeneralPhotoUpload = ({
       console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
-      const watermarkedFile = new File([watermarkedBlob], file.name, { type: 'image/jpeg' });
+      const watermarkedFile = new File([watermarkedBlob], file.name.replace(/\.\w+$/, '.webp'), { type: 'image/webp' });
 
       const photoMetadata: PhotoWithMetadata = {
         file: watermarkedFile,
@@ -399,7 +399,7 @@ const addWatermarkToPhoto = async (
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
         ctx.fillText(brandText, width - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
-        // ✅ OPTIMIZATION: Lower quality to 0.85 (saves ~30% file size, imperceptible quality loss)
+        // ✅ OPTIMIZATION: Use WebP format (30-40% smaller than JPEG with same quality)
         canvas.toBlob(
           (blob) => {
             if (blob) {
@@ -408,7 +408,7 @@ const addWatermarkToPhoto = async (
               reject(new Error('Failed to create watermarked photo'));
             }
           },
-          'image/jpeg',
+          'image/webp',
           0.85
         );
       };

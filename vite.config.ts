@@ -8,12 +8,26 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // DISABLED: Offline mode - app needs to be online for login, upload, database
+      // OPTIMIZED: Aggressive caching for static assets, network-first for API
       workbox: {
-        // Only cache fonts, not the app itself
-        globPatterns: [],
-        // Network-first strategy: Always try online, only cache fonts
+        // Cache all static assets (JS, CSS)
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+
         runtimeCaching: [
+          // 1. Static JS/CSS files - CacheFirst (long cache, save bandwidth)
+          {
+            urlPattern: /\.(?:js|css)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-assets',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
+          },
+
+          // 2. Google Fonts - CacheFirst (1 year)
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -21,11 +35,68 @@ export default defineConfig(({ mode }) => ({
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
               },
             },
           },
-          // Network-first for everything else (always online)
+
+          // 3. Font files - CacheFirst (1 year)
+          {
+            urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          },
+
+          // 4. Images (local) - CacheFirst (30 days)
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
+          },
+
+          // 5. Cloudinary images - StaleWhileRevalidate (show cached, update in background)
+          {
+            urlPattern: /^https:\/\/res\.cloudinary\.com\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'cloudinary-images',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+
+          // 6. Supabase API - NetworkFirst (always try fresh, fallback to cache)
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 5, // 5 minutes
+              },
+            },
+          },
+
+          // 7. Everything else - NetworkFirst (minimal cache)
           {
             urlPattern: /.*/,
             handler: 'NetworkFirst',
@@ -33,8 +104,8 @@ export default defineConfig(({ mode }) => ({
               cacheName: 'runtime-cache',
               networkTimeoutSeconds: 3,
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 5, // 5 minutes only
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 2, // 2 minutes
               },
             },
           },
