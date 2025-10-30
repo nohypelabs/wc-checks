@@ -98,18 +98,12 @@ export default defineConfig(({ mode }) => ({
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
             handler: 'NetworkOnly',
-            options: {
-              networkTimeoutSeconds: 10,
-            },
           },
 
           // 7. Everything else - NetworkOnly (require network)
           {
             urlPattern: /.*/,
             handler: 'NetworkOnly',
-            options: {
-              networkTimeoutSeconds: 10,
-            },
           },
         ],
       },
