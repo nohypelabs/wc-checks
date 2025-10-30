@@ -54,6 +54,9 @@ const AdminDashboard = lazy(() =>
 const QRCodeGenerator = lazy(() =>
   import('./pages/admin/QRCodeGenerator').then(module => ({ default: module.QRCodeGenerator }))
 );
+const UserManagement = lazy(() =>
+  import('./pages/superadmin/UserManagement').then(module => ({ default: module.UserManagement }))
+);
 const SettingsPage = lazy(() =>
   import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage }))
 );
@@ -194,6 +197,10 @@ function AppContent() {
         <Route
           path="/admin/buildings"
           element={user ? <BuildingsManager /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/superadmin/user-management"
+          element={user ? <UserManagement /> : <Navigate to="/login" replace />}
         />
         <Route
           path="/profile"
