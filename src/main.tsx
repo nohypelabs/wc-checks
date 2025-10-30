@@ -4,10 +4,10 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './App.css'
 import { authStorage } from './lib/authStorage.ts';
-import { registerServiceWorker } from './lib/pwa.ts';
+import { registerServiceWorker, initInstallPrompt } from './lib/pwa.ts';
 
 // 🚨 VERSION CHECK: Force hard reload if version changed
-const APP_VERSION = '2.1.0'; // Increment this to force cache clear
+const APP_VERSION = '2.2.0'; // Increment this to force cache clear
 const STORAGE_KEY = 'app_version';
 
 const checkVersionAndClearCache = async () => {
@@ -81,7 +81,8 @@ if (disableSW) {
   sessionStorage.clear(); // Clear any stuck states
 } else if (import.meta.env.PROD) {
   registerServiceWorker();
-  console.log('🚀 Service worker enabled (no install prompt)');
+  initInstallPrompt();
+  console.log('🚀 PWA features enabled (honest messaging)');
 } else {
   console.log('⚠️ PWA features disabled in development mode');
 }

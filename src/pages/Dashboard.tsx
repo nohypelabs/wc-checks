@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { BottomNav } from '../components/mobile/BottomNav';
 import { Sidebar } from '../components/mobile/Sidebar';
+import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { SkeletonStats, SkeletonActivity } from '../components/ui/Skeleton';
 import { useHaptic } from '../hooks/useHaptic';
 
@@ -422,6 +423,9 @@ export const Dashboard = () => {
           </div>
         )}
       </main>
+
+      {/* PWA Install Prompt - HONEST VERSION (no offline lies) */}
+      <PWAInstallPrompt />
 
       <BottomNav />
     </div>
