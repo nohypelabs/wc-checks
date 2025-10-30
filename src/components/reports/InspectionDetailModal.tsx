@@ -1,10 +1,25 @@
-// src/components/reports/InspectionDetailModal.tsx
+// src/components/reports/InspectionDetailModal.tsx - MODERN REDESIGN
 import { useState } from 'react';
-import { X, MapPin, Clock, User, Camera, FileText, AlertCircle } from 'lucide-react';
+import { X, MapPin, Clock, User, Camera, FileText, AlertCircle, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
 import { PhotoReviewModal } from './PhotoReviewModal';
+
+// Helper to get score-based gradient (like SuccessModal)
+const getScoreGradient = (score: number) => {
+  if (score >= 90) return 'from-green-500 via-emerald-500 to-teal-600';
+  if (score >= 75) return 'from-blue-500 via-indigo-500 to-purple-600';
+  if (score >= 60) return 'from-yellow-500 via-amber-500 to-orange-600';
+  return 'from-red-500 via-rose-500 to-pink-600';
+};
+
+const getScoreTextColor = (score: number) => {
+  if (score >= 90) return 'text-green-600';
+  if (score >= 75) return 'text-blue-600';
+  if (score >= 60) return 'text-yellow-600';
+  return 'text-red-600';
+};
 
 interface InspectionDetailModalProps {
   isOpen: boolean;
@@ -113,93 +128,113 @@ export const InspectionDetailModal = ({
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with animation */}
       <div
-        className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm animate-fadeIn"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-2xl mx-auto z-50 max-h-[90vh] overflow-hidden">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white relative">
+      {/* Modal with scale animation - Higher z-index than backdrop */}
+      <div
+        className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-2xl mx-auto z-[60] max-h-[90vh] overflow-hidden animate-scaleIn"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          {/* Header - Dynamic gradient based on score */}
+          <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-6 text-white relative overflow-hidden`}>
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full blur-2xl animate-pulse delay-700" />
+            </div>
+
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-colors"
+              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all z-20 active:scale-95"
+              type="button"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center text-3xl">
-                🚽
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">{inspection.location?.name}</h2>
-                <p className="text-blue-100 text-sm">
-                  {inspection.location?.building} • {inspection.location?.floor}
-                </p>
-              </div>
-            </div>
-
-            {/* Score Badge */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <span className="text-blue-100 text-sm">Inspection Score:</span>
-                <div className="bg-white/90 px-4 py-2 rounded-full">
-                  <span className="text-2xl font-bold text-blue-600">{score}</span>
-                  <span className="text-sm text-gray-600 ml-1">/ 100</span>
+            {/* Location info with better spacing */}
+            <div className="relative z-10">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-3xl border border-white/30">
+                  🚽
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold mb-1">{inspection.location?.name}</h2>
+                  <div className="flex items-center space-x-2 text-white/90 text-sm">
+                    <MapPin className="w-4 h-4" />
+                    <span>{inspection.location?.building}</span>
+                    <span>•</span>
+                    <span>{inspection.location?.floor}</span>
+                  </div>
                 </div>
               </div>
-              <div className="bg-white/20 px-3 py-1 rounded-full text-sm">
-                {scoreStatus.emoji} {scoreStatus.label}
+
+              {/* Score display - BIG and beautiful */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-white/95 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-white/50">
+                    <div className="flex items-baseline gap-2">
+                      <span className={`text-4xl font-extrabold ${getScoreTextColor(score)}`}>
+                        {score}
+                      </span>
+                      <span className="text-lg text-gray-500 font-medium">/ 100</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white/25 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 flex items-center gap-2">
+                  <span className="text-2xl">{scoreStatus.emoji}</span>
+                  <span className="text-sm font-semibold">{scoreStatus.label}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-6 space-y-6">
-            {/* Metadata */}
-            <div className="space-y-3">
-              {/* Date & Time */}
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-                <Clock className="w-5 h-5 text-blue-600" />
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Tanggal & Waktu Inspeksi</p>
-                  <p className="font-medium text-gray-900">{formattedDate}</p>
-                  <p className="text-sm text-gray-600">{inspection.inspection_time}</p>
+          {/* Content - Extra bottom padding to not stick to bottomnav */}
+          <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 pt-6 pb-12 space-y-6">
+            {/* Metadata - Modern cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Date & Time Card */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 shadow-sm">
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-blue-600 mb-1">Date & Time</p>
+                    <p className="font-semibold text-gray-900 text-sm truncate">{formattedDate}</p>
+                    <p className="text-sm text-gray-600 mt-0.5">{inspection.inspection_time}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Inspector Info */}
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-                <User className="w-5 h-5 text-blue-600" />
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Inspector</p>
-                  <p className="font-medium text-gray-900">{inspection.user?.full_name}</p>
-                  <p className="text-sm text-gray-600">{inspection.user?.email}</p>
-                  {inspection.occupation && (
-                    <div className="flex items-center gap-1.5 mt-1">
-                      {inspection.occupation.icon && (
-                        <span className="text-base">{inspection.occupation.icon}</span>
-                      )}
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: inspection.occupation.color || '#6b7280' }}
-                      >
-                        {inspection.occupation.display_name}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Inspection Mode */}
-              <div className="flex items-center justify-center">
-                <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-700 font-medium">
-                  <span>Mode: </span>
-                  <span className="capitalize">{inspectionMode}</span>
+              {/* Inspector Card */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-100 shadow-sm">
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-purple-600 mb-1">Inspector</p>
+                    <p className="font-semibold text-gray-900 text-sm truncate">{inspection.user?.full_name}</p>
+                    <p className="text-xs text-gray-600 truncate mt-0.5">{inspection.user?.email}</p>
+                    {inspection.occupation && (
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        {inspection.occupation.icon && (
+                          <span className="text-sm">{inspection.occupation.icon}</span>
+                        )}
+                        <span
+                          className="text-xs font-semibold"
+                          style={{ color: inspection.occupation.color || '#6b7280' }}
+                        >
+                          {inspection.occupation.display_name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

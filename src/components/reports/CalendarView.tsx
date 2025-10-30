@@ -24,6 +24,31 @@ const getScoreColor = (score: number) => {
   return 'bg-red-500';
 };
 
+const getScoreStyle = (score: number) => {
+  if (score >= 85) {
+    return {
+      bg: 'bg-gradient-to-br from-green-100 to-emerald-100',
+      text: 'text-green-700',
+      border: 'border-green-400',
+      ring: 'ring-green-200'
+    };
+  }
+  if (score >= 70) {
+    return {
+      bg: 'bg-gradient-to-br from-yellow-100 to-amber-100',
+      text: 'text-yellow-700',
+      border: 'border-yellow-400',
+      ring: 'ring-yellow-200'
+    };
+  }
+  return {
+    bg: 'bg-gradient-to-br from-red-100 to-rose-100',
+    text: 'text-red-700',
+    border: 'border-red-400',
+    ring: 'ring-red-200'
+  };
+};
+
 export const CalendarView = ({
   currentDate,
   onDateChange,
@@ -101,6 +126,7 @@ export const CalendarView = ({
             const hasInspections = dateData && dateData.count > 0;
             const dayIsToday = isToday(day);
             const dateStr = format(day, 'yyyy-MM-dd');
+            const scoreStyle = hasInspections ? getScoreStyle(dateData.averageScore) : null;
 
             return (
               <button
@@ -108,28 +134,35 @@ export const CalendarView = ({
                 onClick={() => hasInspections && onDateClick(dateStr)}
                 disabled={!hasInspections}
                 className={`
-                  aspect-square p-1 rounded-lg transition-all relative
-                  ${dayIsToday ? 'ring-2 ring-blue-500' : ''}
-                  ${hasInspections 
-                    ? 'hover:bg-gray-50 cursor-pointer active:scale-95' 
+                  aspect-square p-1 rounded-xl transition-all relative flex items-center justify-center
+                  ${dayIsToday && hasInspections ? `ring-2 ${scoreStyle?.ring}` : ''}
+                  ${dayIsToday && !hasInspections ? 'ring-2 ring-blue-500' : ''}
+                  ${hasInspections
+                    ? `${scoreStyle?.bg} border-2 ${scoreStyle?.border} hover:shadow-lg cursor-pointer active:scale-95 transform`
                     : 'cursor-default opacity-40'
                   }
                 `}
               >
-                {/* Date number */}
-                <div className={`
-                  text-sm font-medium
-                  ${dayIsToday ? 'text-blue-600 font-bold' : 'text-gray-700'}
-                `}>
-                  {format(day, 'd')}
-                </div>
-
-                {/* Inspection indicator */}
-                {hasInspections && (
-                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${getScoreColor(dateData.averageScore)}`} />
+                {/* Date number - BOLD & COLORED for inspections */}
+                <div className="flex flex-col items-center justify-center h-full">
+                  <div className={`
+                    ${hasInspections ? 'text-lg font-extrabold' : 'text-sm font-medium'}
+                    ${hasInspections ? scoreStyle?.text : dayIsToday ? 'text-blue-600 font-bold' : 'text-gray-700'}
+                  `}>
+                    {format(day, 'd')}
                   </div>
-                )}
+
+                  {/* Count badge for multiple inspections */}
+                  {hasInspections && dateData.count > 1 && (
+                    <div className={`
+                      text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5
+                      ${scoreStyle?.text} ${scoreStyle?.bg}
+                      border ${scoreStyle?.border}
+                    `}>
+                      {dateData.count}
+                    </div>
+                  )}
+                </div>
               </button>
             );
           })}
