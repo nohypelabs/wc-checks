@@ -7,7 +7,7 @@ import { authStorage } from './lib/authStorage.ts';
 import { registerServiceWorker, initInstallPrompt } from './lib/pwa.ts';
 
 // 🚨 VERSION CHECK: Force hard reload if version changed
-const APP_VERSION = '2.2.0'; // Increment this to force cache clear
+const APP_VERSION = '2.3.0'; // Increment this to force cache clear
 const STORAGE_KEY = 'app_version';
 
 const checkVersionAndClearCache = async () => {
@@ -17,12 +17,28 @@ const checkVersionAndClearCache = async () => {
     console.log(`🔄 Version changed: ${storedVersion} → ${APP_VERSION}`);
     console.log('🗑️ Clearing all caches and forcing reload...');
 
-    // Clear localStorage (except auth)
-    const authData = localStorage.getItem('auth_token');
-    const authUser = localStorage.getItem('auth_user');
+    // ✅ Preserve ALL Supabase auth keys (DON'T DELETE AUTH!)
+    const authKeys = Object.keys(localStorage).filter(key =>
+      key.startsWith('supabase.auth') ||
+      key.startsWith('sb-')
+    );
+    const authBackup = new Map<string, string>();
+    authKeys.forEach(key => {
+      const value = localStorage.getItem(key);
+      if (value) authBackup.set(key, value);
+    });
+
+    console.log(`💾 Backed up ${authBackup.size} auth keys:`, Array.from(authBackup.keys()));
+
+    // Clear localStorage
     localStorage.clear();
-    if (authData) localStorage.setItem('auth_token', authData);
-    if (authUser) localStorage.setItem('auth_user', authUser);
+
+    // ✅ Restore auth keys
+    authBackup.forEach((value, key) => {
+      localStorage.setItem(key, value);
+    });
+
+    console.log('✅ Auth keys restored');
 
     // Clear sessionStorage
     sessionStorage.clear();
