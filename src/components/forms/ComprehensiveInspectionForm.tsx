@@ -441,7 +441,7 @@ const handleSubmit = async () => {
             <div className={genZMode ? 'text-white' : 'text-gray-900'}>
               <h1 className="font-bold text-lg">{location.name}</h1>
               <p className={`text-sm ${genZMode ? 'text-white/80' : 'text-gray-600'}`}>
-                {location.building} • {location.floor} • {location.area}
+                {[location.building, location.floor, location.area].filter(Boolean).join(' • ') || 'Location details'}
               </p>
             </div>
           </div>
@@ -593,7 +593,7 @@ const handleSubmit = async () => {
               onPhotosChange={setGeneralPhotos}
               maxPhotos={5}
               genZMode={genZMode}
-              locationName={`${location.name} - ${location.building}`}
+              locationName={[location.name, location.building, location.floor].filter(Boolean).join(' - ')}
             />
           </div>
         )}
