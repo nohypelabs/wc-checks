@@ -1,7 +1,7 @@
 // src/components/mobile/BottomNavFixed.tsx - Fixed Bottom Navigation
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Calendar, QrCode, BarChart3, User } from 'lucide-react';
+import { Home, Calendar, QrCode, MapPin, User } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ScanModal } from './ScanModal';
 
@@ -34,10 +34,10 @@ const navItems: NavItem[] = [
     isCenter: true
   },
   {
-    id: 'analytics',
-    icon: BarChart3,
-    label: 'Analitik',
-    path: '/analytics'
+    id: 'locations',
+    icon: MapPin,
+    label: 'Lokasi',
+    path: '/locations'
   },
   {
     id: 'profile',
@@ -148,7 +148,7 @@ export const BottomNavMinimal = () => {
     { icon: Home, label: 'Beranda', path: '/' },
     { icon: Calendar, label: 'Riwayat', path: '/history' },
     { icon: QrCode, label: 'Pindai', path: '/scan' },
-    { icon: BarChart3, label: 'Analitik', path: '/analytics' },
+    { icon: MapPin, label: 'Lokasi', path: '/locations' },
     { icon: User, label: 'Profil', path: '/profile' },
   ];
 
@@ -190,7 +190,7 @@ export const BottomNavLivin = () => {
     { icon: Home, label: 'Beranda', path: '/' },
     { icon: Calendar, label: 'Riwayat', path: '/history' },
     { icon: QrCode, label: 'Scan', path: '/scan', isCenter: true },
-    { icon: BarChart3, label: 'Laporan', path: '/analytics' },
+    { icon: MapPin, label: 'Lokasi', path: '/locations' },
     { icon: User, label: 'Profil', path: '/profile' },
   ];
 
