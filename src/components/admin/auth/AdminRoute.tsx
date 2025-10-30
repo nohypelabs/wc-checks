@@ -48,8 +48,9 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
       console.log(`🛡️ Admin access check:`, {
         user: profile?.full_name || user.email,
         userId: user.id,
-        role: userRole?.level,
-        isAdmin: userRole?.level === 'admin' || userRole?.level === 'super_admin',
+        roleName: userRole?.name,
+        roleLevel: userRole?.level,
+        isAdmin: typeof userRole?.level === 'number' && userRole?.level >= 80,
         timestamp: new Date().toISOString()
       });
     }
@@ -72,8 +73,9 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if user is admin or super_admin
-  const isAdmin = userRole?.level === 'admin' || userRole?.level === 'super_admin';
+  // Check if user is admin (level >= 80)
+  // Level 100: System Admin, 90: Super Admin, 80: Admin
+  const isAdmin = typeof userRole?.level === 'number' && userRole?.level >= 80;
 
   // Not authorized - Enhanced with profile info
   if (!isAdmin) {
@@ -92,7 +94,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
                 {profile?.full_name || user.email}
               </p>
               <p className="text-xs text-gray-600">
-                Role: {userRole?.display_name || 'User'}
+                Role: {userRole?.display_name || 'User'} (Level: {userRole?.level || 'N/A'})
               </p>
             </div>
           </div>
