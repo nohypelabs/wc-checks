@@ -47,27 +47,37 @@ export const UserManagement = () => {
       console.log('[UserManagement] Calling getUserRoleLevel...');
       const level = await getUserRoleLevel(user.id);
 <<<<<<< HEAD
+<<<<<<< HEAD
       console.log('[UserManagement] Access check - User level:', level);
 
       if (level < 90) {
         // Not a super_admin or system_admin - redirect
         console.log('[UserManagement] Access denied - level too low');
 =======
+=======
+>>>>>>> b5d221765ad6f2ee2f043a4c902fd23024afa36b
       console.log('[UserManagement] Got level:', level, 'typeof:', typeof level);
 
       if (level < 100) {
         console.log('[UserManagement] Level < 100 - ACCESS DENIED - redirecting to home');
+<<<<<<< HEAD
 >>>>>>> 3d89fb8277757b0de22966b4af12be58b540807c
+=======
+>>>>>>> b5d221765ad6f2ee2f043a4c902fd23024afa36b
         navigate('/');
         return;
       }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       console.log('[UserManagement] Access granted - level', level);
       console.log('[UserManagement] Setting isSuperAdmin = true, checkingAccess = false');
 =======
       console.log('[UserManagement] Level >= 100 - ACCESS GRANTED');
 >>>>>>> 3d89fb8277757b0de22966b4af12be58b540807c
+=======
+      console.log('[UserManagement] Level >= 100 - ACCESS GRANTED');
+>>>>>>> b5d221765ad6f2ee2f043a4c902fd23024afa36b
       setIsSuperAdmin(true);
       setCheckingAccess(false);
       console.log('[UserManagement] State updated: isSuperAdmin=true, checkingAccess=false');
