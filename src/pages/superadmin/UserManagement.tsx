@@ -17,7 +17,7 @@ import { format } from 'date-fns';
 
 export const UserManagement = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth(); // ← ADD loading
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -28,9 +28,15 @@ export const UserManagement = () => {
   const assignRoleMutation = useAssignRole();
   const toggleStatusMutation = useToggleUserStatus();
 
-  // Security check: Only level 90+ (super_admin/system_admin) can access
+  // Security check: Only level 100 (superadmin) can access
   useEffect(() => {
     const checkSuperAdmin = async () => {
+      // Wait for auth to finish loading
+      if (authLoading) {
+        console.log('[UserManagement] Auth still loading, waiting...');
+        return;
+      }
+
       console.log('[UserManagement] Starting access check for user:', user?.id);
 
       if (!user?.id) {
@@ -56,7 +62,7 @@ export const UserManagement = () => {
     };
 
     checkSuperAdmin();
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   // Filter users
   const filteredUsers = users?.filter((u) => {
