@@ -1,8 +1,9 @@
-// src/components/forms/GeneralPhotoUpload.tsx - OPTIMIZED: No GPS, Fast Upload
+// src/components/forms/GeneralPhotoUpload.tsx - OPTIMIZED: Compress first, then watermark
 import { useState, useRef } from 'react';
 import { Camera, X, Clock, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { PhotoWithMetadata } from '../../types/inspection.types';
+import { compressImage } from '../../lib/cloudinary';
 
 interface GeneralPhotoUploadProps {
   photos: PhotoWithMetadata[];
@@ -24,7 +25,7 @@ export const GeneralPhotoUpload = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  // ✅ Handle CAMERA capture (NO GPS - use database location info)
+  // ✅ Handle CAMERA capture - OPTIMIZED: Compress FIRST, then watermark
   const handleCameraCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -33,11 +34,18 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      // ✅ Simple & Fast: No GPS, just use location name from database
-      const watermarkedBlob = await addWatermarkToPhoto(file, {
+      console.log(`📸 Original photo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+
+      // ✅ STEP 1: Compress first (4MB → 500KB)
+      const compressedFile = await compressImage(file);
+      console.log(`🗜️ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+
+      // ✅ STEP 2: Add watermark to compressed file (500KB → 600KB)
+      const watermarkedBlob = await addWatermarkToPhoto(compressedFile, {
         timestamp: new Date().toISOString(),
         locationName,
       });
+      console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
       const watermarkedFile = new File([watermarkedBlob], file.name, { type: 'image/jpeg' });
@@ -78,7 +86,7 @@ export const GeneralPhotoUpload = ({
     }
   };
 
-  // ✅ Handle GALLERY selection (NO GPS - use database location info)
+  // ✅ Handle GALLERY selection - OPTIMIZED: Compress FIRST, then watermark
   const handleGallerySelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -87,11 +95,18 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      // ✅ Simple & Fast: No GPS, just use location name from database
-      const watermarkedBlob = await addWatermarkToPhoto(file, {
+      console.log(`🖼️ Original photo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+
+      // ✅ STEP 1: Compress first (4MB → 500KB)
+      const compressedFile = await compressImage(file);
+      console.log(`🗜️ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+
+      // ✅ STEP 2: Add watermark to compressed file (500KB → 600KB)
+      const watermarkedBlob = await addWatermarkToPhoto(compressedFile, {
         timestamp: new Date().toISOString(),
         locationName,
       });
+      console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
       const watermarkedFile = new File([watermarkedBlob], file.name, { type: 'image/jpeg' });
@@ -302,7 +317,7 @@ export const GeneralPhotoUpload = ({
   );
 };
 
-// ✅ Watermark function - Simple & Fast (no GPS)
+// ✅ Watermark function - OPTIMIZED: Resize + Lower Quality
 const addWatermarkToPhoto = async (
   file: File,
   metadata: {
@@ -319,8 +334,22 @@ const addWatermarkToPhoto = async (
 
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
+
+        // ✅ OPTIMIZATION: Resize to max 1280px (saves ~30-50% file size)
+        const MAX_WIDTH = 1280;
+        const MAX_HEIGHT = 1280;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+          const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+          console.log(`📐 Resized: ${img.width}x${img.height} → ${width}x${height}`);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
 
         const ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -328,12 +357,12 @@ const addWatermarkToPhoto = async (
           return;
         }
 
-        // Draw image
-        ctx.drawImage(img, 0, 0);
+        // Draw image with resize
+        ctx.drawImage(img, 0, 0, width, height);
 
-        // Watermark config
-        const fontSize = Math.max(20, img.width * 0.03);
-        const padding = Math.max(20, img.width * 0.025);
+        // Watermark config (use canvas dimensions, not original img dimensions)
+        const fontSize = Math.max(20, width * 0.03);
+        const padding = Math.max(20, width * 0.025);
 
         const date = format(new Date(metadata.timestamp), 'dd/MM/yyyy');
         const time = format(new Date(metadata.timestamp), 'HH:mm:ss');
@@ -351,13 +380,13 @@ const addWatermarkToPhoto = async (
 
         // Draw watermark box
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.fillRect(padding, img.height - boxHeight - padding, maxWidth + padding * 3, boxHeight);
+        ctx.fillRect(padding, height - boxHeight - padding, maxWidth + padding * 3, boxHeight);
 
         // Draw text
         ctx.fillStyle = '#FFFFFF';
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
         lines.forEach((line, i) => {
-          ctx.fillText(line, padding * 2, img.height - boxHeight - padding + lineHeight * (i + 1));
+          ctx.fillText(line, padding * 2, height - boxHeight - padding + lineHeight * (i + 1));
         });
 
         // Draw branding
@@ -366,10 +395,11 @@ const addWatermarkToPhoto = async (
         const brandText = 'TOILET CHECK ✓';
         const brandWidth = ctx.measureText(brandText).width;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(img.width - brandWidth - padding * 3, padding, brandWidth + padding * 2, lineHeight * 1.8);
+        ctx.fillRect(width - brandWidth - padding * 3, padding, brandWidth + padding * 2, lineHeight * 1.8);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.fillText(brandText, img.width - brandWidth - padding * 2, padding + lineHeight * 1.2);
+        ctx.fillText(brandText, width - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
+        // ✅ OPTIMIZATION: Lower quality to 0.85 (saves ~30% file size, imperceptible quality loss)
         canvas.toBlob(
           (blob) => {
             if (blob) {
@@ -379,7 +409,7 @@ const addWatermarkToPhoto = async (
             }
           },
           'image/jpeg',
-          0.92
+          0.85
         );
       };
 
