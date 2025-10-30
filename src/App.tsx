@@ -12,6 +12,7 @@ import './App.css';
 // EAGER LOAD: Critical pages (login flow)
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { UserManagement } from './pages/superadmin/UserManagement';
 
 // LAZY LOAD: Heavy pages loaded on-demand
 // FIX: Handle named exports by mapping to default
@@ -54,9 +55,10 @@ const AdminDashboard = lazy(() =>
 const QRCodeGenerator = lazy(() =>
   import('./pages/admin/QRCodeGenerator').then(module => ({ default: module.QRCodeGenerator }))
 );
-const UserManagement = lazy(() =>
-  import('./pages/superadmin/UserManagement').then(module => ({ default: module.UserManagement }))
-);
+// TEMPORARY: Comment lazy import, use eager import above for debugging
+// const UserManagement = lazy(() =>
+//   import('./pages/superadmin/UserManagement').then(module => ({ default: module.UserManagement }))
+// );
 const SettingsPage = lazy(() =>
   import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage }))
 );
