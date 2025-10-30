@@ -10,6 +10,7 @@ import {
   Settings,
   HelpCircle,
   Info,
+  BarChart3,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
@@ -42,6 +43,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const menuItems = [
     { icon: MapPin, label: 'Lokasi', path: '/locations', description: 'Daftar semua lokasi' },
     { icon: FileText, label: 'Laporan', path: '/reports', description: 'Riwayat inspeksi' },
+    { icon: BarChart3, label: 'Analitik', path: '/analytics', description: 'Statistik & wawasan' },
     { icon: Settings, label: 'Pengaturan', path: '/settings', description: 'Preferensi aplikasi' },
     { icon: HelpCircle, label: 'Bantuan & FAQ', path: '/help', description: 'Panduan penggunaan' },
     { icon: Info, label: 'Tentang Aplikasi', path: '/about', description: 'Versi & informasi' },
