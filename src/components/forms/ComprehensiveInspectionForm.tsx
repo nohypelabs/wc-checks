@@ -16,6 +16,7 @@ import { RatingSelector } from './RatingSelector';
 import { EnhancedPhotoUpload } from './EnhancedPhotoUpload'; // Per-component photos
 import { GeneralPhotoUpload } from './GeneralPhotoUpload'; // General photos
 import { InspectionSuccessModal } from './InspectionSuccessModal'; // Success modal
+import { InspectionFailedModal } from './InspectionFailedModal'; // Failed modal
 import { useAuth } from '../../hooks/useAuth';
 import { useInspection } from '../../hooks/useInspection';
 import { batchUploadToCloudinary, compressImage } from '../../lib/cloudinary';
@@ -59,10 +60,10 @@ export const ComprehensiveInspectionForm = ({
   const [startTime] = useState(new Date());
   const [currentScore, setCurrentScore] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  // ✅ ADD THIS
+  const [showFailedModal, setShowFailedModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [expandedComponent, setExpandedComponent] = useState<InspectionComponent | null>(
     INSPECTION_COMPONENTS[0].id
-
   );
 
   const { data: location, isLoading: locationLoading } = getLocation(locationId);
@@ -358,10 +359,17 @@ const handleSubmit = async () => {
   } catch (error: any) {
     console.error('❌ Submission error:', error);
     setUploadProgress(null); // Clear progress on error
+
+    // Show detailed error modal instead of simple toast
+    setErrorMessage(error.message || 'Failed to submit inspection');
+    setShowFailedModal(true);
+
+    // Keep toast for quick notification
     toast.error(
       genZMode
-        ? '😢 Gagal submit, coba lagi!'
-        : error.message || 'Failed to submit inspection'
+        ? '😢 Gagal submit!'
+        : 'Submission failed',
+      { duration: 2000 }
     );
   } finally {
     setIsSubmitting(false);
@@ -369,6 +377,13 @@ const handleSubmit = async () => {
   }
 };
 
+  // Retry handler for failed modal
+  const handleRetry = () => {
+    setShowFailedModal(false);
+    setErrorMessage('');
+    // Trigger submit again
+    handleSubmit();
+  };
 
   if (locationLoading) {
     return (
@@ -813,6 +828,14 @@ const handleSubmit = async () => {
         isOpen={showSuccessModal}
         score={currentScore}
         locationName={location.name}
+      />
+
+      {/* Failed Modal for Network/Upload Errors */}
+      <InspectionFailedModal
+        isOpen={showFailedModal}
+        onClose={() => setShowFailedModal(false)}
+        onRetry={handleRetry}
+        errorMessage={errorMessage}
       />
     </div>
   );
