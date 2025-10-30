@@ -23,7 +23,7 @@ export const UserManagement = () => {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
 
-  const { data: users, isLoading: usersLoading, error: usersError } = useUsers();
+  const { data: users, isLoading: usersLoading } = useUsers();
   const { data: roles } = useRoles();
   const assignRoleMutation = useAssignRole();
   const toggleStatusMutation = useToggleUserStatus();
@@ -31,12 +31,7 @@ export const UserManagement = () => {
   // Security check: Only level 90+ (super_admin/system_admin) can access
   useEffect(() => {
     const checkSuperAdmin = async () => {
-<<<<<<< HEAD
-      console.log('[UserManagement] Starting security check...');
-      console.log('[UserManagement] user?.id:', user?.id);
-=======
       console.log('[UserManagement] Starting access check for user:', user?.id);
->>>>>>> 3d89fb8277757b0de22966b4af12be58b540807c
 
       if (!user?.id) {
         console.log('[UserManagement] No user ID - redirecting to login');
@@ -46,38 +41,15 @@ export const UserManagement = () => {
 
       console.log('[UserManagement] Calling getUserRoleLevel...');
       const level = await getUserRoleLevel(user.id);
-<<<<<<< HEAD
-<<<<<<< HEAD
-      console.log('[UserManagement] Access check - User level:', level);
-
-      if (level < 90) {
-        // Not a super_admin or system_admin - redirect
-        console.log('[UserManagement] Access denied - level too low');
-=======
-=======
->>>>>>> b5d221765ad6f2ee2f043a4c902fd23024afa36b
       console.log('[UserManagement] Got level:', level, 'typeof:', typeof level);
 
       if (level < 100) {
         console.log('[UserManagement] Level < 100 - ACCESS DENIED - redirecting to home');
-<<<<<<< HEAD
->>>>>>> 3d89fb8277757b0de22966b4af12be58b540807c
-=======
->>>>>>> b5d221765ad6f2ee2f043a4c902fd23024afa36b
         navigate('/');
         return;
       }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-      console.log('[UserManagement] Access granted - level', level);
-      console.log('[UserManagement] Setting isSuperAdmin = true, checkingAccess = false');
-=======
       console.log('[UserManagement] Level >= 100 - ACCESS GRANTED');
->>>>>>> 3d89fb8277757b0de22966b4af12be58b540807c
-=======
-      console.log('[UserManagement] Level >= 100 - ACCESS GRANTED');
->>>>>>> b5d221765ad6f2ee2f043a4c902fd23024afa36b
       setIsSuperAdmin(true);
       setCheckingAccess(false);
       console.log('[UserManagement] State updated: isSuperAdmin=true, checkingAccess=false');
@@ -85,18 +57,6 @@ export const UserManagement = () => {
 
     checkSuperAdmin();
   }, [user, navigate]);
-
-  // Debug state changes
-  useEffect(() => {
-    console.log('[UserManagement] State update:', {
-      checkingAccess,
-      isSuperAdmin,
-      usersLoading,
-      hasUsers: !!users,
-      userCount: users?.length,
-      usersError: usersError ? 'YES' : 'NO'
-    });
-  }, [checkingAccess, isSuperAdmin, usersLoading, users, usersError]);
 
   // Filter users
   const filteredUsers = users?.filter((u) => {
@@ -139,11 +99,7 @@ export const UserManagement = () => {
   console.log('[UserManagement] Render state:', { checkingAccess, isSuperAdmin });
 
   if (checkingAccess) {
-<<<<<<< HEAD
-    console.log('[UserManagement] Rendering: Checking access screen');
-=======
     console.log('[UserManagement] Showing loading screen - checking access...');
->>>>>>> 3d89fb8277757b0de22966b4af12be58b540807c
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -155,19 +111,11 @@ export const UserManagement = () => {
   }
 
   if (!isSuperAdmin) {
-<<<<<<< HEAD
-    console.log('[UserManagement] Rendering: null (not superadmin, will redirect)');
-    return null; // Will redirect
-  }
-
-  console.log('[UserManagement] Rendering: Main UI');
-=======
     console.log('[UserManagement] Not superadmin - will redirect');
     return null; // Will redirect
   }
 
   console.log('[UserManagement] Rendering main content');
->>>>>>> 3d89fb8277757b0de22966b4af12be58b540807c
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
