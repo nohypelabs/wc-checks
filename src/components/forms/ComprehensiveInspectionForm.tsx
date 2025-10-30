@@ -15,6 +15,7 @@ import {
 import { RatingSelector } from './RatingSelector';
 import { EnhancedPhotoUpload } from './EnhancedPhotoUpload'; // Per-component photos
 import { GeneralPhotoUpload } from './GeneralPhotoUpload'; // General photos
+import { InspectionSuccessModal } from './InspectionSuccessModal'; // Success modal
 import { useAuth } from '../../hooks/useAuth';
 import { useInspection } from '../../hooks/useInspection';
 import { batchUploadToCloudinary, compressImage } from '../../lib/cloudinary';
@@ -57,10 +58,11 @@ export const ComprehensiveInspectionForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startTime] = useState(new Date());
   const [currentScore, setCurrentScore] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   // ✅ ADD THIS
   const [expandedComponent, setExpandedComponent] = useState<InspectionComponent | null>(
     INSPECTION_COMPONENTS[0].id
-    
+
   );
 
   const { data: location, isLoading: locationLoading } = getLocation(locationId);
@@ -342,7 +344,7 @@ const handleSubmit = async () => {
       duration_seconds: durationSeconds,
     });
 
-    // Success
+    // Success - show modal with options
     toast.success(
       genZMode
         ? `🎉 Sukses! Score: ${currentScore}`
@@ -350,12 +352,8 @@ const handleSubmit = async () => {
       { id: toastId, duration: 2000 }
     );
 
-    // Navigate back to dashboard (with cleanup-safe timeout)
-    navigationTimeoutRef.current = setTimeout(() => {
-      if (isMountedRef.current) {
-        navigate('/', { replace: true });
-      }
-    }, 1500);
+    // Show success modal with navigation options
+    setShowSuccessModal(true);
 
   } catch (error: any) {
     console.error('❌ Submission error:', error);
@@ -441,7 +439,7 @@ const handleSubmit = async () => {
             <div className={genZMode ? 'text-white' : 'text-gray-900'}>
               <h1 className="font-bold text-lg">{location.name}</h1>
               <p className={`text-sm ${genZMode ? 'text-white/80' : 'text-gray-600'}`}>
-                {location.building} • {location.floor} • {location.area}
+                {[location.building, location.floor, location.area].filter(Boolean).join(' • ') || 'Location details'}
               </p>
             </div>
           </div>
@@ -593,7 +591,7 @@ const handleSubmit = async () => {
               onPhotosChange={setGeneralPhotos}
               maxPhotos={5}
               genZMode={genZMode}
-              locationName={`${location.name} - ${location.building}`}
+              locationName={[location.name, location.building, location.floor].filter(Boolean).join(' - ')}
             />
           </div>
         )}
@@ -809,6 +807,13 @@ const handleSubmit = async () => {
           </div>
         )}
       </div>
+
+      {/* Success Modal with Navigation Options */}
+      <InspectionSuccessModal
+        isOpen={showSuccessModal}
+        score={currentScore}
+        locationName={location.name}
+      />
     </div>
   );
 };

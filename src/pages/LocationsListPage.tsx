@@ -21,10 +21,11 @@ import {
 interface Location {
   id: string;
   name: string;
-  building: string;
-  floor: string;
-  code: string;
+  building: string | null; // Building name from join
+  floor: string | null;
+  code: string | null;
   is_active: boolean;
+  building_id: string | null;
 }
 
 export const LocationsListPage = () => {
@@ -55,10 +56,18 @@ export const LocationsListPage = () => {
 
       const { data, error } = await supabase
         .from('locations')
-        .select('id, name, building, floor, code, is_active')
+        .select(`
+          id,
+          name,
+          floor,
+          code,
+          is_active,
+          building_id,
+          buildings!building_id (
+            name
+          )
+        `)
         .eq('is_active', true)
-        .order('building', { ascending: true })
-        .order('floor', { ascending: true })
         .order('name', { ascending: true });
 
       console.log('🔵 Database query result', {
@@ -71,7 +80,17 @@ export const LocationsListPage = () => {
         console.error('❌ Database error:', error);
         throw error;
       }
-      return data || [];
+
+      // Transform data to flatten building name
+      return (data || []).map((loc: any) => ({
+        id: loc.id,
+        name: loc.name,
+        floor: loc.floor,
+        code: loc.code,
+        is_active: loc.is_active,
+        building_id: loc.building_id,
+        building: loc.buildings?.name || null,
+      })) as Location[];
     },
     enabled: isReady,
     staleTime: 2 * 60 * 1000, // Cache 2 minutes
@@ -87,16 +106,17 @@ export const LocationsListPage = () => {
   // Filter locations by search query
   const filteredLocations = locations?.filter(loc =>
     loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    loc.building.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    loc.floor.toLowerCase().includes(searchQuery.toLowerCase())
+    (loc.building?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+    (loc.floor?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   ) || [];
 
   // Group by building
   const groupedLocations = filteredLocations.reduce((acc, loc) => {
-    if (!acc[loc.building]) {
-      acc[loc.building] = [];
+    const buildingKey = loc.building || 'No Building';
+    if (!acc[buildingKey]) {
+      acc[buildingKey] = [];
     }
-    acc[loc.building].push(loc);
+    acc[buildingKey].push(loc);
     return acc;
   }, {} as Record<string, Location[]>);
 
@@ -246,7 +266,7 @@ export const LocationsListPage = () => {
                             <div className="flex items-center gap-2 mt-1">
                               <Layers className="w-3 h-3 text-gray-400" />
                               <span className="text-sm text-gray-500">
-                                {location.floor}
+                                {location.floor || 'No floor specified'}
                               </span>
                               {location.code && (
                                 <>

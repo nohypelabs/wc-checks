@@ -1,6 +1,6 @@
-// src/components/forms/GeneralPhotoUpload.tsx - FIXED: Separate Camera & Gallery buttons
+// src/components/forms/GeneralPhotoUpload.tsx - OPTIMIZED: No GPS, Fast Upload
 import { useState, useRef } from 'react';
-import { Camera, X, MapPin, Clock, Loader2, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Camera, X, Clock, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { PhotoWithMetadata } from '../../types/inspection.types';
 
@@ -24,7 +24,7 @@ export const GeneralPhotoUpload = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  // ✅ Handle CAMERA capture (with permissions)
+  // ✅ Handle CAMERA capture (NO GPS - use database location info)
   const handleCameraCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -33,21 +33,9 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      // ✅ Get location (optional, don't block if fails)
-      const location = await getCurrentLocation();
-
-      // Get address (non-blocking)
-      let address: string | undefined = undefined;
-      if (location) {
-        getAddressFromCoords(location.lat, location.lng)
-          .then(addr => { address = addr; })
-          .catch(() => { /* Silent fail */ });
-      }
-
-      // Create watermarked photo
+      // ✅ Simple & Fast: No GPS, just use location name from database
       const watermarkedBlob = await addWatermarkToPhoto(file, {
         timestamp: new Date().toISOString(),
-        location: location ? { ...location, address } : undefined,
         locationName,
       });
 
@@ -58,7 +46,6 @@ export const GeneralPhotoUpload = ({
         file: watermarkedFile,
         preview,
         timestamp: new Date().toISOString(),
-        geolocation: location,
       };
 
       onPhotosChange([...photos, photoMetadata]);
@@ -91,7 +78,7 @@ export const GeneralPhotoUpload = ({
     }
   };
 
-  // ✅ Handle GALLERY selection (NO permissions needed!)
+  // ✅ Handle GALLERY selection (NO GPS - use database location info)
   const handleGallerySelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -100,13 +87,9 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      // ✅ Gallery photos: Skip GPS (old photos, GPS not accurate anyway)
-      // This makes gallery upload MUCH faster (no GPS wait)
-
-      // ✅ Add watermark with timestamp only (no location for gallery)
+      // ✅ Simple & Fast: No GPS, just use location name from database
       const watermarkedBlob = await addWatermarkToPhoto(file, {
         timestamp: new Date().toISOString(),
-        location: undefined, // No GPS for gallery photos
         locationName,
       });
 
@@ -117,7 +100,6 @@ export const GeneralPhotoUpload = ({
         file: watermarkedFile,
         preview,
         timestamp: new Date().toISOString(),
-        geolocation: undefined, // No GPS for gallery photos
       };
 
       onPhotosChange([...photos, photoMetadata]);
@@ -166,14 +148,8 @@ export const GeneralPhotoUpload = ({
                 className="w-full aspect-[4/3] object-cover rounded-xl border-2 border-gray-200"
               />
 
-              {/* Metadata badges */}
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1">
-                {photo.geolocation && (
-                  <div className="bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg flex items-center space-x-1">
-                    <MapPin className="w-3 h-3" />
-                    <span>GPS</span>
-                  </div>
-                )}
+              {/* Metadata badge */}
+              <div className="absolute bottom-2 right-2">
                 <div className="bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg flex items-center space-x-1">
                   <Clock className="w-3 h-3" />
                   <span>{format(new Date(photo.timestamp), 'HH:mm')}</span>
@@ -289,8 +265,8 @@ export const GeneralPhotoUpload = ({
           </p>
           <p className="text-xs text-gray-500">
             {genZMode
-              ? '✨ Watermark otomatis: Tanggal, Jam & Lokasi'
-              : '✨ Auto watermark: Date, Time & Location'
+              ? '✨ Watermark otomatis: Toilet, Building, Lantai, Tanggal & Jam'
+              : '✨ Auto watermark: Toilet, Building, Floor, Date & Time'
             }
           </p>
         </div>
@@ -326,70 +302,11 @@ export const GeneralPhotoUpload = ({
   );
 };
 
-// Helper functions
-const getCurrentLocation = (): Promise<{ lat: number; lng: number } | null> => {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      resolve(null);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.log('Location permission denied or unavailable:', error.message);
-        resolve(null); // ✅ Don't block, just resolve null
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
-  });
-};
-
-const getAddressFromCoords = async (lat: number, lng: number): Promise<string | undefined> => {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`,
-      {
-        headers: { 'User-Agent': 'ToiletCheck/1.0' },
-        signal: controller.signal,
-      }
-    );
-
-    clearTimeout(timeout);
-
-    if (!response.ok) return undefined;
-
-    const data = await response.json();
-    const addr = data.address;
-    return [addr.road, addr.suburb || addr.neighbourhood, addr.city || addr.county]
-      .filter(Boolean)
-      .slice(0, 2)
-      .join(', ');
-  } catch (error: any) {
-    if (error.name !== 'AbortError') {
-      console.log('Address fetch failed:', error.message);
-    }
-    return undefined;
-  }
-};
-
+// ✅ Watermark function - Simple & Fast (no GPS)
 const addWatermarkToPhoto = async (
   file: File,
   metadata: {
     timestamp: string;
-    location?: { lat: number; lng: number; address?: string };
     locationName: string;
   }
 ): Promise<Blob> => {
@@ -421,16 +338,11 @@ const addWatermarkToPhoto = async (
         const date = format(new Date(metadata.timestamp), 'dd/MM/yyyy');
         const time = format(new Date(metadata.timestamp), 'HH:mm:ss');
 
+        // ✅ Simple watermark: Location (from database) + Date + Time
         const lines = [
           `📍 ${metadata.locationName}`,
           `📅 ${date} ⏰ ${time}`,
         ];
-
-        if (metadata.location?.address) {
-          lines.push(`🗺️ ${metadata.location.address}`);
-        } else if (metadata.location) {
-          lines.push(`🧭 ${metadata.location.lat.toFixed(6)}, ${metadata.location.lng.toFixed(6)}`);
-        }
 
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
         const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
