@@ -15,6 +15,7 @@ import {
 import { RatingSelector } from './RatingSelector';
 import { EnhancedPhotoUpload } from './EnhancedPhotoUpload'; // Per-component photos
 import { GeneralPhotoUpload } from './GeneralPhotoUpload'; // General photos
+import { InspectionSuccessModal } from './InspectionSuccessModal'; // Success modal
 import { useAuth } from '../../hooks/useAuth';
 import { useInspection } from '../../hooks/useInspection';
 import { batchUploadToCloudinary, compressImage } from '../../lib/cloudinary';
@@ -57,10 +58,11 @@ export const ComprehensiveInspectionForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startTime] = useState(new Date());
   const [currentScore, setCurrentScore] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   // ✅ ADD THIS
   const [expandedComponent, setExpandedComponent] = useState<InspectionComponent | null>(
     INSPECTION_COMPONENTS[0].id
-    
+
   );
 
   const { data: location, isLoading: locationLoading } = getLocation(locationId);
@@ -342,20 +344,16 @@ const handleSubmit = async () => {
       duration_seconds: durationSeconds,
     });
 
-    // Success - redirect immediately to dashboard
+    // Success - show modal with options
     toast.success(
       genZMode
-        ? `🎉 Sukses! Score: ${currentScore} - Redirect ke dashboard...`
-        : `✅ Inspection saved! Score: ${currentScore} - Redirecting...`,
+        ? `🎉 Sukses! Score: ${currentScore}`
+        : `✅ Inspection saved! Score: ${currentScore}`,
       { id: toastId, duration: 2000 }
     );
 
-    // Navigate to dashboard immediately (no timeout blocking)
-    // User wants to see updated stats and reports
-    // Using small timeout to let toast display briefly
-    setTimeout(() => {
-      navigate('/', { replace: true });
-    }, 500);
+    // Show success modal with navigation options
+    setShowSuccessModal(true);
 
   } catch (error: any) {
     console.error('❌ Submission error:', error);
@@ -809,6 +807,13 @@ const handleSubmit = async () => {
           </div>
         )}
       </div>
+
+      {/* Success Modal with Navigation Options */}
+      <InspectionSuccessModal
+        isOpen={showSuccessModal}
+        score={currentScore}
+        locationName={location.name}
+      />
     </div>
   );
 };
