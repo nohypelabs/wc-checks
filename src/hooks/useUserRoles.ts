@@ -33,8 +33,8 @@ export function useUsers() {
           is_active,
           created_at,
           last_login_at,
-          user_roles (
-            roles (
+          user_roles!user_id (
+            roles!role_id (
               id,
               name,
               level
