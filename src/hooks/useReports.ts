@@ -19,7 +19,16 @@ export interface InspectionReport {
   user: {
     id: string;
     full_name: string;
+    email: string;
+    occupation_id?: string;
   };
+  occupation?: {
+    id: string;
+    display_name: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+  } | null;
   photo_urls: string[];
   notes: string | null;
 }
@@ -78,7 +87,7 @@ export const useMonthlyInspections = (userId: string | undefined, currentDate: D
 
       console.log('📅 Fetching inspections:', { userId, start, end });
 
-      // FIX: Specify exact relationship for users
+      // FIX: Specify exact relationship for users and fetch occupation
       const { data, error } = await supabase
         .from('inspection_records')
         .select(`
@@ -90,7 +99,13 @@ export const useMonthlyInspections = (userId: string | undefined, currentDate: D
           photo_urls,
           notes,
           location:locations!inner(id, name, building, floor),
-          user:users!inspection_records_user_id_fkey(id, full_name)
+          user:users!inspection_records_user_id_fkey(
+            id,
+            full_name,
+            email,
+            occupation_id,
+            occupation:user_occupations(id, display_name, description, color, icon)
+          )
         `)
         .eq('user_id', userId)
         .gte('inspection_date', start)
@@ -118,7 +133,13 @@ export const useMonthlyInspections = (userId: string | undefined, currentDate: D
           overall_status: item.overall_status,
           responses: item.responses,
           location: item.location,
-          user: item.user,
+          user: {
+            id: item.user.id,
+            full_name: item.user.full_name,
+            email: item.user.email,
+            occupation_id: item.user.occupation_id,
+          },
+          occupation: item.user.occupation || null,
           photo_urls: item.photo_urls || [],
           notes: item.notes,
         });
@@ -160,7 +181,7 @@ export const useDateInspections = (userId: string | undefined, date: string) => 
 
       console.log('📅 Fetching inspections for date:', { userId, date });
 
-      // FIX: Specify exact relationship for users
+      // FIX: Specify exact relationship for users and fetch occupation
       const { data, error } = await supabase
         .from('inspection_records')
         .select(`
@@ -172,7 +193,13 @@ export const useDateInspections = (userId: string | undefined, date: string) => 
           photo_urls,
           notes,
           location:locations!inner(id, name, building, floor),
-          user:users!inspection_records_user_id_fkey(id, full_name)
+          user:users!inspection_records_user_id_fkey(
+            id,
+            full_name,
+            email,
+            occupation_id,
+            occupation:user_occupations(id, display_name, description, color, icon)
+          )
         `)
         .eq('user_id', userId)
         .eq('inspection_date', date)
@@ -192,7 +219,13 @@ export const useDateInspections = (userId: string | undefined, date: string) => 
         overall_status: item.overall_status,
         responses: item.responses,
         location: item.location,
-        user: item.user,
+        user: {
+          id: item.user.id,
+          full_name: item.user.full_name,
+          email: item.user.email,
+          occupation_id: item.user.occupation_id,
+        },
+        occupation: item.user.occupation || null,
         photo_urls: item.photo_urls || [],
         notes: item.notes,
       })) as InspectionReport[];
