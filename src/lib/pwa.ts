@@ -42,12 +42,16 @@ export const registerServiceWorker = async (): Promise<void> => {
 
       console.log('✅ Service worker registered:', registration.scope);
 
-      // Check for updates periodically
+      // ⚠️ DISABLED: Periodic update checks
+      // Causes update prompts that break offline mode detection
+      // Updates will happen naturally when user refreshes page
+      /*
       setInterval(() => {
         registration.update();
       }, 60 * 60 * 1000); // Check every hour
+      */
 
-      // Handle service worker updates - FIXED: Prevent infinite reload
+      // Handle service worker updates - AUTO UPDATE (no prompt)
       let refreshing = false;
 
       registration.addEventListener('updatefound', () => {
@@ -55,44 +59,34 @@ export const registerServiceWorker = async (): Promise<void> => {
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🔄 New service worker available');
+              console.log('🔄 New service worker available - AUTO UPDATING...');
 
-              // Check if we already showed update prompt
-              const hasShownPrompt = sessionStorage.getItem('sw-update-prompted');
-              if (hasShownPrompt) {
-                console.log('⚠️ Update prompt already shown, skipping');
-                return;
-              }
+              // ⚠️ DISABLED: No more update prompt
+              // User complained: clicking OK causes offline mode
+              // Root cause: Reload with cached SW content
 
-              // Mark that we showed the prompt
-              sessionStorage.setItem('sw-update-prompted', 'true');
-
-              // Notify user about update (non-blocking)
-              setTimeout(() => {
-                if (confirm('New version available! Reload to update?')) {
-                  sessionStorage.setItem('sw-reload-pending', 'true');
-                  newWorker.postMessage({ type: 'SKIP_WAITING' });
-                }
-              }, 1000);
+              // SOLUTION: Auto-update silently in background
+              // User will get update on next page load naturally
+              console.log('✅ Update will apply on next page load');
             }
           });
         }
       });
 
-      // Reload page when new service worker takes control - FIXED
+      // ⚠️ DISABLED: Auto-reload on controller change
+      // This was causing offline mode issues
+      // Let update happen naturally on next page load
+      /*
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        // Prevent infinite reload loop
         if (refreshing) return;
+        refreshing = true;
 
-        // Check if reload is pending (user accepted update)
-        const reloadPending = sessionStorage.getItem('sw-reload-pending');
-        if (reloadPending) {
-          refreshing = true;
-          sessionStorage.removeItem('sw-reload-pending');
-          sessionStorage.removeItem('sw-update-prompted');
+        // Clear all caches before reload
+        clearAllCaches().then(() => {
           window.location.reload();
-        }
+        });
       });
+      */
 
     } catch (error) {
       console.error('❌ Service worker registration failed:', error);
