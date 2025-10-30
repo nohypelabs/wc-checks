@@ -42,9 +42,14 @@ export const UserManagement = () => {
     console.log('🟢 [UserManagement] useEffect TRIGGERED');
 
     const checkSuperAdmin = async () => {
-      // Wait for auth to finish loading
+      // Wait for auth to finish loading AND user to be loaded
       if (authLoading) {
         console.log('[UserManagement] Auth still loading, waiting...');
+        return;
+      }
+
+      if (!user) {
+        console.log('[UserManagement] User object not loaded yet, waiting...');
         return;
       }
 
@@ -120,15 +125,15 @@ export const UserManagement = () => {
     hasUser: !!user,
   });
 
-  // Wait for auth to finish loading OR access check
-  if (authLoading || checkingAccess) {
-    console.log('⏳ [UserManagement] Showing loading screen - auth or access check in progress');
+  // Wait for auth to finish loading, user to be loaded, OR access check
+  if (authLoading || !user || checkingAccess) {
+    console.log('⏳ [UserManagement] Showing loading screen - waiting for auth/user/access check');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {authLoading ? 'Loading authentication...' : 'Checking access...'}
+            {authLoading ? 'Loading authentication...' : !user ? 'Loading user...' : 'Checking access...'}
           </p>
         </div>
       </div>
