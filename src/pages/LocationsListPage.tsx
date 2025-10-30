@@ -21,9 +21,9 @@ import {
 interface Location {
   id: string;
   name: string;
-  building: string;
-  floor: string;
-  code: string;
+  building: string | null;
+  floor: string | null;
+  code: string | null;
   is_active: boolean;
 }
 
@@ -87,16 +87,17 @@ export const LocationsListPage = () => {
   // Filter locations by search query
   const filteredLocations = locations?.filter(loc =>
     loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    loc.building.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    loc.floor.toLowerCase().includes(searchQuery.toLowerCase())
+    (loc.building?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+    (loc.floor?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   ) || [];
 
   // Group by building
   const groupedLocations = filteredLocations.reduce((acc, loc) => {
-    if (!acc[loc.building]) {
-      acc[loc.building] = [];
+    const buildingKey = loc.building || 'No Building';
+    if (!acc[buildingKey]) {
+      acc[buildingKey] = [];
     }
-    acc[loc.building].push(loc);
+    acc[buildingKey].push(loc);
     return acc;
   }, {} as Record<string, Location[]>);
 
@@ -246,7 +247,7 @@ export const LocationsListPage = () => {
                             <div className="flex items-center gap-2 mt-1">
                               <Layers className="w-3 h-3 text-gray-400" />
                               <span className="text-sm text-gray-500">
-                                {location.floor}
+                                {location.floor || 'No floor specified'}
                               </span>
                               {location.code && (
                                 <>
