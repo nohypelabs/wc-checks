@@ -87,10 +87,21 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
 
   // Check if user is admin (level >= 80)
   // Level 100: System Admin, 90: Super Admin, 80: Admin
+  console.log('[AdminRoute] BEFORE isAdmin check:', {
+    userRole,
+    'userRole?.level': userRole?.level,
+    'typeof level': typeof userRole?.level,
+    'level >= 80': userRole?.level >= 80,
+  });
+
   const isAdmin = typeof userRole?.level === 'number' && userRole?.level >= 80;
+
+  console.log('[AdminRoute] isAdmin result:', isAdmin);
 
   // Not authorized - Enhanced with profile info
   if (!isAdmin) {
+    console.log('[AdminRoute] ACCESS DENIED - Showing error page');
+    console.log('[AdminRoute] userRole at denial:', JSON.stringify(userRole, null, 2));
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
