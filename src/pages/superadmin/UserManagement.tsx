@@ -28,7 +28,7 @@ export const UserManagement = () => {
   const assignRoleMutation = useAssignRole();
   const toggleStatusMutation = useToggleUserStatus();
 
-  // Security check: Only level 100 (superadmin) can access
+  // Security check: Only level 90+ (super_admin/system_admin) can access
   useEffect(() => {
     const checkSuperAdmin = async () => {
       if (!user?.id) {
@@ -37,12 +37,16 @@ export const UserManagement = () => {
       }
 
       const level = await getUserRoleLevel(user.id);
-      if (level < 100) {
-        // Not a superadmin - redirect
+      console.log('[UserManagement] Access check - User level:', level);
+
+      if (level < 90) {
+        // Not a super_admin or system_admin - redirect
+        console.log('[UserManagement] Access denied - level too low');
         navigate('/');
         return;
       }
 
+      console.log('[UserManagement] Access granted - level', level);
       setIsSuperAdmin(true);
       setCheckingAccess(false);
     };
@@ -121,7 +125,7 @@ export const UserManagement = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold">User Management</h1>
-            <p className="text-purple-100 text-sm">Superadmin Only</p>
+            <p className="text-purple-100 text-sm">Level 90+ Required</p>
           </div>
         </div>
 
@@ -281,7 +285,8 @@ export const UserManagement = () => {
               Role Level Guide
             </h4>
             <ul className="text-xs text-blue-800 space-y-1">
-              <li>• <strong>Level 100:</strong> Superadmin (you) - Full control</li>
+              <li>• <strong>Level 100:</strong> System Admin - Full system control</li>
+              <li>• <strong>Level 90:</strong> Super Admin - User management access</li>
               <li>• <strong>Level 80:</strong> Admin - Manage organization</li>
               <li>• <strong>Level 50:</strong> Manager - Supervisory access</li>
               <li>• <strong>Level 10:</strong> Inspector - Basic user</li>

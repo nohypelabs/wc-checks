@@ -121,21 +121,21 @@ export function useAuth(): UseAuthReturn {
       }, 3000);
 
       try {
-        console.log('🔍 Calling supabase.auth.getSession()...');
+        console.log('[useAuth] Calling supabase.auth.getSession()...');
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        console.log('🔍 getSession() returned:', { hasSession: !!session, hasError: !!sessionError });
+        console.log('[useAuth] getSession() returned:', JSON.stringify({ hasSession: !!session, hasError: !!sessionError }));
 
         clearTimeout(timeoutId);
 
         if (!mounted) {
-          console.log('🔍 Component unmounted during auth - completing anyway');
+          console.log('[useAuth] Component unmounted during auth - completing anyway');
           // ✅ FIX: Still set loading to false even if unmounted (React Strict Mode)
           setLoading(false);
           return;
         }
 
         if (sessionError || !session?.user) {
-          console.log('ℹ️ No session');
+          console.log('[useAuth] No session');
           authStorage.clear();
           setUser(null);
           setProfile(null);
@@ -143,7 +143,7 @@ export function useAuth(): UseAuthReturn {
           return;
         }
 
-        console.log('✅ Session found');
+        console.log('[useAuth] Session found');
         authStorage.save(session);
 
         const appUser: AppUser = {

@@ -30,12 +30,12 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { isAdmin } = useIsAdmin();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
-  // Check if user is superadmin (level 100)
+  // Check if user is superadmin (level 90+: super_admin or system_admin)
   useEffect(() => {
     const checkSuperAdmin = async () => {
       if (user?.id) {
         const level = await getUserRoleLevel(user.id);
-        setIsSuperAdmin(level >= 100);
+        setIsSuperAdmin(level >= 90);
       }
     };
     checkSuperAdmin();
