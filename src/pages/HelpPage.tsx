@@ -86,35 +86,39 @@ export const HelpPage = () => {
           <h2 className="font-bold text-gray-900 mb-3">Hubungi Kami</h2>
           <div className="space-y-3">
             <a
-              href="mailto:support@wccheck.com"
+              href="mailto:abdulgofur100persen@gmail.com"
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Mail className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">Email Support</p>
-                <p className="text-xs text-gray-500">support@wccheck.com</p>
+                <p className="text-xs text-gray-500">abdulgofur100persen@gmail.com</p>
               </div>
             </a>
 
             <a
-              href="tel:+6281234567890"
+              href="https://wa.me/6287874415491"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Phone className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">WhatsApp Support</p>
-                <p className="text-xs text-gray-500">+62 812-3456-7890</p>
+                <p className="text-xs text-gray-500">+62 878-7441-5491</p>
               </div>
             </a>
 
             <a
-              href="#"
+              href="https://github.com/agds-alt/wc-checks"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <MessageCircle className="w-5 h-5 text-blue-600" />
               <div>
-                <p className="font-medium text-gray-900">Live Chat</p>
-                <p className="text-xs text-gray-500">Senin - Jumat, 09:00 - 17:00</p>
+                <p className="font-medium text-gray-900">GitHub Repository</p>
+                <p className="text-xs text-gray-500">Report bugs & request features</p>
               </div>
             </a>
           </div>

@@ -1,8 +1,10 @@
 // src/components/reports/InspectionDetailModal.tsx
+import { useState } from 'react';
 import { X, MapPin, Clock, User, Camera, FileText, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
+import { PhotoReviewModal } from './PhotoReviewModal';
 
 interface InspectionDetailModalProps {
   isOpen: boolean;
@@ -89,6 +91,9 @@ export const InspectionDetailModal = ({
   onClose,
   inspection,
 }: InspectionDetailModalProps) => {
+  const [photoReviewOpen, setPhotoReviewOpen] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+
   if (!isOpen || !inspection) return null;
 
   const responses = inspection.responses as any;
@@ -100,6 +105,11 @@ export const InspectionDetailModal = ({
   const inspectionMode = responses?.inspection_mode || 'professional';
 
   const formattedDate = format(new Date(inspection.inspection_date), 'EEEE, MMMM d, yyyy');
+
+  const handlePhotoClick = (index: number) => {
+    setSelectedPhotoIndex(index);
+    setPhotoReviewOpen(true);
+  };
 
   return (
     <>
@@ -151,19 +161,45 @@ export const InspectionDetailModal = ({
           {/* Content */}
           <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-6 space-y-6">
             {/* Metadata */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2 text-gray-600">
-                <Clock className="w-4 h-4" />
-                <div className="text-sm">
+            <div className="space-y-3">
+              {/* Date & Time */}
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                <Clock className="w-5 h-5 text-blue-600" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Tanggal & Waktu Inspeksi</p>
                   <p className="font-medium text-gray-900">{formattedDate}</p>
-                  <p className="text-xs">{inspection.inspection_time}</p>
+                  <p className="text-sm text-gray-600">{inspection.inspection_time}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2 text-gray-600">
-                <User className="w-4 h-4" />
-                <div className="text-sm">
+
+              {/* Inspector Info */}
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                <User className="w-5 h-5 text-blue-600" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Inspector</p>
                   <p className="font-medium text-gray-900">{inspection.user?.full_name}</p>
-                  <p className="text-xs capitalize">{inspectionMode} mode</p>
+                  <p className="text-sm text-gray-600">{inspection.user?.email}</p>
+                  {inspection.occupation && (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      {inspection.occupation.icon && (
+                        <span className="text-base">{inspection.occupation.icon}</span>
+                      )}
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: inspection.occupation.color || '#6b7280' }}
+                      >
+                        {inspection.occupation.display_name}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Inspection Mode */}
+              <div className="flex items-center justify-center">
+                <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-700 font-medium">
+                  <span>Mode: </span>
+                  <span className="capitalize">{inspectionMode}</span>
                 </div>
               </div>
             </div>
@@ -257,23 +293,27 @@ export const InspectionDetailModal = ({
               <div>
                 <h3 className="font-bold text-gray-900 mb-3 flex items-center space-x-2">
                   <Camera className="w-5 h-5" />
-                  <span>Photos ({inspection.photo_urls.length})</span>
+                  <span>Foto Dokumentasi ({inspection.photo_urls.length})</span>
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 place-items-center">
                   {inspection.photo_urls.map((url, idx) => (
-                    <a
+                    <button
                       key={idx}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="aspect-square rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
+                      onClick={() => handlePhotoClick(idx)}
+                      className="w-full aspect-square rounded-xl overflow-hidden hover:opacity-80 hover:scale-105 transition-all shadow-md hover:shadow-xl cursor-pointer group relative"
                     >
                       <img
                         src={url}
-                        alt={`Photo ${idx + 1}`}
+                        alt={`Foto ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
-                    </a>
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Camera className="w-8 h-8 text-white drop-shadow-lg" />
+                        </div>
+                      </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -294,6 +334,14 @@ export const InspectionDetailModal = ({
           </div>
         </div>
       </div>
+
+      {/* Photo Review Modal */}
+      <PhotoReviewModal
+        isOpen={photoReviewOpen}
+        onClose={() => setPhotoReviewOpen(false)}
+        photos={inspection.photo_urls || []}
+        initialIndex={selectedPhotoIndex}
+      />
     </>
   );
 };

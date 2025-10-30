@@ -106,7 +106,7 @@ export const AboutPage = () => {
           <h3 className="font-bold text-gray-900 mb-3">Tautan</h3>
           <div className="space-y-3">
             <a
-              href="https://wccheck.com"
+              href="https://wc-checks.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
@@ -114,23 +114,23 @@ export const AboutPage = () => {
               <Globe className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">Website</p>
-                <p className="text-xs text-gray-500">wccheck.com</p>
+                <p className="text-xs text-gray-500">wc-checks.vercel.app</p>
               </div>
             </a>
 
             <a
-              href="mailto:info@wccheck.com"
+              href="mailto:abdulgofur100persen@gmail.com"
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Mail className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">Email</p>
-                <p className="text-xs text-gray-500">info@wccheck.com</p>
+                <p className="text-xs text-gray-500">abdulgofur100persen@gmail.com</p>
               </div>
             </a>
 
             <a
-              href="https://github.com/wccheck"
+              href="https://github.com/agds-alt"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
@@ -138,7 +138,7 @@ export const AboutPage = () => {
               <Github className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">GitHub</p>
-                <p className="text-xs text-gray-500">github.com/wccheck</p>
+                <p className="text-xs text-gray-500">github.com/agds-alt</p>
               </div>
             </a>
           </div>
