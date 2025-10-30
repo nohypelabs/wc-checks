@@ -170,10 +170,16 @@ export function useToggleUserStatus() {
 export async function getUserRoleLevel(userId: string): Promise<number> {
   const { data, error } = await supabase
     .from('user_roles')
-    .select('roles (level)')
+    .select('roles!user_roles_role_id_fkey (level)')
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (error || !data) return 0;
-  return (data.roles as any)?.level || 0;
+  if (error || !data) {
+    console.error('❌ getUserRoleLevel error:', error);
+    return 0;
+  }
+
+  const level = (data.roles as any)?.level || 0;
+  console.log('✅ getUserRoleLevel success:', { userId, level });
+  return level;
 }
