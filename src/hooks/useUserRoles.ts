@@ -23,41 +23,42 @@ export function useUsers() {
   return useQuery({
     queryKey: ['users-with-roles'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch all users first
+      const { data: users, error: usersError } = await supabase
         .from('users')
-        .select(`
-          id,
-          email,
-          full_name,
-          phone,
-          is_active,
-          created_at,
-          last_login_at,
-          user_roles!user_id (
-            roles!role_id (
-              id,
-              name,
-              level
-            )
-          )
-        `)
+        .select('id, email, full_name, phone, is_active, created_at, last_login_at')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (usersError) throw usersError;
 
-      // Transform data to flatten role
-      return data.map((user: any) => ({
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        phone: user.phone,
-        is_active: user.is_active,
-        created_at: user.created_at,
-        last_login_at: user.last_login_at,
-        role: user.user_roles && user.user_roles.length > 0
-          ? user.user_roles[0].roles
-          : null,
-      })) as UserWithRole[];
+      // Fetch all user_roles with roles
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select(`
+          user_id,
+          roles!user_roles_role_id_fkey (
+            id,
+            name,
+            level
+          )
+        `);
+
+      if (rolesError) throw rolesError;
+
+      // Combine the data
+      return users.map((user: any) => {
+        const userRole = userRoles?.find((ur: any) => ur.user_id === user.id);
+        return {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          phone: user.phone,
+          is_active: user.is_active,
+          created_at: user.created_at,
+          last_login_at: user.last_login_at,
+          role: userRole?.roles || null,
+        };
+      }) as UserWithRole[];
     },
   });
 }
