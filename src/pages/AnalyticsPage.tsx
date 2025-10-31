@@ -354,7 +354,6 @@ export const AnalyticsPage = () => {
     },
     enabled: !!user?.id,
     retry: 2,
-    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const periodLabels = {

@@ -61,7 +61,6 @@ export const ProfilePage = () => {
       return data;
     },
     enabled: !!profile?.occupation_id,
-    staleTime: 5 * 60 * 1000, // Cache 5 minutes
   });
 
   // Fetch all occupations for dropdown
@@ -81,7 +80,6 @@ export const ProfilePage = () => {
 
       return data;
     },
-    staleTime: 10 * 60 * 1000, // Cache 10 minutes
   });
 
   // Sync form with profile data when profile loads

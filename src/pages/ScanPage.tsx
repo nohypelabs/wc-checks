@@ -56,7 +56,6 @@ export const ScanPage = () => {
       return data;
     },
     enabled: isReady,
-    staleTime: 30 * 1000, // Cache 30 seconds
   });
 
   // Fetch user stats
@@ -83,7 +82,6 @@ export const ScanPage = () => {
       return { total, completed, today };
     },
     enabled: isReady,
-    staleTime: 60 * 1000, // Cache 1 minute
   });
 
   const handleScan = async (locationId: string) => {
