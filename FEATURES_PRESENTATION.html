@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WC Check - Features Overview</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            font-size: 72px;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .tagline {
+            font-size: 20px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        /* Content Section */
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+        }
+        
+        .section-icon {
+            font-size: 40px;
+            animation: rotate 3s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+        }
+        
+        .feature-desc {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .highlight-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .highlight-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .highlight-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #78350f;
+            font-weight: 600;
+        }
+        
+        .highlight-list li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            font-size: 18px;
+        }
+        
+        /* Tech Stack */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .tech-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: transform 0.2s;
+        }
+        
+        .tech-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .feature-card:hover {
+                transform: none;
+            }
+            
+            @page {
+                margin: 0;
+                size: A4;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="logo">🚽</div>
+                <h1>WC Check</h1>
+                <p class="tagline">Professional Toilet Monitoring & Inspection System</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">⚡</div>
+                    <div class="stat-label">Lightning Fast</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">📱</div>
+                    <div class="stat-label">Mobile Ready</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">🔒</div>
+                    <div class="stat-label">Secure & Reliable</div>
+                </div>
+            </div>
+
+            <!-- Core Features -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎯</div>
+                    <h2 class="section-title">Core Features</h2>
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">📱</span>
+                            QR Code Scanner
+                        </div>
+                        <p class="feature-desc">Scan & go! Instant location identification with smart QR technology. Manual selection available as backup.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">📋</span>
+                            Smart Inspection
+                        </div>
+                        <p class="feature-desc">Multi-component assessment with intelligent scoring. Photo evidence upload with Cloudinary integration.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">📊</span>
+                            Live Dashboard
+                        </div>
+                        <p class="feature-desc">Real-time stats, weekly breakdowns, and visual charts. Track everything at a glance!</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">📈</span>
+                            Analytics Pro
+                        </div>
+                        <p class="feature-desc">Advanced trends, performance metrics, and CSV export. Data-driven insights for better decisions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">👥</div>
+                    <h2 class="section-title">Smart User Management</h2>
+                </div>
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">
+                        <span>🔐</span>
+                        Role-Based Access Control
+                    </div>
+                    <ul class="highlight-list">
+                        <li>Admin - Full system access & user management</li>
+                        <li>User - Inspection execution & personal reports</li>
+                        <li>Super Admin - Organization-wide control</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Organization Structure -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🏢</div>
+                    <h2 class="section-title">Multi-Level Organization</h2>
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">🏛️</span>
+                            Organizations
+                        </div>
+                        <p class="feature-desc">Top-level entity management with full hierarchy control.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">🏗️</span>
+                            Buildings
+                        </div>
+                        <p class="feature-desc">Property tracking with type, floors, and address metadata.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">📍</span>
+                            Locations
+                        </div>
+                        <p class="feature-desc">Individual rooms with auto-generated QR codes.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">🎨</span>
+                            QR Generator
+                        </div>
+                        <p class="feature-desc">Bulk generation, printable format, auto-assignment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PWA Features -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">📱</div>
+                    <h2 class="section-title">Progressive Web App</h2>
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">⬇️</span>
+                            Install Anywhere
+                        </div>
+                        <p class="feature-desc">Add to home screen on iOS, Android, Windows, macOS. Native app experience!</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">⚡</span>
+                            Lightning Fast
+                        </div>
+                        <p class="feature-desc">Smart caching (2-3 min), optimized assets, instant navigation. Blazing speed!</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">🌐</span>
+                            Cross-Platform
+                        </div>
+                        <p class="feature-desc">One app, all devices. Responsive design adapts perfectly everywhere.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">
+                            <span class="feature-icon">🎯</span>
+                            Fullscreen Mode
+                        </div>
+                        <p class="feature-desc">Immersive experience without browser UI. Professional & focused.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🔒</div>
+                    <h2 class="section-title">Security & Reliability</h2>
+                </div>
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">
+                        <span>🛡️</span>
+                        Enterprise-Grade Protection
+                    </div>
+                    <ul class="highlight-list">
+                        <li>Secure Supabase Auth with session management</li>
+                        <li>Real-time validation prevents invalid data</li>
+                        <li>Database constraints ensure data integrity</li>
+                        <li>Graceful error handling with auto-retry</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tech Stack -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">💻</div>
+                    <h2 class="section-title">Powered By Modern Tech</h2>
+                </div>
+                
+                <div class="tech-stack">
+                    <div class="tech-badge">⚛️ React</div>
+                    <div class="tech-badge">📘 TypeScript</div>
+                    <div class="tech-badge">🗄️ Supabase</div>
+                    <div class="tech-badge">🎨 Tailwind CSS</div>
+                    <div class="tech-badge">⚡ Vite</div>
+                    <div class="tech-badge">🔄 React Query</div>
+                    <div class="tech-badge">☁️ Cloudinary</div>
+                    <div class="tech-badge">🔐 PostgreSQL</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <p><strong>WC Check v1.0.0</strong> | Professional Toilet Monitoring System</p>
+                <p style="margin-top: 10px; opacity: 0.6;">Built with ❤️ using modern web technologies</p>
+                <p style="margin-top: 5px; opacity: 0.6;">© 2025 WC Check. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
