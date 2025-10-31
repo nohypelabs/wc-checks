@@ -27,7 +27,7 @@ const buildingSchema = z.object({
   short_code: z.string()
     .min(1, 'Short code is required')
     .max(10, 'Short code must be 10 characters or less')
-    .regex(/^[A-Z0-9\-_]+$/, 'Short code must contain only uppercase letters, numbers, hyphens, and underscores')
+    .regex(/^[A-Z0-9_]+$/, 'Short code must contain only uppercase letters, numbers, and underscores (NO hyphens)')
     .transform(val => val.toUpperCase()),
   organization_id: z.string()
     .uuid('Invalid organization selected')
@@ -492,17 +492,23 @@ export const BuildingsManager = () => {
                   value={formData.short_code}
                   onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., BLD01, TOWER-A"
+                  placeholder="e.g., BLD01, TOWERA, GED_1"
                   maxLength={10}
-                  pattern="[A-Z0-9\-_]+"
-                  title="Only uppercase letters, numbers, hyphens (-), and underscores (_) allowed"
+                  pattern="[A-Z0-9_]+"
+                  title="Only uppercase letters, numbers, and underscores (_) allowed. NO hyphens/dashes!"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  ✓ Hanya HURUF BESAR, angka, strip (-), dan underscore (_)
+                <p className="text-xs text-red-500 mt-1 font-semibold">
+                  ⚠️ TIDAK BOLEH pakai strip/hyphen (-) !
                 </p>
                 <p className="text-xs text-gray-500">
-                  ✓ Contoh: <span className="font-mono bg-gray-100 px-1 rounded">BLD01</span>, <span className="font-mono bg-gray-100 px-1 rounded">TOWER-A</span>, <span className="font-mono bg-gray-100 px-1 rounded">GED_1</span>
+                  ✓ Hanya HURUF BESAR, angka, dan underscore (_)
+                </p>
+                <p className="text-xs text-gray-500">
+                  ✓ Contoh: <span className="font-mono bg-gray-100 px-1 rounded">BLD01</span>, <span className="font-mono bg-gray-100 px-1 rounded">TOWERA</span>, <span className="font-mono bg-gray-100 px-1 rounded">GED_1</span>
+                </p>
+                <p className="text-xs text-red-500">
+                  ✗ SALAH: <span className="font-mono bg-red-50 px-1 rounded line-through">GD-01</span>, <span className="font-mono bg-red-50 px-1 rounded line-through">TOWER-A</span>
                 </p>
               </div>
 
