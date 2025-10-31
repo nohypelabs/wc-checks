@@ -155,6 +155,16 @@ export const useInspection = (inspectionId?: string) => {
         photo_count: photo_urls.length
       });
 
+      // Validate photo URLs
+      if (photo_urls.length > 0) {
+        const invalidUrls = photo_urls.filter(url => !url || typeof url !== 'string' || !url.startsWith('http'));
+        if (invalidUrls.length > 0) {
+          console.error('❌ Invalid photo URLs detected:', invalidUrls);
+          throw new Error(`Invalid photo URLs: ${invalidUrls.length} URLs are not valid`);
+        }
+        console.log('✅ All photo URLs validated');
+      }
+
       // Get template ID with timeout protection
       let templateId = 'comprehensive-template';
       try {
@@ -212,6 +222,7 @@ export const useInspection = (inspectionId?: string) => {
       // Calculate payload size
       const jsonPayload = JSON.stringify(inspectionRecord);
       const payloadSizeKB = (new Blob([jsonPayload]).size / 1024).toFixed(2);
+      const payloadSizeMB = (parseFloat(payloadSizeKB) / 1024).toFixed(2);
 
       console.log('💾 [DB] Record data:', {
         location_id,
@@ -219,9 +230,20 @@ export const useInspection = (inspectionId?: string) => {
         photos: photo_urls.length,
         score,
         status: overall_status,
-        payloadSize: `${payloadSizeKB} KB`,
+        payloadSize: `${payloadSizeKB} KB (${payloadSizeMB} MB)`,
         responsesKeys: Object.keys(responses).length
       });
+
+      // Warn if payload is too large (>1MB)
+      if (parseFloat(payloadSizeKB) > 1024) {
+        console.warn(`⚠️ Large payload detected: ${payloadSizeMB}MB. Database save may be slow.`);
+      }
+
+      // Reject if payload is unreasonably large (>5MB)
+      if (parseFloat(payloadSizeKB) > 5120) {
+        console.error(`❌ Payload too large: ${payloadSizeMB}MB. Maximum 5MB allowed.`);
+        throw new Error(`Payload too large: ${payloadSizeMB}MB. Please reduce number of photos or notes length.`);
+      }
 
       logger.info('Saving inspection to database', {
         location_id,
@@ -232,35 +254,69 @@ export const useInspection = (inspectionId?: string) => {
       console.log('💾 [DB] Executing INSERT query...');
       const dbStartTime = Date.now();
 
-      // Add timeout protection for database insert (30s)
-      const dbInsertPromise = supabase
-        .from('inspection_records')
-        .insert(inspectionRecord)
-        .select('id, location_id, overall_status, submitted_at')
-        .single();
+      try {
+        // Add timeout protection for database insert (30s)
+        const dbInsertPromise = supabase
+          .from('inspection_records')
+          .insert(inspectionRecord)
+          .select('id, location_id, overall_status, submitted_at')
+          .single();
 
-      const dbTimeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Database timeout after 30s. Please check your connection and try again.')), 30000)
-      );
+        const dbTimeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => {
+            console.error('❌ [DB] INSERT timeout after 30s');
+            reject(new Error('Database save timed out after 30 seconds. Your internet connection may be slow. Please try again.'));
+          }, 30000)
+        );
 
-      const { data, error } = await Promise.race([dbInsertPromise, dbTimeoutPromise]) as any;
+        const { data, error } = await Promise.race([dbInsertPromise, dbTimeoutPromise]) as any;
 
-      const dbDuration = ((Date.now() - dbStartTime) / 1000).toFixed(2);
-      console.log(`💾 [DB] INSERT completed in ${dbDuration}s`);
+        const dbDuration = ((Date.now() - dbStartTime) / 1000).toFixed(2);
+        console.log(`💾 [DB] INSERT completed in ${dbDuration}s`);
 
-      if (error) {
-        console.error('❌ [DB] INSERT failed:', error);
+        if (error) {
+          console.error('❌ [DB] INSERT failed:', error);
+          console.error('❌ [DB] Error details:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+          });
+          endTimer();
+          logger.error('Failed to submit inspection', error);
+
+          // Provide user-friendly error message
+          let userMessage = 'Failed to save inspection to database.';
+          if (error.message.includes('timeout')) {
+            userMessage = 'Database save timed out. Please check your internet connection and try again.';
+          } else if (error.message.includes('network')) {
+            userMessage = 'Network error. Please check your internet connection and try again.';
+          } else if (error.code === '23505') {
+            userMessage = 'Duplicate entry detected. This inspection may have already been submitted.';
+          } else if (error.code === '23503') {
+            userMessage = 'Invalid reference data. Please contact administrator.';
+          }
+
+          throw new Error(userMessage);
+        }
+
+        console.log('✅ [DB] INSERT successful! Record ID:', data.id);
         endTimer();
-        logger.error('Failed to submit inspection', error);
-        throw new Error(`Failed to submit inspection: ${error.message}`);
+        logger.info('Inspection submitted successfully', { id: data.id });
+
+        return data;
+      } catch (dbError: any) {
+        console.error('❌ [DB] Unexpected error during INSERT:', dbError);
+        endTimer();
+
+        // Re-throw with better message
+        if (dbError.message) {
+          throw dbError; // Already has user-friendly message
+        } else {
+          throw new Error('Unexpected error during database save. Please try again.');
+        }
       }
 
-      console.log('✅ [DB] INSERT successful! Record ID:', data.id);
-
-      endTimer();
-      logger.info('Inspection submitted successfully', { id: data.id });
-      
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inspections'] });
