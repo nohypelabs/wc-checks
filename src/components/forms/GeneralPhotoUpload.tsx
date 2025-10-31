@@ -61,6 +61,13 @@ export const GeneralPhotoUpload = ({
     } catch (error: any) {
       console.error('Error processing camera photo:', error);
 
+      // Show detailed error on screen for mobile debugging
+      const errorMsg = genZMode
+        ? `Gagal proses foto: ${error.message || 'Unknown error'}`
+        : `Photo processing failed: ${error.message || 'Unknown error'}`;
+
+      setPermissionError(errorMsg);
+
       // Fallback: add without watermark
       const preview = URL.createObjectURL(file);
       onPhotosChange([...photos, {
@@ -68,12 +75,6 @@ export const GeneralPhotoUpload = ({
         preview,
         timestamp: new Date().toISOString(),
       }]);
-
-      setPermissionError(
-        genZMode
-          ? 'Foto ditambah tanpa watermark'
-          : 'Photo added without watermark'
-      );
     } finally {
       setIsProcessing(false);
       if (cameraInputRef.current) {
@@ -115,6 +116,13 @@ export const GeneralPhotoUpload = ({
     } catch (error: any) {
       console.error('Error processing gallery photo:', error);
 
+      // Show detailed error on screen for mobile debugging
+      const errorMsg = genZMode
+        ? `Gagal proses foto: ${error.message || 'Unknown error'}`
+        : `Photo processing failed: ${error.message || 'Unknown error'}`;
+
+      setPermissionError(errorMsg);
+
       // Fallback: add without watermark
       const preview = URL.createObjectURL(file);
       onPhotosChange([...photos, {
@@ -122,12 +130,6 @@ export const GeneralPhotoUpload = ({
         preview,
         timestamp: new Date().toISOString(),
       }]);
-
-      setPermissionError(
-        genZMode
-          ? 'Foto ditambah tanpa watermark'
-          : 'Photo added without watermark'
-      );
     } finally {
       setIsProcessing(false);
       if (galleryInputRef.current) {
