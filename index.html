@@ -17,9 +17,19 @@
     <link rel="preconnect" href="https://api.cloudinary.com" crossorigin />
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
 
-    <!-- 🔥 PWA COMPLETELY REMOVED - Pure web app -->
+    <!-- 📱 PWA: INSTALL ONLY (NO SERVICE WORKER, NO OFFLINE MODE) -->
     <meta name="theme-color" content="#2563eb" />
     <meta name="description" content="Professional toilet monitoring and inspection system" />
+
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="WC Check" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Android PWA Support -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
     <div id="root"></div>
