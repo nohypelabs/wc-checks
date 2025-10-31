@@ -607,17 +607,17 @@ export const LocationsManager = () => {
                     <MoreVertical className="w-5 h-5 text-gray-600" />
                   </button>
 
-                  {/* Dropdown Menu */}
+                  {/* Dropdown Menu - FIX: z-index super tinggi biar ga ketutup container lain */}
                   {openMenuId === location.id && (
                     <>
                       {/* Backdrop */}
                       <div
-                        className="fixed inset-0 z-10"
+                        className="fixed inset-0 z-[9998]"
                         onClick={() => setOpenMenuId(null)}
                       />
-                      
+
                       {/* Menu */}
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-20 overflow-hidden">
+                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-[9999] overflow-hidden">
                         <button
                           onClick={() => handleGenerateQR(location)}
                           className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors"
