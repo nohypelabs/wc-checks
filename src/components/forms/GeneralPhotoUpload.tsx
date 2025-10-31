@@ -1,9 +1,8 @@
-// src/components/forms/GeneralPhotoUpload.tsx - OPTIMIZED: Compress first, then watermark
+// src/components/forms/GeneralPhotoUpload.tsx - Direct upload (no client compression)
 import { useState, useRef } from 'react';
 import { Camera, X, Clock, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { PhotoWithMetadata } from '../../types/inspection.types';
-import { compressImage } from '../../lib/cloudinary';
 
 interface GeneralPhotoUploadProps {
   photos: PhotoWithMetadata[];
@@ -25,7 +24,7 @@ export const GeneralPhotoUpload = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  // ✅ Handle CAMERA capture - OPTIMIZED: Compress FIRST, then watermark
+  // ✅ Handle CAMERA capture - Watermark only (compression handled by Cloudinary)
   const handleCameraCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -34,14 +33,11 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      console.log(`📸 Original photo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+      console.log(`📸 Camera photo: ${fileSizeMB}MB (will be optimized by Cloudinary on upload)`);
 
-      // ✅ STEP 1: Compress first (4MB → 500KB)
-      const compressedFile = await compressImage(file);
-      console.log(`🗜️ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
-
-      // ✅ STEP 2: Add watermark to compressed file (500KB → 600KB)
-      const watermarkedBlob = await addWatermarkToPhoto(compressedFile, {
+      // Add watermark to original file (compression happens server-side later)
+      const watermarkedBlob = await addWatermarkToPhoto(file, {
         timestamp: new Date().toISOString(),
         locationName,
       });
@@ -86,7 +82,7 @@ export const GeneralPhotoUpload = ({
     }
   };
 
-  // ✅ Handle GALLERY selection - OPTIMIZED: Compress FIRST, then watermark
+  // ✅ Handle GALLERY selection - Watermark only (compression handled by Cloudinary)
   const handleGallerySelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -95,14 +91,11 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      console.log(`🖼️ Original photo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+      console.log(`🖼️ Gallery photo: ${fileSizeMB}MB (will be optimized by Cloudinary on upload)`);
 
-      // ✅ STEP 1: Compress first (4MB → 500KB)
-      const compressedFile = await compressImage(file);
-      console.log(`🗜️ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
-
-      // ✅ STEP 2: Add watermark to compressed file (500KB → 600KB)
-      const watermarkedBlob = await addWatermarkToPhoto(compressedFile, {
+      // Add watermark to original file (compression happens server-side later)
+      const watermarkedBlob = await addWatermarkToPhoto(file, {
         timestamp: new Date().toISOString(),
         locationName,
       });
