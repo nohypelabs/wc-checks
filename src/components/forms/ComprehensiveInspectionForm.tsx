@@ -69,7 +69,15 @@ export const ComprehensiveInspectionForm = ({
 
   const { data: location, isLoading: locationLoading } = getLocation(locationId);
 
-  
+  // Debug: Log when showSuccessModal changes
+  useEffect(() => {
+    console.log('🔄 showSuccessModal changed:', showSuccessModal);
+  }, [showSuccessModal]);
+
+  // Debug: Log when isSubmitting changes
+  useEffect(() => {
+    console.log('🔄 isSubmitting changed:', isSubmitting);
+  }, [isSubmitting]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -337,6 +345,7 @@ const handleSubmit = async () => {
     };
 
     // ✅ Submit to database with photo URLs (not files!)
+    console.log('📤 Submitting inspection to database...');
     await submitInspection.mutateAsync({
       location_id: locationId,
       user_id: user.id,
@@ -345,6 +354,8 @@ const handleSubmit = async () => {
       notes: generalNotes.trim() || undefined,
       duration_seconds: durationSeconds,
     });
+
+    console.log('✅ Inspection submitted successfully!');
 
     // Success - show modal with options
     toast.success(
@@ -355,6 +366,7 @@ const handleSubmit = async () => {
     );
 
     // Show success modal with navigation options
+    console.log('🎉 Setting showSuccessModal = true');
     setShowSuccessModal(true);
 
   } catch (error: any) {
@@ -839,7 +851,7 @@ const handleSubmit = async () => {
       <InspectionSuccessModal
         isOpen={showSuccessModal}
         score={currentScore}
-        locationName={location.name}
+        locationName={location?.name || 'Location'}
       />
 
       {/* Failed Modal for Network/Upload Errors */}
