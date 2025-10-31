@@ -310,7 +310,43 @@ export const GeneralPhotoUpload = ({
   );
 };
 
-// ✅ Watermark function - OPTIMIZED: Resize + Lower Quality
+// ✅ Helper: Extract EXIF orientation from image file
+const getOrientation = (file: File): Promise<number> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const view = new DataView(e.target?.result as ArrayBuffer);
+      if (view.getUint16(0, false) !== 0xFFD8) {
+        return resolve(1); // Not JPEG, assume normal orientation
+      }
+      const length = view.byteLength;
+      let offset = 2;
+      while (offset < length) {
+        if (view.getUint16(offset + 2, false) <= 8) return resolve(1);
+        const marker = view.getUint16(offset, false);
+        offset += 2;
+        if (marker === 0xFFE1) {
+          const little = view.getUint16(offset + 8, false) === 0x4949;
+          offset += 18;
+          const tags = view.getUint16(offset - 2, little);
+          for (let i = 0; i < tags; i++) {
+            if (view.getUint16(offset + (i * 12), little) === 0x0112) {
+              return resolve(view.getUint16(offset + (i * 12) + 8, little));
+            }
+          }
+        } else if ((marker & 0xFF00) !== 0xFF00) {
+          break;
+        } else {
+          offset += view.getUint16(offset, false);
+        }
+      }
+      return resolve(1);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+// ✅ Watermark function - OPTIMIZED: Resize + Lower Quality + EXIF Fix
 const addWatermarkToPhoto = async (
   file: File,
   metadata: {
@@ -320,6 +356,10 @@ const addWatermarkToPhoto = async (
 ): Promise<Blob> => {
   console.log(`🏷️ [WATERMARK] Starting watermark for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
   const startTime = Date.now();
+
+  // Get EXIF orientation first
+  const orientation = await getOrientation(file);
+  console.log(`🏷️ [WATERMARK] EXIF Orientation: ${orientation}`);
 
   return new Promise((resolve, reject) => {
     // Timeout after 30 seconds
@@ -351,8 +391,15 @@ const addWatermarkToPhoto = async (
           console.log(`📐 Resized: ${img.width}x${img.height} → ${width}x${height}`);
         }
 
-        canvas.width = width;
-        canvas.height = height;
+        // 🔧 Handle EXIF orientation (fix camera photos)
+        // Orientations 5,6,7,8 need width/height swap
+        if (orientation >= 5 && orientation <= 8) {
+          canvas.width = height;
+          canvas.height = width;
+        } else {
+          canvas.width = width;
+          canvas.height = height;
+        }
 
         const ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -360,12 +407,44 @@ const addWatermarkToPhoto = async (
           return;
         }
 
-        // Draw image with resize
+        // Apply EXIF orientation transforms
+        switch (orientation) {
+          case 2: // Flip horizontal
+            ctx.transform(-1, 0, 0, 1, width, 0);
+            break;
+          case 3: // Rotate 180°
+            ctx.transform(-1, 0, 0, -1, width, height);
+            break;
+          case 4: // Flip vertical
+            ctx.transform(1, 0, 0, -1, 0, height);
+            break;
+          case 5: // Rotate 90° + flip horizontal
+            ctx.transform(0, 1, 1, 0, 0, 0);
+            break;
+          case 6: // Rotate 90° clockwise
+            ctx.transform(0, 1, -1, 0, height, 0);
+            break;
+          case 7: // Rotate 270° + flip horizontal
+            ctx.transform(0, -1, -1, 0, height, width);
+            break;
+          case 8: // Rotate 270° clockwise
+            ctx.transform(0, -1, 1, 0, 0, width);
+            break;
+        }
+
+        // Draw image with correct orientation
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Watermark config (use canvas dimensions, not original img dimensions)
-        const fontSize = Math.max(20, width * 0.03);
-        const padding = Math.max(20, width * 0.025);
+        // Reset transformation for watermark (so watermark is always upright)
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Use corrected canvas dimensions for watermark
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        // Watermark config (use actual canvas dimensions after orientation fix)
+        const fontSize = Math.max(20, canvasWidth * 0.03);
+        const padding = Math.max(20, canvasWidth * 0.025);
 
         const date = format(new Date(metadata.timestamp), 'dd/MM/yyyy');
         const time = format(new Date(metadata.timestamp), 'HH:mm:ss');
@@ -381,15 +460,15 @@ const addWatermarkToPhoto = async (
         const lineHeight = fontSize * 1.4;
         const boxHeight = lines.length * lineHeight + padding * 2;
 
-        // Draw watermark box
+        // Draw watermark box (use canvas dimensions)
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.fillRect(padding, height - boxHeight - padding, maxWidth + padding * 3, boxHeight);
+        ctx.fillRect(padding, canvasHeight - boxHeight - padding, maxWidth + padding * 3, boxHeight);
 
         // Draw text
         ctx.fillStyle = '#FFFFFF';
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
         lines.forEach((line, i) => {
-          ctx.fillText(line, padding * 2, height - boxHeight - padding + lineHeight * (i + 1));
+          ctx.fillText(line, padding * 2, canvasHeight - boxHeight - padding + lineHeight * (i + 1));
         });
 
         // Draw branding
@@ -398,9 +477,9 @@ const addWatermarkToPhoto = async (
         const brandText = 'TOILET CHECK ✓';
         const brandWidth = ctx.measureText(brandText).width;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(width - brandWidth - padding * 3, padding, brandWidth + padding * 2, lineHeight * 1.8);
+        ctx.fillRect(canvasWidth - brandWidth - padding * 3, padding, brandWidth + padding * 2, lineHeight * 1.8);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.fillText(brandText, width - brandWidth - padding * 2, padding + lineHeight * 1.2);
+        ctx.fillText(brandText, canvasWidth - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
         // ✅ OPTIMIZATION: Use WebP format (30-40% smaller than JPEG with same quality)
         console.log(`🏷️ [WATERMARK] Converting to blob...`);
