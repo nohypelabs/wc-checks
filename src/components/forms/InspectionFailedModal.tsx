@@ -1,5 +1,5 @@
 // src/components/forms/InspectionFailedModal.tsx
-import { XCircle, RefreshCw, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { XCircle, RefreshCw, ArrowLeft, AlertTriangle, WifiOff } from 'lucide-react';
 
 interface InspectionFailedModalProps {
   isOpen: boolean;

@@ -328,39 +328,97 @@ export const GeneralPhotoUpload = ({
   );
 };
 
-// ✅ Helper: Extract EXIF orientation from image file
+// ✅ Helper: Extract EXIF orientation from image file (SAFE - never fails)
 const getOrientation = (file: File): Promise<number> => {
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const view = new DataView(e.target?.result as ArrayBuffer);
-      if (view.getUint16(0, false) !== 0xFFD8) {
-        return resolve(1); // Not JPEG, assume normal orientation
-      }
-      const length = view.byteLength;
-      let offset = 2;
-      while (offset < length) {
-        if (view.getUint16(offset + 2, false) <= 8) return resolve(1);
-        const marker = view.getUint16(offset, false);
-        offset += 2;
-        if (marker === 0xFFE1) {
-          const little = view.getUint16(offset + 8, false) === 0x4949;
-          offset += 18;
-          const tags = view.getUint16(offset - 2, little);
-          for (let i = 0; i < tags; i++) {
-            if (view.getUint16(offset + (i * 12), little) === 0x0112) {
-              return resolve(view.getUint16(offset + (i * 12) + 8, little));
+    // Timeout protection - default to 1 after 3 seconds
+    const timeoutId = setTimeout(() => {
+      console.log('🏷️ [EXIF] Timeout - using default orientation');
+      resolve(1);
+    }, 3000);
+
+    try {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
+          clearTimeout(timeoutId);
+
+          if (!e.target?.result) {
+            console.log('🏷️ [EXIF] No result - using default orientation');
+            return resolve(1);
+          }
+
+          const view = new DataView(e.target.result as ArrayBuffer);
+
+          // Check if JPEG (starts with 0xFFD8)
+          if (view.getUint16(0, false) !== 0xFFD8) {
+            console.log('🏷️ [EXIF] Not JPEG - using default orientation');
+            return resolve(1);
+          }
+
+          const length = view.byteLength;
+          let offset = 2;
+
+          while (offset < length) {
+            if (view.getUint16(offset + 2, false) <= 8) {
+              console.log('🏷️ [EXIF] Invalid marker size - using default orientation');
+              return resolve(1);
+            }
+
+            const marker = view.getUint16(offset, false);
+            offset += 2;
+
+            if (marker === 0xFFE1) {
+              // EXIF marker found
+              if (offset + 10 > length) return resolve(1);
+
+              const little = view.getUint16(offset + 8, false) === 0x4949;
+              offset += 18;
+
+              if (offset >= length) return resolve(1);
+
+              const tags = view.getUint16(offset - 2, little);
+
+              for (let i = 0; i < tags; i++) {
+                const entryOffset = offset + (i * 12);
+                if (entryOffset + 12 > length) break;
+
+                if (view.getUint16(entryOffset, little) === 0x0112) {
+                  const orientationValue = view.getUint16(entryOffset + 8, little);
+                  console.log(`🏷️ [EXIF] Found orientation: ${orientationValue}`);
+                  return resolve(orientationValue);
+                }
+              }
+            } else if ((marker & 0xFF00) !== 0xFF00) {
+              break;
+            } else {
+              if (offset >= length) break;
+              offset += view.getUint16(offset, false);
             }
           }
-        } else if ((marker & 0xFF00) !== 0xFF00) {
-          break;
-        } else {
-          offset += view.getUint16(offset, false);
+
+          console.log('🏷️ [EXIF] No orientation tag - using default');
+          return resolve(1);
+        } catch (parseError) {
+          clearTimeout(timeoutId);
+          console.warn('🏷️ [EXIF] Parse error - using default orientation:', parseError);
+          resolve(1);
         }
-      }
-      return resolve(1);
-    };
-    reader.readAsArrayBuffer(file);
+      };
+
+      reader.onerror = () => {
+        clearTimeout(timeoutId);
+        console.warn('🏷️ [EXIF] Read error - using default orientation');
+        resolve(1);
+      };
+
+      reader.readAsArrayBuffer(file);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.warn('🏷️ [EXIF] Exception - using default orientation:', error);
+      resolve(1);
+    }
   });
 };
 
@@ -375,9 +433,15 @@ const addWatermarkToPhoto = async (
   console.log(`🏷️ [WATERMARK] Starting watermark for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
   const startTime = Date.now();
 
-  // Get EXIF orientation first
-  const orientation = await getOrientation(file);
-  console.log(`🏷️ [WATERMARK] EXIF Orientation: ${orientation}`);
+  // Get EXIF orientation first (safe - always returns a value)
+  let orientation = 1;
+  try {
+    orientation = await getOrientation(file);
+    console.log(`🏷️ [WATERMARK] EXIF Orientation: ${orientation}`);
+  } catch (error) {
+    console.warn('🏷️ [WATERMARK] Failed to get orientation, using default:', error);
+    orientation = 1;
+  }
 
   return new Promise((resolve, reject) => {
     // Timeout after 30 seconds
@@ -388,73 +452,104 @@ const addWatermarkToPhoto = async (
     const reader = new FileReader();
 
     reader.onload = (e) => {
-      console.log(`🏷️ [WATERMARK] File read complete, creating image...`);
-      const img = new Image();
-      img.src = e.target?.result as string;
+      try {
+        console.log(`🏷️ [WATERMARK] File read complete, creating image...`);
 
-      img.onload = () => {
-        console.log(`🏷️ [WATERMARK] Image loaded: ${img.width}x${img.height}px`);
-        const canvas = document.createElement('canvas');
-
-        // ✅ OPTIMIZATION: Resize to max 1280px (saves ~30-50% file size)
-        const MAX_WIDTH = 1280;
-        const MAX_HEIGHT = 1280;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
-          const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
-          width = Math.floor(width * ratio);
-          height = Math.floor(height * ratio);
-          console.log(`📐 Resized: ${img.width}x${img.height} → ${width}x${height}`);
-        }
-
-        // 🔧 Handle EXIF orientation (fix camera photos)
-        // Orientations 5,6,7,8 need width/height swap
-        if (orientation >= 5 && orientation <= 8) {
-          canvas.width = height;
-          canvas.height = width;
-        } else {
-          canvas.width = width;
-          canvas.height = height;
-        }
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Could not get canvas context'));
+        if (!e.target?.result) {
+          clearTimeout(timeoutId);
+          reject(new Error('Failed to read file'));
           return;
         }
 
-        // Apply EXIF orientation transforms
-        switch (orientation) {
-          case 2: // Flip horizontal
-            ctx.transform(-1, 0, 0, 1, width, 0);
-            break;
-          case 3: // Rotate 180°
-            ctx.transform(-1, 0, 0, -1, width, height);
-            break;
-          case 4: // Flip vertical
-            ctx.transform(1, 0, 0, -1, 0, height);
-            break;
-          case 5: // Rotate 90° + flip horizontal
-            ctx.transform(0, 1, 1, 0, 0, 0);
-            break;
-          case 6: // Rotate 90° clockwise
-            ctx.transform(0, 1, -1, 0, height, 0);
-            break;
-          case 7: // Rotate 270° + flip horizontal
-            ctx.transform(0, -1, -1, 0, height, width);
-            break;
-          case 8: // Rotate 270° clockwise
-            ctx.transform(0, -1, 1, 0, 0, width);
-            break;
-        }
+        const img = new Image();
+        img.src = e.target.result as string;
 
-        // Draw image with correct orientation
-        ctx.drawImage(img, 0, 0, width, height);
+        img.onload = () => {
+          try {
+            console.log(`🏷️ [WATERMARK] Image loaded: ${img.width}x${img.height}px`);
+            const canvas = document.createElement('canvas');
 
-        // Reset transformation for watermark (so watermark is always upright)
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+            // ✅ OPTIMIZATION: Resize to max 1280px (saves ~30-50% file size)
+            const MAX_WIDTH = 1280;
+            const MAX_HEIGHT = 1280;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+              const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+              width = Math.floor(width * ratio);
+              height = Math.floor(height * ratio);
+              console.log(`📐 Resized: ${img.width}x${img.height} → ${width}x${height}`);
+            }
+
+            // Validate dimensions
+            if (width <= 0 || height <= 0 || isNaN(width) || isNaN(height)) {
+              clearTimeout(timeoutId);
+              reject(new Error('Invalid image dimensions'));
+              return;
+            }
+
+            // 🔧 Handle EXIF orientation (fix camera photos)
+            // Orientations 5,6,7,8 need width/height swap
+            try {
+              if (orientation >= 5 && orientation <= 8) {
+                canvas.width = height;
+                canvas.height = width;
+              } else {
+                canvas.width = width;
+                canvas.height = height;
+              }
+            } catch (canvasError) {
+              console.warn('🏷️ [WATERMARK] Canvas sizing error, using default:', canvasError);
+              canvas.width = width;
+              canvas.height = height;
+            }
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              clearTimeout(timeoutId);
+              reject(new Error('Could not get canvas context'));
+              return;
+            }
+
+            // Apply EXIF orientation transforms (wrapped in try-catch)
+            try {
+              switch (orientation) {
+                case 2: // Flip horizontal
+                  ctx.transform(-1, 0, 0, 1, width, 0);
+                  break;
+                case 3: // Rotate 180°
+                  ctx.transform(-1, 0, 0, -1, width, height);
+                  break;
+                case 4: // Flip vertical
+                  ctx.transform(1, 0, 0, -1, 0, height);
+                  break;
+                case 5: // Rotate 90° + flip horizontal
+                  ctx.transform(0, 1, 1, 0, 0, 0);
+                  break;
+                case 6: // Rotate 90° clockwise
+                  ctx.transform(0, 1, -1, 0, height, 0);
+                  break;
+                case 7: // Rotate 270° + flip horizontal
+                  ctx.transform(0, -1, -1, 0, height, width);
+                  break;
+                case 8: // Rotate 270° clockwise
+                  ctx.transform(0, -1, 1, 0, 0, width);
+                  break;
+                default:
+                  // Orientation 1 or invalid - no transform needed
+                  break;
+              }
+            } catch (transformError) {
+              console.warn('🏷️ [WATERMARK] Transform error, continuing with default:', transformError);
+              // Continue without transform
+            }
+
+            // Draw image with correct orientation
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Reset transformation for watermark (so watermark is always upright)
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         // Use corrected canvas dimensions for watermark
         const canvasWidth = canvas.width;
@@ -489,42 +584,52 @@ const addWatermarkToPhoto = async (
           ctx.fillText(line, padding * 2, canvasHeight - boxHeight - padding + lineHeight * (i + 1));
         });
 
-        // Draw branding
-        ctx.font = `bold ${fontSize * 0.9}px Arial, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        const brandText = 'TOILET CHECK ✓';
-        const brandWidth = ctx.measureText(brandText).width;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(canvasWidth - brandWidth - padding * 3, padding, brandWidth + padding * 2, lineHeight * 1.8);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.fillText(brandText, canvasWidth - brandWidth - padding * 2, padding + lineHeight * 1.2);
+            // Draw branding
+            ctx.font = `bold ${fontSize * 0.9}px Arial, sans-serif`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            const brandText = 'TOILET CHECK ✓';
+            const brandWidth = ctx.measureText(brandText).width;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(canvasWidth - brandWidth - padding * 3, padding, brandWidth + padding * 2, lineHeight * 1.8);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.fillText(brandText, canvasWidth - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
-        // ✅ OPTIMIZATION: Use WebP format (strips all EXIF/metadata - clean file)
-        // WebP format automatically removes ALL metadata (GPS, camera info, etc)
-        // This prevents Cloudinary rejection due to problematic EXIF data
-        console.log(`🏷️ [WATERMARK] Converting to clean WebP (strips metadata)...`);
-        canvas.toBlob(
-          (blob) => {
+            // ✅ OPTIMIZATION: Use WebP format (strips all EXIF/metadata - clean file)
+            // WebP format automatically removes ALL metadata (GPS, camera info, etc)
+            // This prevents Cloudinary rejection due to problematic EXIF data
+            console.log(`🏷️ [WATERMARK] Converting to clean WebP (strips metadata)...`);
+            canvas.toBlob(
+              (blob) => {
+                clearTimeout(timeoutId);
+                if (blob) {
+                  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+                  const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
+                  console.log(`✅ [WATERMARK] Complete in ${elapsed}s (${sizeMB}MB, metadata stripped)`);
+                  resolve(blob);
+                } else {
+                  reject(new Error('Failed to create watermarked photo'));
+                }
+              },
+              'image/webp',
+              0.85 // Good quality, but strips ALL metadata
+            );
+          } catch (canvasProcessError) {
             clearTimeout(timeoutId);
-            if (blob) {
-              const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-              const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
-              console.log(`✅ [WATERMARK] Complete in ${elapsed}s (${sizeMB}MB, metadata stripped)`);
-              resolve(blob);
-            } else {
-              reject(new Error('Failed to create watermarked photo'));
-            }
-          },
-          'image/webp',
-          0.85 // Good quality, but strips ALL metadata
-        );
-      };
+            console.error('❌ [WATERMARK] Canvas processing error:', canvasProcessError);
+            reject(canvasProcessError);
+          }
+        };
 
-      img.onerror = () => {
+        img.onerror = () => {
+          clearTimeout(timeoutId);
+          console.error('❌ [WATERMARK] Failed to load image');
+          reject(new Error('Failed to load image'));
+        };
+      } catch (readerError) {
         clearTimeout(timeoutId);
-        console.error('❌ [WATERMARK] Failed to load image');
-        reject(new Error('Failed to load image'));
-      };
+        console.error('❌ [WATERMARK] Reader error:', readerError);
+        reject(readerError);
+      }
     };
 
     reader.onerror = () => {
