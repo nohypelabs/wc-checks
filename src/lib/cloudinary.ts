@@ -29,10 +29,11 @@ validateCloudinaryConfig();
  */
 export const compressImage = async (file: File): Promise<File> => {
   const options = {
-    maxSizeMB: 0.5, // Max 500KB
-    maxWidthOrHeight: 1920, // Max dimension
+    maxSizeMB: 0.4, // Max 400KB (reduced for faster upload)
+    maxWidthOrHeight: 1280, // Max dimension (1280px is enough for inspections)
     useWebWorker: true,
-    fileType: 'image/webp' // Convert to WebP
+    fileType: 'image/webp', // Convert to WebP
+    initialQuality: 0.8 // Start with 80% quality for faster compression
   };
   
   try {
@@ -105,7 +106,7 @@ export const batchUploadToCloudinary = async (
   files: File[],
   onProgress?: (current: number, total: number) => void
 ): Promise<string[]> => {
-  const CONCURRENT_UPLOADS = 2; // ✅ Upload 2 at a time (reduced for mobile stability)
+  const CONCURRENT_UPLOADS = 3; // ⚡ Upload 3 at a time for faster processing
   const results: string[] = [];
   const failedFiles: Array<{ fileName: string; error: string }> = [];
   let completed = 0;
