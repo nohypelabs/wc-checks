@@ -182,18 +182,13 @@ export const Dashboard = () => {
             </button>
             <div className="flex items-center gap-2">
               <img
-                src="/logo.svg"
+                src="/logo.png"
                 alt="WC Check"
                 className="h-8 w-auto"
                 onError={(e) => {
-                  // Fallback to PNG if SVG fails
+                  // If logo fails to load, hide it (text will remain)
                   const img = e.target as HTMLImageElement;
-                  if (img.src.endsWith('.svg')) {
-                    img.src = '/logo.png';
-                  } else {
-                    // If both fail, just hide the image (text will remain)
-                    img.style.display = 'none';
-                  }
+                  img.style.display = 'none';
                 }}
               />
               <div>
