@@ -20,7 +20,7 @@ import { InspectionSuccessModal } from './InspectionSuccessModal'; // Success mo
 import { InspectionFailedModal } from './InspectionFailedModal'; // Failed modal
 import { useAuth } from '../../hooks/useAuth';
 import { useInspection } from '../../hooks/useInspection';
-import { batchUploadToCloudinary, compressImage } from '../../lib/cloudinary';
+import { batchUploadToCloudinary } from '../../lib/cloudinary';
 
 interface ComprehensiveInspectionFormProps {
   locationId: string;
@@ -255,14 +255,16 @@ const handleSubmit = async () => {
       return;
     }
 
-    console.log('📸 [SUBMIT] Total photos to process:', totalPhotos);
+    console.log('📸 [SUBMIT] Total photos to upload:', totalPhotos);
 
-    // Step 1: Compress photos
-    console.log('🗜️ [SUBMIT] Starting compression...');
+    // 🔥 NO COMPRESSION - Direct upload to Cloudinary
+    // Cloudinary will optimize on their servers (faster & saves battery)
+    console.log('☁️ [SUBMIT] Starting direct upload to Cloudinary (server will optimize)...');
+
     const toastId = toast.loading(
       genZMode
-        ? `🗜️ Kompres ${totalPhotos} foto...`
-        : `🗜️ Compressing ${totalPhotos} photos...`
+        ? `☁️ Upload ${totalPhotos} foto...`
+        : `☁️ Uploading ${totalPhotos} photos...`
     );
 
     setUploadProgress({
@@ -271,41 +273,12 @@ const handleSubmit = async () => {
       percentage: 0
     });
 
-    const compressedPhotos: File[] = [];
-    for (let i = 0; i < allPhotos.length; i++) {
-      console.log(`🗜️ [SUBMIT] Compressing photo ${i + 1}/${totalPhotos}...`);
-      const compressed = await compressImage(allPhotos[i]);
-      compressedPhotos.push(compressed);
-
-      // Update compression progress (check mounted)
-      if (isMountedRef.current) {
-        const compressPercent = Math.round(((i + 1) / totalPhotos) * 50); // 0-50%
-        setUploadProgress({
-          current: i + 1,
-          total: totalPhotos,
-          percentage: compressPercent
-        });
-      }
-    }
-
-    console.log(`✅ [SUBMIT] Compressed ${compressedPhotos.length} photos`);
-
-    // Step 2: Upload compressed photos
-    console.log('☁️ [SUBMIT] Starting upload to Cloudinary...');
-    toast.loading(
-      genZMode
-        ? `☁️ Upload ${totalPhotos} foto...`
-        : `☁️ Uploading ${totalPhotos} photos...`,
-      { id: toastId }
-    );
-
-    console.log('☁️ [SUBMIT] Calling batchUploadToCloudinary...');
     const uploadedUrls = await batchUploadToCloudinary(
-      compressedPhotos,
+      allPhotos, // Upload original photos directly (no compression)
       (current: number, total: number) => {
         // Only update state if component is still mounted
         if (isMountedRef.current) {
-          const uploadPercent = 50 + Math.round((current / total) * 50); // 50-100%
+          const uploadPercent = Math.round((current / total) * 100); // 0-100%
           setUploadProgress({
             current: current,
             total: total,

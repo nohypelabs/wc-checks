@@ -1,5 +1,5 @@
-// src/lib/cloudinary.ts
-import imageCompression from 'browser-image-compression';
+// src/lib/cloudinary.ts - DIRECT UPLOAD with Server-Side Transformations
+// No client-side compression - Cloudinary handles optimization on their servers
 
 // Environment variables for Cloudinary
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -25,33 +25,20 @@ const validateCloudinaryConfig = (): void => {
 validateCloudinaryConfig();
 
 /**
- * Compress image before upload
+ * 🔥 REMOVED CLIENT-SIDE COMPRESSION
+ *
+ * Why? Server-side transformation is faster and more efficient:
+ * - No compression delay on client (instant upload start)
+ * - Cloudinary servers are more powerful than mobile devices
+ * - Saves battery and CPU on mobile devices
+ * - Original quality preserved in Cloudinary storage
+ *
+ * Cloudinary automatically optimizes images on upload with the preset configuration.
  */
-export const compressImage = async (file: File): Promise<File> => {
-  const options = {
-    maxSizeMB: 0.4, // Max 400KB (reduced for faster upload)
-    maxWidthOrHeight: 1280, // Max dimension (1280px is enough for inspections)
-    useWebWorker: true,
-    fileType: 'image/webp', // Convert to WebP
-    initialQuality: 0.8 // Start with 80% quality for faster compression
-  };
-  
-  try {
-    const compressedFile = await imageCompression(file, options);
-    console.log(`✅ Compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
-    return compressedFile;
-  } catch (error) {
-    console.error('Compression error:', error);
-    return file; // Fallback to original
-  }
-};
-
-
-// src/lib/cloudinary.ts - FIXED WITH BATCH UPLOAD
 
 /**
- * Upload single file to Cloudinary - MOBILE OPTIMIZED
- * Includes timeout for slow mobile networks
+ * Upload file directly to Cloudinary - Server-side transformation
+ * Cloudinary automatically optimizes on their servers (faster than client-side)
  */
 export const uploadToCloudinary = async (file: File): Promise<string> => {
   const formData = new FormData();
@@ -59,12 +46,24 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
   formData.append('folder', CLOUDINARY_FOLDER);
 
-  try {
-    // Mobile-friendly timeout: 60 seconds for slow 3G/4G
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+  // Add transformation parameters (server-side optimization)
+  // These apply during upload - Cloudinary processes on their servers
+  formData.append('transformation', JSON.stringify({
+    width: 1080,
+    height: 1080,
+    crop: 'limit', // Don't upscale, only downscale if needed
+    quality: 'auto:good', // Cloudinary auto-optimizes quality
+    fetch_format: 'auto', // Cloudinary picks best format (WebP/JPEG)
+  }));
 
-    console.log(`📤 Uploading ${file.name} (${(file.size / 1024).toFixed(0)}KB)...`);
+  try {
+    // Mobile-friendly timeout: 90 seconds for large files on slow networks
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout (increased for large files)
+
+    const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+    console.log(`📤 [UPLOAD] Uploading ${file.name} (${fileSizeMB}MB) directly to Cloudinary...`);
+    console.log(`🔄 [UPLOAD] Server will auto-optimize to 1080px, quality:auto, format:auto`);
     const startTime = Date.now();
 
     const response = await fetch(
@@ -79,7 +78,7 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
     clearTimeout(timeoutId);
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-    console.log(`✅ Uploaded ${file.name} in ${elapsed}s`);
+    console.log(`✅ [UPLOAD] Uploaded & optimized ${file.name} in ${elapsed}s`);
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error?.message || 'Upload failed');

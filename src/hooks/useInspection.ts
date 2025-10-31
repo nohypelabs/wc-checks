@@ -155,14 +155,24 @@ export const useInspection = (inspectionId?: string) => {
         photo_count: photo_urls.length
       });
 
-      // Get template ID
+      // Get template ID with timeout protection
       let templateId = 'comprehensive-template';
       try {
-        const templateData = await getDefaultTemplate.refetch();
-        if (templateData.data?.id) {
+        console.log('🔍 Fetching template...');
+        const templatePromise = getDefaultTemplate.refetch();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Template fetch timeout')), 5000)
+        );
+
+        const templateData = await Promise.race([templatePromise, timeoutPromise]) as any;
+        if (templateData?.data?.id) {
           templateId = templateData.data.id;
+          console.log('✅ Template fetched:', templateId);
+        } else {
+          console.log('⚠️ Using fallback template ID');
         }
       } catch (error) {
+        console.warn('⚠️ Template fetch failed, using fallback:', error);
         logger.warn('Using fallback template ID');
       }
 
@@ -197,23 +207,55 @@ export const useInspection = (inspectionId?: string) => {
         verified_by: null,
       };
 
+      console.log('💾 [DB] Preparing to insert into database...');
+
+      // Calculate payload size
+      const jsonPayload = JSON.stringify(inspectionRecord);
+      const payloadSizeKB = (new Blob([jsonPayload]).size / 1024).toFixed(2);
+
+      console.log('💾 [DB] Record data:', {
+        location_id,
+        user_id,
+        photos: photo_urls.length,
+        score,
+        status: overall_status,
+        payloadSize: `${payloadSizeKB} KB`,
+        responsesKeys: Object.keys(responses).length
+      });
+
       logger.info('Saving inspection to database', {
         location_id,
         photos: photo_urls.length,
         score
       });
 
-      const { data, error } = await supabase
+      console.log('💾 [DB] Executing INSERT query...');
+      const dbStartTime = Date.now();
+
+      // Add timeout protection for database insert (30s)
+      const dbInsertPromise = supabase
         .from('inspection_records')
         .insert(inspectionRecord)
         .select('id, location_id, overall_status, submitted_at')
         .single();
 
+      const dbTimeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database timeout after 30s. Please check your connection and try again.')), 30000)
+      );
+
+      const { data, error } = await Promise.race([dbInsertPromise, dbTimeoutPromise]) as any;
+
+      const dbDuration = ((Date.now() - dbStartTime) / 1000).toFixed(2);
+      console.log(`💾 [DB] INSERT completed in ${dbDuration}s`);
+
       if (error) {
+        console.error('❌ [DB] INSERT failed:', error);
         endTimer();
         logger.error('Failed to submit inspection', error);
         throw new Error(`Failed to submit inspection: ${error.message}`);
       }
+
+      console.log('✅ [DB] INSERT successful! Record ID:', data.id);
 
       endTimer();
       logger.info('Inspection submitted successfully', { id: data.id });
