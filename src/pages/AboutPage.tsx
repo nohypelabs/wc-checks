@@ -66,7 +66,7 @@ export const AboutPage = () => {
               'Riwayat inspeksi lengkap',
               'Analytics & reporting',
               'Export data ke CSV',
-              'Offline capability (PWA)',
+              'Real-time data synchronization',
               'Multi-organizasi & multi-lokasi',
               'Role-based access (Admin/User)',
             ].map((feature, index) => (
@@ -95,8 +95,8 @@ export const AboutPage = () => {
               <p className="text-xs text-gray-500">Tailwind CSS</p>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="font-medium text-gray-900">PWA</p>
-              <p className="text-xs text-gray-500">Vite PWA</p>
+              <p className="font-medium text-gray-900">Build Tool</p>
+              <p className="text-xs text-gray-500">Vite</p>
             </div>
           </div>
         </Card>

@@ -477,10 +477,8 @@ export const initializeConnection = async (): Promise<boolean> => {
 // Export a promise that resolves immediately (no auto-test)
 export const connectionReady = Promise.resolve(true);
 
-// Utility function to check if we're likely offline
-export const isLikelyOffline = (): boolean => {
-  return !navigator.onLine;
-};
+// 🔥 REMOVED: isLikelyOffline() function - no offline detection
+// App should fail gracefully with browser native errors instead of custom offline handling
 
 // Export connection constants
 export { MAX_RETRIES, RETRY_DELAY, CONNECTION_TIMEOUT };
