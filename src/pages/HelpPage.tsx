@@ -13,8 +13,8 @@ export const HelpPage = () => {
       answer: 'Tap tombol "Pindai Kode QR" di dashboard, arahkan kamera ke QR code lokasi toilet, dan mulai inspeksi.',
     },
     {
-      question: 'Apakah saya bisa inspeksi tanpa internet?',
-      answer: 'Ya, aplikasi dapat bekerja offline. Data akan otomatis tersinkronisasi saat terhubung internet.',
+      question: 'Apakah aplikasi ini memerlukan internet?',
+      answer: 'Ya, aplikasi memerlukan koneksi internet aktif untuk menyimpan dan mengakses data inspeksi secara real-time.',
     },
     {
       question: 'Bagaimana cara melihat riwayat inspeksi?',
@@ -68,7 +68,7 @@ export const HelpPage = () => {
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start gap-2">
               <span className="text-blue-600 mt-1">•</span>
-              <span>Gunakan mode PWA untuk akses lebih cepat dan offline capability</span>
+              <span>Pastikan koneksi internet stabil untuk pengalaman terbaik</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-600 mt-1">•</span>
