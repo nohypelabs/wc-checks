@@ -148,9 +148,10 @@ export const Dashboard = () => {
       };
     },
     enabled: isAuthReady,
-    // 🔥 REMOVED ALL CACHING - Always fetch fresh data
-    // Problem: Cached data showed "template dashboard" after 10 minutes
-    // Solution: No cache, always fresh from server
+    // ⚡ PERFORMANCE: Cache dashboard stats - rarely changes
+    staleTime: 3 * 60 * 1000, // Cache 3 minutes - stats don't change often
+    gcTime: 10 * 60 * 1000, // Keep 10 minutes - quick navigation back
+    // Still refetch on mount/focus (from global config)
   });
 
   // ✅ Use default empty stats if no data (removed redundant auth check - handled by App.tsx routing)

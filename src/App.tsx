@@ -67,22 +67,22 @@ const AboutPage = lazy(() =>
   import('./pages/AboutPage').then(module => ({ default: module.AboutPage }))
 );
 
-// 🔥 React Query - NO CACHING, pure web app
+// ⚡ React Query - OPTIMIZED for performance + freshness balance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: true, // ✅ Always refetch when window focused
-      refetchOnMount: true, // ✅ Always refetch on component mount
+      refetchOnWindowFocus: true, // ✅ Refetch when user comes back
+      refetchOnMount: true, // ✅ Fresh data on component mount
       refetchOnReconnect: true, // ✅ Refetch when internet reconnects
-      retry: false, // ❌ NO retries - fail fast
-      staleTime: 0, // 🔥 NO CACHING - always fresh data
-      gcTime: 0, // 🔥 NO memory cache - immediate garbage collection
+      retry: 1, // ⚡ Retry once (not infinite, not zero)
+      staleTime: 2 * 60 * 1000, // ⚡ Cache 2 minutes - balance performance & freshness
+      gcTime: 5 * 60 * 1000, // ⚡ Keep in memory 5 minutes - reduce re-fetching
       onError: (error: any) => {
         logger.error('React Query error', error);
       },
     },
     mutations: {
-      retry: 0,
+      retry: 0, // ❌ No retry for mutations
       onError: (error: any) => {
         logger.error('React Query mutation error', error);
       },
