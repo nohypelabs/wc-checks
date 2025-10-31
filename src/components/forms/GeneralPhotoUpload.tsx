@@ -44,7 +44,15 @@ export const GeneralPhotoUpload = ({
       console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
-      const watermarkedFile = new File([watermarkedBlob], file.name.replace(/\.\w+$/, '.webp'), { type: 'image/webp' });
+
+      // Create clean filename (no special chars that might confuse Cloudinary)
+      const cleanFileName = `camera_${Date.now()}.webp`;
+      const watermarkedFile = new File([watermarkedBlob], cleanFileName, {
+        type: 'image/webp',
+        lastModified: Date.now()
+      });
+
+      console.log(`📸 Final camera file: ${cleanFileName} (${(watermarkedFile.size / 1024 / 1024).toFixed(2)}MB, clean WebP)`);
 
       const photoMetadata: PhotoWithMetadata = {
         file: watermarkedFile,
@@ -103,7 +111,15 @@ export const GeneralPhotoUpload = ({
       console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
-      const watermarkedFile = new File([watermarkedBlob], file.name.replace(/\.\w+$/, '.webp'), { type: 'image/webp' });
+
+      // Create clean filename (no special chars that might confuse Cloudinary)
+      const cleanFileName = `gallery_${Date.now()}.webp`;
+      const watermarkedFile = new File([watermarkedBlob], cleanFileName, {
+        type: 'image/webp',
+        lastModified: Date.now()
+      });
+
+      console.log(`🖼️ Final gallery file: ${cleanFileName} (${(watermarkedFile.size / 1024 / 1024).toFixed(2)}MB, clean WebP)`);
 
       const photoMetadata: PhotoWithMetadata = {
         file: watermarkedFile,
@@ -483,22 +499,24 @@ const addWatermarkToPhoto = async (
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
         ctx.fillText(brandText, canvasWidth - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
-        // ✅ OPTIMIZATION: Use WebP format (30-40% smaller than JPEG with same quality)
-        console.log(`🏷️ [WATERMARK] Converting to blob...`);
+        // ✅ OPTIMIZATION: Use WebP format (strips all EXIF/metadata - clean file)
+        // WebP format automatically removes ALL metadata (GPS, camera info, etc)
+        // This prevents Cloudinary rejection due to problematic EXIF data
+        console.log(`🏷️ [WATERMARK] Converting to clean WebP (strips metadata)...`);
         canvas.toBlob(
           (blob) => {
             clearTimeout(timeoutId);
             if (blob) {
               const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
               const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
-              console.log(`✅ [WATERMARK] Complete in ${elapsed}s (${sizeMB}MB)`);
+              console.log(`✅ [WATERMARK] Complete in ${elapsed}s (${sizeMB}MB, metadata stripped)`);
               resolve(blob);
             } else {
               reject(new Error('Failed to create watermarked photo'));
             }
           },
           'image/webp',
-          0.85
+          0.85 // Good quality, but strips ALL metadata
         );
       };
 
