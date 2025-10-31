@@ -24,9 +24,10 @@ const buildingSchema = z.object({
     .min(2, 'Building name must be at least 2 characters')
     .max(255, 'Building name is too long'),
   short_code: z.string()
-    .min(1, 'Short code is required')
+    .trim() // Remove whitespace
+    .min(2, 'Short code must be at least 2 characters')
     .max(10, 'Short code must be 10 characters or less')
-    .regex(/^[A-Z0-9\-_]+$/, 'Short code must contain only uppercase letters, numbers, hyphens, and underscores')
+    .regex(/^[A-Z0-9\-_]+$/, 'Short code must contain only uppercase letters, numbers, hyphens, and underscores (e.g., BLD-01)')
     .transform(val => val.toUpperCase()),
   organization_id: z.string()
     .uuid('Invalid organization selected')
@@ -453,16 +454,23 @@ export const BuildingsManager = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Short Code *
+                  Short Code * <span className="text-xs text-gray-500">(min 2 chars, uppercase only)</span>
                 </label>
                 <input
                   type="text"
                   value={formData.short_code}
-                  onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., BLD01"
+                  onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase().trim() })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono"
+                  placeholder="e.g., BLD-01 or GD01"
+                  pattern="[A-Z0-9\-_]{2,10}"
+                  title="2-10 characters: uppercase letters, numbers, hyphens, underscores only"
+                  minLength={2}
+                  maxLength={10}
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  ✓ Uppercase letters, numbers, hyphens, underscores only
+                </p>
               </div>
 
               <div>
