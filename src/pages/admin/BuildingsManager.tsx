@@ -33,8 +33,16 @@ const buildingSchema = z.object({
     .uuid('Invalid organization selected')
     .min(1, 'Organization is required'),
   type: z.preprocess(
-    (val) => val === '' || val === undefined ? null : val,
-    z.string().max(50, 'Type is too long').nullable()
+    (val) => {
+      console.log('🔍 Type value before preprocessing:', val, typeof val);
+      if (val === '' || val === undefined || val === null) {
+        console.log('  → Converting to null');
+        return null;
+      }
+      console.log('  → Keeping value:', val);
+      return val;
+    },
+    z.enum(['Office', 'Residential', 'Commercial', 'Industrial', 'Mixed Use']).nullable()
   ),
   address: z.preprocess(
     (val) => val === '' || val === undefined ? null : val,
