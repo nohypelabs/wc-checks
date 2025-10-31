@@ -27,7 +27,11 @@ interface UseAuthReturn {
   refreshProfile: () => Promise<void>;
 }
 
-// 🔥 REMOVED manual caching - always fetch fresh
+// ⚡ PERFORMANCE: Cache profile in memory (profile rarely changes)
+let cachedProfile: UserProfile | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 3 * 60 * 1000; // 3 minutes - profile rarely changes
+
 export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<AppUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -35,9 +39,16 @@ export function useAuth(): UseAuthReturn {
   const [error, setError] = useState<string | null>(null);
   const initRef = useRef(false); // ✅ Prevent double init
 
-  // ✅ Always fetch fresh profile (no cache)
+  // ⚡ Fast profile fetch with cache (profile data rarely changes)
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
+      // Check cache first - PERFORMANCE BOOST
+      const now = Date.now();
+      if (cachedProfile && (now - cacheTimestamp) < CACHE_DURATION) {
+        console.log('⚡ Using cached profile (fast!)');
+        return cachedProfile;
+      }
+
       console.log('🔄 Fetching fresh profile...');
 
       const { data, error: profileError } = await supabase
@@ -57,7 +68,11 @@ export function useAuth(): UseAuthReturn {
         return null;
       }
 
-      console.log('✅ Profile loaded');
+      // Update cache - next load will be instant
+      cachedProfile = data;
+      cacheTimestamp = now;
+
+      console.log('✅ Profile loaded & cached');
       return data;
     } catch (err) {
       console.error('❌ Profile fetch failed:', err);
@@ -205,6 +220,8 @@ export function useAuth(): UseAuthReturn {
 
         case 'SIGNED_OUT':
           authStorage.clear();
+          cachedProfile = null; // Clear cache
+          cacheTimestamp = 0;
           setUser(null);
           setProfile(null);
           console.log('🗑️ Signed out');
@@ -222,6 +239,8 @@ export function useAuth(): UseAuthReturn {
     try {
       await supabase.auth.signOut();
       authStorage.clear();
+      cachedProfile = null; // Clear cache
+      cacheTimestamp = 0;
       setUser(null);
       setProfile(null);
       console.log('✅ Signed out');
