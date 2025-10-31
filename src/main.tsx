@@ -1,13 +1,12 @@
-// src/main.tsx
+// src/main.tsx - NO PWA (just a normal web app)
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './App.css'
 import { authStorage } from './lib/authStorage.ts';
-import { registerServiceWorker, initInstallPrompt } from './lib/pwa.ts';
 
 // 🚨 VERSION CHECK: Force hard reload if version changed
-const APP_VERSION = '2.4.0'; // Increment this to force cache clear
+const APP_VERSION = '3.0.0'; // NO MORE PWA! Just normal web app
 const STORAGE_KEY = 'app_version';
 
 const checkVersionAndClearCache = async () => {
@@ -82,27 +81,9 @@ const checkVersionAndClearCache = async () => {
   // Validate storage before rendering app
   authStorage.validateOnStartup();
 
-  // Register PWA service worker - WITH EMERGENCY DISABLE
-  // Add ?disable-sw to URL to disable service worker
-  const urlParams = new URLSearchParams(window.location.search);
-  const disableSW = urlParams.get('disable-sw') === 'true';
-
-  if (disableSW) {
-    console.log('🛑 Service worker disabled via URL parameter');
-    // Unregister all service workers
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        registrations.forEach((registration) => registration.unregister());
-      });
-    }
-    sessionStorage.clear(); // Clear any stuck states
-  } else if (import.meta.env.PROD) {
-    registerServiceWorker();
-    initInstallPrompt();
-    console.log('🚀 PWA features enabled (honest messaging)');
-  } else {
-    console.log('⚠️ PWA features disabled in development mode');
-  }
+  // ❌ NO MORE PWA/SERVICE WORKER!
+  // Just a normal web app that requires internet
+  console.log('🌐 Running as normal web app (no PWA/offline features)');
 
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
