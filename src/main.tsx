@@ -4,31 +4,32 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './App.css'
 import { authStorage } from './lib/authStorage.ts';
-import { registerServiceWorker, initInstallPrompt } from './lib/pwa.ts';
 
 // Validate storage before rendering app
 authStorage.validateOnStartup();
 
-// Register PWA service worker - WITH EMERGENCY DISABLE
-// Add ?disable-sw to URL to disable service worker
-const urlParams = new URLSearchParams(window.location.search);
-const disableSW = urlParams.get('disable-sw') === 'true';
+// 🔥 PWA REMOVED: No service worker, no offline mode, no caching
+// Pure web app - requires internet connection
+console.log('🌐 Running as normal web app (no PWA/offline features)');
 
-if (disableSW) {
-  console.log('🛑 Service worker disabled via URL parameter');
-  // Unregister all service workers
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((registration) => registration.unregister());
+// Clean up any existing service workers from previous versions
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      registration.unregister();
+      console.log('🗑️ Unregistered old service worker');
     });
-  }
-  sessionStorage.clear(); // Clear any stuck states
-} else if (import.meta.env.PROD) {
-  registerServiceWorker();
-  initInstallPrompt();
-  console.log('🚀 PWA features enabled');
-} else {
-  console.log('⚠️ PWA features disabled in development mode');
+  });
+}
+
+// Clear any old caches
+if ('caches' in window) {
+  caches.keys().then((cacheNames) => {
+    cacheNames.forEach((cacheName) => {
+      caches.delete(cacheName);
+      console.log(`🗑️ Deleted cache: ${cacheName}`);
+    });
+  });
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
