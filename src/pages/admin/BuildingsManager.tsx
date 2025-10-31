@@ -42,7 +42,7 @@ const buildingSchema = z.object({
       console.log('  → Keeping value:', val);
       return val;
     },
-    z.enum(['Office', 'Residential', 'Commercial', 'Industrial', 'Mixed Use']).nullable()
+    z.enum(['apartment', 'mall', 'office', 'hospital', 'other']).nullable()
   ),
   address: z.preprocess(
     (val) => val === '' || val === undefined ? null : val,
@@ -522,11 +522,11 @@ export const BuildingsManager = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select type</option>
-                  <option value="Office">Office</option>
-                  <option value="Residential">Residential</option>
-                  <option value="Commercial">Commercial</option>
-                  <option value="Industrial">Industrial</option>
-                  <option value="Mixed Use">Mixed Use</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="mall">Mall</option>
+                  <option value="office">Office</option>
+                  <option value="hospital">Hospital</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
 
