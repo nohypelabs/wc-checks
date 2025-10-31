@@ -453,16 +453,25 @@ export const BuildingsManager = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Short Code *
+                  Short Code * <span className="text-xs text-gray-500">(Max 10 karakter)</span>
                 </label>
                 <input
                   type="text"
                   value={formData.short_code}
                   onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., BLD01"
+                  placeholder="e.g., BLD01, TOWER-A"
+                  maxLength={10}
+                  pattern="[A-Z0-9\-_]+"
+                  title="Only uppercase letters, numbers, hyphens (-), and underscores (_) allowed"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  ✓ Hanya HURUF BESAR, angka, strip (-), dan underscore (_)
+                </p>
+                <p className="text-xs text-gray-500">
+                  ✓ Contoh: <span className="font-mono bg-gray-100 px-1 rounded">BLD01</span>, <span className="font-mono bg-gray-100 px-1 rounded">TOWER-A</span>, <span className="font-mono bg-gray-100 px-1 rounded">GED_1</span>
+                </p>
               </div>
 
               <div>
