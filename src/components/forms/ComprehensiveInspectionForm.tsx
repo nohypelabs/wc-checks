@@ -297,6 +297,20 @@ const handleSubmit = async () => {
 
     console.log(`✅ [SUBMIT] Uploaded ${uploadedUrls.length} photos to Cloudinary`);
 
+    // ⚠️ VALIDATION: Check if photo upload failed
+    if (totalPhotos > 0 && uploadedUrls.length === 0) {
+      console.error('❌ [SUBMIT] All photo uploads failed!');
+      throw new Error(
+        genZMode
+          ? 'Gagal upload foto! Coba lagi atau cek koneksi internet.'
+          : 'Failed to upload photos! Please try again or check your internet connection.'
+      );
+    }
+
+    if (uploadedUrls.length < totalPhotos) {
+      console.warn(`⚠️ [SUBMIT] Only ${uploadedUrls.length}/${totalPhotos} photos uploaded successfully`);
+    }
+
     // Update toast - saving
     console.log('💾 [SUBMIT] Preparing to save to database...');
     toast.loading(

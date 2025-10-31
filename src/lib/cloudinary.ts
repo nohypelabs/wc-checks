@@ -46,18 +46,30 @@ validateCloudinaryConfig();
  * Cloudinary automatically optimizes based on preset configuration.
  */
 export const uploadToCloudinary = async (file: File): Promise<string> => {
+  const fileSizeMB = file.size / 1024 / 1024;
+
+  // Validate file size (warn if > 10MB, reject if > 20MB)
+  if (fileSizeMB > 20) {
+    throw new Error(`File too large: ${fileSizeMB.toFixed(2)}MB. Maximum 20MB allowed.`);
+  }
+
+  if (fileSizeMB > 10) {
+    console.warn(`⚠️ Large file detected: ${fileSizeMB.toFixed(2)}MB. Upload may be slow.`);
+  }
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
   formData.append('folder', CLOUDINARY_FOLDER);
 
   try {
-    // Mobile-friendly timeout: 90 seconds for large files on slow networks
+    // Dynamic timeout based on file size (10s per MB, min 30s, max 180s)
+    const timeoutDuration = Math.max(30000, Math.min(180000, fileSizeMB * 10000));
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout (increased for large files)
+    const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
-    const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
-    console.log(`📤 [UPLOAD] Uploading ${file.name} (${fileSizeMB}MB) directly to Cloudinary...`);
+    console.log(`📤 [UPLOAD] Uploading ${file.name} (${fileSizeMB.toFixed(2)}MB)...`);
+    console.log(`⏱️ [UPLOAD] Timeout: ${(timeoutDuration / 1000).toFixed(0)}s`);
     console.log(`🔄 [UPLOAD] Cloudinary will optimize based on preset configuration`);
     const startTime = Date.now();
 

@@ -318,14 +318,24 @@ const addWatermarkToPhoto = async (
     locationName: string;
   }
 ): Promise<Blob> => {
+  console.log(`🏷️ [WATERMARK] Starting watermark for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+  const startTime = Date.now();
+
   return new Promise((resolve, reject) => {
+    // Timeout after 30 seconds
+    const timeoutId = setTimeout(() => {
+      reject(new Error('Watermark timeout after 30s'));
+    }, 30000);
+
     const reader = new FileReader();
 
     reader.onload = (e) => {
+      console.log(`🏷️ [WATERMARK] File read complete, creating image...`);
       const img = new Image();
       img.src = e.target?.result as string;
 
       img.onload = () => {
+        console.log(`🏷️ [WATERMARK] Image loaded: ${img.width}x${img.height}px`);
         const canvas = document.createElement('canvas');
 
         // ✅ OPTIMIZATION: Resize to max 1280px (saves ~30-50% file size)
@@ -393,9 +403,14 @@ const addWatermarkToPhoto = async (
         ctx.fillText(brandText, width - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
         // ✅ OPTIMIZATION: Use WebP format (30-40% smaller than JPEG with same quality)
+        console.log(`🏷️ [WATERMARK] Converting to blob...`);
         canvas.toBlob(
           (blob) => {
+            clearTimeout(timeoutId);
             if (blob) {
+              const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+              const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
+              console.log(`✅ [WATERMARK] Complete in ${elapsed}s (${sizeMB}MB)`);
               resolve(blob);
             } else {
               reject(new Error('Failed to create watermarked photo'));
@@ -406,10 +421,20 @@ const addWatermarkToPhoto = async (
         );
       };
 
-      img.onerror = () => reject(new Error('Failed to load image'));
+      img.onerror = () => {
+        clearTimeout(timeoutId);
+        console.error('❌ [WATERMARK] Failed to load image');
+        reject(new Error('Failed to load image'));
+      };
     };
 
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onerror = () => {
+      clearTimeout(timeoutId);
+      console.error('❌ [WATERMARK] Failed to read file');
+      reject(new Error('Failed to read file'));
+    };
+
+    console.log(`🏷️ [WATERMARK] Reading file...`);
     reader.readAsDataURL(file);
   });
 };
