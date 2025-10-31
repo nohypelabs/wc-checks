@@ -93,7 +93,6 @@ export const LocationsListPage = () => {
       })) as Location[];
     },
     enabled: isReady,
-    staleTime: 2 * 60 * 1000, // Cache 2 minutes
   });
 
   console.log('🟢 LocationsListPage: Query result', {

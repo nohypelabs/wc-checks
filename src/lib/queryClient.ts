@@ -1,13 +1,18 @@
-// src/lib/queryClient.ts - Centralized React Query configuration
+// src/lib/queryClient.ts - NO CACHING, pure web app
 import { QueryClient } from '@tanstack/react-query';
 import { logger } from './logger';
 
+// 🔥 REMOVED ALL CACHING - This file is DEPRECATED
+// Use QueryClient from App.tsx instead (with NO caching config)
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: true, // Always refetch
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      retry: false, // Fail fast
+      staleTime: 0, // NO cache
+      gcTime: 0, // NO memory
       onError: (error: any) => {
         logger.error('React Query error', error);
       },

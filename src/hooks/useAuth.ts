@@ -27,11 +27,7 @@ interface UseAuthReturn {
   refreshProfile: () => Promise<void>;
 }
 
-// ✅ CACHE profile in memory
-let cachedProfile: UserProfile | null = null;
-let cacheTimestamp = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
+// 🔥 REMOVED manual caching - always fetch fresh
 export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<AppUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -39,16 +35,9 @@ export function useAuth(): UseAuthReturn {
   const [error, setError] = useState<string | null>(null);
   const initRef = useRef(false); // ✅ Prevent double init
 
-  // ✅ Fast profile fetch with cache
+  // ✅ Always fetch fresh profile (no cache)
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
-      // Check cache first
-      const now = Date.now();
-      if (cachedProfile && (now - cacheTimestamp) < CACHE_DURATION) {
-        console.log('✅ Using cached profile');
-        return cachedProfile;
-      }
-
       console.log('🔄 Fetching fresh profile...');
 
       const { data, error: profileError } = await supabase
@@ -56,7 +45,7 @@ export function useAuth(): UseAuthReturn {
         .select('id, email, full_name, is_active, occupation_id')
         .eq('id', userId)
         .eq('is_active', true)
-        .maybeSingle(); // ✅ Use maybeSingle instead of single
+        .maybeSingle();
 
       if (profileError) {
         console.error('❌ Profile fetch error:', profileError);
@@ -67,10 +56,6 @@ export function useAuth(): UseAuthReturn {
         console.warn('⚠️ No profile found');
         return null;
       }
-
-      // Update cache
-      cachedProfile = data;
-      cacheTimestamp = now;
 
       console.log('✅ Profile loaded');
       return data;
@@ -220,8 +205,6 @@ export function useAuth(): UseAuthReturn {
 
         case 'SIGNED_OUT':
           authStorage.clear();
-          cachedProfile = null; // Clear cache
-          cacheTimestamp = 0;
           setUser(null);
           setProfile(null);
           console.log('🗑️ Signed out');
@@ -239,8 +222,6 @@ export function useAuth(): UseAuthReturn {
     try {
       await supabase.auth.signOut();
       authStorage.clear();
-      cachedProfile = null;
-      cacheTimestamp = 0;
       setUser(null);
       setProfile(null);
       console.log('✅ Signed out');

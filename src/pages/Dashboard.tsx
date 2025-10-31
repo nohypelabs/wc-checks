@@ -148,11 +148,9 @@ export const Dashboard = () => {
       };
     },
     enabled: isAuthReady,
-    staleTime: 5 * 60 * 1000, // Cache 5 minutes (was 2 mins)
-    gcTime: 10 * 60 * 1000, // Keep in memory 10 minutes (was 5)
-    refetchOnMount: false, // ⚡ Don't refetch on mount if data is fresh
-    refetchOnWindowFocus: false,
-    retry: false, // ⚡ Fail fast, don't retry
+    // 🔥 REMOVED ALL CACHING - Always fetch fresh data
+    // Problem: Cached data showed "template dashboard" after 10 minutes
+    // Solution: No cache, always fresh from server
   });
 
   // ✅ Use default empty stats if no data (removed redundant auth check - handled by App.tsx routing)
