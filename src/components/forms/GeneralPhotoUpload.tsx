@@ -44,7 +44,15 @@ export const GeneralPhotoUpload = ({
       console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
-      const watermarkedFile = new File([watermarkedBlob], file.name.replace(/\.\w+$/, '.webp'), { type: 'image/webp' });
+
+      // Create clean filename (no special chars that might confuse Cloudinary)
+      const cleanFileName = `camera_${Date.now()}.webp`;
+      const watermarkedFile = new File([watermarkedBlob], cleanFileName, {
+        type: 'image/webp',
+        lastModified: Date.now()
+      });
+
+      console.log(`📸 Final camera file: ${cleanFileName} (${(watermarkedFile.size / 1024 / 1024).toFixed(2)}MB, clean WebP)`);
 
       const photoMetadata: PhotoWithMetadata = {
         file: watermarkedFile,
@@ -103,7 +111,15 @@ export const GeneralPhotoUpload = ({
       console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
       const preview = URL.createObjectURL(watermarkedBlob);
-      const watermarkedFile = new File([watermarkedBlob], file.name.replace(/\.\w+$/, '.webp'), { type: 'image/webp' });
+
+      // Create clean filename (no special chars that might confuse Cloudinary)
+      const cleanFileName = `gallery_${Date.now()}.webp`;
+      const watermarkedFile = new File([watermarkedBlob], cleanFileName, {
+        type: 'image/webp',
+        lastModified: Date.now()
+      });
+
+      console.log(`🖼️ Final gallery file: ${cleanFileName} (${(watermarkedFile.size / 1024 / 1024).toFixed(2)}MB, clean WebP)`);
 
       const photoMetadata: PhotoWithMetadata = {
         file: watermarkedFile,
