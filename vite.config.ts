@@ -1,58 +1,12 @@
-// vite.config.ts - FIXED: Proper env handling
+// vite.config.ts - Pure web app, no PWA
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      // 🎯 PWA MINIMAL MODE: Install-only, NO caching, NO offline mode
-      // Service worker ONLY for PWA installability (Add to Home Screen)
-      // App REQUIRES internet - no false offline mode promises
-      workbox: {
-        // ✅ ZERO PRECACHING: Don't cache ANY files
-        globPatterns: [],
-
-        // ✅ Clear old caches from previous versions
-        cleanupOutdatedCaches: true,
-
-        // ✅ EVERYTHING is NetworkOnly - NO CACHING AT ALL
-        runtimeCaching: [
-          {
-            urlPattern: /.*/,
-            handler: 'NetworkOnly',
-          },
-        ],
-      },
-      // Keep manifest for PWA installability
-      manifest: {
-        name: 'WC Check - Toilet Monitoring System',
-        short_name: 'WC Check',
-        description: 'Professional toilet monitoring and inspection system',
-        theme_color: '#2563eb',
-        background_color: '#ffffff',
-        display: 'standalone',
-        orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
-        icons: [
-          {
-            src: '/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-          {
-            src: '/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-        ],
-      },
-    }),
+    // 🔥 PWA REMOVED: No service worker, no offline mode, no caching
+    // Pure web app - requires internet connection
   ],
 
   build: {
