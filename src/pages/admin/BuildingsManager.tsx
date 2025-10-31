@@ -445,7 +445,7 @@ export const BuildingsManager = () => {
       {/* Form Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <Card className="w-full max-w-lg max-h-[calc(100vh-8rem)] overflow-y-auto">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               {selectedBuilding ? 'Ubah Gedung' : 'Tambah Gedung'}
             </h2>
