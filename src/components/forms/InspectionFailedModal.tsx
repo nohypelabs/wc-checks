@@ -1,5 +1,5 @@
 // src/components/forms/InspectionFailedModal.tsx
-import { XCircle, RefreshCw, ArrowLeft, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
+import { XCircle, RefreshCw, ArrowLeft, AlertTriangle } from 'lucide-react';
 
 interface InspectionFailedModalProps {
   isOpen: boolean;
@@ -150,20 +150,7 @@ export const InspectionFailedModal = ({
               </button>
             </div>
 
-            {/* Network Status Indicator */}
-            <div className="flex items-center justify-center gap-2 pt-2">
-              {navigator.onLine ? (
-                <>
-                  <Wifi className="w-4 h-4 text-green-600" />
-                  <span className="text-xs text-green-600 font-medium">Internet Connected</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff className="w-4 h-4 text-red-600" />
-                  <span className="text-xs text-red-600 font-medium">No Internet Connection</span>
-                </>
-              )}
-            </div>
+            {/* 🔥 REMOVED: Network Status Indicator - no offline detection */}
           </div>
         </div>
       </div>
