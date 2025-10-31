@@ -31,20 +31,18 @@ const buildingSchema = z.object({
   organization_id: z.string()
     .uuid('Invalid organization selected')
     .min(1, 'Organization is required'),
-  type: z.string()
-    .max(50, 'Type is too long')
-    .optional()
-    .or(z.literal('')),
-  address: z.string()
-    .max(500, 'Address is too long')
-    .optional()
-    .or(z.literal('')),
-  total_floors: z.number()
-    .int('Total floors must be a whole number')
-    .min(1, 'Total floors must be at least 1')
-    .max(200, 'Total floors cannot exceed 200')
-    .optional()
-    .or(z.literal(undefined)),
+  type: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().max(50, 'Type is too long').optional()
+  ),
+  address: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().max(500, 'Address is too long').optional()
+  ),
+  total_floors: z.preprocess(
+    (val) => val === '' || val === undefined || val === null ? undefined : Number(val),
+    z.number().int('Total floors must be a whole number').min(1).max(200).optional()
+  ),
   is_active: z.boolean().default(true),
 });
 
@@ -110,29 +108,46 @@ export const BuildingsManager = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: Partial<BuildingInsert>) => {
+      console.log('💾 Saving building with data:', data);
+
       if (selectedBuilding) {
         // Update
+        console.log('📝 Updating building:', selectedBuilding.id);
         const { error } = await supabase
           .from('buildings')
           .update(data)
           .eq('id', selectedBuilding.id);
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Update error:', error);
+          throw error;
+        }
       } else {
         // Create
-        const { error } = await supabase
+        const insertData = { ...data, created_by: user?.id };
+        console.log('➕ Creating building with data:', insertData);
+
+        const { data: result, error } = await supabase
           .from('buildings')
-          .insert([{ ...data, created_by: user?.id }]);
-        if (error) throw error;
+          .insert([insertData])
+          .select();
+
+        if (error) {
+          console.error('❌ Insert error:', error);
+          throw error;
+        }
+        console.log('✅ Building created:', result);
       }
     },
     onSuccess: () => {
+      console.log('✅ Save mutation success');
       queryClient.invalidateQueries({ queryKey: ['buildings'] });
       toast.success(selectedBuilding ? 'Building updated' : 'Building created');
       setIsFormOpen(false);
       resetForm();
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to save');
+      console.error('❌ Save mutation error:', error);
+      toast.error(error.message || 'Failed to save building');
     },
   });
 
@@ -192,17 +207,21 @@ export const BuildingsManager = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('📋 Form submitted with data:', formData);
+
     // Validate form data with Zod schema
     try {
       const validatedData = buildingSchema.parse(formData);
+      console.log('✅ Validation passed:', validatedData);
       saveMutation.mutate(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Show first validation error
         const firstError = error.errors[0];
+        console.error('❌ Validation errors:', error.errors);
         toast.error(firstError.message);
-        console.error('Validation errors:', error.errors);
       } else {
+        console.error('❌ Unknown validation error:', error);
         toast.error('Validation failed');
       }
     }
