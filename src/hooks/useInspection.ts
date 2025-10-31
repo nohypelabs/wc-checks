@@ -255,7 +255,7 @@ export const useInspection = (inspectionId?: string) => {
       const dbStartTime = Date.now();
 
       try {
-        // Add timeout protection for database insert (30s)
+        // Add timeout protection for database insert (60s for slow mobile connections)
         const dbInsertPromise = supabase
           .from('inspection_records')
           .insert(inspectionRecord)
@@ -264,9 +264,9 @@ export const useInspection = (inspectionId?: string) => {
 
         const dbTimeoutPromise = new Promise((_, reject) =>
           setTimeout(() => {
-            console.error('❌ [DB] INSERT timeout after 30s');
-            reject(new Error('Database save timed out after 30 seconds. Your internet connection may be slow. Please try again.'));
-          }, 30000)
+            console.error('❌ [DB] INSERT timeout after 60s');
+            reject(new Error('Database save timed out after 60 seconds. Your internet connection is very slow. Please check your connection and try again.'));
+          }, 60000)
         );
 
         const { data, error } = await Promise.race([dbInsertPromise, dbTimeoutPromise]) as any;
