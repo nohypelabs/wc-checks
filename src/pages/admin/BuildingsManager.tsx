@@ -19,6 +19,7 @@ type BuildingInsert = TablesInsert<'buildings'>;
 type Organization = Tables<'organizations'>;
 
 // Zod validation schema for building
+// ⚠️ IMPORTANT: DB expects NULL for optional fields, not undefined!
 const buildingSchema = z.object({
   name: z.string()
     .min(2, 'Building name must be at least 2 characters')
@@ -32,16 +33,20 @@ const buildingSchema = z.object({
     .uuid('Invalid organization selected')
     .min(1, 'Organization is required'),
   type: z.preprocess(
-    (val) => val === '' ? undefined : val,
-    z.string().max(50, 'Type is too long').optional()
+    (val) => val === '' || val === undefined ? null : val,
+    z.string().max(50, 'Type is too long').nullable()
   ),
   address: z.preprocess(
-    (val) => val === '' ? undefined : val,
-    z.string().max(500, 'Address is too long').optional()
+    (val) => val === '' || val === undefined ? null : val,
+    z.string().max(500, 'Address is too long').nullable()
   ),
   total_floors: z.preprocess(
-    (val) => val === '' || val === undefined || val === null ? undefined : Number(val),
-    z.number().int('Total floors must be a whole number').min(1).max(200).optional()
+    (val) => {
+      if (val === '' || val === undefined || val === null) return null;
+      const num = Number(val);
+      return isNaN(num) ? null : num;
+    },
+    z.number().int('Total floors must be a whole number').min(1).max(200).nullable()
   ),
   is_active: z.boolean().default(true),
 });
@@ -63,9 +68,9 @@ export const BuildingsManager = () => {
     name: '',
     short_code: '',
     organization_id: '',
-    address: '',
-    type: '',
-    total_floors: undefined,
+    address: null,
+    type: null,
+    total_floors: null,
     is_active: true,
   });
 
@@ -174,9 +179,9 @@ export const BuildingsManager = () => {
       name: '',
       short_code: '',
       organization_id: '',
-      address: '',
-      type: '',
-      total_floors: undefined,
+      address: null,
+      type: null,
+      total_floors: null,
       is_active: true,
     });
     setSelectedBuilding(null);
@@ -188,9 +193,9 @@ export const BuildingsManager = () => {
       name: building.name,
       short_code: building.short_code,
       organization_id: building.organization_id,
-      address: building.address || '',
-      type: building.type || '',
-      total_floors: building.total_floors || undefined,
+      address: building.address,
+      type: building.type,
+      total_floors: building.total_floors,
       is_active: building.is_active,
     });
     setIsFormOpen(true);
@@ -498,8 +503,8 @@ export const BuildingsManager = () => {
                   Building Type
                 </label>
                 <select
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  value={formData.type || ''}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value || null })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select type</option>
@@ -517,8 +522,8 @@ export const BuildingsManager = () => {
                 </label>
                 <input
                   type="number"
-                  value={formData.total_floors || ''}
-                  onChange={(e) => setFormData({ ...formData, total_floors: e.target.value ? parseInt(e.target.value) : undefined })}
+                  value={formData.total_floors ?? ''}
+                  onChange={(e) => setFormData({ ...formData, total_floors: e.target.value ? parseInt(e.target.value) : null })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   min="1"
                 />
@@ -529,8 +534,8 @@ export const BuildingsManager = () => {
                   Address
                 </label>
                 <textarea
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  value={formData.address || ''}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value || null })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   rows={3}
                 />
