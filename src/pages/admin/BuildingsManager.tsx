@@ -24,28 +24,25 @@ const buildingSchema = z.object({
     .min(2, 'Building name must be at least 2 characters')
     .max(255, 'Building name is too long'),
   short_code: z.string()
-    .trim() // Remove whitespace
-    .min(2, 'Short code must be at least 2 characters')
+    .min(1, 'Short code is required')
     .max(10, 'Short code must be 10 characters or less')
-    .regex(/^[A-Z0-9\-_]+$/, 'Short code must contain only uppercase letters, numbers, hyphens, and underscores (e.g., BLD-01)')
+    .regex(/^[A-Z0-9\-_]+$/, 'Short code must contain only uppercase letters, numbers, hyphens, and underscores')
     .transform(val => val.toUpperCase()),
   organization_id: z.string()
     .uuid('Invalid organization selected')
     .min(1, 'Organization is required'),
-  type: z.string()
-    .max(50, 'Type is too long')
-    .optional()
-    .or(z.literal('')),
-  address: z.string()
-    .max(500, 'Address is too long')
-    .optional()
-    .or(z.literal('')),
-  total_floors: z.number()
-    .int('Total floors must be a whole number')
-    .min(1, 'Total floors must be at least 1')
-    .max(200, 'Total floors cannot exceed 200')
-    .optional()
-    .or(z.literal(undefined)),
+  type: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().max(50, 'Type is too long').optional()
+  ),
+  address: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().max(500, 'Address is too long').optional()
+  ),
+  total_floors: z.preprocess(
+    (val) => val === '' || val === undefined || val === null ? undefined : Number(val),
+    z.number().int('Total floors must be a whole number').min(1).max(200).optional()
+  ),
   is_active: z.boolean().default(true),
 });
 
@@ -111,29 +108,46 @@ export const BuildingsManager = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: Partial<BuildingInsert>) => {
+      console.log('💾 Saving building with data:', data);
+
       if (selectedBuilding) {
         // Update
+        console.log('📝 Updating building:', selectedBuilding.id);
         const { error } = await supabase
           .from('buildings')
           .update(data)
           .eq('id', selectedBuilding.id);
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Update error:', error);
+          throw error;
+        }
       } else {
         // Create
-        const { error } = await supabase
+        const insertData = { ...data, created_by: user?.id };
+        console.log('➕ Creating building with data:', insertData);
+
+        const { data: result, error } = await supabase
           .from('buildings')
-          .insert([{ ...data, created_by: user?.id }]);
-        if (error) throw error;
+          .insert([insertData])
+          .select();
+
+        if (error) {
+          console.error('❌ Insert error:', error);
+          throw error;
+        }
+        console.log('✅ Building created:', result);
       }
     },
     onSuccess: () => {
+      console.log('✅ Save mutation success');
       queryClient.invalidateQueries({ queryKey: ['buildings'] });
       toast.success(selectedBuilding ? 'Building updated' : 'Building created');
       setIsFormOpen(false);
       resetForm();
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to save');
+      console.error('❌ Save mutation error:', error);
+      toast.error(error.message || 'Failed to save building');
     },
   });
 
@@ -193,17 +207,21 @@ export const BuildingsManager = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('📋 Form submitted with data:', formData);
+
     // Validate form data with Zod schema
     try {
       const validatedData = buildingSchema.parse(formData);
+      console.log('✅ Validation passed:', validatedData);
       saveMutation.mutate(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Show first validation error
         const firstError = error.errors[0];
+        console.error('❌ Validation errors:', error.errors);
         toast.error(firstError.message);
-        console.error('Validation errors:', error.errors);
       } else {
+        console.error('❌ Unknown validation error:', error);
         toast.error('Validation failed');
       }
     }
@@ -454,22 +472,24 @@ export const BuildingsManager = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Short Code * <span className="text-xs text-gray-500">(min 2 chars, uppercase only)</span>
+                  Short Code * <span className="text-xs text-gray-500">(Max 10 karakter)</span>
                 </label>
                 <input
                   type="text"
                   value={formData.short_code}
-                  onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase().trim() })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono"
-                  placeholder="e.g., BLD-01 or GD01"
-                  pattern="[A-Z0-9\-_]{2,10}"
-                  title="2-10 characters: uppercase letters, numbers, hyphens, underscores only"
-                  minLength={2}
+                  onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., BLD01, TOWER-A"
                   maxLength={10}
+                  pattern="[A-Z0-9\-_]+"
+                  title="Only uppercase letters, numbers, hyphens (-), and underscores (_) allowed"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  ✓ Uppercase letters, numbers, hyphens, underscores only
+                  ✓ Hanya HURUF BESAR, angka, strip (-), dan underscore (_)
+                </p>
+                <p className="text-xs text-gray-500">
+                  ✓ Contoh: <span className="font-mono bg-gray-100 px-1 rounded">BLD01</span>, <span className="font-mono bg-gray-100 px-1 rounded">TOWER-A</span>, <span className="font-mono bg-gray-100 px-1 rounded">GED_1</span>
                 </p>
               </div>
 
