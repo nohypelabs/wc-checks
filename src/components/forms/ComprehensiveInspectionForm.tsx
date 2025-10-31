@@ -202,18 +202,29 @@ export const ComprehensiveInspectionForm = ({
 // REPLACE handleSubmit FUNCTION:
 // ===============================================
 const handleSubmit = async () => {
+  console.log('🚀 [SUBMIT] Starting submission...');
+
   if (!user) {
+    console.error('❌ [SUBMIT] No user logged in');
     toast.error('Please login first');
     return;
   }
+  console.log('✅ [SUBMIT] User check passed:', user.id);
 
-  if (!validateForm()) return;
+  console.log('🔍 [SUBMIT] Running validation...');
+  if (!validateForm()) {
+    console.error('❌ [SUBMIT] Validation failed!');
+    return;
+  }
+  console.log('✅ [SUBMIT] Validation passed');
 
+  console.log('⏳ [SUBMIT] Setting isSubmitting = true');
   setIsSubmitting(true);
-  
+
   try {
     const endTime = new Date();
     const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+    console.log('⏱️ [SUBMIT] Duration:', durationSeconds, 'seconds');
 
     // Collect all photos from per-component uploads
     const componentPhotos: File[] = [];
@@ -222,26 +233,32 @@ const handleSubmit = async () => {
         componentPhotos.push(photo.file);
       }
     }
+    console.log('📷 [SUBMIT] Component photos collected:', componentPhotos.length);
 
     // Collect general photos (mandatory)
     const allGeneralPhotos = generalPhotos.map(p => p.file);
+    console.log('📷 [SUBMIT] General photos collected:', allGeneralPhotos.length);
 
     // Combine all photos
     const allPhotos = [...componentPhotos, ...allGeneralPhotos];
     const totalPhotos = allPhotos.length;
+    console.log('📸 [SUBMIT] Total photos to process:', totalPhotos);
 
     if (totalPhotos === 0) {
+      console.error('❌ [SUBMIT] No photos found!');
       toast.error(
         genZMode
           ? '📸 Wajib upload minimal 1 foto!'
           : 'Please add at least one photo'
       );
+      setIsSubmitting(false);
       return;
     }
 
-    console.log(`📸 Total photos to process: ${totalPhotos}`);
+    console.log('📸 [SUBMIT] Total photos to process:', totalPhotos);
 
     // Step 1: Compress photos
+    console.log('🗜️ [SUBMIT] Starting compression...');
     const toastId = toast.loading(
       genZMode
         ? `🗜️ Kompres ${totalPhotos} foto...`
@@ -256,6 +273,7 @@ const handleSubmit = async () => {
 
     const compressedPhotos: File[] = [];
     for (let i = 0; i < allPhotos.length; i++) {
+      console.log(`🗜️ [SUBMIT] Compressing photo ${i + 1}/${totalPhotos}...`);
       const compressed = await compressImage(allPhotos[i]);
       compressedPhotos.push(compressed);
 
@@ -270,9 +288,10 @@ const handleSubmit = async () => {
       }
     }
 
-    console.log(`✅ Compressed ${compressedPhotos.length} photos`);
+    console.log(`✅ [SUBMIT] Compressed ${compressedPhotos.length} photos`);
 
     // Step 2: Upload compressed photos
+    console.log('☁️ [SUBMIT] Starting upload to Cloudinary...');
     toast.loading(
       genZMode
         ? `☁️ Upload ${totalPhotos} foto...`
@@ -280,6 +299,7 @@ const handleSubmit = async () => {
       { id: toastId }
     );
 
+    console.log('☁️ [SUBMIT] Calling batchUploadToCloudinary...');
     const uploadedUrls = await batchUploadToCloudinary(
       compressedPhotos,
       (current: number, total: number) => {
@@ -302,9 +322,10 @@ const handleSubmit = async () => {
       }
     );
 
-    console.log(`✅ Uploaded ${uploadedUrls.length} photos`);
+    console.log(`✅ [SUBMIT] Uploaded ${uploadedUrls.length} photos to Cloudinary`);
 
     // Update toast - saving
+    console.log('💾 [SUBMIT] Preparing to save to database...');
     toast.loading(
       genZMode ? '💾 Nyimpen inspection...' : '💾 Saving inspection...',
       { id: toastId }
