@@ -67,22 +67,16 @@ const AboutPage = lazy(() =>
   import('./pages/AboutPage').then(module => ({ default: module.AboutPage }))
 );
 
-// QueryClient with logging + OPTIMIZED for offline→online transitions
+// 🔥 React Query - NO CACHING, pure web app
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      retry: (failureCount, error) => {
-        // ✅ DON'T retry network errors - fail fast
-        const errorMessage = error?.toString().toLowerCase() || '';
-        if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
-          return false;
-        }
-        // ✅ Only retry once for other errors
-        return failureCount < 1;
-      },
-      staleTime: 60 * 1000, // ✅ Cache data for 1 minute
-      cacheTime: 5 * 60 * 1000, // ✅ Keep unused data for 5 minutes
+      refetchOnWindowFocus: true, // ✅ Always refetch when window focused
+      refetchOnMount: true, // ✅ Always refetch on component mount
+      refetchOnReconnect: true, // ✅ Refetch when internet reconnects
+      retry: false, // ❌ NO retries - fail fast
+      staleTime: 0, // 🔥 NO CACHING - always fresh data
+      gcTime: 0, // 🔥 NO memory cache - immediate garbage collection
       onError: (error: any) => {
         logger.error('React Query error', error);
       },
