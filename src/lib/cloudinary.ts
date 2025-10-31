@@ -38,23 +38,18 @@ validateCloudinaryConfig();
 
 /**
  * Upload file directly to Cloudinary - Server-side transformation
- * Cloudinary automatically optimizes on their servers (faster than client-side)
+ *
+ * IMPORTANT: Transformation MUST be configured in the upload preset!
+ * Go to: Cloudinary Dashboard → Settings → Upload → Upload Presets → [Your Preset]
+ * Add "Incoming Transformation": width:1080, crop:limit, quality:auto:good, format:auto
+ *
+ * Cloudinary automatically optimizes based on preset configuration.
  */
 export const uploadToCloudinary = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
   formData.append('folder', CLOUDINARY_FOLDER);
-
-  // Add transformation parameters (server-side optimization)
-  // These apply during upload - Cloudinary processes on their servers
-  formData.append('transformation', JSON.stringify({
-    width: 1080,
-    height: 1080,
-    crop: 'limit', // Don't upscale, only downscale if needed
-    quality: 'auto:good', // Cloudinary auto-optimizes quality
-    fetch_format: 'auto', // Cloudinary picks best format (WebP/JPEG)
-  }));
 
   try {
     // Mobile-friendly timeout: 90 seconds for large files on slow networks
@@ -63,7 +58,7 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
 
     const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
     console.log(`📤 [UPLOAD] Uploading ${file.name} (${fileSizeMB}MB) directly to Cloudinary...`);
-    console.log(`🔄 [UPLOAD] Server will auto-optimize to 1080px, quality:auto, format:auto`);
+    console.log(`🔄 [UPLOAD] Cloudinary will optimize based on preset configuration`);
     const startTime = Date.now();
 
     const response = await fetch(
