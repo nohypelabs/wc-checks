@@ -208,12 +208,19 @@ export const useInspection = (inspectionId?: string) => {
       };
 
       console.log('💾 [DB] Preparing to insert into database...');
+
+      // Calculate payload size
+      const jsonPayload = JSON.stringify(inspectionRecord);
+      const payloadSizeKB = (new Blob([jsonPayload]).size / 1024).toFixed(2);
+
       console.log('💾 [DB] Record data:', {
         location_id,
         user_id,
         photos: photo_urls.length,
         score,
-        status: overall_status
+        status: overall_status,
+        payloadSize: `${payloadSizeKB} KB`,
+        responsesKeys: Object.keys(responses).length
       });
 
       logger.info('Saving inspection to database', {

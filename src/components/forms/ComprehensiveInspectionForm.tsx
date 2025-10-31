@@ -271,17 +271,29 @@ const handleSubmit = async () => {
       percentage: 0
     });
 
+    // Compress photos in parallel (2 at a time) for faster processing
     const compressedPhotos: File[] = [];
-    for (let i = 0; i < allPhotos.length; i++) {
-      console.log(`🗜️ [SUBMIT] Compressing photo ${i + 1}/${totalPhotos}...`);
-      const compressed = await compressImage(allPhotos[i]);
-      compressedPhotos.push(compressed);
+    const COMPRESS_BATCH_SIZE = 2; // Compress 2 photos at a time
+
+    for (let i = 0; i < allPhotos.length; i += COMPRESS_BATCH_SIZE) {
+      const batch = allPhotos.slice(i, i + COMPRESS_BATCH_SIZE);
+      console.log(`🗜️ [SUBMIT] Compressing batch ${Math.floor(i / COMPRESS_BATCH_SIZE) + 1} (${batch.length} photos)...`);
+
+      // Compress batch in parallel
+      const compressedBatch = await Promise.all(
+        batch.map((photo, idx) => {
+          console.log(`🗜️ [SUBMIT] Compressing photo ${i + idx + 1}/${totalPhotos}...`);
+          return compressImage(photo);
+        })
+      );
+
+      compressedPhotos.push(...compressedBatch);
 
       // Update compression progress (check mounted)
       if (isMountedRef.current) {
-        const compressPercent = Math.round(((i + 1) / totalPhotos) * 50); // 0-50%
+        const compressPercent = Math.round((compressedPhotos.length / totalPhotos) * 50); // 0-50%
         setUploadProgress({
-          current: i + 1,
+          current: compressedPhotos.length,
           total: totalPhotos,
           percentage: compressPercent
         });

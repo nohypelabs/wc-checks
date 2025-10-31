@@ -25,23 +25,34 @@ const validateCloudinaryConfig = (): void => {
 validateCloudinaryConfig();
 
 /**
- * Compress image before upload
+ * Compress image before upload - AGGRESSIVE FOR CAMERA PHOTOS
  */
 export const compressImage = async (file: File): Promise<File> => {
+  const startTime = Date.now();
+  const originalSizeMB = file.size / 1024 / 1024;
+
+  console.log(`🖼️ Original photo: ${originalSizeMB.toFixed(2)}MB (${file.type})`);
+
+  // Aggressive compression for large camera photos
   const options = {
-    maxSizeMB: 0.4, // Max 400KB (reduced for faster upload)
-    maxWidthOrHeight: 1280, // Max dimension (1280px is enough for inspections)
+    maxSizeMB: 0.3, // Max 300KB (very aggressive)
+    maxWidthOrHeight: 1080, // 1080px (HD quality, enough for inspections)
     useWebWorker: true,
-    fileType: 'image/webp', // Convert to WebP
-    initialQuality: 0.8 // Start with 80% quality for faster compression
+    fileType: 'image/webp', // WebP has better compression
+    initialQuality: 0.7, // 70% quality (balance between size and clarity)
+    alwaysKeepResolution: false, // Allow downscaling for better compression
   };
-  
+
   try {
     const compressedFile = await imageCompression(file, options);
-    console.log(`✅ Compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+    const compressedSizeMB = compressedFile.size / 1024 / 1024;
+    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+    const reduction = ((1 - compressedFile.size / file.size) * 100).toFixed(0);
+
+    console.log(`✅ Compressed: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB (${reduction}% smaller) in ${duration}s`);
     return compressedFile;
   } catch (error) {
-    console.error('Compression error:', error);
+    console.error('❌ Compression error:', error);
     return file; // Fallback to original
   }
 };
