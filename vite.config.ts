@@ -8,99 +8,18 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // ⚠️ NETWORK-ONLY APP: Requires internet for auth, upload, and database
-      // Cache static assets to save bandwidth, but app won't work offline
+      // 🎯 PWA MINIMAL MODE: Install-only, NO caching, NO offline mode
+      // Service worker ONLY for PWA installability (Add to Home Screen)
+      // App REQUIRES internet - no false offline mode promises
       workbox: {
-        // ⚠️ IMPORTANT: Don't cache HTML! Only truly static assets
-        // HTML caching causes offline mode issues
-        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'], // NO HTML!
+        // ✅ ZERO PRECACHING: Don't cache ANY files
+        globPatterns: [],
 
-        // Clear old caches on activation
+        // ✅ Clear old caches from previous versions
         cleanupOutdatedCaches: true,
 
+        // ✅ EVERYTHING is NetworkOnly - NO CACHING AT ALL
         runtimeCaching: [
-          // 1. HTML pages - NetworkOnly (NEVER cache, always fresh)
-          {
-            urlPattern: /\.html$/i,
-            handler: 'NetworkOnly',
-          },
-
-          // 2. Static JS/CSS files - NetworkFirst with fallback (save bandwidth, but require network)
-          {
-            urlPattern: /\.(?:js|css)$/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'static-assets',
-              networkTimeoutSeconds: 10, // Wait max 10s for network
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-              },
-              plugins: [
-                {
-                  // If network fails, show error instead of serving stale cache
-                  cacheWillUpdate: async ({ response }) => {
-                    // Only cache successful responses
-                    if (response && response.status === 200) {
-                      return response;
-                    }
-                    return null;
-                  },
-                },
-              ],
-            },
-          },
-
-          // 3. Font files - CacheFirst (safe to cache forever)
-          {
-            urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'fonts-cache',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-              },
-            },
-          },
-
-          // 4. Images (local) - CacheFirst (safe to cache)
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-              },
-            },
-          },
-
-          // 5. Cloudinary images - NetworkFirst (always try fresh, fallback to cache)
-          {
-            urlPattern: /^https:\/\/res\.cloudinary\.com\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'cloudinary-images',
-              networkTimeoutSeconds: 5,
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-
-          // 6. Supabase API - NetworkOnly (NEVER cache API responses)
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: 'NetworkOnly',
-          },
-
-          // 7. Everything else - NetworkOnly (require network)
           {
             urlPattern: /.*/,
             handler: 'NetworkOnly',

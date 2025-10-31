@@ -27,66 +27,30 @@ const clearAllCaches = async (): Promise<void> => {
 
 /**
  * Register service worker for PWA functionality
+ * 🎯 MINIMAL MODE: Install-only, no caching, no offline
  */
 export const registerServiceWorker = async (): Promise<void> => {
   if ('serviceWorker' in navigator) {
     try {
-      console.log('🔄 Registering service worker...');
+      console.log('🔄 Registering service worker (PWA install-only mode)...');
 
-      // Clear old caches on startup (prevents offline mode issues)
-      await clearAllCaches();
-
-      const registration = await navigator.serviceWorker.register('/service-worker.js', {
+      const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/',
       });
 
       console.log('✅ Service worker registered:', registration.scope);
 
-      // ⚠️ DISABLED: Periodic update checks
-      // Causes update prompts that break offline mode detection
-      // Updates will happen naturally when user refreshes page
-      /*
-      setInterval(() => {
-        registration.update();
-      }, 60 * 60 * 1000); // Check every hour
-      */
-
-      // Handle service worker updates - AUTO UPDATE (no prompt)
-      let refreshing = false;
-
+      // ✅ Simple update handling: Silent update in background
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🔄 New service worker available - AUTO UPDATING...');
-
-              // ⚠️ DISABLED: No more update prompt
-              // User complained: clicking OK causes offline mode
-              // Root cause: Reload with cached SW content
-
-              // SOLUTION: Auto-update silently in background
-              // User will get update on next page load naturally
-              console.log('✅ Update will apply on next page load');
+              console.log('🔄 New service worker available (will activate on next page load)');
             }
           });
         }
       });
-
-      // ⚠️ DISABLED: Auto-reload on controller change
-      // This was causing offline mode issues
-      // Let update happen naturally on next page load
-      /*
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-
-        // Clear all caches before reload
-        clearAllCaches().then(() => {
-          window.location.reload();
-        });
-      });
-      */
 
     } catch (error) {
       console.error('❌ Service worker registration failed:', error);
@@ -200,18 +164,14 @@ export const getInstallInstructions = (): string => {
 };
 
 /**
- * Clear service worker cache (aggressive - clears ALL caches)
+ * Clear service worker cache (if any exists from old versions)
+ * 🎯 MINIMAL MODE: No caching, so this just cleans up old caches
  */
 export const clearServiceWorkerCache = async (): Promise<void> => {
-  // Method 1: Tell service worker to clear
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
-  }
-
-  // Method 2: Clear caches directly
+  // Clear any leftover caches from old versions
   await clearAllCaches();
 
-  console.log('🗑️ Service worker caches cleared');
+  console.log('🗑️ Old service worker caches cleared');
 };
 
 /**
