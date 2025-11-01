@@ -1,0 +1,171 @@
+// api/middleware/role-guard.ts - Server-side auth & role validation
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../../src/types/database.types';
+
+// Initialize Supabase with SERVICE_KEY (backend access)
+const supabase = createClient<Database>(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!, // 🔥 SERVICE_KEY for backend operations
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+);
+
+export interface AuthContext {
+  userId: string;
+  userRole: {
+    id: string;
+    name: string;
+    level: number;
+  };
+}
+
+/**
+ * Validate user authentication and check minimum role level
+ * @param req - Vercel request object
+ * @param minLevel - Minimum role level required (default: 0)
+ * @returns AuthContext if valid, null otherwise
+ */
+export async function validateAuth(
+  req: VercelRequest,
+  minLevel: number = 0
+): Promise<AuthContext | null> {
+  try {
+    // Get auth token from Authorization header
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('[validateAuth] Missing or invalid Authorization header');
+      return null;
+    }
+
+    const token = authHeader.substring(7);
+
+    // Verify token with Supabase Auth
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('[validateAuth] Auth error:', authError?.message);
+      return null;
+    }
+
+    console.log('[validateAuth] User authenticated:', user.id);
+
+    // Get user's role from database (server-side validation)
+    const { data: userRoleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select(`
+        role_id,
+        roles!user_roles_role_id_fkey (
+          id,
+          name,
+          level
+        )
+      `)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (roleError) {
+      console.error('[validateAuth] Role query error:', roleError.message);
+      return null;
+    }
+
+    // Extract role data (handle Supabase typed response)
+    const roleData = userRoleData?.roles as { id: string; name: string; level: number } | null;
+
+    const roleLevel = roleData?.level || 0;
+    const roleName = roleData?.name || 'user';
+    const roleId = roleData?.id || '';
+
+    console.log('[validateAuth] User role:', { name: roleName, level: roleLevel });
+
+    // Check minimum level requirement
+    if (roleLevel < minLevel) {
+      console.error('[validateAuth] Insufficient role level:', {
+        required: minLevel,
+        actual: roleLevel
+      });
+      return null;
+    }
+
+    return {
+      userId: user.id,
+      userRole: {
+        id: roleId,
+        name: roleName,
+        level: roleLevel,
+      },
+    };
+  } catch (error) {
+    console.error('[validateAuth] Unexpected error:', error);
+    return null;
+  }
+}
+
+/**
+ * Create audit log entry for admin actions
+ * @param userId - User who performed the action
+ * @param action - Action type (e.g., 'ASSIGN_ROLE', 'TOGGLE_USER_STATUS')
+ * @param details - Additional details as JSON
+ */
+export async function createAuditLog(
+  userId: string,
+  action: string,
+  details: Record<string, any>
+): Promise<void> {
+  try {
+    // Note: audit_logs table might not exist yet
+    // This is a placeholder for future implementation
+    console.log('[createAuditLog] Audit log:', {
+      userId,
+      action,
+      details,
+      timestamp: new Date().toISOString(),
+    });
+
+    // TODO: Uncomment when audit_logs table is created
+    // await supabase.from('audit_logs').insert({
+    //   user_id: userId,
+    //   action,
+    //   details,
+    //   created_at: new Date().toISOString(),
+    // });
+  } catch (error) {
+    console.error('[createAuditLog] Error creating audit log:', error);
+    // Don't throw - audit log failure shouldn't break the main operation
+  }
+}
+
+/**
+ * Standard error response helper
+ */
+export function errorResponse(
+  res: VercelResponse,
+  status: number,
+  message: string
+): void {
+  res.status(status).json({
+    error: message,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Standard success response helper
+ */
+export function successResponse(
+  res: VercelResponse,
+  data: any,
+  message?: string
+): void {
+  res.status(200).json({
+    success: true,
+    data,
+    message,
+    timestamp: new Date().toISOString(),
+  });
+}
