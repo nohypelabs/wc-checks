@@ -3,17 +3,30 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../../src/types/database.types';
 
+// Validate environment variables
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  console.error('[role-guard] Missing environment variables:', {
+    hasUrl: !!SUPABASE_URL,
+    hasServiceKey: !!SUPABASE_SERVICE_KEY,
+  });
+}
+
 // Initialize Supabase with SERVICE_KEY (backend access)
-const supabase = createClient<Database>(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!, // 🔥 SERVICE_KEY for backend operations
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
+const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
+  ? createClient<Database>(
+      SUPABASE_URL,
+      SUPABASE_SERVICE_KEY, // 🔥 SERVICE_KEY for backend operations
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    )
+  : null;
 
 export interface AuthContext {
   userId: string;
@@ -35,6 +48,12 @@ export async function validateAuth(
   minLevel: number = 0
 ): Promise<AuthContext | null> {
   try {
+    // Check if Supabase client is initialized
+    if (!supabase) {
+      console.error('[validateAuth] Supabase client not initialized - missing env vars');
+      return null;
+    }
+
     // Get auth token from Authorization header
     const authHeader = req.headers.authorization;
 
