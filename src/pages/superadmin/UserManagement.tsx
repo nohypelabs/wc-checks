@@ -99,7 +99,7 @@ export const UserManagement = () => {
     assignRoleMutation.mutate({
       userId,
       roleId,
-      assignedBy: user.id,
+      // assignedBy is now handled automatically by the backend
     });
   };
 

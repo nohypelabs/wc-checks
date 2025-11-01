@@ -95,7 +95,7 @@ export function useRoles() {
   });
 }
 
-// Assign role to user
+// Assign role to user (BACKEND API VERSION)
 export function useAssignRole() {
   const queryClient = useQueryClient();
 
@@ -103,80 +103,84 @@ export function useAssignRole() {
     mutationFn: async ({
       userId,
       roleId,
-      assignedBy
     }: {
       userId: string;
       roleId: string;
-      assignedBy: string;
+      assignedBy?: string; // Not needed anymore - backend handles it
     }) => {
-      // First, check if user already has a role
-      const { data: existing } = await supabase
-        .from('user_roles')
-        .select('id')
-        .eq('user_id', userId)
-        .maybeSingle();
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (existing) {
-        // Update existing role
-        const { error } = await supabase
-          .from('user_roles')
-          .update({
-            role_id: roleId,
-            assigned_by: assignedBy,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('user_id', userId);
-
-        if (error) throw error;
-      } else {
-        // Insert new role
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: userId,
-            role_id: roleId,
-            assigned_by: assignedBy,
-          });
-
-        if (error) throw error;
+      if (!token) {
+        throw new Error('No authentication token available');
       }
+
+      // Call backend API with server-side validation
+      const response = await fetch('/api/admin/assign-role', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, roleId }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to assign role');
+      }
+
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
-      toast.success('Role assigned successfully!');
+      queryClient.invalidateQueries({ queryKey: ['verify-role'] });
+      toast.success(data.message || 'Role assigned successfully!');
     },
     onError: (error: any) => {
-      toast.error('Failed to assign role: ' + error.message);
+      toast.error(error.message || 'Failed to assign role');
     },
   });
 }
 
-// Toggle user active status
+// Toggle user active status (BACKEND API VERSION)
 export function useToggleUserStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ userId, isActive }: { userId: string; isActive: boolean }) => {
-      const { error } = await supabase
-        .from('users')
-        .update({
-          is_active: isActive,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', userId);
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) throw error;
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+
+      // Call backend API with server-side validation
+      const response = await fetch('/api/admin/toggle-user-status', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, isActive }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to update user status');
+      }
+
+      return response.json();
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
-      toast.success(
-        variables.isActive
-          ? 'User activated successfully!'
-          : 'User deactivated successfully!'
-      );
+      toast.success(data.message || 'User status updated successfully!');
     },
     onError: (error: any) => {
-      toast.error('Failed to update user status: ' + error.message);
+      toast.error(error.message || 'Failed to update user status');
     },
   });
 }
