@@ -4,10 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 import { validateAuth, createAuditLog, errorResponse, successResponse } from '../middleware/role-guard';
 import type { Database } from '../../src/types/database.types';
 
-const supabase = createClient<Database>(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
+// Initialize Supabase client
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
+  ? createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+  : null;
 
 /**
  * POST /api/admin/assign-role
@@ -55,6 +58,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Check if Supabase client is initialized
+    if (!supabase) {
+      return errorResponse(res, 500, 'Database connection error - missing configuration');
+    }
+
     // Get target role details
     const { data: targetRole, error: roleError } = await supabase
       .from('roles')
