@@ -1,10 +1,8 @@
-// src/components/auth/AdminRoute.tsx - IMPROVED VERSION
+// src/components/auth/AdminRoute.tsx - BACKEND VERIFIED VERSION
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/supabase';
+import { useIsAdmin } from '../../../hooks/useIsAdmin';
 import { AlertTriangle, User } from 'lucide-react';
-import { useEffect } from 'react';
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -12,61 +10,7 @@ interface AdminRouteProps {
 
 export const AdminRoute = ({ children }: AdminRouteProps) => {
   const { user, profile, loading: authLoading } = useAuth();
-
-  // Fetch user role from user_roles table
-  const { data: userRole, isLoading: roleLoading, error: roleError } = useQuery({
-    queryKey: ['user-role', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      console.log('[AdminRoute] Fetching role for user:', user.id);
-
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select(`
-          roles!user_roles_role_id_fkey (
-            id,
-            name,
-            level,
-            description
-          )
-        `)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error('[AdminRoute] ERROR fetching user role:', error);
-        return null;
-      }
-
-      console.log('[AdminRoute] Role data:', data?.roles);
-      return data?.roles;
-    },
-    enabled: !!user?.id
-  });
-
-  // Audit logging
-  useEffect(() => {
-    if (!authLoading && !roleLoading && user) {
-      const isAdminLevel = typeof userRole?.level === 'number' && userRole?.level >= 80;
-      console.log('[AdminRoute] Admin access check:', {
-        user: profile?.full_name || user.email,
-        userId: user.id,
-        roleName: userRole?.name || 'NO ROLE',
-        roleLevel: userRole?.level ?? 'NULL',
-        isAdmin: isAdminLevel,
-        hasError: !!roleError,
-        timestamp: new Date().toISOString()
-      });
-
-      if (!userRole) {
-        console.warn('[AdminRoute] WARNING: No role found for user');
-      }
-      if (roleError) {
-        console.error('[AdminRoute] ERROR: Role query error:', roleError);
-      }
-    }
-  }, [authLoading, roleLoading, user, profile, userRole, roleError]);
+  const { isAdmin, isSuperAdmin, loading: roleLoading } = useIsAdmin();
 
   // Loading state
   if (authLoading || roleLoading) {
@@ -85,30 +29,21 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if user is admin (level >= 80)
-  // Level 100: System Admin, 90: Super Admin, 80: Admin
-  console.log('[AdminRoute] BEFORE isAdmin check:', {
-    userRole,
-    'userRole?.level': userRole?.level,
-    'typeof level': typeof userRole?.level,
-    'level >= 80': userRole?.level >= 80,
-  });
-
-  const isAdmin = typeof userRole?.level === 'number' && userRole?.level >= 80;
-
-  console.log('[AdminRoute] isAdmin result:', isAdmin);
-
   // Not authorized - Enhanced with profile info
-  if (!isAdmin) {
-    console.log('[AdminRoute] ACCESS DENIED - Showing error page');
-    console.log('[AdminRoute] userRole at denial:', JSON.stringify(userRole, null, 2));
+  if (!isAdmin && !isSuperAdmin) {
+    console.log('[AdminRoute] ACCESS DENIED - User is not admin', {
+      user: profile?.full_name || user.email,
+      isAdmin,
+      isSuperAdmin,
+    });
+
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
-          
+
           {/* User info section */}
           <div className="flex items-center justify-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
             <User className="w-5 h-5 text-gray-600" />
@@ -117,7 +52,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
                 {profile?.full_name || user.email}
               </p>
               <p className="text-xs text-gray-600">
-                Role: {userRole?.name || 'User'} (Level: {userRole?.level || 'N/A'})
+                Role: User
               </p>
             </div>
           </div>
@@ -126,7 +61,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
           <p className="text-gray-600 mb-6">
             You don't have permission to access admin pages. Admin privileges required.
           </p>
-          
+
           <div className="flex gap-3">
             <button
               onClick={() => window.history.back()}
@@ -145,6 +80,12 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
       </div>
     );
   }
+
+  console.log('[AdminRoute] ACCESS GRANTED', {
+    user: profile?.full_name || user.email,
+    isAdmin,
+    isSuperAdmin,
+  });
 
   // Authorized - render admin content
   return <>{children}</>;
