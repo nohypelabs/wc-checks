@@ -1,8 +1,7 @@
 // src/pages/admin/AdminDashboard.tsx - Main Admin Dashboard
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
+import { useAdminStats } from '../../hooks/useAdminStats';
 import {
   Users,
   MapPin,
@@ -20,105 +19,15 @@ import {
 } from 'lucide-react';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { Card, CardHeader } from '../../components/ui/Card';
-import { format, subDays } from 'date-fns';
 import { usePerformance } from '../../hooks/usePerformance'
-interface AdminStats {
-  totalUsers: number;
-  totalLocations: number;
-  totalInspections: number;
-  todayInspections: number;
-  activeUsers: number;
-  avgScore: number;
-  userGrowth: number;
-  inspectionGrowth: number;
-}
 
 export const AdminDashboard = () => {
    usePerformance('HomePage');
   const { profile } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch admin stats
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['admin-stats'],
-    queryFn: async (): Promise<AdminStats> => {
-      const today = format(new Date(), 'yyyy-MM-dd');
-      const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
-      const weekAgo = format(subDays(new Date(), 7), 'yyyy-MM-dd');
-
-      // Total users
-      const { count: totalUsers } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true);
-
-      // Total locations
-      const { count: totalLocations } = await supabase
-        .from('locations')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true);
-
-      // Total inspections
-      const { count: totalInspections } = await supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true });
-
-      // Today's inspections
-      const { count: todayInspections } = await supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('inspection_date', today);
-
-      // Yesterday's inspections for comparison
-      const { count: yesterdayInspections } = await supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('inspection_date', yesterday);
-
-      // Active users (logged in last 7 days)
-      const { count: activeUsers } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .gte('last_login_at', weekAgo)
-        .eq('is_active', true);
-
-      // Average score calculation
-      const { data: inspections } = await supabase
-        .from('inspection_records')
-        .select('responses')
-        .limit(100);
-
-      const calculateScore = (responses: any): number => {
-        const values = Object.values(responses || {});
-        if (values.length === 0) return 0;
-        const goodCount = values.filter(v => 
-          v === true || v === 'good' || v === 'excellent' || 
-          v === 'baik' || v === 'bersih' || v === 'ada'
-        ).length;
-        return Math.round((goodCount / values.length) * 100);
-      };
-
-      const avgScore = inspections && inspections.length > 0
-        ? Math.round(inspections.reduce((sum, i) => sum + calculateScore(i.responses), 0) / inspections.length)
-        : 0;
-
-      // Growth calculations
-      const inspectionGrowth = yesterdayInspections && yesterdayInspections > 0
-        ? Math.round(((todayInspections || 0) - yesterdayInspections) / yesterdayInspections * 100)
-        : 0;
-
-      return {
-        totalUsers: totalUsers || 0,
-        totalLocations: totalLocations || 0,
-        totalInspections: totalInspections || 0,
-        todayInspections: todayInspections || 0,
-        activeUsers: activeUsers || 0,
-        avgScore,
-        userGrowth: 0, // Can be calculated with historical data
-        inspectionGrowth
-      };
-    }
-  });
+  // ✅ FIXED: Use backend API for dashboard stats
+  const { data: stats, isLoading } = useAdminStats();
 
   if (isLoading) {
     return (
