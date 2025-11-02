@@ -61,7 +61,7 @@ async function fallbackRoleCheck(userId: string): Promise<{ isAdmin: boolean; is
 export function useIsAdmin() {
   const { user } = useAuth();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['verify-role', user?.id],
     queryFn: async (): Promise<{ isAdmin: boolean; isSuperAdmin: boolean }> => {
       if (!user?.id) {
@@ -121,11 +121,20 @@ export function useIsAdmin() {
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2, // Retry twice before giving up
     retryDelay: 1000, // Wait 1s between retries
+    // Return false defaults on error instead of throwing
+    throwOnError: false,
   });
 
+  // Log error if present for debugging
+  if (error) {
+    console.error('[useIsAdmin] Query error:', error);
+  }
+
+  // Always return safe defaults - never undefined
   return {
-    isAdmin: data?.isAdmin || false,
-    isSuperAdmin: data?.isSuperAdmin || false,
+    isAdmin: data?.isAdmin ?? false,
+    isSuperAdmin: data?.isSuperAdmin ?? false,
     loading: isLoading,
+    error: error ? String(error) : null,
   };
 }
