@@ -18,62 +18,41 @@ export interface UserWithRole {
   } | null;
 }
 
-// Fetch all users with their roles
+// Fetch all users with their roles (BACKEND API VERSION)
 export function useUsers() {
   return useQuery({
     queryKey: ['users-with-roles'],
     queryFn: async () => {
-      console.log('[useUsers] Fetching users...');
+      console.log('[useUsers] Fetching users from backend API...');
 
-      // Fetch all users first
-      const { data: users, error: usersError } = await supabase
-        .from('users')
-        .select('id, email, full_name, phone, is_active, created_at, last_login_at')
-        .order('created_at', { ascending: false });
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (usersError) {
-        console.error('[useUsers] Error fetching users:', usersError);
-        throw usersError;
+      if (!token) {
+        throw new Error('No authentication token available');
       }
 
-      console.log('[useUsers] Fetched', users?.length, 'users');
+      // ✅ Call backend API instead of direct Supabase query
+      const response = await fetch('/api/admin/list-users', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-      // Fetch all user_roles with roles
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select(`
-          user_id,
-          roles!user_roles_role_id_fkey (
-            id,
-            name,
-            level
-          )
-        `);
-
-      if (rolesError) {
-        console.error('[useUsers] Error fetching user roles:', rolesError);
-        throw rolesError;
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('[useUsers] Backend API error:', error);
+        throw new Error(error.error || 'Failed to fetch users');
       }
 
-      console.log('[useUsers] Fetched', userRoles?.length, 'user roles');
+      const result = await response.json();
+      const users = result.data as UserWithRole[];
 
-      // Combine the data
-      const combined = users.map((user: any) => {
-        const userRole = userRoles?.find((ur: any) => ur.user_id === user.id);
-        return {
-          id: user.id,
-          email: user.email,
-          full_name: user.full_name,
-          phone: user.phone,
-          is_active: user.is_active,
-          created_at: user.created_at,
-          last_login_at: user.last_login_at,
-          role: userRole?.roles || null,
-        };
-      }) as UserWithRole[];
-
-      console.log('[useUsers] Combined data ready:', combined.length, 'users with roles');
-      return combined;
+      console.log('[useUsers] Fetched', users.length, 'users from backend API');
+      return users;
     },
   });
 }
@@ -185,8 +164,29 @@ export function useToggleUserStatus() {
   });
 }
 
-// Get current user's role level
+/**
+ * @deprecated This function makes direct database queries and bypasses backend validation.
+ * Use the `useIsAdmin()` hook instead, which calls the backend API.
+ *
+ * This function is kept for backward compatibility but should not be used in new code.
+ * All role checks should go through the backend API to ensure:
+ * - Consistent validation
+ * - Audit logging
+ * - Single source of truth
+ *
+ * Example migration:
+ * ```
+ * // ❌ OLD (bypasses backend)
+ * const level = await getUserRoleLevel(user.id);
+ * const isAdmin = level >= 80;
+ *
+ * // ✅ NEW (uses backend)
+ * const { isAdmin, isSuperAdmin } = useIsAdmin();
+ * ```
+ */
 export async function getUserRoleLevel(userId: string): Promise<number> {
+  console.warn('⚠️ DEPRECATED: getUserRoleLevel() bypasses backend. Use useIsAdmin() hook instead.');
+
   const { data, error } = await supabase
     .from('user_roles')
     .select('roles!user_roles_role_id_fkey (level)')

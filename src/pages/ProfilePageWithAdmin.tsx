@@ -4,6 +4,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useIsAdmin } from '../hooks/useIsAdmin';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { 
@@ -43,32 +44,8 @@ export const ProfilePageWithAdmin = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
-  // Check if user is admin
-  const { data: userRole } = useQuery({
-    queryKey: ['user-role', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select(`
-          role_id,
-          roles (
-            name,
-            level,
-            display_name
-          )
-        `)
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) return null;
-      return data?.roles;
-    },
-    enabled: !!user?.id
-  });
-
-  const isAdmin = userRole?.level === 'admin' || userRole?.level === 'super_admin';
+  // ✅ FIXED: Use backend API for role check
+  const { isAdmin, isSuperAdmin, role: userRole } = useIsAdmin();
 
   // Fetch user stats
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -333,12 +310,12 @@ export const ProfilePageWithAdmin = () => {
             <div className="flex items-center justify-center gap-2">
               <div className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
                 <UserIcon className="w-4 h-4" />
-                <span>{userRole?.display_name || 'Member'}</span>
+                <span>{userRole?.name || 'Member'}</span>
               </div>
-              {isAdmin && (
+              {(isAdmin || isSuperAdmin) && (
                 <div className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 rounded-full text-sm text-purple-600">
                   <Shield className="w-4 h-4" />
-                  <span>Admin</span>
+                  <span>{isSuperAdmin ? 'Super Admin' : 'Admin'}</span>
                 </div>
               )}
             </div>
@@ -460,7 +437,7 @@ export const ProfilePageWithAdmin = () => {
         {/* Action Buttons */}
         <div className="mt-6 space-y-3">
           {/* Admin Panel Button - Only for Admins */}
-          {isAdmin && (
+          {(isAdmin || isSuperAdmin) && (
             <button
               onClick={() => navigate('/admin')}
               className="w-full flex items-center justify-center gap-2 p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl active:scale-95"
