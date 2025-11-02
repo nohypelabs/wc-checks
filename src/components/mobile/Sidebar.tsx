@@ -1,5 +1,4 @@
 // src/components/mobile/Sidebar.tsx
-import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   X,
@@ -16,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
-import { getUserRoleLevel } from '../../hooks/useUserRoles';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -27,19 +25,9 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
-  const { isAdmin } = useIsAdmin();
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
-  // Check if user is superadmin (level 90+: super_admin or system_admin)
-  useEffect(() => {
-    const checkSuperAdmin = async () => {
-      if (user?.id) {
-        const level = await getUserRoleLevel(user.id);
-        setIsSuperAdmin(level >= 90);
-      }
-    };
-    checkSuperAdmin();
-  }, [user?.id]);
+  // ✅ FIXED: Use backend API for both admin and superadmin checks
+  const { isAdmin, isSuperAdmin } = useIsAdmin();
 
   const handleNavigate = (path: string) => {
     navigate(path);
