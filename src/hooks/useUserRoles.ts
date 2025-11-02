@@ -57,19 +57,41 @@ export function useUsers() {
   });
 }
 
-// Fetch all available roles
+// Fetch all available roles (BACKEND API VERSION)
 export function useRoles() {
   return useQuery({
     queryKey: ['roles'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('roles')
-        .select('*')
-        .eq('is_active', true)
-        .order('level', { ascending: false });
+      console.log('[useRoles] Fetching roles from backend API...');
 
-      if (error) throw error;
-      return data;
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+
+      // ✅ Call backend API instead of direct Supabase query
+      const response = await fetch('/api/admin/list-roles', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('[useRoles] Backend API error:', error);
+        throw new Error(error.error || 'Failed to fetch roles');
+      }
+
+      const result = await response.json();
+      const roles = result.data;
+
+      console.log('[useRoles] Fetched', roles.length, 'roles from backend API');
+      return roles;
     },
   });
 }
