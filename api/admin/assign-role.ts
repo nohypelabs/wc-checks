@@ -154,14 +154,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 📝 AUDIT LOG
-    await createAuditLog(auth.userId, 'ASSIGN_ROLE', {
-      targetUserId: userId,
-      targetUserEmail: targetUser.email,
-      roleId: targetRole.id,
-      roleName: targetRole.name,
-      roleLevel: targetRole.level,
-      operation,
-    });
+    await createAuditLog(
+      auth.userId,
+      'ASSIGN_ROLE',
+      'user_role',
+      userId,
+      {
+        targetUserEmail: targetUser.email,
+        targetUserName: targetUser.full_name,
+        roleId: targetRole.id,
+        roleName: targetRole.name,
+        roleLevel: targetRole.level,
+        operation,
+      },
+      true
+    );
 
     console.log(`[assign-role] Success: ${operation} role ${targetRole.name} to user ${targetUser.email}`);
 
