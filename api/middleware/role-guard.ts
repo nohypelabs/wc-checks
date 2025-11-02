@@ -129,32 +129,45 @@ export async function validateAuth(
  * Create audit log entry for admin actions
  * @param userId - User who performed the action
  * @param action - Action type (e.g., 'ASSIGN_ROLE', 'TOGGLE_USER_STATUS')
+ * @param resourceType - Type of resource affected
+ * @param resourceId - ID of resource affected
  * @param details - Additional details as JSON
+ * @param success - Whether the action succeeded
+ * @param errorMessage - Error message if failed
  */
 export async function createAuditLog(
   userId: string,
   action: string,
-  details: Record<string, any>
+  resourceType: string,
+  resourceId?: string,
+  details?: Record<string, any>,
+  success: boolean = true,
+  errorMessage?: string
 ): Promise<void> {
   try {
-    // Note: audit_logs table might not exist yet
-    // This is a placeholder for future implementation
-    console.log('[createAuditLog] Audit log:', {
-      userId,
-      action,
-      details,
-      timestamp: new Date().toISOString(),
+    if (!supabase) {
+      console.error('[createAuditLog] Supabase client not initialized');
+      return;
+    }
+
+    // Use RPC function for audit logging (server-side)
+    const { error } = await supabase.rpc('create_audit_log', {
+      p_user_id: userId,
+      p_action: action,
+      p_resource_type: resourceType,
+      p_resource_id: resourceId || null,
+      p_details: details || {},
+      p_success: success,
+      p_error_message: errorMessage || null,
     });
 
-    // TODO: Uncomment when audit_logs table is created
-    // await supabase.from('audit_logs').insert({
-    //   user_id: userId,
-    //   action,
-    //   details,
-    //   created_at: new Date().toISOString(),
-    // });
+    if (error) {
+      console.error('[createAuditLog] Error creating audit log:', error);
+    } else {
+      console.log('[createAuditLog] Audit log created:', { userId, action, resourceType });
+    }
   } catch (error) {
-    console.error('[createAuditLog] Error creating audit log:', error);
+    console.error('[createAuditLog] Unexpected error:', error);
     // Don't throw - audit log failure shouldn't break the main operation
   }
 }

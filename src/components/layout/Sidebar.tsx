@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useIsAdmin } from '../../hooks/useIsAdmin';
 import {
   Home,
   QrCode,
@@ -38,8 +39,12 @@ export const Sidebar = ({ className }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+  const { isAdmin, isSuperAdmin } = useIsAdmin();
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Show admin items only if user is admin or superadmin
+  const showAdminItems = isAdmin || isSuperAdmin;
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -223,8 +228,8 @@ export const Sidebar = ({ className }: SidebarProps) => {
             ))}
           </div>
 
-          {/* Admin Section */}
-          {adminNavItems.length > 0 && (
+          {/* Admin Section - Only show for admins */}
+          {showAdminItems && adminNavItems.length > 0 && (
             <div className="mt-6 space-y-1">
               {!isCollapsed && (
                 <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">

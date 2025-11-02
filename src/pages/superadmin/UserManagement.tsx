@@ -11,7 +11,8 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { useUsers, useRoles, useAssignRole, useToggleUserStatus, getUserRoleLevel } from '../../hooks/useUserRoles';
+import { useIsAdmin } from '../../hooks/useIsAdmin';
+import { useUsers, useRoles, useAssignRole, useToggleUserStatus } from '../../hooks/useUserRoles';
 import { BottomNav } from '../../components/mobile/BottomNav';
 import { format } from 'date-fns';
 
@@ -29,56 +30,39 @@ export const UserManagement = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [checkingAccess, setCheckingAccess] = useState(true);
+
+  // ✅ FIXED: Use backend API for role check instead of direct query
+  const { isSuperAdmin, loading: roleLoading } = useIsAdmin();
 
   const { data: users, isLoading: usersLoading } = useUsers();
   const { data: roles } = useRoles();
   const assignRoleMutation = useAssignRole();
   const toggleStatusMutation = useToggleUserStatus();
 
-  // Security check: Only level 100 (superadmin) can access
+  // Security check: Only superadmin can access
   useEffect(() => {
     console.log('🟢 [UserManagement] useEffect TRIGGERED');
 
-    const checkSuperAdmin = async () => {
-      // Wait for auth to finish loading AND user to be loaded
-      if (authLoading) {
-        console.log('[UserManagement] Auth still loading, waiting...');
-        return;
-      }
+    // Wait for auth and role check to complete
+    if (authLoading || roleLoading) {
+      console.log('[UserManagement] Still loading auth or role...');
+      return;
+    }
 
-      if (!user) {
-        console.log('[UserManagement] User object not loaded yet, waiting...');
-        return;
-      }
+    if (!user?.id) {
+      console.log('🔴 [UserManagement] No user ID - redirecting to login');
+      navigate('/login');
+      return;
+    }
 
-      console.log('[UserManagement] Starting access check for user:', user?.id);
+    if (!isSuperAdmin) {
+      console.log('🔴 [UserManagement] Not superadmin - ACCESS DENIED - redirecting to home');
+      navigate('/');
+      return;
+    }
 
-      if (!user?.id) {
-        console.log('🔴 [UserManagement] No user ID - redirecting to login');
-        navigate('/login');
-        return;
-      }
-
-      console.log('[UserManagement] Calling getUserRoleLevel...');
-      const level = await getUserRoleLevel(user.id);
-      console.log('[UserManagement] Got level:', level, 'typeof:', typeof level);
-
-      if (level < 100) {
-        console.log('🔴 [UserManagement] Level < 100 - ACCESS DENIED - redirecting to home');
-        navigate('/');
-        return;
-      }
-
-      console.log('✅ [UserManagement] Level >= 100 - ACCESS GRANTED');
-      setIsSuperAdmin(true);
-      setCheckingAccess(false);
-      console.log('[UserManagement] State updated: isSuperAdmin=true, checkingAccess=false');
-    };
-
-    checkSuperAdmin();
-  }, [user, navigate, authLoading]);
+    console.log('✅ [UserManagement] Superadmin verified - ACCESS GRANTED');
+  }, [user, isSuperAdmin, authLoading, roleLoading, navigate]);
 
   // Filter users
   const filteredUsers = users?.filter((u) => {
@@ -120,20 +104,20 @@ export const UserManagement = () => {
 
   console.log('🔵 [UserManagement] Render state:', {
     authLoading,
-    checkingAccess,
+    roleLoading,
     isSuperAdmin,
     hasUser: !!user,
   });
 
-  // Wait for auth to finish loading, user to be loaded, OR access check
-  if (authLoading || !user || checkingAccess) {
-    console.log('⏳ [UserManagement] Showing loading screen - waiting for auth/user/access check');
+  // Wait for auth to finish loading, user to be loaded, OR role check
+  if (authLoading || !user || roleLoading) {
+    console.log('⏳ [UserManagement] Showing loading screen - waiting for auth/user/role check');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {authLoading ? 'Loading authentication...' : !user ? 'Loading user...' : 'Checking access...'}
+            {authLoading ? 'Loading authentication...' : !user ? 'Loading user...' : 'Verifying superadmin access...'}
           </p>
         </div>
       </div>

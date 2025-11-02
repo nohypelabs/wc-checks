@@ -142,14 +142,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 📝 AUDIT LOG
-    await createAuditLog(auth.userId, 'TOGGLE_USER_STATUS', {
-      targetUserId: userId,
-      targetUserEmail: targetUser.email,
-      targetUserName: targetUser.full_name,
-      targetRole: targetRoleName,
-      previousStatus: targetUser.is_active,
-      newStatus: isActive,
-    });
+    await createAuditLog(
+      auth.userId,
+      'TOGGLE_USER_STATUS',
+      'user',
+      userId,
+      {
+        targetUserEmail: targetUser.email,
+        targetUserName: targetUser.full_name,
+        targetRole: targetRoleName,
+        previousStatus: targetUser.is_active,
+        newStatus: isActive,
+      },
+      true
+    );
 
     console.log(`[toggle-user-status] Success: ${targetUser.email} ${isActive ? 'activated' : 'deactivated'}`);
 
