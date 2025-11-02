@@ -41,7 +41,7 @@ interface AdminStats {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only GET allowed
   if (req.method !== 'GET') {
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   }
 
   // Validate authentication and require admin (level 80+)
@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!auth || !supabase) {
     console.error('[stats] Auth failed or Supabase not initialized');
-    return res.status(403).json(errorResponse('Access denied - Admin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
   console.log('[stats] Admin access granted:', {
@@ -157,9 +157,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('[stats] Success - returning dashboard statistics');
 
-    return res.status(200).json(successResponse(stats, 'Statistics retrieved successfully'));
+    return successResponse(res, stats, 'Statistics retrieved successfully');
   } catch (error: any) {
     console.error('[stats] Error:', error);
-    return res.status(500).json(errorResponse('Failed to retrieve statistics: ' + error.message));
+    return errorResponse(res, 500, 'Failed to retrieve statistics: ' + error.message);
   }
 }

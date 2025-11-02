@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const auth = await validateAuth(req, 80);
 
   if (!auth || !supabase) {
-    return res.status(403).json(errorResponse('Access denied - Admin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
   const { id, organization_id } = req.query;
@@ -38,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .single();
 
         if (error) throw error;
-        return res.status(200).json(successResponse(building, 'Building retrieved'));
+        return successResponse(res, building, 'Building retrieved');
       }
 
       let query = supabase
@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: buildings, error } = await query;
       if (error) throw error;
 
-      return res.status(200).json(successResponse(buildings || [], 'Buildings retrieved'));
+      return successResponse(res, buildings || [], 'Buildings retrieved');
     }
 
     // POST - Create building
@@ -61,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { name, short_code, organization_id, address, total_floors, type } = req.body;
 
       if (!name || !short_code || !organization_id) {
-        return res.status(400).json(errorResponse('Missing required fields'));
+        return errorResponse(res, 400, 'Missing required fields');
       }
 
       const { data: newBuilding, error } = await supabase
@@ -83,22 +83,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'create_building',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: { buildingId: newBuilding.id, name: newBuilding.name },
-        status: 'success',
-      });
+      await createAuditLog(
+        auth.userId,
+        'CREATE_BUILDING',
+        'building',
+        newBuilding.id,
+        { buildingId: newBuilding.id, name: newBuilding.name },
+        true
+      );
 
-      return res.status(201).json(successResponse(newBuilding, 'Building created'));
+      return successResponse(res, newBuilding, 'Building created');
     }
 
     // PATCH - Update building
     if (req.method === 'PATCH') {
       if (!id) {
-        return res.status(400).json(errorResponse('Building ID required'));
+        return errorResponse(res, 400, 'Building ID required');
       }
 
       const updates: any = {};
@@ -119,22 +119,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'update_building',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: { buildingId: id, updates },
-        status: 'success',
-      });
+      await createAuditLog(
+        auth.userId,
+        'UPDATE_BUILDING',
+        'building',
+        id as string,
+        { buildingId: id, updates },
+        true
+      );
 
-      return res.status(200).json(successResponse(updated, 'Building updated'));
+      return successResponse(res, updated, 'Building updated');
     }
 
     // DELETE - Soft delete building
     if (req.method === 'DELETE') {
       if (!id) {
-        return res.status(400).json(errorResponse('Building ID required'));
+        return errorResponse(res, 400, 'Building ID required');
       }
 
       const { data: deleted, error } = await supabase
@@ -146,21 +146,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'delete_building',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: { buildingId: id },
-        status: 'success',
-      });
+      await createAuditLog(
+        auth.userId,
+        'DELETE_BUILDING',
+        'building',
+        id as string,
+        { buildingId: id },
+        true
+      );
 
-      return res.status(200).json(successResponse(deleted, 'Building deleted'));
+      return successResponse(res, deleted, 'Building deleted');
     }
 
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   } catch (error: any) {
     console.error('[buildings] Error:', error);
-    return res.status(500).json(errorResponse('Operation failed: ' + error.message));
+    return errorResponse(res, 500, 'Operation failed: ' + error.message);
   }
 }

@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const auth = await validateAuth(req, 80);
 
   if (!auth || !supabase) {
-    return res.status(403).json(errorResponse('Access denied - Admin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
   const { id, building_id, organization_id } = req.query;
@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .single();
 
         if (error) throw error;
-        return res.status(200).json(successResponse(location, 'Location retrieved'));
+        return successResponse(res, location, 'Location retrieved');
       }
 
       let query = supabase
@@ -58,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: locations, error } = await query;
       if (error) throw error;
 
-      return res.status(200).json(successResponse(locations || [], 'Locations retrieved'));
+      return successResponse(res, locations || [], 'Locations retrieved');
     }
 
     // POST - Create location
@@ -66,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { name, short_code, building_id, organization_id, floor, code, type } = req.body;
 
       if (!name || !short_code || !organization_id) {
-        return res.status(400).json(errorResponse('Missing required fields: name, short_code, organization_id'));
+        return errorResponse(res, 400, 'Missing required fields: name, short_code, organization_id');
       }
 
       const { data: newLocation, error } = await supabase
@@ -89,22 +89,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'create_location',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: { locationId: newLocation.id, name: newLocation.name },
-        status: 'success',
-      });
+      await createAuditLog(
+        auth.userId,
+        'CREATE_LOCATION',
+        'location',
+        newLocation.id,
+        { locationId: newLocation.id, name: newLocation.name },
+        true
+      );
 
-      return res.status(201).json(successResponse(newLocation, 'Location created'));
+      return successResponse(res, newLocation, 'Location created');
     }
 
     // PATCH - Update location
     if (req.method === 'PATCH') {
       if (!id) {
-        return res.status(400).json(errorResponse('Location ID required'));
+        return errorResponse(res, 400, 'Location ID required');
       }
 
       const updates: any = {};
@@ -125,22 +125,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'update_location',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: { locationId: id, updates },
-        status: 'success',
-      });
+      await createAuditLog(
+        auth.userId,
+        'UPDATE_LOCATION',
+        'location',
+        id as string,
+        { locationId: id, updates },
+        true
+      );
 
-      return res.status(200).json(successResponse(updated, 'Location updated'));
+      return successResponse(res, updated, 'Location updated');
     }
 
     // DELETE - Soft delete location
     if (req.method === 'DELETE') {
       if (!id) {
-        return res.status(400).json(errorResponse('Location ID required'));
+        return errorResponse(res, 400, 'Location ID required');
       }
 
       const { data: deleted, error } = await supabase
@@ -152,21 +152,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'delete_location',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: { locationId: id },
-        status: 'success',
-      });
+      await createAuditLog(
+        auth.userId,
+        'DELETE_LOCATION',
+        'location',
+        id as string,
+        { locationId: id },
+        true
+      );
 
-      return res.status(200).json(successResponse(deleted, 'Location deleted'));
+      return successResponse(res, deleted, 'Location deleted');
     }
 
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   } catch (error: any) {
     console.error('[locations] Error:', error);
-    return res.status(500).json(errorResponse('Operation failed: ' + error.message));
+    return errorResponse(res, 500, 'Operation failed: ' + error.message);
   }
 }

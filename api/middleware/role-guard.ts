@@ -15,7 +15,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 }
 
 // Initialize Supabase with SERVICE_KEY (backend access)
-const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
+const supabaseClient = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient<Database>(
       SUPABASE_URL,
       SUPABASE_SERVICE_KEY, // 🔥 SERVICE_KEY for backend operations
@@ -27,6 +27,9 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
       }
     )
   : null;
+
+// Export for use in API endpoints
+export const supabase = supabaseClient;
 
 export interface AuthContext {
   userId: string;

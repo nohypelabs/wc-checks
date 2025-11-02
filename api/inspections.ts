@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const auth = await validateAuth(req, 0); // Any authenticated user
 
   if (!auth || !supabase) {
-    return res.status(401).json(errorResponse('Authentication required'));
+    return errorResponse(res, 401, 'Authentication required');
   }
 
   const { id } = req.query;
@@ -35,10 +35,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (error) throw error;
         if (!inspection) {
-          return res.status(404).json(errorResponse('Inspection not found'));
+          return errorResponse(res, 404, 'Inspection not found');
         }
 
-        return res.status(200).json(successResponse(inspection, 'Inspection retrieved'));
+        return successResponse(res, inspection, 'Inspection retrieved');
       }
 
       // List all inspections for current user
@@ -50,7 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      return res.status(200).json(successResponse(inspections || [], 'Inspections retrieved'));
+      return successResponse(res, inspections || [], 'Inspections retrieved');
     }
 
     // POST - Create inspection
@@ -66,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } = req.body;
 
       if (!location_id || !inspection_date || !responses) {
-        return res.status(400).json(errorResponse('Missing required fields'));
+        return errorResponse(res, 400, 'Missing required fields');
       }
 
       const { data: newInspection, error } = await supabase
@@ -88,13 +88,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      return res.status(201).json(successResponse(newInspection, 'Inspection created'));
+      return successResponse(res, newInspection, 'Inspection created');
     }
 
     // PATCH - Update inspection (own only)
     if (req.method === 'PATCH') {
       if (!id) {
-        return res.status(400).json(errorResponse('Inspection ID required'));
+        return errorResponse(res, 400, 'Inspection ID required');
       }
 
       // Verify ownership
@@ -105,7 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .single();
 
       if (!existing || existing.user_id !== userId) {
-        return res.status(403).json(errorResponse('Access denied - not your inspection'));
+        return errorResponse(res, 403, 'Access denied - not your inspection');
       }
 
       const updates: any = {};
@@ -127,13 +127,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      return res.status(200).json(successResponse(updated, 'Inspection updated'));
+      return successResponse(res, updated, 'Inspection updated');
     }
 
     // DELETE - Delete inspection (own only)
     if (req.method === 'DELETE') {
       if (!id) {
-        return res.status(400).json(errorResponse('Inspection ID required'));
+        return errorResponse(res, 400, 'Inspection ID required');
       }
 
       const { data: deleted, error } = await supabase
@@ -146,12 +146,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (error) throw error;
 
-      return res.status(200).json(successResponse(deleted, 'Inspection deleted'));
+      return successResponse(res, deleted, 'Inspection deleted');
     }
 
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   } catch (error: any) {
     console.error('[inspections] Error:', error);
-    return res.status(500).json(errorResponse('Operation failed: ' + error.message));
+    return errorResponse(res, 500, 'Operation failed: ' + error.message);
   }
 }

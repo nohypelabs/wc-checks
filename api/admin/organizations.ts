@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const auth = await validateAuth(req, 80);
 
   if (!auth || !supabase) {
-    return res.status(403).json(errorResponse('Access denied - Admin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
   const { id } = req.query;
@@ -40,10 +40,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (error) throw error;
         if (!org) {
-          return res.status(404).json(errorResponse('Organization not found'));
+          return errorResponse(res, 404, 'Organization not found');
         }
 
-        return res.status(200).json(successResponse(org, 'Organization retrieved successfully'));
+        return successResponse(res, org, 'Organization retrieved successfully');
       } else {
         // List all organizations
         const { data: organizations, error } = await supabase
@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (error) throw error;
 
-        return res.status(200).json(successResponse(organizations || [], 'Organizations retrieved successfully'));
+        return successResponse(res, organizations || [], 'Organizations retrieved successfully');
       }
     }
 
@@ -63,7 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       // Validation
       if (!name || !short_code) {
-        return res.status(400).json(errorResponse('Missing required fields: name, short_code'));
+        return errorResponse(res, 400, 'Missing required fields: name, short_code');
       }
 
       // Create organization
@@ -87,26 +87,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
 
       // Audit log
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'create_organization',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: {
+      await createAuditLog(
+        auth.userId,
+        'CREATE_ORGANIZATION',
+        'organization',
+        newOrg.id,
+        {
           organizationId: newOrg.id,
           name: newOrg.name,
           short_code: newOrg.short_code,
         },
-        status: 'success',
-      });
+        true
+      );
 
-      return res.status(201).json(successResponse(newOrg, 'Organization created successfully'));
+      return successResponse(res, newOrg, 'Organization created successfully');
     }
 
     // PATCH - Update organization
     if (req.method === 'PATCH') {
       if (!id) {
-        return res.status(400).json(errorResponse('Organization ID required'));
+        return errorResponse(res, 400, 'Organization ID required');
       }
 
       const { name, short_code, address, phone, email, logo_url, is_active } = req.body;
@@ -133,25 +133,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
 
       // Audit log
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'update_organization',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: {
+      await createAuditLog(
+        auth.userId,
+        'UPDATE_ORGANIZATION',
+        'organization',
+        id as string,
+        {
           organizationId: id,
           updates,
         },
-        status: 'success',
-      });
+        true
+      );
 
-      return res.status(200).json(successResponse(updatedOrg, 'Organization updated successfully'));
+      return successResponse(res, updatedOrg, 'Organization updated successfully');
     }
 
     // DELETE - Delete organization
     if (req.method === 'DELETE') {
       if (!id) {
-        return res.status(400).json(errorResponse('Organization ID required'));
+        return errorResponse(res, 400, 'Organization ID required');
       }
 
       // Soft delete - set is_active to false
@@ -165,39 +165,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
 
       // Audit log
-      await createAuditLog({
-        userId: auth.userId,
-        action: 'delete_organization',
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: {
+      await createAuditLog(
+        auth.userId,
+        'DELETE_ORGANIZATION',
+        'organization',
+        id as string,
+        {
           organizationId: id,
         },
-        status: 'success',
-      });
+        true
+      );
 
-      return res.status(200).json(successResponse(deletedOrg, 'Organization deleted successfully'));
+      return successResponse(res, deletedOrg, 'Organization deleted successfully');
     }
 
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   } catch (error: any) {
     console.error('[organizations] Error:', error);
 
     // Audit log for failure
     if (req.method !== 'GET') {
-      await createAuditLog({
-        userId: auth.userId,
-        action: `${req.method?.toLowerCase()}_organization`,
-        targetUserId: null,
-        targetRoleId: null,
-        metadata: {
+      await createAuditLog(
+        auth.userId,
+        `${req.method?.toUpperCase()}_ORGANIZATION`,
+        'organization',
+        (req.query.id as string) || undefined,
+        {
           error: error.message,
           body: req.body,
         },
-        status: 'failed',
-      });
+        false,
+        error.message
+      );
     }
 
-    return res.status(500).json(errorResponse('Operation failed: ' + error.message));
+    return errorResponse(res, 500, 'Operation failed: ' + error.message);
   }
 }

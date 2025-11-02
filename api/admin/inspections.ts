@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const auth = await validateAuth(req, 80);
 
   if (!auth || !supabase) {
-    return res.status(403).json(errorResponse('Access denied - Admin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
   const { id, user_id, location_id, date, limit = '100' } = req.query;
@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     // GET only - admins can view, not modify
     if (req.method !== 'GET') {
-      return res.status(405).json(errorResponse('Method not allowed - use /api/inspections for modifications'));
+      return errorResponse(res, 405, 'Method not allowed - use /api/inspections for modifications');
     }
 
     // Get specific inspection
@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .single();
 
       if (error) throw error;
-      return res.status(200).json(successResponse(inspection, 'Inspection retrieved'));
+      return successResponse(res, inspection, 'Inspection retrieved');
     }
 
     // List inspections with filters
@@ -66,18 +66,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: inspections, error } = await query;
     if (error) throw error;
 
-    return res.status(200).json(
-      successResponse(
-        {
-          inspections: inspections || [],
-          count: inspections?.length || 0,
-          filters: { user_id, location_id, date, limit },
-        },
-        'Inspections retrieved'
-      )
+    return successResponse(
+      res,
+      {
+        inspections: inspections || [],
+        count: inspections?.length || 0,
+        filters: { user_id, location_id, date, limit },
+      },
+      'Inspections retrieved'
     );
   } catch (error: any) {
     console.error('[admin/inspections] Error:', error);
-    return res.status(500).json(errorResponse('Operation failed: ' + error.message));
+    return errorResponse(res, 500, 'Operation failed: ' + error.message);
   }
 }
