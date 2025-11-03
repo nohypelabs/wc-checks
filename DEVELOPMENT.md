@@ -25,28 +25,39 @@ cp .env.example .env  # then edit .env with your credentials
 
 ### Running the Dev Server
 
-#### Method 1: With Backend API (Recommended) 🚀
+#### Recommended: One Simple Command 🚀
 
 ```bash
-# Start with Vercel (runs both frontend + backend)
-vercel dev
-```
+# Install dependencies first (if not done yet)
+npm install  # or: pnpm install
 
-This will:
-- ✅ Run Vite dev server (frontend)
-- ✅ Execute API routes (backend serverless functions)
-- ✅ Properly handle `/api/*` requests
-
-**Access the app at:** `http://localhost:3000` (Vercel's default port)
-
-#### Method 2: Frontend Only (For UI Development)
-
-```bash
-# Start frontend only (no API)
+# Run development server (frontend + API)
 npm run dev
 ```
 
-⚠️ **Warning:** API requests will fail when using `npm run dev` because the backend API routes won't be running. Only use this if you're working on UI components that don't need API calls.
+This will:
+- ✅ Start Vercel dev environment
+- ✅ Run Vite dev server for frontend
+- ✅ Execute TypeScript API routes automatically
+- ✅ Handle hot-reload for both frontend and API
+
+**Access the app at:** `http://localhost:3000`
+
+**To stop:** Press `Ctrl+C`
+
+---
+
+#### Alternative: Frontend Only (No API)
+
+If you only want to work on UI without backend:
+
+```bash
+npm run dev:vite
+```
+
+**Access at:** `http://localhost:5174`
+
+⚠️ **Warning:** API requests will fail. Only use this for UI-only work.
 
 ## API Routes
 

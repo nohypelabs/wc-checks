@@ -93,11 +93,6 @@ export default defineConfig(({ mode }) => ({
     sourcemap: false,
   },
 
-  server: {
-    port: 5174,
-    host: true,
-  },
-
   optimizeDeps: {
     include: [
       'react',
