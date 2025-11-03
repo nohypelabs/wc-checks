@@ -1,27 +1,29 @@
-// src/hooks/useBuildings.ts - Buildings CRUD via backend API
+// src/hooks/useLocations.ts - Locations CRUD via backend API
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
 import type { Tables } from '../types/database.types';
 
-type Building = Tables<'buildings'>;
+type Location = Tables<'locations'>;
 
-interface UseBuildingsOptions {
+interface UseLocationsOptions {
+  buildingId?: string;
   organizationId?: string;
   enabled?: boolean;
   includeInactive?: boolean;
 }
 
 /**
- * Fetch buildings with optional organization filter via BACKEND API
+ * Fetch locations with optional filters via BACKEND API
  */
-export function useBuildings({
+export function useLocations({
+  buildingId,
   organizationId,
   enabled = true,
   includeInactive = false,
-}: UseBuildingsOptions = {}) {
+}: UseLocationsOptions = {}) {
   return useQuery({
-    queryKey: ['buildings', organizationId, includeInactive],
+    queryKey: ['locations', buildingId, organizationId, includeInactive],
     queryFn: async () => {
       const {
         data: { session },
@@ -32,9 +34,12 @@ export function useBuildings({
         throw new Error('No authentication token');
       }
 
-      const url = organizationId
-        ? `/api/admin/buildings?organization_id=${organizationId}`
-        : '/api/admin/buildings';
+      // Build query params
+      const params = new URLSearchParams();
+      if (buildingId) params.append('building_id', buildingId);
+      if (organizationId) params.append('organization_id', organizationId);
+
+      const url = `/api/admin/locations${params.toString() ? '?' + params.toString() : ''}`;
 
       const response = await fetch(url, {
         headers: {
@@ -44,18 +49,18 @@ export function useBuildings({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch buildings');
+        throw new Error(error.error || 'Failed to fetch locations');
       }
 
       const result = await response.json();
-      let buildings = result.data as Building[];
+      let locations = result.data as Location[];
 
       // Client-side filter for inactive if needed
       if (!includeInactive) {
-        buildings = buildings.filter((b) => b.is_active);
+        locations = locations.filter((l) => l.is_active);
       }
 
-      return buildings;
+      return locations;
     },
     enabled: enabled,
     staleTime: 30 * 1000, // 30 seconds
@@ -63,13 +68,13 @@ export function useBuildings({
 }
 
 /**
- * Fetch single building by ID via BACKEND API
+ * Fetch single location by ID via BACKEND API
  */
-export function useBuilding(buildingId?: string) {
+export function useLocation(locationId?: string) {
   return useQuery({
-    queryKey: ['building', buildingId],
+    queryKey: ['location', locationId],
     queryFn: async () => {
-      if (!buildingId) return null;
+      if (!locationId) return null;
 
       const {
         data: { session },
@@ -80,7 +85,7 @@ export function useBuilding(buildingId?: string) {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/buildings?id=${buildingId}`, {
+      const response = await fetch(`/api/admin/locations?id=${locationId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -88,29 +93,34 @@ export function useBuilding(buildingId?: string) {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch building');
+        throw new Error(error.error || 'Failed to fetch location');
       }
 
       const result = await response.json();
-      return result.data as Building & {
-        organizations?: {
+      return result.data as Location & {
+        buildings?: {
           name: string;
+          organization_id: string;
         };
       };
     },
-    enabled: !!buildingId,
+    enabled: !!locationId,
     staleTime: 30 * 1000,
   });
 }
 
 /**
- * Fetch building by short code via BACKEND API
+ * Fetch location by short code via BACKEND API
  * NOTE: Backend doesn't support filtering by short_code yet,
  * so we fetch all and filter client-side
  */
-export function useBuildingByCode(shortCode?: string, organizationId?: string) {
+export function useLocationByCode(
+  shortCode?: string,
+  buildingId?: string,
+  organizationId?: string
+) {
   return useQuery({
-    queryKey: ['building-by-code', shortCode, organizationId],
+    queryKey: ['location-by-code', shortCode, buildingId, organizationId],
     queryFn: async () => {
       if (!shortCode) return null;
 
@@ -123,9 +133,12 @@ export function useBuildingByCode(shortCode?: string, organizationId?: string) {
         throw new Error('No authentication token');
       }
 
-      const url = organizationId
-        ? `/api/admin/buildings?organization_id=${organizationId}`
-        : '/api/admin/buildings';
+      // Build query params
+      const params = new URLSearchParams();
+      if (buildingId) params.append('building_id', buildingId);
+      if (organizationId) params.append('organization_id', organizationId);
+
+      const url = `/api/admin/locations${params.toString() ? '?' + params.toString() : ''}`;
 
       const response = await fetch(url, {
         headers: {
@@ -135,34 +148,35 @@ export function useBuildingByCode(shortCode?: string, organizationId?: string) {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch buildings');
+        throw new Error(error.error || 'Failed to fetch locations');
       }
 
       const result = await response.json();
-      const buildings = result.data as Building[];
+      const locations = result.data as Location[];
 
       // Client-side filter by short_code
-      const building = buildings.find((b) => b.short_code === shortCode);
-      return building || null;
+      const location = locations.find((l) => l.short_code === shortCode);
+      return location || null;
     },
     enabled: !!shortCode,
   });
 }
 
 /**
- * Create new building via BACKEND API
+ * Create new location via BACKEND API
  */
-export function useCreateBuilding() {
+export function useCreateLocation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (buildingData: {
+    mutationFn: async (locationData: {
       name: string;
       short_code: string;
       organization_id: string;
-      type?: string;
-      address?: string;
-      total_floors?: number;
+      building_id?: string | null;
+      floor?: string | null;
+      code?: string | null;
+      type?: string | null;
     }) => {
       const {
         data: { session },
@@ -173,52 +187,59 @@ export function useCreateBuilding() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch('/api/admin/buildings', {
+      const response = await fetch('/api/admin/locations', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(buildingData),
+        body: JSON.stringify(locationData),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to create building');
+        throw new Error(error.error || 'Failed to create location');
       }
 
       const result = await response.json();
-      return result.data as Building;
+      return result.data as Location;
     },
     onSuccess: (data) => {
-      // Invalidate buildings cache for this organization
+      // Invalidate all location caches
       queryClient.invalidateQueries({
-        queryKey: ['buildings', data.organization_id],
+        queryKey: ['locations'],
       });
-      queryClient.invalidateQueries({
-        queryKey: ['buildings'],
-      });
-      toast.success('Building created successfully!');
+      if (data.building_id) {
+        queryClient.invalidateQueries({
+          queryKey: ['locations', data.building_id],
+        });
+      }
+      if (data.organization_id) {
+        queryClient.invalidateQueries({
+          queryKey: ['locations', undefined, data.organization_id],
+        });
+      }
+      toast.success('Location created successfully!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create building');
+      toast.error(error.message || 'Failed to create location');
     },
   });
 }
 
 /**
- * Update building via BACKEND API
+ * Update location via BACKEND API
  */
-export function useUpdateBuilding() {
+export function useUpdateLocation() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
-      buildingId,
+      locationId,
       updates,
     }: {
-      buildingId: string;
-      updates: Partial<Building>;
+      locationId: string;
+      updates: Partial<Location>;
     }) => {
       const {
         data: { session },
@@ -229,7 +250,7 @@ export function useUpdateBuilding() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/buildings?id=${buildingId}`, {
+      const response = await fetch(`/api/admin/locations?id=${locationId}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -240,39 +261,36 @@ export function useUpdateBuilding() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to update building');
+        throw new Error(error.error || 'Failed to update location');
       }
 
       const result = await response.json();
-      return result.data as Building;
+      return result.data as Location;
     },
     onSuccess: (data) => {
       // Invalidate related caches
       queryClient.invalidateQueries({
-        queryKey: ['buildings', data.organization_id],
+        queryKey: ['locations'],
       });
       queryClient.invalidateQueries({
-        queryKey: ['building', data.id],
+        queryKey: ['location', data.id],
       });
-      queryClient.invalidateQueries({
-        queryKey: ['buildings'],
-      });
-      toast.success('Building updated successfully!');
+      toast.success('Location updated successfully!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update building');
+      toast.error(error.message || 'Failed to update location');
     },
   });
 }
 
 /**
- * Soft delete building via BACKEND API
+ * Soft delete location via BACKEND API
  */
-export function useDeleteBuilding() {
+export function useDeleteLocation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (buildingId: string) => {
+    mutationFn: async (locationId: string) => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -282,7 +300,7 @@ export function useDeleteBuilding() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/buildings?id=${buildingId}`, {
+      const response = await fetch(`/api/admin/locations?id=${locationId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -291,43 +309,17 @@ export function useDeleteBuilding() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to delete building');
+        throw new Error(error.error || 'Failed to delete location');
       }
 
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['buildings'] });
-      toast.success('Building deleted successfully!');
+      queryClient.invalidateQueries({ queryKey: ['locations'] });
+      toast.success('Location deleted successfully!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete building');
+      toast.error(error.message || 'Failed to delete location');
     },
-  });
-}
-
-/**
- * Count locations per building
- * NOTE: Still uses direct query as we don't have a stats endpoint for buildings yet
- */
-export function useBuildingStats(buildingId?: string) {
-  return useQuery({
-    queryKey: ['building-stats', buildingId],
-    queryFn: async () => {
-      if (!buildingId) return null;
-
-      const { count, error } = await supabase
-        .from('locations')
-        .select('*', { count: 'exact', head: true })
-        .eq('building_id', buildingId)
-        .eq('is_active', true);
-
-      if (error) throw error;
-
-      return {
-        totalLocations: count || 0,
-      };
-    },
-    enabled: !!buildingId,
   });
 }
