@@ -25,14 +25,14 @@ cp .env.example .env  # then edit .env with your credentials
 
 ### Running the Dev Server
 
-#### Recommended: One Simple Command 🚀
+#### Method 1: With Backend API (Recommended) 🚀
 
 ```bash
 # Install dependencies first (if not done yet)
-npm install  # or: pnpm install
+pnpm install  # or: npm install
 
 # Run development server (frontend + API)
-npm run dev
+vercel dev
 ```
 
 This will:
@@ -47,12 +47,12 @@ This will:
 
 ---
 
-#### Alternative: Frontend Only (No API)
+#### Method 2: Frontend Only (No API)
 
 If you only want to work on UI without backend:
 
 ```bash
-npm run dev:vite
+npm run dev
 ```
 
 **Access at:** `http://localhost:5174`
