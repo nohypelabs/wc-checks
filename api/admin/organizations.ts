@@ -6,7 +6,7 @@ import {
   successResponse,
   errorResponse,
   createAuditLog,
-} from '../middleware/role-guard';
+} from '../middleware/role-guard.js';
 
 /**
  * GET /api/admin/organizations - List all organizations
@@ -26,16 +26,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { id } = req.query;
+  const orgId = Array.isArray(id) ? id[0] : id;
 
   try {
     // GET - List all or get specific
     if (req.method === 'GET') {
-      if (id) {
+      if (orgId) {
         // Get specific organization
         const { data: org, error } = await supabase
           .from('organizations')
           .select('*')
-          .eq('id', id)
+          .eq('id', orgId)
           .single();
 
         if (error) throw error;
@@ -126,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: updatedOrg, error } = await supabase
         .from('organizations')
         .update(updates)
-        .eq('id', id)
+        .eq('id', orgId)
         .select()
         .single();
 
@@ -158,7 +159,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: deletedOrg, error } = await supabase
         .from('organizations')
         .update({ is_active: false, updated_at: new Date().toISOString() })
-        .eq('id', id)
+        .eq('id', orgId)
         .select()
         .single();
 
