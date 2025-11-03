@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "vercel dev --listen 3001",
+    "dev:full": "concurrently \"npm run dev:api\" \"npm run dev\" --names \"API,UI\" --prefix-colors \"blue,green\"",
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",

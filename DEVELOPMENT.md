@@ -25,28 +25,51 @@ cp .env.example .env  # then edit .env with your credentials
 
 ### Running the Dev Server
 
-#### Method 1: With Backend API (Recommended) 🚀
+#### Method 1: One Command (Recommended) 🚀
 
 ```bash
-# Start with Vercel (runs both frontend + backend)
-vercel dev
+# Install dependencies first (if not done yet)
+npm install  # or: pnpm install
+
+# Run both frontend and API servers
+./dev.sh
 ```
 
 This will:
-- ✅ Run Vite dev server (frontend)
-- ✅ Execute API routes (backend serverless functions)
-- ✅ Properly handle `/api/*` requests
+- ✅ Run Vercel dev server on port 3001 (API routes)
+- ✅ Run Vite dev server on port 5174 (frontend)
+- ✅ Proxy `/api/*` requests from frontend to backend
+- ✅ Both servers run simultaneously
 
-**Access the app at:** `http://localhost:3000` (Vercel's default port)
+**Access the app at:** `http://localhost:5174`
 
-#### Method 2: Frontend Only (For UI Development)
+**To stop:** Press `Ctrl+C` (stops both servers)
 
+---
+
+#### Method 2: Manual (Run in separate terminals)
+
+**Terminal 1 - API Server:**
 ```bash
-# Start frontend only (no API)
+vercel dev --listen 3001
+```
+
+**Terminal 2 - Frontend:**
+```bash
 npm run dev
 ```
 
-⚠️ **Warning:** API requests will fail when using `npm run dev` because the backend API routes won't be running. Only use this if you're working on UI components that don't need API calls.
+**Access the app at:** `http://localhost:5174`
+
+---
+
+#### Method 3: Frontend Only (No API)
+
+```bash
+npm run dev
+```
+
+⚠️ **Warning:** API requests will fail. Only use this for UI-only work.
 
 ## API Routes
 
