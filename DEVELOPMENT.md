@@ -25,9 +25,11 @@ cp .env.example .env  # then edit .env with your credentials
 
 ### Running the Dev Server
 
+#### Method 1: With Backend API (Recommended) 🚀
+
 ```bash
-# Start development server with Vercel (recommended)
-npm run dev
+# Start with Vercel (runs both frontend + backend)
+vercel dev
 ```
 
 This will:
@@ -37,15 +39,14 @@ This will:
 
 **Access the app at:** `http://localhost:3000` (Vercel's default port)
 
-### Alternative: Frontend Only
-
-If you only want to work on the frontend without the backend:
+#### Method 2: Frontend Only (For UI Development)
 
 ```bash
-npm run dev:vite
+# Start frontend only (no API)
+npm run dev
 ```
 
-⚠️ **Warning:** API requests will fail when using `dev:vite` because the backend API routes won't be running.
+⚠️ **Warning:** API requests will fail when using `npm run dev` because the backend API routes won't be running. Only use this if you're working on UI components that don't need API calls.
 
 ## API Routes
 
