@@ -1,11 +1,10 @@
-// src/pages/admin/LocationsManager.tsx - Admin-only CRUD for locations
+// src/pages/admin/LocationsManager.tsx - Admin-only CRUD for locations via Backend API
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
+import { useLocations, useDeleteLocation } from '../../hooks/useLocations';
 import { Tables, TablesInsert } from '../../types/database.types';
 import { Plus, Edit2, Trash2, MapPin, QrCode, Search, MoreVertical, Copy, User, ShieldAlert, Menu, CheckSquare, Square, Download, BarChart3, X, Check, Power, PowerOff } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
@@ -23,7 +22,6 @@ export const LocationsManager = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const queryClient = useQueryClient();
 
   console.log('🟢 LocationsManager: Auth state', {
     hasUser: !!user,
@@ -31,7 +29,7 @@ export const LocationsManager = () => {
     isAdmin,
     adminLoading
   });
-  
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,45 +40,18 @@ export const LocationsManager = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showAnalytics, setShowAnalytics] = useState(false);
 
-  // Fetch locations
-  const { data: locations, isLoading } = useQuery({
-    queryKey: ['locations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('locations')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as Location[];
-    },
-  });
+  // Fetch locations via BACKEND API
+  const { data: locations, isLoading } = useLocations({});
 
   // Filter locations
-  const filteredLocations = locations?.filter(loc => 
+  const filteredLocations = locations?.filter(loc =>
     loc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     loc.building?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     loc.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('locations')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['locations'] });
-      toast.success('Location deleted');
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete');
-    },
-  });
+  // Backend API hook for delete
+  const deleteLocation = useDeleteLocation();
 
   const handleEdit = (location: Location) => {
     setSelectedLocation(location);
@@ -90,8 +61,11 @@ export const LocationsManager = () => {
 
   const handleDelete = async (id: string, name: string) => {
     if (window.confirm(`Delete "${name}"?`)) {
-      deleteMutation.mutate(id);
-      setOpenMenuId(null);
+      deleteLocation.mutate(id, {
+        onSuccess: () => {
+          setOpenMenuId(null);
+        },
+      });
     }
   };
 

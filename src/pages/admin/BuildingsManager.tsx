@@ -1,11 +1,11 @@
-// src/pages/admin/BuildingsManager.tsx - CRUD for Buildings
+// src/pages/admin/BuildingsManager.tsx - CRUD for Buildings via Backend API
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
+import { useBuildings, useCreateBuilding, useUpdateBuilding, useDeleteBuilding } from '../../hooks/useBuildings';
+import { useOrganizations } from '../../hooks/useOrganizations';
 import { Tables, TablesInsert } from '../../types/database.types';
 import { Plus, Edit2, Trash2, Search, MoreVertical, Building2, Menu, ShieldAlert, User } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
@@ -63,7 +63,6 @@ export const BuildingsManager = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const queryClient = useQueryClient();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
@@ -82,34 +81,11 @@ export const BuildingsManager = () => {
     is_active: true,
   });
 
-  // Fetch buildings
-  const { data: buildings, isLoading } = useQuery({
-    queryKey: ['buildings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('buildings')
-        .select('*')
-        .order('created_at', { ascending: false });
+  // Fetch buildings via BACKEND API
+  const { data: buildings, isLoading } = useBuildings({});
 
-      if (error) throw error;
-      return data as Building[];
-    },
-  });
-
-  // Fetch organizations for dropdown
-  const { data: organizations } = useQuery({
-    queryKey: ['organizations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) throw error;
-      return data as Organization[];
-    },
-  });
+  // Fetch organizations for dropdown via BACKEND API
+  const { data: organizations } = useOrganizations();
 
   // Filter buildings
   const filteredBuildings = buildings?.filter(building =>
@@ -118,69 +94,10 @@ export const BuildingsManager = () => {
     building.address?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Create/Update mutation
-  const saveMutation = useMutation({
-    mutationFn: async (data: Partial<BuildingInsert>) => {
-      console.log('💾 Saving building with data:', data);
-
-      if (selectedBuilding) {
-        // Update
-        console.log('📝 Updating building:', selectedBuilding.id);
-        const { error } = await supabase
-          .from('buildings')
-          .update(data)
-          .eq('id', selectedBuilding.id);
-        if (error) {
-          console.error('❌ Update error:', error);
-          throw error;
-        }
-      } else {
-        // Create
-        const insertData = { ...data, created_by: user?.id };
-        console.log('➕ Creating building with data:', insertData);
-
-        const { data: result, error } = await supabase
-          .from('buildings')
-          .insert([insertData])
-          .select();
-
-        if (error) {
-          console.error('❌ Insert error:', error);
-          throw error;
-        }
-        console.log('✅ Building created:', result);
-      }
-    },
-    onSuccess: () => {
-      console.log('✅ Save mutation success');
-      queryClient.invalidateQueries({ queryKey: ['buildings'] });
-      toast.success(selectedBuilding ? 'Building updated' : 'Building created');
-      setIsFormOpen(false);
-      resetForm();
-    },
-    onError: (error: any) => {
-      console.error('❌ Save mutation error:', error);
-      toast.error(error.message || 'Failed to save building');
-    },
-  });
-
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('buildings')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['buildings'] });
-      toast.success('Building deleted');
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete');
-    },
-  });
+  // Backend API hooks for CRUD
+  const createBuilding = useCreateBuilding();
+  const updateBuilding = useUpdateBuilding();
+  const deleteBuilding = useDeleteBuilding();
 
   const resetForm = () => {
     setFormData({
@@ -212,8 +129,11 @@ export const BuildingsManager = () => {
 
   const handleDelete = async (id: string, name: string) => {
     if (window.confirm(`Delete building "${name}"? This will affect all locations!`)) {
-      deleteMutation.mutate(id);
-      setOpenMenuId(null);
+      deleteBuilding.mutate(id, {
+        onSuccess: () => {
+          setOpenMenuId(null);
+        },
+      });
     }
   };
 
@@ -226,7 +146,27 @@ export const BuildingsManager = () => {
     try {
       const validatedData = buildingSchema.parse(formData);
       console.log('✅ Validation passed:', validatedData);
-      saveMutation.mutate(validatedData);
+
+      if (selectedBuilding) {
+        // Update existing building
+        updateBuilding.mutate({
+          buildingId: selectedBuilding.id,
+          updates: validatedData,
+        }, {
+          onSuccess: () => {
+            setIsFormOpen(false);
+            resetForm();
+          },
+        });
+      } else {
+        // Create new building
+        createBuilding.mutate(validatedData, {
+          onSuccess: () => {
+            setIsFormOpen(false);
+            resetForm();
+          },
+        });
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Show first validation error
