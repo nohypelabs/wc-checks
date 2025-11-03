@@ -25,7 +25,7 @@ import {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only GET allowed
   if (req.method !== 'GET') {
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   }
 
   // Validate authentication and require superadmin (level 90+)
@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!auth || !supabase) {
     console.error('[list-users] Auth failed or Supabase not initialized');
-    return res.status(403).json(errorResponse('Access denied - Superadmin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Superadmin privileges required');
   }
 
   console.log('[list-users] Superadmin access granted:', {
@@ -91,39 +91,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     // Create audit log
-    await createAuditLog({
-      userId: auth.userId,
-      action: 'list_users',
-      targetUserId: null,
-      targetRoleId: null,
-      metadata: {
+    await createAuditLog(
+      auth.userId,
+      'LIST_USERS',
+      'user',
+      undefined,
+      {
         userCount: combined.length,
         timestamp: new Date().toISOString(),
       },
-      status: 'success',
-    });
+      true
+    );
 
     console.log('[list-users] Success - returning', combined.length, 'users with roles');
 
-    return res.status(200).json(
-      successResponse(combined, 'Users retrieved successfully')
-    );
+    return successResponse(res, combined, 'Users retrieved successfully');
   } catch (error: any) {
     console.error('[list-users] Error:', error);
 
     // Create audit log for failure
-    await createAuditLog({
-      userId: auth.userId,
-      action: 'list_users',
-      targetUserId: null,
-      targetRoleId: null,
-      metadata: {
+    await createAuditLog(
+      auth.userId,
+      'LIST_USERS',
+      'user',
+      undefined,
+      {
         error: error.message,
         timestamp: new Date().toISOString(),
       },
-      status: 'failed',
-    });
+      false,
+      error.message
+    );
 
-    return res.status(500).json(errorResponse('Failed to retrieve users: ' + error.message));
+    return errorResponse(res, 500, 'Failed to retrieve users: ' + error.message);
   }
 }

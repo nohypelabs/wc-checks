@@ -67,8 +67,19 @@ export async function validateAuth(
 
     const token = authHeader.substring(7);
 
-    // Verify token with Supabase Auth
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Verify token by creating a client with the user's JWT
+    const userClient = createClient(SUPABASE_URL!, SUPABASE_SERVICE_KEY!, {
+      auth: {
+        persistSession: false,
+      },
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    });
+
+    const { data: { user }, error: authError } = await userClient.auth.getUser();
 
     if (authError || !user) {
       console.error('[validateAuth] Auth error:', authError?.message);
@@ -154,7 +165,7 @@ export async function createAuditLog(
     }
 
     // Use RPC function for audit logging (server-side)
-    const { error } = await supabase.rpc('create_audit_log', {
+    const { error } = await (supabase as any).rpc('create_audit_log', {
       p_user_id: userId,
       p_action: action,
       p_resource_type: resourceType,

@@ -24,7 +24,7 @@ import {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only GET allowed
   if (req.method !== 'GET') {
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   }
 
   // Validate authentication and require admin (level 80+)
@@ -32,7 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!auth || !supabase) {
     console.error('[list-roles] Auth failed or Supabase not initialized');
-    return res.status(403).json(errorResponse('Access denied - Admin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
   console.log('[list-roles] Admin access granted:', {
@@ -56,11 +56,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('[list-roles] Success - returning', roles?.length || 0, 'roles');
 
-    return res.status(200).json(
-      successResponse(roles || [], 'Roles retrieved successfully')
-    );
+    return successResponse(res, roles || [], 'Roles retrieved successfully');
   } catch (error: any) {
     console.error('[list-roles] Error:', error);
-    return res.status(500).json(errorResponse('Failed to retrieve roles: ' + error.message));
+    return errorResponse(res, 500, 'Failed to retrieve roles: ' + error.message);
   }
 }

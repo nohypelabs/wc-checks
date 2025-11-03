@@ -65,8 +65,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Validate limit
     const parsedLimit = Math.min(parseInt(limit as string, 10) || 50, 500);
 
-    // Build query
-    let query = supabase
+    // Build query (cast to any to bypass type checking for audit_logs table)
+    let query = (supabase as any)
       .from('audit_logs')
       .select('*')
       .order('created_at', { ascending: false })
@@ -82,7 +82,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (success !== undefined) {
-      const isSuccess = success === 'true' || success === true;
+      const isSuccess = typeof success === 'string' ? success === 'true' : Boolean(success);
       query = query.eq('success', isSuccess);
     }
 
@@ -109,7 +109,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           limit: parsedLimit,
           userId: userId || null,
           action: action || null,
-          success: success !== undefined ? (success === 'true' || success === true) : null,
+          success: success !== undefined ? (typeof success === 'string' ? success === 'true' : Boolean(success)) : null,
           since: since || null,
         },
       },

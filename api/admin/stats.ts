@@ -131,7 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const inspections = recentInspections.data || [];
     const avgScore = inspections.length > 0
       ? Math.round(
-          inspections.reduce((sum, i) => sum + calculateScore(i.responses), 0) /
+          inspections.reduce((sum: number, i: any) => sum + calculateScore(i.responses), 0) /
             inspections.length
         )
       : 0;
