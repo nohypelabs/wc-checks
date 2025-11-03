@@ -5,7 +5,7 @@ import {
   supabase,
   successResponse,
   errorResponse,
-} from '../middleware/role-guard';
+} from '../middleware/role-guard.js';
 
 /**
  * GET /api/admin/inspections - List all inspections (admin view)
@@ -25,6 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { id, user_id, location_id, date, limit = '100' } = req.query;
+  const inspectionId = Array.isArray(id) ? id[0] : id;
+  const userId = Array.isArray(user_id) ? user_id[0] : user_id;
+  const locationId = Array.isArray(location_id) ? location_id[0] : location_id;
+  const filterDate = Array.isArray(date) ? date[0] : date;
+  const resultLimit = Array.isArray(limit) ? limit[0] : limit;
 
   try {
     // GET only - admins can view, not modify
@@ -33,11 +38,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Get specific inspection
-    if (id) {
+    if (inspectionId) {
       const { data: inspection, error } = await supabase
         .from('inspection_records')
         .select('*, locations(name, floor, buildings(name)), users(full_name, email)')
-        .eq('id', id)
+        .eq('id', inspectionId)
         .single();
 
       if (error) throw error;
@@ -49,18 +54,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .from('inspection_records')
       .select('*, locations(name, floor), users(full_name, email)')
       .order('inspection_date', { ascending: false })
-      .limit(parseInt(limit as string, 10));
+      .limit(parseInt(resultLimit, 10));
 
-    if (user_id) {
-      query = query.eq('user_id', user_id);
+    if (userId) {
+      query = query.eq('user_id', userId);
     }
 
-    if (location_id) {
-      query = query.eq('location_id', location_id);
+    if (locationId) {
+      query = query.eq('location_id', locationId);
     }
 
-    if (date) {
-      query = query.eq('inspection_date', date);
+    if (filterDate) {
+      query = query.eq('inspection_date', filterDate);
     }
 
     const { data: inspections, error } = await query;
@@ -71,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       {
         inspections: inspections || [],
         count: inspections?.length || 0,
-        filters: { user_id, location_id, date, limit },
+        filters: { user_id: userId, location_id: locationId, date: filterDate, limit: resultLimit },
       },
       'Inspections retrieved'
     );

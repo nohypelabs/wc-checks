@@ -5,7 +5,7 @@ import {
   supabase,
   successResponse,
   errorResponse,
-} from '../middleware/role-guard';
+} from '../middleware/role-guard.js';
 
 /**
  * GET /api/admin/audit-logs
@@ -62,8 +62,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       since,
     } = req.query;
 
+    // Convert query params to strings
+    const userIdStr = Array.isArray(userId) ? userId[0] : userId;
+    const actionStr = Array.isArray(action) ? action[0] : action;
+    const sinceStr = Array.isArray(since) ? since[0] : since;
+    const limitStr = Array.isArray(limit) ? limit[0] : limit;
+
     // Validate limit
-    const parsedLimit = Math.min(parseInt(limit as string, 10) || 50, 500);
+    const parsedLimit = Math.min(parseInt(limitStr, 10) || 50, 500);
 
     // Build query (cast to any to bypass type checking for audit_logs table)
     let query = (supabase as any)
@@ -73,21 +79,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .limit(parsedLimit);
 
     // Apply filters
-    if (userId) {
-      query = query.eq('user_id', userId);
+    if (userIdStr) {
+      query = query.eq('user_id', userIdStr);
     }
 
-    if (action) {
-      query = query.eq('action', action);
+    if (actionStr) {
+      query = query.eq('action', actionStr);
     }
 
     if (success !== undefined) {
-      const isSuccess = typeof success === 'string' ? success === 'true' : Boolean(success);
+      const successValue = Array.isArray(success) ? success[0] : success;
+      const isSuccess = typeof successValue === 'string' ? successValue === 'true' : Boolean(successValue);
       query = query.eq('success', isSuccess);
     }
 
-    if (since) {
-      query = query.gte('created_at', since);
+    if (sinceStr) {
+      query = query.gte('created_at', sinceStr);
     }
 
     // Execute query
@@ -107,10 +114,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         count: logs?.length || 0,
         filters: {
           limit: parsedLimit,
-          userId: userId || null,
-          action: action || null,
-          success: success !== undefined ? (typeof success === 'string' ? success === 'true' : Boolean(success)) : null,
-          since: since || null,
+          userId: userIdStr || null,
+          action: actionStr || null,
+          success: success !== undefined ? (typeof (Array.isArray(success) ? success[0] : success) === 'string' ? (Array.isArray(success) ? success[0] : success) === 'true' : Boolean(Array.isArray(success) ? success[0] : success)) : null,
+          since: sinceStr || null,
         },
       },
       'Audit logs retrieved successfully'

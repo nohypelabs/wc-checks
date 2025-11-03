@@ -5,7 +5,7 @@ import {
   supabase,
   successResponse,
   errorResponse,
-} from '../middleware/role-guard';
+} from '../middleware/role-guard.js';
 
 /**
  * GET /api/admin/list-roles

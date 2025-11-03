@@ -1,7 +1,7 @@
 // api/admin/toggle-user-status.ts - Toggle user active status with protection
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { validateAuth, createAuditLog, errorResponse, successResponse } from '../middleware/role-guard';
+import { validateAuth, createAuditLog, errorResponse, successResponse } from '../middleware/role-guard.js';
 import type { Database } from '../../src/types/database.types';
 
 // Initialize Supabase client
