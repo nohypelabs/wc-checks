@@ -119,7 +119,9 @@ export const LocationsManager = () => {
     setSelectedIds(new Set());
   };
 
-  // Bulk operations
+  // TODO: Bulk operations - Need backend API support
+  // For now, bulk operations are disabled
+  /*
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       const { error } = await supabase
@@ -155,8 +157,11 @@ export const LocationsManager = () => {
       toast.error(error.message || 'Failed to update locations');
     },
   });
+  */
 
   const handleBulkDelete = () => {
+    toast.error('Bulk operations not yet implemented - use individual delete');
+    /*
     if (selectedIds.size === 0) {
       toast.error('No locations selected');
       return;
@@ -164,14 +169,18 @@ export const LocationsManager = () => {
     if (window.confirm(`Delete ${selectedIds.size} locations? This cannot be undone.`)) {
       bulkDeleteMutation.mutate(Array.from(selectedIds));
     }
+    */
   };
 
   const handleBulkActivate = (isActive: boolean) => {
+    toast.error('Bulk operations not yet implemented');
+    /*
     if (selectedIds.size === 0) {
       toast.error('No locations selected');
       return;
     }
     bulkToggleActiveMutation.mutate({ ids: Array.from(selectedIds), isActive });
+    */
   };
 
   const exportToCSV = () => {
