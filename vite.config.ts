@@ -9,6 +9,15 @@ export default defineConfig(({ mode }) => ({
     // Pure web app - requires internet connection
   ],
 
+  server: {
+    port: 5174,
+    host: true,
+    // Proxy API calls to Vercel dev server
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
+
   build: {
     // Increased limit: React is inherently large, 782KB is acceptable for main vendor
     chunkSizeWarningLimit: 1000,
