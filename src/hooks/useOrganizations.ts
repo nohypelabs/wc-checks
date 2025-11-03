@@ -3,6 +3,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
+// Helper function to safely parse JSON responses
+async function safeJsonParse(response: Response) {
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error('[useOrganizations] Non-JSON response:', text.substring(0, 200));
+    throw new Error('Server returned non-JSON response');
+  }
+  return response.json();
+}
+
 export interface Organization {
   id: string;
   name: string;
@@ -32,11 +43,11 @@ export function useOrganizations() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch organizations' }));
         throw new Error(error.error || 'Failed to fetch organizations');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       return result.data as Organization[];
     },
   });
@@ -63,11 +74,11 @@ export function useCreateOrganization() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to create organization' }));
         throw new Error(error.error || 'Failed to create organization');
       }
 
-      return response.json();
+      return safeJsonParse(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
@@ -100,11 +111,11 @@ export function useUpdateOrganization() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to update organization' }));
         throw new Error(error.error || 'Failed to update organization');
       }
 
-      return response.json();
+      return safeJsonParse(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
@@ -133,11 +144,11 @@ export function useDeleteOrganization() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to delete organization' }));
         throw new Error(error.error || 'Failed to delete organization');
       }
 
-      return response.json();
+      return safeJsonParse(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });

@@ -3,6 +3,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
+// Helper function to safely parse JSON responses
+async function safeJsonParse(response: Response) {
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error('[useUserRoles] Non-JSON response:', text.substring(0, 200));
+    throw new Error('Server returned non-JSON response');
+  }
+  return response.json();
+}
+
 export interface UserWithRole {
   id: string;
   email: string;
@@ -43,12 +54,12 @@ export function useUsers() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch users' }));
         console.error('[useUsers] Backend API error:', error);
         throw new Error(error.error || 'Failed to fetch users');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       const users = result.data as UserWithRole[];
 
       console.log('[useUsers] Fetched', users.length, 'users from backend API');
@@ -82,12 +93,12 @@ export function useRoles() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch roles' }));
         console.error('[useRoles] Backend API error:', error);
         throw new Error(error.error || 'Failed to fetch roles');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       const roles = result.data;
 
       console.log('[useRoles] Fetched', roles.length, 'roles from backend API');
@@ -128,11 +139,11 @@ export function useAssignRole() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to assign role' }));
         throw new Error(error.error || 'Failed to assign role');
       }
 
-      return response.json();
+      return safeJsonParse(response);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
@@ -170,11 +181,11 @@ export function useToggleUserStatus() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to update user status' }));
         throw new Error(error.error || 'Failed to update user status');
       }
 
-      return response.json();
+      return safeJsonParse(response);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });

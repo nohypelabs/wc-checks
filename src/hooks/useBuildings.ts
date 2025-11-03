@@ -6,6 +6,17 @@ import type { Tables } from '../types/database.types';
 
 type Building = Tables<'buildings'>;
 
+// Helper function to safely parse JSON responses
+async function safeJsonParse(response: Response) {
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error('[useBuildings] Non-JSON response:', text.substring(0, 200));
+    throw new Error('Server returned non-JSON response');
+  }
+  return response.json();
+}
+
 interface UseBuildingsOptions {
   organizationId?: string;
   enabled?: boolean;
@@ -43,11 +54,11 @@ export function useBuildings({
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch buildings' }));
         throw new Error(error.error || 'Failed to fetch buildings');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       let buildings = result.data as Building[];
 
       // Client-side filter for inactive if needed
@@ -87,11 +98,11 @@ export function useBuilding(buildingId?: string) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch building' }));
         throw new Error(error.error || 'Failed to fetch building');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       return result.data as Building & {
         organizations?: {
           name: string;
@@ -134,11 +145,11 @@ export function useBuildingByCode(shortCode?: string, organizationId?: string) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch buildings' }));
         throw new Error(error.error || 'Failed to fetch buildings');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       const buildings = result.data as Building[];
 
       // Client-side filter by short_code
@@ -183,11 +194,11 @@ export function useCreateBuilding() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to create building' }));
         throw new Error(error.error || 'Failed to create building');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       return result.data as Building;
     },
     onSuccess: (data) => {
@@ -239,11 +250,11 @@ export function useUpdateBuilding() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to update building' }));
         throw new Error(error.error || 'Failed to update building');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       return result.data as Building;
     },
     onSuccess: (data) => {
@@ -290,11 +301,11 @@ export function useDeleteBuilding() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to delete building' }));
         throw new Error(error.error || 'Failed to delete building');
       }
 
-      return response.json();
+      return safeJsonParse(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buildings'] });
