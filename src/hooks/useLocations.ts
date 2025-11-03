@@ -6,6 +6,17 @@ import type { Tables } from '../types/database.types';
 
 type Location = Tables<'locations'>;
 
+// Helper function to safely parse JSON responses
+async function safeJsonParse(response: Response) {
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error('[useLocations] Non-JSON response:', text.substring(0, 200));
+    throw new Error('Server returned non-JSON response');
+  }
+  return response.json();
+}
+
 interface UseLocationsOptions {
   buildingId?: string;
   organizationId?: string;
@@ -48,11 +59,11 @@ export function useLocations({
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch locations' }));
         throw new Error(error.error || 'Failed to fetch locations');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       let locations = result.data as Location[];
 
       // Client-side filter for inactive if needed
@@ -92,11 +103,11 @@ export function useLocation(locationId?: string) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch location' }));
         throw new Error(error.error || 'Failed to fetch location');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       return result.data as Location & {
         buildings?: {
           name: string;
@@ -147,11 +158,11 @@ export function useLocationByCode(
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to fetch locations' }));
         throw new Error(error.error || 'Failed to fetch locations');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       const locations = result.data as Location[];
 
       // Client-side filter by short_code
@@ -197,11 +208,11 @@ export function useCreateLocation() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to create location' }));
         throw new Error(error.error || 'Failed to create location');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       return result.data as Location;
     },
     onSuccess: (data) => {
@@ -260,11 +271,11 @@ export function useUpdateLocation() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to update location' }));
         throw new Error(error.error || 'Failed to update location');
       }
 
-      const result = await response.json();
+      const result = await safeJsonParse(response);
       return result.data as Location;
     },
     onSuccess: (data) => {
@@ -308,11 +319,11 @@ export function useDeleteLocation() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to delete location' }));
         throw new Error(error.error || 'Failed to delete location');
       }
 
-      return response.json();
+      return safeJsonParse(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['locations'] });
