@@ -101,6 +101,13 @@ export function useIsAdmin() {
           return { isAdmin: false, isSuperAdmin: false };
         }
 
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.warn('[useIsAdmin] Non-JSON response, using fallback');
+          return await fallbackRoleCheck(user.id);
+        }
+
         const result: VerifyRoleResponse = await response.json();
 
         console.log('[useIsAdmin] ✅ Backend verified role:', result.data.role);
