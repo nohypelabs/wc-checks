@@ -432,9 +432,9 @@ export const OrganizationsManager = () => {
                 <Button
                   type="submit"
                   className="flex-1"
-                  disabled={saveMutation.isPending}
+                  disabled={createOrganization.isPending || updateOrganization.isPending}
                 >
-                  {saveMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                  {createOrganization.isPending || updateOrganization.isPending ? 'Menyimpan...' : 'Simpan'}
                 </Button>
                 <Button
                   type="button"
