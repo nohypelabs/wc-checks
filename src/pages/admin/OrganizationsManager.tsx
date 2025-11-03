@@ -1,11 +1,10 @@
-// src/pages/admin/OrganizationsManager.tsx - CRUD for Organizations
+// src/pages/admin/OrganizationsManager.tsx - CRUD for Organizations via Backend API
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
+import { useOrganizations, useCreateOrganization, useUpdateOrganization, useDeleteOrganization } from '../../hooks/useOrganizations';
 import { Tables, TablesInsert } from '../../types/database.types';
 import { Plus, Edit2, Trash2, Search, MoreVertical, Building2, QrCode, Menu, ShieldAlert, User } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
@@ -46,7 +45,6 @@ export const OrganizationsManager = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const queryClient = useQueryClient();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
@@ -64,19 +62,8 @@ export const OrganizationsManager = () => {
     is_active: true,
   });
 
-  // Fetch organizations
-  const { data: organizations, isLoading } = useQuery({
-    queryKey: ['organizations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as Organization[];
-    },
-  });
+  // Fetch organizations via BACKEND API
+  const { data: organizations, isLoading } = useOrganizations();
 
   // Filter organizations
   const filteredOrgs = organizations?.filter(org =>
@@ -85,52 +72,10 @@ export const OrganizationsManager = () => {
     org.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Create/Update mutation
-  const saveMutation = useMutation({
-    mutationFn: async (data: Partial<OrganizationInsert>) => {
-      if (selectedOrg) {
-        // Update
-        const { error } = await supabase
-          .from('organizations')
-          .update(data)
-          .eq('id', selectedOrg.id);
-        if (error) throw error;
-      } else {
-        // Create
-        const { error } = await supabase
-          .from('organizations')
-          .insert([{ ...data, created_by: user?.id }]);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organizations'] });
-      toast.success(selectedOrg ? 'Organization updated' : 'Organization created');
-      setIsFormOpen(false);
-      resetForm();
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to save');
-    },
-  });
-
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('organizations')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organizations'] });
-      toast.success('Organization deleted');
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete');
-    },
-  });
+  // Backend API hooks for CRUD
+  const createOrganization = useCreateOrganization();
+  const updateOrganization = useUpdateOrganization();
+  const deleteOrganization = useDeleteOrganization();
 
   const resetForm = () => {
     setFormData({
@@ -160,8 +105,11 @@ export const OrganizationsManager = () => {
 
   const handleDelete = async (id: string, name: string) => {
     if (window.confirm(`Delete organization "${name}"? This will affect all buildings and locations!`)) {
-      deleteMutation.mutate(id);
-      setOpenMenuId(null);
+      deleteOrganization.mutate(id, {
+        onSuccess: () => {
+          setOpenMenuId(null);
+        },
+      });
     }
   };
 
@@ -171,7 +119,27 @@ export const OrganizationsManager = () => {
     // Validate form data with Zod schema
     try {
       const validatedData = organizationSchema.parse(formData);
-      saveMutation.mutate(validatedData);
+
+      if (selectedOrg) {
+        // Update existing organization
+        updateOrganization.mutate({
+          id: selectedOrg.id,
+          data: validatedData,
+        }, {
+          onSuccess: () => {
+            setIsFormOpen(false);
+            resetForm();
+          },
+        });
+      } else {
+        // Create new organization
+        createOrganization.mutate(validatedData, {
+          onSuccess: () => {
+            setIsFormOpen(false);
+            resetForm();
+          },
+        });
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Show first validation error

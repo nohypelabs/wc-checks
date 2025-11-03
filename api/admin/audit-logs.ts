@@ -35,7 +35,7 @@ import {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only GET allowed
   if (req.method !== 'GET') {
-    return res.status(405).json(errorResponse('Method not allowed'));
+    return errorResponse(res, 405, 'Method not allowed');
   }
 
   // Validate authentication and require admin (level 80+)
@@ -43,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!auth || !supabase) {
     console.error('[audit-logs] Auth failed or Supabase not initialized');
-    return res.status(403).json(errorResponse('Access denied - Admin privileges required'));
+    return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
   console.log('[audit-logs] Admin access granted:', {
@@ -100,24 +100,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('[audit-logs] Success - returning', logs?.length || 0, 'audit logs');
 
-    return res.status(200).json(
-      successResponse(
-        {
-          logs: logs || [],
-          count: logs?.length || 0,
-          filters: {
-            limit: parsedLimit,
-            userId: userId || null,
-            action: action || null,
-            success: success !== undefined ? (success === 'true' || success === true) : null,
-            since: since || null,
-          },
+    return successResponse(
+      res,
+      {
+        logs: logs || [],
+        count: logs?.length || 0,
+        filters: {
+          limit: parsedLimit,
+          userId: userId || null,
+          action: action || null,
+          success: success !== undefined ? (success === 'true' || success === true) : null,
+          since: since || null,
         },
-        'Audit logs retrieved successfully'
-      )
+      },
+      'Audit logs retrieved successfully'
     );
   } catch (error: any) {
     console.error('[audit-logs] Error:', error);
-    return res.status(500).json(errorResponse('Failed to retrieve audit logs: ' + error.message));
+    return errorResponse(res, 500, 'Failed to retrieve audit logs: ' + error.message);
   }
 }
