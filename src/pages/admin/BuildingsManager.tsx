@@ -512,9 +512,9 @@ export const BuildingsManager = () => {
                 <Button
                   type="submit"
                   className="flex-1"
-                  disabled={saveMutation.isPending}
+                  disabled={createBuilding.isPending || updateBuilding.isPending}
                 >
-                  {saveMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                  {createBuilding.isPending || updateBuilding.isPending ? 'Menyimpan...' : 'Simpan'}
                 </Button>
                 <Button
                   type="button"
