@@ -1,7 +1,9 @@
 {
-  "buildCommand": "vite build",
-  "devCommand": "vite --port $PORT",
-  "framework": "vite",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": null,
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/api/:path*",
