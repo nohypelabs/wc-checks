@@ -24,7 +24,7 @@ export const GeneralPhotoUpload = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  // ✅ Handle CAMERA capture - Watermark only (compression handled by Cloudinary)
+  // ✅ Handle CAMERA capture - Try watermark with aggressive timeout, fallback to original
   const handleCameraCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -33,29 +33,37 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
-      console.log(`📸 Camera photo: ${fileSizeMB}MB (will be optimized by Cloudinary on upload)`);
-
-      // Add watermark to original file (compression happens server-side later)
-      const watermarkedBlob = await addWatermarkToPhoto(file, {
+      // Try watermark with 10s timeout
+      const watermarkPromise = addWatermarkToPhoto(file, {
         timestamp: new Date().toISOString(),
         locationName,
       });
-      console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
-      const preview = URL.createObjectURL(watermarkedBlob);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Watermark timeout')), 10000)
+      );
 
-      // Create clean filename (no special chars that might confuse Cloudinary)
-      const cleanFileName = `camera_${Date.now()}.webp`;
-      const watermarkedFile = new File([watermarkedBlob], cleanFileName, {
-        type: 'image/webp',
-        lastModified: Date.now()
-      });
+      let finalFile: File;
+      let preview: string;
 
-      console.log(`📸 Final camera file: ${cleanFileName} (${(watermarkedFile.size / 1024 / 1024).toFixed(2)}MB, clean WebP)`);
+      try {
+        const watermarkedBlob = await Promise.race([watermarkPromise, timeoutPromise]);
+
+        const cleanFileName = `camera_${Date.now()}.webp`;
+        finalFile = new File([watermarkedBlob], cleanFileName, {
+          type: 'image/webp',
+          lastModified: Date.now()
+        });
+        preview = URL.createObjectURL(watermarkedBlob);
+      } catch (watermarkError) {
+        // Watermark failed/timeout - use original
+        console.warn('⚠️ Watermark failed, using original photo:', watermarkError);
+        finalFile = file;
+        preview = URL.createObjectURL(file);
+      }
 
       const photoMetadata: PhotoWithMetadata = {
-        file: watermarkedFile,
+        file: finalFile,
         preview,
         timestamp: new Date().toISOString(),
       };
@@ -67,16 +75,9 @@ export const GeneralPhotoUpload = ({
       }
 
     } catch (error: any) {
-      console.error('Error processing camera photo:', error);
+      console.error('Error capturing photo:', error);
 
-      // Show detailed error on screen for mobile debugging
-      const errorMsg = genZMode
-        ? `Gagal proses foto: ${error.message || 'Unknown error'}`
-        : `Photo processing failed: ${error.message || 'Unknown error'}`;
-
-      setPermissionError(errorMsg);
-
-      // Fallback: add without watermark
+      // Ultimate fallback: just add the original file
       const preview = URL.createObjectURL(file);
       onPhotosChange([...photos, {
         file,
