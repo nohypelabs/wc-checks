@@ -67,19 +67,8 @@ export async function validateAuth(
 
     const token = authHeader.substring(7);
 
-    // Verify token by creating a client with the user's JWT
-    const userClient = createClient(SUPABASE_URL!, SUPABASE_SERVICE_KEY!, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    });
-
-    const { data: { user }, error: authError } = await userClient.auth.getUser();
+    // Verify token using service role client
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('[validateAuth] Auth error:', authError?.message);

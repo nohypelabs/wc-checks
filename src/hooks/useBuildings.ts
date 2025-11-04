@@ -45,7 +45,7 @@ export function useBuildings({
 
       const url = organizationId
         ? `/api/admin/buildings?organization_id=${organizationId}`
-        : '/api/admin/buildings';
+        : '/api/admin/resources?type=buildings';
 
       const response = await fetch(url, {
         headers: {
@@ -136,7 +136,7 @@ export function useBuildingByCode(shortCode?: string, organizationId?: string) {
 
       const url = organizationId
         ? `/api/admin/buildings?organization_id=${organizationId}`
-        : '/api/admin/buildings';
+        : '/api/admin/resources?type=buildings';
 
       const response = await fetch(url, {
         headers: {
@@ -184,7 +184,7 @@ export function useCreateBuilding() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch('/api/admin/buildings', {
+      const response = await fetch('/api/admin/resources?type=buildings', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
