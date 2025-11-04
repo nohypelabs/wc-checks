@@ -274,32 +274,27 @@ export const useInspection = (inspectionId?: string) => {
       const apiStartTime = Date.now();
 
       try {
-        // Get auth token
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token;
 
         if (!token) {
-          throw new Error('No authentication token. Please log in again.');
+          throw new Error('No auth token');
         }
 
-        // Add timeout protection for API call (60s for slow mobile connections)
-        const apiCallPromise = fetch('/api/inspections', {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+        const response = await fetch('/api/inspections', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(inspectionRecord),
+          signal: controller.signal,
         });
 
-        const apiTimeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => {
-            console.error('❌ [API] Request timeout after 60s');
-            reject(new Error('API request timed out after 60 seconds. Your internet connection is very slow. Please check your connection and try again.'));
-          }, 60000)
-        );
-
-        const response = await Promise.race([apiCallPromise, apiTimeoutPromise]) as Response;
+        clearTimeout(timeout);
 
         const apiDuration = ((Date.now() - apiStartTime) / 1000).toFixed(2);
         console.log(`🌐 [API] Request completed in ${apiDuration}s`);
@@ -332,15 +327,15 @@ export const useInspection = (inspectionId?: string) => {
 
         return data;
       } catch (apiError: any) {
-        console.error('❌ [API] Unexpected error during submission:', apiError);
         endTimer();
 
-        // Re-throw with better message
-        if (apiError.message) {
-          throw apiError; // Already has user-friendly message
-        } else {
-          throw new Error('Unexpected error during submission. Please try again.');
+        if (apiError.name === 'AbortError') {
+          throw new Error('Request timeout. Check your connection and try again.');
         }
+
+        throw apiError.message
+          ? apiError
+          : new Error('Failed to save. Try again.');
       }
 
     },
