@@ -1,10 +1,7 @@
 // api/profile.ts - User Profile Management
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
 import { validateAuth } from './middleware/role-guard.js';
-
-const supabaseUrl = process.env.VITE_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+import { supabase } from './middleware/role-guard.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -17,13 +14,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
   try {
-    // Validate authentication (no specific role required)
-    const userId = await validateAuth(req, supabase);
-    if (!userId) {
+    // Validate authentication (no specific role required, minLevel = 0)
+    const authContext = await validateAuth(req, 0);
+    if (!authContext) {
       return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const userId = authContext.userId;
+
+    // Check if supabase client is available
+    if (!supabase) {
+      console.error('[profile] Supabase client not initialized');
+      return res.status(500).json({ error: 'Internal server error' });
     }
 
     // GET - Get user profile
