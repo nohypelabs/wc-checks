@@ -1,8 +1,7 @@
-// src/hooks/useReports.ts - FIXED VERSION
+// src/hooks/useReports.ts - FIXED VERSION using API endpoints with admin support
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { startOfMonth, endOfMonth, format } from 'date-fns';
-import { calculateWeightedScore } from '../types/inspection.types';
+import { format } from 'date-fns';
 
 export interface InspectionReport {
   id: string;
@@ -40,196 +39,116 @@ export interface DateInspections {
   count: number;
 }
 
-// Helper function to extract score from responses
-const getScoreFromResponses = (responses: any): number => {
-  if (!responses) return 0;
-
-  // Case 1: Direct score field
-  if (typeof responses.score === 'number') {
-    return responses.score;
-  }
-
-  // Case 2: Calculate from ratings array (like ComprehensiveInspectionForm)
-  if (Array.isArray(responses.ratings) && responses.ratings.length > 0) {
-    return calculateWeightedScore(responses.ratings);
-  }
-
-  // Case 3: Old format - count good responses
-  const values = Object.values(responses).filter(v => 
-    typeof v === 'string' || typeof v === 'boolean'
-  );
-  
-  if (values.length === 0) return 0;
-
-  const goodCount = values.filter(v => 
-    v === true || 
-    v === 'good' || 
-    v === 'excellent' || 
-    v === 'baik' || 
-    v === 'bersih'
-  ).length;
-
-  return Math.round((goodCount / values.length) * 100);
-};
-
-// Get inspections for a specific month
+/**
+ * Get inspections for a specific month
+ *
+ * @param userId - Optional. If provided, filters to specific user. If not provided:
+ *   - Admin (level >= 80): fetches ALL users' inspections
+ *   - Regular user: fetches their own inspections
+ * @param currentDate - The month to fetch data for
+ */
 export const useMonthlyInspections = (userId: string | undefined, currentDate: Date) => {
   return useQuery({
-    queryKey: ['monthly-inspections', userId, format(currentDate, 'yyyy-MM')],
+    queryKey: ['monthly-inspections', userId || 'all', format(currentDate, 'yyyy-MM')],
     queryFn: async () => {
-      if (!userId) {
-        console.warn('⚠️ No userId provided to useMonthlyInspections');
-        return [];
+      const month = format(currentDate, 'yyyy-MM');
+
+      console.log('📅 Fetching monthly inspections:', { userId: userId || 'ALL', month });
+
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('No authentication token');
       }
 
-      const start = format(startOfMonth(currentDate), 'yyyy-MM-dd');
-      const end = format(endOfMonth(currentDate), 'yyyy-MM-dd');
-
-      console.log('📅 Fetching inspections:', { userId, start, end });
-
-      // FIX: Specify exact relationship for users and fetch occupation
-      const { data, error } = await supabase
-        .from('inspection_records')
-        .select(`
-          id,
-          inspection_date,
-          inspection_time,
-          overall_status,
-          responses,
-          photo_urls,
-          notes,
-          location:locations!inner(id, name, building, floor),
-          user:users!inspection_records_user_id_fkey(
-            id,
-            full_name,
-            email,
-            occupation_id,
-            occupation:user_occupations(id, display_name, description, color, icon)
-          )
-        `)
-        .eq('user_id', userId)
-        .gte('inspection_date', start)
-        .lte('inspection_date', end)
-        .order('inspection_date', { ascending: false })
-        .order('inspection_time', { ascending: false });
-
-      if (error) {
-        console.error('❌ Error fetching inspections:', error);
-        throw error;
+      // Build API URL
+      let apiUrl = `/api/reports?month=${month}`;
+      if (userId) {
+        apiUrl += `&userId=${userId}`;
       }
+      // If no userId provided, admin will see ALL, regular users will see their own (backend handles this)
 
-      console.log('✅ Fetched inspections:', data?.length || 0);
-
-      // Group by date
-      const groupedByDate = (data || []).reduce((acc: Record<string, InspectionReport[]>, item: any) => {
-        const date = item.inspection_date;
-        if (!acc[date]) {
-          acc[date] = [];
-        }
-        acc[date].push({
-          id: item.id,
-          inspection_date: item.inspection_date,
-          inspection_time: item.inspection_time,
-          overall_status: item.overall_status,
-          responses: item.responses,
-          location: item.location,
-          user: {
-            id: item.user.id,
-            full_name: item.user.full_name,
-            email: item.user.email,
-            occupation_id: item.user.occupation_id,
-          },
-          occupation: item.user.occupation || null,
-          photo_urls: item.photo_urls || [],
-          notes: item.notes,
-        });
-        return acc;
-      }, {});
-
-      // Calculate average score per date
-      const dateInspections: DateInspections[] = Object.entries(groupedByDate).map(([date, inspections]) => {
-        const scores = inspections.map(ins => getScoreFromResponses(ins.responses));
-        const averageScore = scores.length > 0 
-          ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-          : 0;
-
-        console.log(`📊 Date ${date}: ${inspections.length} inspections, avg score: ${averageScore}`);
-
-        return {
-          date,
-          inspections,
-          averageScore,
-          count: inspections.length,
-        };
+      // Call API endpoint
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        console.error('❌ Error fetching monthly inspections:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch monthly inspections');
+      }
+
+      const result = await response.json();
+      const dateInspections: DateInspections[] = result.data;
+
+      console.log('✅ Fetched monthly inspections:', dateInspections.length, 'dates');
 
       return dateInspections;
     },
-    enabled: !!userId,
+    // Always enabled - backend will handle auth/permissions
+    enabled: true,
   });
 };
 
-// Get inspections for a specific date
+/**
+ * Get inspections for a specific date
+ *
+ * @param userId - Optional. If provided, filters to specific user. If not provided:
+ *   - Admin (level >= 80): fetches ALL users' inspections
+ *   - Regular user: fetches their own inspections
+ * @param date - The specific date to fetch data for
+ */
 export const useDateInspections = (userId: string | undefined, date: string) => {
   return useQuery({
-    queryKey: ['date-inspections', userId, date],
+    queryKey: ['date-inspections', userId || 'all', date],
     queryFn: async () => {
-      if (!userId || !date) {
-        console.warn('⚠️ Missing userId or date');
+      if (!date) {
+        console.warn('⚠️ Missing date');
         return [];
       }
 
-      console.log('📅 Fetching inspections for date:', { userId, date });
+      console.log('📅 Fetching inspections for date:', { userId: userId || 'ALL', date });
 
-      // FIX: Specify exact relationship for users and fetch occupation
-      const { data, error } = await supabase
-        .from('inspection_records')
-        .select(`
-          id,
-          inspection_date,
-          inspection_time,
-          overall_status,
-          responses,
-          photo_urls,
-          notes,
-          location:locations!inner(id, name, building, floor),
-          user:users!inspection_records_user_id_fkey(
-            id,
-            full_name,
-            email,
-            occupation_id,
-            occupation:user_occupations(id, display_name, description, color, icon)
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('inspection_date', date)
-        .order('inspection_time', { ascending: false });
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) {
-        console.error('❌ Error fetching date inspections:', error);
-        throw error;
+      if (!token) {
+        throw new Error('No authentication token');
       }
 
-      console.log('✅ Fetched date inspections:', data?.length || 0);
+      // Build API URL
+      let apiUrl = `/api/reports?date=${date}`;
+      if (userId) {
+        apiUrl += `&userId=${userId}`;
+      }
+      // If no userId provided, admin will see ALL, regular users will see their own (backend handles this)
 
-      return (data || []).map((item: any) => ({
-        id: item.id,
-        inspection_date: item.inspection_date,
-        inspection_time: item.inspection_time,
-        overall_status: item.overall_status,
-        responses: item.responses,
-        location: item.location,
-        user: {
-          id: item.user.id,
-          full_name: item.user.full_name,
-          email: item.user.email,
-          occupation_id: item.user.occupation_id,
+      // Call API endpoint
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
         },
-        occupation: item.user.occupation || null,
-        photo_urls: item.photo_urls || [],
-        notes: item.notes,
-      })) as InspectionReport[];
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        console.error('❌ Error fetching date inspections:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch date inspections');
+      }
+
+      const result = await response.json();
+      const inspections: InspectionReport[] = result.data;
+
+      console.log('✅ Fetched date inspections:', inspections.length);
+
+      return inspections;
     },
-    enabled: !!userId && !!date,
+    enabled: !!date,
   });
 };

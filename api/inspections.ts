@@ -1,6 +1,6 @@
 // api/inspections.ts - Inspections CRUD (ALL USERS)
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { validateAuth, supabase, successResponse, errorResponse } from './middleware/role-guard';
+import { validateAuth, supabase, successResponse, errorResponse } from './middleware/role-guard.js';
 
 /**
  * GET /api/inspections - List user's own inspections
@@ -20,16 +20,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { id } = req.query;
+  const inspectionId = Array.isArray(id) ? id[0] : id;
   const userId = auth.userId;
 
   try {
     // GET - List user's inspections or get specific
     if (req.method === 'GET') {
-      if (id) {
+      if (inspectionId) {
         const { data: inspection, error } = await supabase
           .from('inspection_records')
           .select('*, locations(name, floor), users(full_name)')
-          .eq('id', id)
+          .eq('id', inspectionId)
           .eq('user_id', userId) // Users can only see their own
           .single();
 
@@ -57,43 +58,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'POST') {
       const {
         location_id,
-        inspection_date,
-        responses,
-        photos,
-        notes,
-        status,
         template_id,
+        inspection_date,
+        inspection_time,
+        overall_status,
+        responses,
+        photo_urls,
+        notes,
+        submitted_at,
+        duration_seconds,
+        verification_notes,
+        verified_at,
+        verified_by,
       } = req.body;
 
       if (!location_id || !inspection_date || !responses) {
-        return errorResponse(res, 400, 'Missing required fields');
+        return errorResponse(res, 400, 'Missing required fields: location_id, inspection_date, responses');
       }
+
+      const now = new Date();
+      const inspectionData = {
+        user_id: userId,
+        location_id,
+        template_id: template_id || null,
+        inspection_date: inspection_date || now.toISOString().split('T')[0],
+        inspection_time: inspection_time || now.toTimeString().split(' ')[0],
+        overall_status: overall_status || 'satisfactory',
+        responses,
+        photo_urls: photo_urls || null,
+        notes: notes?.trim() || null,
+        submitted_at: submitted_at || now.toISOString(),
+        duration_seconds: duration_seconds || null,
+        verification_notes: verification_notes || null,
+        verified_at: verified_at || null,
+        verified_by: verified_by || null,
+      };
+
+      console.log('[inspections] Creating inspection:', {
+        user_id: userId,
+        location_id,
+        photo_count: photo_urls?.length || 0,
+      });
 
       const { data: newInspection, error } = await supabase
         .from('inspection_records')
-        .insert([
-          {
-            user_id: userId,
-            location_id,
-            inspection_date,
-            responses,
-            photos: photos || [],
-            notes: notes || null,
-            status: status || 'completed',
-            template_id: template_id || null,
-          },
-        ])
-        .select()
+        .insert([inspectionData])
+        .select('id, location_id, overall_status, submitted_at')
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[inspections] Insert error:', error);
+        throw error;
+      }
+
+      console.log('[inspections] Inspection created successfully:', newInspection.id);
 
       return successResponse(res, newInspection, 'Inspection created');
     }
 
     // PATCH - Update inspection (own only)
     if (req.method === 'PATCH') {
-      if (!id) {
+      if (!inspectionId) {
         return errorResponse(res, 400, 'Inspection ID required');
       }
 
@@ -101,7 +126,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: existing } = await supabase
         .from('inspection_records')
         .select('user_id')
-        .eq('id', id)
+        .eq('id', inspectionId)
         .single();
 
       if (!existing || existing.user_id !== userId) {
@@ -109,7 +134,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const updates: any = {};
-      const allowedFields = ['responses', 'photos', 'notes', 'status'];
+      const allowedFields = ['responses', 'photo_urls', 'notes', 'overall_status'];
 
       allowedFields.forEach(field => {
         if (req.body[field] !== undefined) updates[field] = req.body[field];
@@ -120,7 +145,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: updated, error } = await supabase
         .from('inspection_records')
         .update(updates)
-        .eq('id', id)
+        .eq('id', inspectionId)
         .eq('user_id', userId) // Double check ownership
         .select()
         .single();
@@ -132,14 +157,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // DELETE - Delete inspection (own only)
     if (req.method === 'DELETE') {
-      if (!id) {
+      if (!inspectionId) {
         return errorResponse(res, 400, 'Inspection ID required');
       }
 
       const { data: deleted, error } = await supabase
         .from('inspection_records')
         .delete()
-        .eq('id', id)
+        .eq('id', inspectionId)
         .eq('user_id', userId) // Users can only delete their own
         .select()
         .single();

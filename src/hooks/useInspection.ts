@@ -34,19 +34,28 @@ export const useInspection = (inspectionId?: string) => {
     queryKey: ['inspection', inspectionId],
     queryFn: async () => {
       if (!inspectionId) return null;
-      
-      const { data, error } = await supabase
-        .from('inspection_records')
-        .select('*')
-        .eq('id', inspectionId)
-        .single();
 
-      if (error) {
-        logger.error('Failed to fetch inspection', error);
-        throw new Error(`Failed to fetch inspection: ${error.message}`);
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('No authentication token');
       }
-      
-      return data as InspectionComponent;
+
+      const response = await fetch(`/api/inspections?id=${inspectionId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        logger.error('Failed to fetch inspection via API', errorData);
+        throw new Error(`Failed to fetch inspection: ${errorData.error || response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.data as InspectionComponent;
     },
     enabled: !!inspectionId,
   });
@@ -54,15 +63,11 @@ export const useInspection = (inspectionId?: string) => {
   const getDefaultTemplate = useQuery({
     queryKey: ['default-template'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('inspection_templates')
-        .select('*')
-        .eq('is_default', true)
-        .eq('is_active', true)
-        .single();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) {
-        logger.warn('Using fallback template', error);
+      if (!token) {
+        logger.warn('No auth token for template fetch, using fallback');
         return {
           id: 'comprehensive-template',
           name: 'Comprehensive Inspection',
@@ -80,7 +85,39 @@ export const useInspection = (inspectionId?: string) => {
           updated_at: new Date().toISOString()
         };
       }
-      return data;
+
+      try {
+        const response = await fetch('/api/templates', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch template');
+        }
+
+        const result = await response.json();
+        return result.data;
+      } catch (error) {
+        logger.warn('Template fetch failed, using fallback', error);
+        return {
+          id: 'comprehensive-template',
+          name: 'Comprehensive Inspection',
+          description: 'Default comprehensive inspection template',
+          fields: {
+            components: [],
+            requiredPhotos: 0,
+            maxPhotos: 10,
+            allowNotes: true
+          },
+          estimated_time: 300,
+          is_active: true,
+          is_default: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+      }
     },
     retry: 1,
   });
@@ -90,45 +127,27 @@ export const useInspection = (inspectionId?: string) => {
     queryFn: async () => {
       if (!locationId) throw new Error('Location ID is required');
 
-      const { data, error } = await supabase
-        .from('locations')
-        .select(`
-          id,
-          name,
-          floor,
-          area,
-          code,
-          building_id,
-          organization_id,
-          qr_code,
-          is_active,
-          buildings!building_id (
-            name
-          )
-        `)
-        .eq('id', locationId)
-        .single();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) {
-        logger.error('Failed to fetch location', error);
-        throw new Error(`Failed to fetch location: ${error.message}`);
+      if (!token) {
+        throw new Error('No authentication token');
       }
 
-      // Transform data to flatten building name
-      const transformed: LocationWithDetails = {
-        id: data.id,
-        name: data.name,
-        floor: data.floor,
-        area: data.area,
-        code: data.code,
-        building_id: data.building_id,
-        organization_id: data.organization_id,
-        qr_code: data.qr_code,
-        is_active: data.is_active,
-        building: (data as any).buildings?.name || null,
-      };
+      const response = await fetch(`/api/locations?id=${locationId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-      return transformed;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        logger.error('Failed to fetch location via API', errorData);
+        throw new Error(`Failed to fetch location: ${errorData.error || response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.data as LocationWithDetails;
     },
     enabled: !!locationId,
   });
@@ -251,69 +270,76 @@ export const useInspection = (inspectionId?: string) => {
         score
       });
 
-      console.log('💾 [DB] Executing INSERT query...');
-      const dbStartTime = Date.now();
+      console.log('🌐 [API] Sending inspection to backend API...');
+      const apiStartTime = Date.now();
 
       try {
-        // Add timeout protection for database insert (60s for slow mobile connections)
-        const dbInsertPromise = supabase
-          .from('inspection_records')
-          .insert(inspectionRecord)
-          .select('id, location_id, overall_status, submitted_at')
-          .single();
+        // Get auth token
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
 
-        const dbTimeoutPromise = new Promise((_, reject) =>
+        if (!token) {
+          throw new Error('No authentication token. Please log in again.');
+        }
+
+        // Add timeout protection for API call (60s for slow mobile connections)
+        const apiCallPromise = fetch('/api/inspections', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(inspectionRecord),
+        });
+
+        const apiTimeoutPromise = new Promise((_, reject) =>
           setTimeout(() => {
-            console.error('❌ [DB] INSERT timeout after 60s');
-            reject(new Error('Database save timed out after 60 seconds. Your internet connection is very slow. Please check your connection and try again.'));
+            console.error('❌ [API] Request timeout after 60s');
+            reject(new Error('API request timed out after 60 seconds. Your internet connection is very slow. Please check your connection and try again.'));
           }, 60000)
         );
 
-        const { data, error } = await Promise.race([dbInsertPromise, dbTimeoutPromise]) as any;
+        const response = await Promise.race([apiCallPromise, apiTimeoutPromise]) as Response;
 
-        const dbDuration = ((Date.now() - dbStartTime) / 1000).toFixed(2);
-        console.log(`💾 [DB] INSERT completed in ${dbDuration}s`);
+        const apiDuration = ((Date.now() - apiStartTime) / 1000).toFixed(2);
+        console.log(`🌐 [API] Request completed in ${apiDuration}s`);
 
-        if (error) {
-          console.error('❌ [DB] INSERT failed:', error);
-          console.error('❌ [DB] Error details:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint
-          });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: response.statusText }));
+          console.error('❌ [API] Request failed:', errorData);
           endTimer();
-          logger.error('Failed to submit inspection', error);
+          logger.error('Failed to submit inspection via API', errorData);
 
           // Provide user-friendly error message
-          let userMessage = 'Failed to save inspection to database.';
-          if (error.message.includes('timeout')) {
-            userMessage = 'Database save timed out. Please check your internet connection and try again.';
-          } else if (error.message.includes('network')) {
-            userMessage = 'Network error. Please check your internet connection and try again.';
-          } else if (error.code === '23505') {
-            userMessage = 'Duplicate entry detected. This inspection may have already been submitted.';
-          } else if (error.code === '23503') {
-            userMessage = 'Invalid reference data. Please contact administrator.';
+          let userMessage = errorData.error || 'Failed to save inspection.';
+          if (response.status === 401 || response.status === 403) {
+            userMessage = 'Authentication failed. Please log in again.';
+          } else if (response.status === 400) {
+            userMessage = `Invalid data: ${errorData.error}`;
+          } else if (response.status >= 500) {
+            userMessage = 'Server error. Please try again later.';
           }
 
           throw new Error(userMessage);
         }
 
-        console.log('✅ [DB] INSERT successful! Record ID:', data.id);
+        const result = await response.json();
+        const data = result.data;
+
+        console.log('✅ [API] Inspection submitted successfully! Record ID:', data.id);
         endTimer();
         logger.info('Inspection submitted successfully', { id: data.id });
 
         return data;
-      } catch (dbError: any) {
-        console.error('❌ [DB] Unexpected error during INSERT:', dbError);
+      } catch (apiError: any) {
+        console.error('❌ [API] Unexpected error during submission:', apiError);
         endTimer();
 
         // Re-throw with better message
-        if (dbError.message) {
-          throw dbError; // Already has user-friendly message
+        if (apiError.message) {
+          throw apiError; // Already has user-friendly message
         } else {
-          throw new Error('Unexpected error during database save. Please try again.');
+          throw new Error('Unexpected error during submission. Please try again.');
         }
       }
 
