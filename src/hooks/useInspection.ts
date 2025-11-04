@@ -251,69 +251,76 @@ export const useInspection = (inspectionId?: string) => {
         score
       });
 
-      console.log('💾 [DB] Executing INSERT query...');
-      const dbStartTime = Date.now();
+      console.log('🌐 [API] Sending inspection to backend API...');
+      const apiStartTime = Date.now();
 
       try {
-        // Add timeout protection for database insert (60s for slow mobile connections)
-        const dbInsertPromise = supabase
-          .from('inspection_records')
-          .insert(inspectionRecord)
-          .select('id, location_id, overall_status, submitted_at')
-          .single();
+        // Get auth token
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
 
-        const dbTimeoutPromise = new Promise((_, reject) =>
+        if (!token) {
+          throw new Error('No authentication token. Please log in again.');
+        }
+
+        // Add timeout protection for API call (60s for slow mobile connections)
+        const apiCallPromise = fetch('/api/inspections', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(inspectionRecord),
+        });
+
+        const apiTimeoutPromise = new Promise((_, reject) =>
           setTimeout(() => {
-            console.error('❌ [DB] INSERT timeout after 60s');
-            reject(new Error('Database save timed out after 60 seconds. Your internet connection is very slow. Please check your connection and try again.'));
+            console.error('❌ [API] Request timeout after 60s');
+            reject(new Error('API request timed out after 60 seconds. Your internet connection is very slow. Please check your connection and try again.'));
           }, 60000)
         );
 
-        const { data, error } = await Promise.race([dbInsertPromise, dbTimeoutPromise]) as any;
+        const response = await Promise.race([apiCallPromise, apiTimeoutPromise]) as Response;
 
-        const dbDuration = ((Date.now() - dbStartTime) / 1000).toFixed(2);
-        console.log(`💾 [DB] INSERT completed in ${dbDuration}s`);
+        const apiDuration = ((Date.now() - apiStartTime) / 1000).toFixed(2);
+        console.log(`🌐 [API] Request completed in ${apiDuration}s`);
 
-        if (error) {
-          console.error('❌ [DB] INSERT failed:', error);
-          console.error('❌ [DB] Error details:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint
-          });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: response.statusText }));
+          console.error('❌ [API] Request failed:', errorData);
           endTimer();
-          logger.error('Failed to submit inspection', error);
+          logger.error('Failed to submit inspection via API', errorData);
 
           // Provide user-friendly error message
-          let userMessage = 'Failed to save inspection to database.';
-          if (error.message.includes('timeout')) {
-            userMessage = 'Database save timed out. Please check your internet connection and try again.';
-          } else if (error.message.includes('network')) {
-            userMessage = 'Network error. Please check your internet connection and try again.';
-          } else if (error.code === '23505') {
-            userMessage = 'Duplicate entry detected. This inspection may have already been submitted.';
-          } else if (error.code === '23503') {
-            userMessage = 'Invalid reference data. Please contact administrator.';
+          let userMessage = errorData.error || 'Failed to save inspection.';
+          if (response.status === 401 || response.status === 403) {
+            userMessage = 'Authentication failed. Please log in again.';
+          } else if (response.status === 400) {
+            userMessage = `Invalid data: ${errorData.error}`;
+          } else if (response.status >= 500) {
+            userMessage = 'Server error. Please try again later.';
           }
 
           throw new Error(userMessage);
         }
 
-        console.log('✅ [DB] INSERT successful! Record ID:', data.id);
+        const result = await response.json();
+        const data = result.data;
+
+        console.log('✅ [API] Inspection submitted successfully! Record ID:', data.id);
         endTimer();
         logger.info('Inspection submitted successfully', { id: data.id });
 
         return data;
-      } catch (dbError: any) {
-        console.error('❌ [DB] Unexpected error during INSERT:', dbError);
+      } catch (apiError: any) {
+        console.error('❌ [API] Unexpected error during submission:', apiError);
         endTimer();
 
         // Re-throw with better message
-        if (dbError.message) {
-          throw dbError; // Already has user-friendly message
+        if (apiError.message) {
+          throw apiError; // Already has user-friendly message
         } else {
-          throw new Error('Unexpected error during database save. Please try again.');
+          throw new Error('Unexpected error during submission. Please try again.');
         }
       }
 
