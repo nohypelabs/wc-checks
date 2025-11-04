@@ -104,6 +104,7 @@ export const RegisterPage = () => {
           phone: null,
           profile_photo_url: null,
           last_login_at: null,
+          created_at: authData.user.created_at, // Use Supabase auth timestamp
         });
 
       if (profileError) {
