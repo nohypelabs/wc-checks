@@ -48,13 +48,8 @@ validateCloudinaryConfig();
 export const uploadToCloudinary = async (file: File): Promise<string> => {
   const fileSizeMB = file.size / 1024 / 1024;
 
-  // Validate file size (warn if > 10MB, reject if > 20MB)
   if (fileSizeMB > 20) {
-    throw new Error(`File too large: ${fileSizeMB.toFixed(2)}MB. Maximum 20MB allowed.`);
-  }
-
-  if (fileSizeMB > 10) {
-    console.warn(`⚠️ Large file detected: ${fileSizeMB.toFixed(2)}MB. Upload may be slow.`);
+    throw new Error(`File too large: ${fileSizeMB.toFixed(2)}MB`);
   }
 
   const formData = new FormData();
@@ -63,9 +58,10 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
   formData.append('folder', CLOUDINARY_FOLDER);
 
   try {
-    const timeoutDuration = Math.max(30000, Math.min(60000, fileSizeMB * 8000));
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s max
+
+    console.log(`📤 Uploading ${file.name} (${fileSizeMB.toFixed(2)}MB)...`);
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -79,22 +75,21 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
-      throw new Error(errorData.error?.message || `Upload failed with status ${response.status}`);
+      console.error(`❌ Upload failed: ${response.status}`);
+      throw new Error(`Upload failed (${response.status})`);
     }
 
     const data = await response.json();
+    console.log(`✅ Uploaded: ${file.name}`);
     return data.secure_url;
   } catch (error: any) {
+    console.error(`❌ Upload error:`, error);
+
     if (error.name === 'AbortError') {
-      throw new Error('Upload timeout - slow connection or file too large.');
+      throw new Error('Upload timeout (15s)');
     }
 
-    if (error.message?.includes('fetch')) {
-      throw new Error('Network error - check your connection.');
-    }
-
-    throw new Error(error.message || 'Failed to upload photo');
+    throw new Error(error.message || 'Upload failed');
   }
 };
 
@@ -107,28 +102,43 @@ export const batchUploadToCloudinary = async (
   files: File[],
   onProgress?: (current: number, total: number) => void
 ): Promise<string[]> => {
-  const CONCURRENT_UPLOADS = 3;
+  console.log(`📤 Starting batch upload: ${files.length} files`);
+
+  const CONCURRENT_UPLOADS = 1; // Upload 1 at a time for reliability
   const results: string[] = [];
+  const errors: string[] = [];
   let completed = 0;
 
   for (let i = 0; i < files.length; i += CONCURRENT_UPLOADS) {
     const batch = files.slice(i, i + CONCURRENT_UPLOADS);
 
+    console.log(`📤 Uploading batch ${i / CONCURRENT_UPLOADS + 1}/${Math.ceil(files.length / CONCURRENT_UPLOADS)}`);
+
     const batchResults = await Promise.allSettled(
       batch.map(file => uploadToCloudinary(file))
     );
 
-    batchResults.forEach(result => {
+    batchResults.forEach((result, idx) => {
       if (result.status === 'fulfilled') {
         results.push(result.value);
+      } else {
+        errors.push(`${batch[idx].name}: ${result.reason}`);
       }
     });
 
     completed += batch.length;
+    console.log(`✅ Progress: ${completed}/${files.length}`);
+
     if (onProgress) {
       onProgress(completed, files.length);
     }
   }
+
+  if (errors.length > 0) {
+    console.error(`❌ Upload errors:`, errors);
+  }
+
+  console.log(`✅ Batch upload complete: ${results.length}/${files.length} succeeded`);
 
   return results;
 };
