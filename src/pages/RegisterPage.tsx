@@ -15,6 +15,7 @@ type Occupation = Tables<'user_occupations'>;
 const registerSchema = z.object({
   full_name: z.string().min(2, 'Full name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
+  phone: z.string().optional(),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
   occupation_id: z.string().optional(),
@@ -101,7 +102,7 @@ export const RegisterPage = () => {
           password_hash: 'supabase_auth',
           occupation_id: data.occupation_id || null,
           is_active: true,
-          phone: null,
+          phone: data.phone?.trim() || null,
           profile_photo_url: null,
           last_login_at: null,
           created_at: authData.user.created_at, // Use Supabase auth timestamp
@@ -186,6 +187,22 @@ export const RegisterPage = () => {
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            )}
+          </div>
+
+          {/* Phone Number */}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+              Phone Number (Optional)
+            </label>
+            <input
+              {...register('phone')}
+              type="tel"
+              className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Example: 081234567890"
+            />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
             )}
           </div>
 
