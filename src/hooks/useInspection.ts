@@ -256,21 +256,17 @@ export const useInspection = (inspectionId?: string) => {
       const apiStartTime = Date.now();
 
       try {
-        // Get session with timeout
-        const sessionPromise = supabase.auth.getSession();
-        const sessionTimeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Session timeout')), 3000)
-        );
-
-        const { data: { session } } = await Promise.race([sessionPromise, sessionTimeout]) as any;
+        const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token;
 
         if (!token) {
           throw new Error('No auth token');
         }
 
+        console.log('📤 Sending to API...');
+
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
+        const timeout = setTimeout(() => controller.abort(), 30000); // 30s for API
 
         const response = await fetch('/api/inspections', {
           method: 'POST',
@@ -285,28 +281,25 @@ export const useInspection = (inspectionId?: string) => {
         clearTimeout(timeout);
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: response.statusText }));
-          throw new Error(errorData.error || `Failed (${response.status})`);
+          const errorData = await response.json().catch(() => ({}));
+          console.error('❌ API error:', errorData);
+          throw new Error(errorData.error || `API error ${response.status}`);
         }
 
         const result = await response.json();
-        const data = result.data;
-
-        console.log('✅ [API] Inspection submitted successfully! Record ID:', data.id);
+        console.log('✅ Saved!');
         endTimer();
-        logger.info('Inspection submitted successfully', { id: data.id });
 
-        return data;
+        return result.data;
       } catch (apiError: any) {
         endTimer();
+        console.error('❌ Save failed:', apiError);
 
         if (apiError.name === 'AbortError') {
-          throw new Error('Request timeout. Check your connection and try again.');
+          throw new Error('Connection timeout (30s)');
         }
 
-        throw apiError.message
-          ? apiError
-          : new Error('Failed to save. Try again.');
+        throw new Error(apiError.message || 'Failed to save');
       }
 
     },
