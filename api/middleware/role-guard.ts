@@ -67,11 +67,29 @@ export async function validateAuth(
 
     const token = authHeader.substring(7);
 
-    // Verify token using service role client
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Verify token and get user - use admin API for server-side verification
+    let user;
+    try {
+      // Decode JWT to get user ID (JWT format: header.payload.signature)
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      const userId = payload.sub;
 
-    if (authError || !user) {
-      console.error('[validateAuth] Auth error:', authError?.message);
+      if (!userId) {
+        console.error('[validateAuth] No user ID in token');
+        return null;
+      }
+
+      // Fetch user from database using service role
+      const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);
+
+      if (userError || !userData?.user) {
+        console.error('[validateAuth] Auth error:', userError?.message);
+        return null;
+      }
+
+      user = userData.user;
+    } catch (error: any) {
+      console.error('[validateAuth] Token verification failed:', error.message);
       return null;
     }
 
