@@ -49,7 +49,7 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
   const fileSizeMB = file.size / 1024 / 1024;
 
   if (fileSizeMB > 20) {
-    throw new Error(`File too large: ${fileSizeMB.toFixed(2)}MB`);
+    throw new Error(`File too large`);
   }
 
   const formData = new FormData();
@@ -57,38 +57,36 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
   formData.append('folder', CLOUDINARY_FOLDER);
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s max
+  console.log(`📤 Uploading ${file.name} (${fileSizeMB.toFixed(2)}MB)...`);
 
-    console.log(`📤 Uploading ${file.name} (${fileSizeMB.toFixed(2)}MB)...`);
-
+  // Use Promise.race for reliable timeout
+  const uploadPromise = (async () => {
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
       {
         method: 'POST',
         body: formData,
-        signal: controller.signal,
       }
     );
 
-    clearTimeout(timeoutId);
-
     if (!response.ok) {
-      console.error(`❌ Upload failed: ${response.status}`);
-      throw new Error(`Upload failed (${response.status})`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(`✅ Uploaded: ${file.name}`);
     return data.secure_url;
+  })();
+
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Timeout (60s)')), 60000) // 60s for slow connections
+  );
+
+  try {
+    const url = await Promise.race([uploadPromise, timeoutPromise]);
+    console.log(`✅ Uploaded: ${file.name}`);
+    return url;
   } catch (error: any) {
-    console.error(`❌ Upload error:`, error);
-
-    if (error.name === 'AbortError') {
-      throw new Error('Upload timeout (15s)');
-    }
-
+    console.error(`❌ Upload failed:`, error.message);
     throw new Error(error.message || 'Upload failed');
   }
 };
