@@ -346,7 +346,11 @@ export const ProfilePageWithAdmin = () => {
               <div className="flex-1">
                 <div className="text-xs text-gray-500">Member Since</div>
                 <div className="font-medium text-gray-900">
-                  {format(new Date(profile.created_at!), 'dd MMM yyyy')}
+                  {profile.created_at
+                    ? format(new Date(profile.created_at), 'dd MMM yyyy')
+                    : user?.created_at
+                    ? format(new Date(user.created_at), 'dd MMM yyyy')
+                    : 'Baru bergabung'}
                 </div>
               </div>
             </div>
