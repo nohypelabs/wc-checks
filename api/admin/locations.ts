@@ -6,7 +6,7 @@ import {
   successResponse,
   errorResponse,
   createAuditLog,
-} from '../middleware/role-guard';
+} from '../middleware/role-guard.js';
 
 /**
  * GET /api/admin/locations - List all locations
@@ -27,15 +27,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { id, building_id, organization_id } = req.query;
+  const locationId = Array.isArray(id) ? id[0] : id;
+  const buildingId = Array.isArray(building_id) ? building_id[0] : building_id;
+  const orgId = Array.isArray(organization_id) ? organization_id[0] : organization_id;
 
   try {
     // GET - List all or get specific
     if (req.method === 'GET') {
-      if (id) {
+      if (locationId) {
         const { data: location, error } = await supabase
           .from('locations')
           .select('*, buildings(name, organization_id)')
-          .eq('id', id)
+          .eq('id', locationId)
           .single();
 
         if (error) throw error;
@@ -47,12 +50,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .select('*, buildings(name, organization_id)')
         .order('created_at', { ascending: false });
 
-      if (building_id) {
-        query = query.eq('building_id', building_id);
+      if (buildingId) {
+        query = query.eq('building_id', buildingId);
       }
 
-      if (organization_id) {
-        query = query.eq('organization_id', organization_id);
+      if (orgId) {
+        query = query.eq('organization_id', orgId);
       }
 
       const { data: locations, error } = await query;
@@ -103,7 +106,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // PATCH - Update location
     if (req.method === 'PATCH') {
-      if (!id) {
+      if (!locationId) {
         return errorResponse(res, 400, 'Location ID required');
       }
 
@@ -119,7 +122,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: updated, error } = await supabase
         .from('locations')
         .update(updates)
-        .eq('id', id)
+        .eq('id', locationId)
         .select()
         .single();
 
@@ -129,8 +132,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         auth.userId,
         'UPDATE_LOCATION',
         'location',
-        id as string,
-        { locationId: id, updates },
+        locationId,
+        { locationId, updates },
         true
       );
 
@@ -139,14 +142,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // DELETE - Soft delete location
     if (req.method === 'DELETE') {
-      if (!id) {
+      if (!locationId) {
         return errorResponse(res, 400, 'Location ID required');
       }
 
       const { data: deleted, error } = await supabase
         .from('locations')
         .update({ is_active: false, updated_at: new Date().toISOString() })
-        .eq('id', id)
+        .eq('id', locationId)
         .select()
         .single();
 
@@ -156,8 +159,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         auth.userId,
         'DELETE_LOCATION',
         'location',
-        id as string,
-        { locationId: id },
+        locationId,
+        { locationId },
         true
       );
 

@@ -6,7 +6,7 @@ import {
   successResponse,
   errorResponse,
   createAuditLog,
-} from '../middleware/role-guard';
+} from '../middleware/role-guard.js';
 
 /**
  * GET /api/admin/list-users

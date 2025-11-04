@@ -1,6 +1,6 @@
 // api/auth/verify-role.ts - Server-side role verification endpoint
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { validateAuth, errorResponse, successResponse } from '../middleware/role-guard';
+import { validateAuth, errorResponse, successResponse } from '../middleware/role-guard.js';
 
 /**
  * GET /api/auth/verify-role
