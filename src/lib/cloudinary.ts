@@ -63,10 +63,13 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
   formData.append('folder', CLOUDINARY_FOLDER);
 
   try {
-    // Dynamic timeout based on file size (10s per MB, min 30s, max 180s)
-    const timeoutDuration = Math.max(30000, Math.min(180000, fileSizeMB * 10000));
+    // ⚡ REDUCED timeout for faster failure detection (max 60s)
+    const timeoutDuration = Math.max(30000, Math.min(60000, fileSizeMB * 8000));
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
+    const timeoutId = setTimeout(() => {
+      console.error(`❌ [UPLOAD] Timeout after ${(timeoutDuration / 1000).toFixed(0)}s for ${file.name}`);
+      controller.abort();
+    }, timeoutDuration);
 
     console.log(`📤 [UPLOAD] Uploading ${file.name} (${fileSizeMB.toFixed(2)}MB)...`);
     console.log(`⏱️ [UPLOAD] Timeout: ${(timeoutDuration / 1000).toFixed(0)}s`);
@@ -85,10 +88,15 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
     clearTimeout(timeoutId);
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-    console.log(`✅ [UPLOAD] Uploaded & optimized ${file.name} in ${elapsed}s`);
+    console.log(`✅ [UPLOAD] Response received for ${file.name} in ${elapsed}s`);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+      throw new Error(errorData.error?.message || `Upload failed with status ${response.status}`);
+    }
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || 'Upload failed');
+    console.log(`✅ [UPLOAD] Successfully uploaded ${file.name}`);
 
     return data.secure_url;
   } catch (error: any) {
@@ -96,7 +104,11 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
 
     // Better error messages for mobile users
     if (error.name === 'AbortError') {
-      throw new Error('Upload timeout (slow connection). Please try again.');
+      throw new Error('Upload timeout - slow connection or file too large. Try again with better signal.');
+    }
+
+    if (error.message?.includes('fetch')) {
+      throw new Error('Network error - check your internet connection and try again.');
     }
 
     throw new Error(error.message || 'Failed to upload photo');
