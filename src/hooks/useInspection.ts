@@ -184,26 +184,8 @@ export const useInspection = (inspectionId?: string) => {
         console.log('✅ All photo URLs validated');
       }
 
-      // Get template ID with timeout protection
-      let templateId = 'comprehensive-template';
-      try {
-        console.log('🔍 Fetching template...');
-        const templatePromise = getDefaultTemplate.refetch();
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Template fetch timeout')), 5000)
-        );
-
-        const templateData = await Promise.race([templatePromise, timeoutPromise]) as any;
-        if (templateData?.data?.id) {
-          templateId = templateData.data.id;
-          console.log('✅ Template fetched:', templateId);
-        } else {
-          console.log('⚠️ Using fallback template ID');
-        }
-      } catch (error) {
-        console.warn('⚠️ Template fetch failed, using fallback:', error);
-        logger.warn('Using fallback template ID');
-      }
+      // Skip template fetch - use fallback directly
+      const templateId = 'comprehensive-template';
 
       const now = new Date();
       const inspection_date = now.toISOString().split('T')[0];
@@ -274,7 +256,13 @@ export const useInspection = (inspectionId?: string) => {
       const apiStartTime = Date.now();
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        // Get session with timeout
+        const sessionPromise = supabase.auth.getSession();
+        const sessionTimeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Session timeout')), 3000)
+        );
+
+        const { data: { session } } = await Promise.race([sessionPromise, sessionTimeout]) as any;
         const token = session?.access_token;
 
         if (!token) {
@@ -282,7 +270,7 @@ export const useInspection = (inspectionId?: string) => {
         }
 
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+        const timeout = setTimeout(() => controller.abort(), 10000);
 
         const response = await fetch('/api/inspections', {
           method: 'POST',
