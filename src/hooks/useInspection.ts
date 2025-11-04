@@ -252,22 +252,14 @@ export const useInspection = (inspectionId?: string) => {
         score
       });
 
-      console.log('🌐 [API] Sending inspection to backend API...');
-      const apiStartTime = Date.now();
-
-      try {
+      // FORCE TIMEOUT with Promise.race - GUARANTEED to resolve
+      const apiCall = (async () => {
+        console.log('🔐 Getting token...');
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token;
+        if (!token) throw new Error('No token');
 
-        if (!token) {
-          throw new Error('No auth token');
-        }
-
-        console.log('📤 Sending to API...');
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000); // 30s for API
-
+        console.log('📤 Calling /api/inspections...');
         const response = await fetch('/api/inspections', {
           method: 'POST',
           headers: {
@@ -275,31 +267,35 @@ export const useInspection = (inspectionId?: string) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(inspectionRecord),
-          signal: controller.signal,
         });
 
-        clearTimeout(timeout);
+        console.log(`📥 Response: ${response.status}`);
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('❌ API error:', errorData);
-          throw new Error(errorData.error || `API error ${response.status}`);
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${response.status}`);
         }
 
         const result = await response.json();
-        console.log('✅ Saved!');
-        endTimer();
-
         return result.data;
-      } catch (apiError: any) {
+      })();
+
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => {
+          console.error('⏰ TIMEOUT after 15s');
+          reject(new Error('TIMEOUT'));
+        }, 15000) // 15s HARD LIMIT
+      );
+
+      try {
+        const data = await Promise.race([apiCall, timeout]);
+        console.log('✅ SUCCESS!');
         endTimer();
-        console.error('❌ Save failed:', apiError);
-
-        if (apiError.name === 'AbortError') {
-          throw new Error('Connection timeout (30s)');
-        }
-
-        throw new Error(apiError.message || 'Failed to save');
+        return data;
+      } catch (error: any) {
+        endTimer();
+        console.error('❌ FAILED:', error.message);
+        throw new Error(error.message || 'Save failed');
       }
 
     },
