@@ -125,17 +125,30 @@ export const ProfilePage = () => {
     toast.loading('Menyimpan perubahan...');
 
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('No auth token available');
+      }
+
+      // Update profile via API
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           full_name: editForm.full_name.trim(),
           phone: editForm.phone.trim() || null,
           occupation_id: editForm.occupation_id || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to update profile');
+      }
 
       // Invalidate queries to refetch fresh data
       await queryClient.invalidateQueries({ queryKey: ['user', user.id] });
