@@ -24,60 +24,27 @@ export const GeneralPhotoUpload = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  // ✅ Handle CAMERA capture - Compress to max 2MB THEN watermark
+  // ✅ Handle CAMERA capture - NO WATERMARK for reliability
   const handleCameraCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsProcessing(true);
-    setPermissionError(null);
 
-    try {
-      // Compress camera photo to max 2MB (fast upload)
-      let compressedFile = file;
-      const fileSizeMB = file.size / 1024 / 1024;
+    // Just use original photo - no watermark, no processing
+    onPhotosChange([...photos, {
+      file,
+      preview: URL.createObjectURL(file),
+      timestamp: new Date().toISOString(),
+    }]);
 
-      if (fileSizeMB > 2) {
-        compressedFile = await compressImage(file, 2); // Max 2MB
-      }
+    if ('vibrate' in navigator) {
+      navigator.vibrate(100);
+    }
 
-      const watermarkedBlob = await addWatermarkToPhoto(compressedFile, {
-        timestamp: new Date().toISOString(),
-        locationName,
-      });
-
-      const preview = URL.createObjectURL(watermarkedBlob);
-      const cleanFileName = `camera_${Date.now()}.webp`;
-      const watermarkedFile = new File([watermarkedBlob], cleanFileName, {
-        type: 'image/webp',
-        lastModified: Date.now()
-      });
-
-      onPhotosChange([...photos, {
-        file: watermarkedFile,
-        preview,
-        timestamp: new Date().toISOString(),
-      }]);
-
-      if ('vibrate' in navigator) {
-        navigator.vibrate(100);
-      }
-    } catch (error: any) {
-      console.error('Camera photo error:', error);
-      setPermissionError(`Failed: ${error.message}`);
-
-      // Fallback: use original
-      const preview = URL.createObjectURL(file);
-      onPhotosChange([...photos, {
-        file,
-        preview,
-        timestamp: new Date().toISOString(),
-      }]);
-    } finally {
-      setIsProcessing(false);
-      if (cameraInputRef.current) {
-        cameraInputRef.current.value = '';
-      }
+    setIsProcessing(false);
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = '';
     }
   };
 
@@ -576,25 +543,31 @@ const addWatermarkToPhoto = async (
             ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
             ctx.fillText(brandText, canvasWidth - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
-            // ✅ OPTIMIZATION: Use WebP format (strips all EXIF/metadata - clean file)
-            // WebP format automatically removes ALL metadata (GPS, camera info, etc)
-            // This prevents Cloudinary rejection due to problematic EXIF data
-            console.log(`🏷️ [WATERMARK] Converting to clean WebP (strips metadata)...`);
-            canvas.toBlob(
-              (blob) => {
-                clearTimeout(timeoutId);
-                if (blob) {
-                  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-                  const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
-                  console.log(`✅ [WATERMARK] Complete in ${elapsed}s (${sizeMB}MB, metadata stripped)`);
-                  resolve(blob);
-                } else {
-                  reject(new Error('Failed to create watermarked photo'));
-                }
-              },
-              'image/webp',
-              0.85 // Good quality, but strips ALL metadata
-            );
+            // Use JPEG for better compatibility (WebP can hang on some devices)
+            const blobPromise = new Promise<Blob>((resolveBlob, rejectBlob) => {
+              canvas.toBlob(
+                (blob) => {
+                  if (blob) {
+                    resolveBlob(blob);
+                  } else {
+                    rejectBlob(new Error('toBlob returned null'));
+                  }
+                },
+                'image/jpeg',
+                0.85
+              );
+            });
+
+            // Race between blob creation and 5s timeout
+            const blob = await Promise.race([
+              blobPromise,
+              new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('toBlob timeout')), 5000)
+              )
+            ]);
+
+            clearTimeout(timeoutId);
+            resolve(blob);
           } catch (canvasProcessError) {
             clearTimeout(timeoutId);
             console.error('❌ [WATERMARK] Canvas processing error:', canvasProcessError);
