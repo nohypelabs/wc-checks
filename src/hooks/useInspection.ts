@@ -184,7 +184,42 @@ export const useInspection = (inspectionId?: string) => {
         console.log('✅ All photo URLs validated');
       }
 
-      // No template_id for now - database expects UUID or NULL
+      // Fetch template to get real UUID from database
+      console.log('📋 Fetching template...');
+      let templateId: string | null = null;
+
+      try {
+        // Get token from localStorage (same as later in the code)
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+        const projectId = supabaseUrl.split('//')[1]?.split('.')[0];
+        const storageKey = `sb-${projectId}-auth-token`;
+        const sessionStr = localStorage.getItem(storageKey);
+
+        if (sessionStr) {
+          const sessionData = JSON.parse(sessionStr);
+          const token = sessionData?.access_token;
+
+          if (token) {
+            const templateRes = await fetch('/api/templates', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (templateRes.ok) {
+              const templateData = await templateRes.json();
+              templateId = templateData.data?.id || null;
+              console.log('✅ Template fetched:', templateId);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('⚠️ Failed to fetch template:', e);
+      }
+
+      // If no template found, throw error
+      if (!templateId) {
+        throw new Error('No inspection template found. Please contact admin to create a default template.');
+      }
+
       const now = new Date();
       const inspection_date = now.toISOString().split('T')[0];
       const inspection_time = now.toTimeString().split(' ')[0];
@@ -202,7 +237,7 @@ export const useInspection = (inspectionId?: string) => {
       const inspectionRecord: TablesInsert<'inspection_records'> = {
         location_id,
         user_id,
-        template_id: null,
+        template_id: templateId,
         inspection_date,
         inspection_time,
         overall_status,
