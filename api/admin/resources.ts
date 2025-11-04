@@ -39,13 +39,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // GET - List all or get specific
     if (req.method === 'GET') {
       if (resourceId) {
-        let query = supabase.from(resourceType).select('*').eq('id', resourceId);
+        let query = (supabase as any).from(resourceType).select('*').eq('id', resourceId);
 
         // Add relations
         if (resourceType === 'buildings') {
-          query = supabase.from(resourceType).select('*, organizations(name)').eq('id', resourceId);
+          query = (supabase as any).from(resourceType).select('*, organizations(name)').eq('id', resourceId);
         } else if (resourceType === 'locations') {
-          query = supabase.from(resourceType).select('*, buildings(name, organization_id)').eq('id', resourceId);
+          query = (supabase as any).from(resourceType).select('*, buildings(name, organization_id)').eq('id', resourceId);
         }
 
         const { data, error } = await query.single();
@@ -55,13 +55,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // List all with optional filters
-      let query = supabase.from(resourceType).select('*').order('created_at', { ascending: false });
+      let query = (supabase as any).from(resourceType).select('*').order('created_at', { ascending: false });
 
       // Add relations
       if (resourceType === 'buildings') {
-        query = supabase.from(resourceType).select('*, organizations(name)').order('created_at', { ascending: false });
+        query = (supabase as any).from(resourceType).select('*, organizations(name)').order('created_at', { ascending: false });
       } else if (resourceType === 'locations') {
-        query = supabase.from(resourceType).select('*, buildings(name, organization_id)').order('created_at', { ascending: false });
+        query = (supabase as any).from(resourceType).select('*, buildings(name, organization_id)').order('created_at', { ascending: false });
       }
 
       // Apply filters
@@ -108,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      const { data: newResource, error } = await supabase
+      const { data: newResource, error } = await (supabase as any)
         .from(resourceType)
         .insert([insertData])
         .select()
@@ -147,7 +147,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       updates.updated_at = new Date().toISOString();
 
-      const { data: updated, error } = await supabase
+      const { data: updated, error } = await (supabase as any)
         .from(resourceType)
         .update(updates)
         .eq('id', resourceId)
@@ -174,7 +174,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return errorResponse(res, 400, 'Resource ID required');
       }
 
-      const { data: deleted, error } = await supabase
+      const { data: deleted, error } = await (supabase as any)
         .from(resourceType)
         .update({ is_active: false, updated_at: new Date().toISOString() })
         .eq('id', resourceId)

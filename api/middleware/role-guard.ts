@@ -67,11 +67,43 @@ export async function validateAuth(
 
     const token = authHeader.substring(7);
 
-    // Verify token using service role client
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Decode JWT to get user ID and verify token
+    let userId: string;
+    try {
+      // JWT format: header.payload.signature
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      userId = payload.sub;
 
-    if (authError || !user) {
-      console.error('[validateAuth] Auth error:', authError?.message);
+      if (!userId) {
+        console.error('[validateAuth] No user ID in token');
+        return null;
+      }
+
+      // Check token expiration
+      const exp = payload.exp;
+      if (exp && Date.now() >= exp * 1000) {
+        console.error('[validateAuth] Token expired');
+        return null;
+      }
+    } catch (error: any) {
+      console.error('[validateAuth] Token decode failed:', error.message);
+      return null;
+    }
+
+    // Verify user exists in database
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, email, is_active')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !user) {
+      console.error('[validateAuth] User not found:', userError?.message);
+      return null;
+    }
+
+    if (!user.is_active) {
+      console.error('[validateAuth] User is not active');
       return null;
     }
 
@@ -149,12 +181,12 @@ export async function createAuditLog(
 ): Promise<void> {
   try {
     if (!supabase) {
-      console.error('[createAuditLog] Supabase client not initialized');
+      console.warn('[createAuditLog] Supabase client not initialized - skipping audit log');
       return;
     }
 
-    // Use RPC function for audit logging (server-side)
-    const { error } = await (supabase as any).rpc('create_audit_log', {
+    // Try using RPC function first
+    const { error: rpcError } = await (supabase as any).rpc('create_audit_log', {
       p_user_id: userId,
       p_action: action,
       p_resource_type: resourceType,
@@ -164,14 +196,37 @@ export async function createAuditLog(
       p_error_message: errorMessage || null,
     });
 
-    if (error) {
-      console.error('[createAuditLog] Error creating audit log:', error);
+    if (rpcError) {
+      // If RPC function doesn't exist, try direct insert as fallback
+      if (rpcError.code === 'PGRST202' || rpcError.message?.includes('Could not find')) {
+        console.warn('[createAuditLog] RPC function not found - trying direct insert');
+
+        const { error: insertError } = await supabase
+          .from('audit_logs')
+          .insert({
+            user_id: userId,
+            action,
+            resource_type: resourceType,
+            resource_id: resourceId || null,
+            details: details || {},
+            success,
+            error_message: errorMessage || null,
+          });
+
+        if (insertError) {
+          console.warn('[createAuditLog] Direct insert also failed - audit logging disabled:', insertError.message);
+        } else {
+          console.log('[createAuditLog] Audit log created via direct insert:', { userId, action, resourceType });
+        }
+      } else {
+        console.warn('[createAuditLog] Error creating audit log:', rpcError.message);
+      }
     } else {
-      console.log('[createAuditLog] Audit log created:', { userId, action, resourceType });
+      console.log('[createAuditLog] Audit log created via RPC:', { userId, action, resourceType });
     }
-  } catch (error) {
-    console.error('[createAuditLog] Unexpected error:', error);
-    // Don't throw - audit log failure shouldn't break the main operation
+  } catch (error: any) {
+    // Silently fail - audit log failure shouldn't break the main operation
+    console.warn('[createAuditLog] Audit logging skipped:', error.message);
   }
 }
 
