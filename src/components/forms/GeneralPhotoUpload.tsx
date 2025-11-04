@@ -433,21 +433,13 @@ const addWatermarkToPhoto = async (
   console.log(`🏷️ [WATERMARK] Starting watermark for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
   const startTime = Date.now();
 
-  // Get EXIF orientation first (safe - always returns a value)
-  let orientation = 1;
-  try {
-    orientation = await getOrientation(file);
-    console.log(`🏷️ [WATERMARK] EXIF Orientation: ${orientation}`);
-  } catch (error) {
-    console.warn('🏷️ [WATERMARK] Failed to get orientation, using default:', error);
-    orientation = 1;
-  }
+  // Skip EXIF for faster processing
+  const orientation = 1;
 
   return new Promise((resolve, reject) => {
-    // Timeout after 30 seconds
     const timeoutId = setTimeout(() => {
-      reject(new Error('Watermark timeout after 30s'));
-    }, 30000);
+      reject(new Error('Watermark timeout'));
+    }, 15000); // 15s timeout for camera photos
 
     const reader = new FileReader();
 
