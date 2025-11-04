@@ -572,30 +572,18 @@ const addWatermarkToPhoto = async (
             ctx.fillText(brandText, canvasWidth - brandWidth - padding * 2, padding + lineHeight * 1.2);
 
             // Use JPEG for better compatibility (WebP can hang on some devices)
-            const blobPromise = new Promise<Blob>((resolveBlob, rejectBlob) => {
-              canvas.toBlob(
-                (blob) => {
-                  if (blob) {
-                    resolveBlob(blob);
-                  } else {
-                    rejectBlob(new Error('toBlob returned null'));
-                  }
-                },
-                'image/jpeg',
-                0.85
-              );
-            });
-
-            // Race between blob creation and 5s timeout
-            const blob = await Promise.race([
-              blobPromise,
-              new Promise<never>((_, reject) =>
-                setTimeout(() => reject(new Error('toBlob timeout')), 5000)
-              )
-            ]);
-
-            clearTimeout(timeoutId);
-            resolve(blob);
+            canvas.toBlob(
+              (blob) => {
+                clearTimeout(timeoutId);
+                if (blob) {
+                  resolve(blob);
+                } else {
+                  reject(new Error('toBlob returned null'));
+                }
+              },
+              'image/jpeg',
+              0.85
+            );
           } catch (canvasProcessError) {
             clearTimeout(timeoutId);
             console.error('❌ [WATERMARK] Canvas processing error:', canvasProcessError);
