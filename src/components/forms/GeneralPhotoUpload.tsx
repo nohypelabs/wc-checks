@@ -24,7 +24,7 @@ export const GeneralPhotoUpload = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  // ✅ Handle CAMERA capture - Try watermark with aggressive timeout, fallback to original
+  // ✅ Handle CAMERA capture - Compress to max 2MB THEN watermark
   const handleCameraCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -33,51 +33,40 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
-      // Try watermark with 10s timeout
-      const watermarkPromise = addWatermarkToPhoto(file, {
+      // Compress camera photo to max 2MB (fast upload)
+      let compressedFile = file;
+      const fileSizeMB = file.size / 1024 / 1024;
+
+      if (fileSizeMB > 2) {
+        compressedFile = await compressImage(file, 2); // Max 2MB
+      }
+
+      const watermarkedBlob = await addWatermarkToPhoto(compressedFile, {
         timestamp: new Date().toISOString(),
         locationName,
       });
 
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Watermark timeout')), 10000)
-      );
+      const preview = URL.createObjectURL(watermarkedBlob);
+      const cleanFileName = `camera_${Date.now()}.webp`;
+      const watermarkedFile = new File([watermarkedBlob], cleanFileName, {
+        type: 'image/webp',
+        lastModified: Date.now()
+      });
 
-      let finalFile: File;
-      let preview: string;
-
-      try {
-        const watermarkedBlob = await Promise.race([watermarkPromise, timeoutPromise]);
-
-        const cleanFileName = `camera_${Date.now()}.webp`;
-        finalFile = new File([watermarkedBlob], cleanFileName, {
-          type: 'image/webp',
-          lastModified: Date.now()
-        });
-        preview = URL.createObjectURL(watermarkedBlob);
-      } catch (watermarkError) {
-        // Watermark failed/timeout - use original
-        console.warn('⚠️ Watermark failed, using original photo:', watermarkError);
-        finalFile = file;
-        preview = URL.createObjectURL(file);
-      }
-
-      const photoMetadata: PhotoWithMetadata = {
-        file: finalFile,
+      onPhotosChange([...photos, {
+        file: watermarkedFile,
         preview,
         timestamp: new Date().toISOString(),
-      };
-
-      onPhotosChange([...photos, photoMetadata]);
+      }]);
 
       if ('vibrate' in navigator) {
         navigator.vibrate(100);
       }
-
     } catch (error: any) {
-      console.error('Error capturing photo:', error);
+      console.error('Camera photo error:', error);
+      setPermissionError(`Failed: ${error.message}`);
 
-      // Ultimate fallback: just add the original file
+      // Fallback: use original
       const preview = URL.createObjectURL(file);
       onPhotosChange([...photos, {
         file,
@@ -632,6 +621,70 @@ const addWatermarkToPhoto = async (
     };
 
     console.log(`🏷️ [WATERMARK] Reading file...`);
+    reader.readAsDataURL(file);
+  });
+};
+
+// Compress image to target size in MB
+const compressImage = async (file: File, targetMB: number): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const img = new Image();
+      img.src = e.target?.result as string;
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+
+        // Resize to max 1920px
+        let width = img.width;
+        let height = img.height;
+        const MAX = 1920;
+
+        if (width > MAX || height > MAX) {
+          if (width > height) {
+            height = (height / width) * MAX;
+            width = MAX;
+          } else {
+            width = (width / height) * MAX;
+            height = MAX;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context unavailable'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to blob with quality 0.8
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name, {
+                type: 'image/webp',
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            } else {
+              reject(new Error('Compression failed'));
+            }
+          },
+          'image/webp',
+          0.8
+        );
+      };
+
+      img.onerror = () => reject(new Error('Image load failed'));
+    };
+
+    reader.onerror = () => reject(new Error('File read failed'));
     reader.readAsDataURL(file);
   });
 };
