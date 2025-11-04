@@ -201,7 +201,7 @@ export async function createAuditLog(
       if (rpcError.code === 'PGRST202' || rpcError.message?.includes('Could not find')) {
         console.warn('[createAuditLog] RPC function not found - trying direct insert');
 
-        const { error: insertError } = await supabase
+        const { error: insertError } = await (supabase as any)
           .from('audit_logs')
           .insert({
             user_id: userId,
