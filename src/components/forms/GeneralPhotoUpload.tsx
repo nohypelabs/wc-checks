@@ -134,10 +134,7 @@ export const GeneralPhotoUpload = ({
       console.error('Error processing gallery photo:', error);
 
       // Show detailed error on screen for mobile debugging
-      const errorMsg = genZMode
-        ? `Gagal proses foto: ${error.message || 'Unknown error'}`
-        : `Photo processing failed: ${error.message || 'Unknown error'}`;
-
+      const errorMsg = `Gagal proses foto: ${error.message || 'Unknown error'}`;
       setPermissionError(errorMsg);
 
       // Fallback: add without watermark
@@ -227,10 +224,10 @@ export const GeneralPhotoUpload = ({
             <Camera className="w-7 h-7" />
             <div className="text-center">
               <p className="text-sm font-semibold">
-                {genZMode ? '📸 Kamera' : '📸 Camera'}
+                📸 Kamera
               </p>
               <p className="text-xs opacity-75">
-                {genZMode ? 'Ambil foto' : 'Take photo'}
+                Ambil foto
               </p>
             </div>
           </button>
@@ -255,10 +252,10 @@ export const GeneralPhotoUpload = ({
             <ImageIcon className="w-7 h-7" />
             <div className="text-center">
               <p className="text-sm font-semibold">
-                {genZMode ? '🖼️ Galeri' : '🖼️ Gallery'}
+                🖼️ Galeri
               </p>
               <p className="text-xs opacity-75">
-                {genZMode ? 'Pilih file' : 'Choose file'}
+                Pilih file
               </p>
             </div>
           </button>
@@ -288,13 +285,10 @@ export const GeneralPhotoUpload = ({
       {canAddMore && (
         <div className="text-center space-y-1">
           <p className="text-xs text-gray-600 font-medium">
-            {photos.length}/{maxPhotos} photos
+            {photos.length}/{maxPhotos} foto
           </p>
           <p className="text-xs text-gray-500">
-            {genZMode
-              ? '✨ Watermark otomatis: Toilet, Building, Lantai, Tanggal & Jam'
-              : '✨ Auto watermark: Toilet, Building, Floor, Date & Time'
-            }
+            ✨ Watermark otomatis: Toilet, Building, Lantai, Tanggal & Jam
           </p>
         </div>
       )}
@@ -314,13 +308,13 @@ export const GeneralPhotoUpload = ({
             </div>
 
             <h3 className="text-xl font-bold text-gray-900 mb-2">
-              {genZMode ? 'Memproses Foto' : 'Processing Photo'}
+              Memproses Foto
             </h3>
             <p className="text-gray-600 mb-1">
-              {genZMode ? 'Menambahkan watermark...' : 'Adding watermark...'}
+              Menambahkan watermark...
             </p>
             <p className="text-sm text-gray-500">
-              {genZMode ? 'Tunggu sebentar' : 'Please wait'}
+              Tunggu sebentar
             </p>
           </div>
         </div>

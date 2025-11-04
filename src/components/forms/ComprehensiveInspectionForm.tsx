@@ -138,11 +138,7 @@ export const ComprehensiveInspectionForm = ({
 
     if (missingRatings.length > 0) {
       const missing = missingRatings.map((c) => c.label).join(', ');
-      toast.error(
-        genZMode
-          ? `Masih ada yang belum diisi: ${missing}`
-          : `Please rate: ${missing}`
-      );
+      toast.error(`Masih ada yang belum diisi: ${missing}`);
       setExpandedComponent(missingRatings[0].id);
       return false;
     }
@@ -156,40 +152,24 @@ export const ComprehensiveInspectionForm = ({
       const component = INSPECTION_COMPONENTS.find(
         (c) => c.id === otherWithoutNotes[0].component
       );
-      toast.error(
-        genZMode
-          ? `"${component?.labelGenZ}" pilih "Lainnya" tapi belum dikasih penjelasan!`
-          : `"${component?.label}" requires explanation when selecting "Other"`
-      );
+      toast.error(`"${component?.labelGenZ}" pilih "Lainnya" tapi belum dikasih penjelasan!`);
       setExpandedComponent(otherWithoutNotes[0].component);
       return false;
     }
 
     // VALIDATE: General photos REQUIRED (min 1)
     if (generalPhotos.length === 0) {
-      toast.error(
-        genZMode
-          ? '📸 Wajib upload minimal 1 foto dokumentasi!'
-          : '📸 At least 1 documentation photo is required!'
-      );
+      toast.error('📸 Wajib upload minimal 1 foto dokumentasi!');
       return false;
     }
 
     if (issuesFound && !issueDescription.trim()) {
-      toast.error(
-        genZMode
-          ? 'Tolong jelasin masalah yang ditemukan!'
-          : 'Please describe the issues found'
-      );
+      toast.error('Tolong jelasin masalah yang ditemukan!');
       return false;
     }
 
     if (requiresMaintenance && !maintenancePriority) {
-      toast.error(
-        genZMode
-          ? 'Pilih prioritas maintenance dong!'
-          : 'Please select maintenance priority'
-      );
+      toast.error('Pilih prioritas maintenance dong!');
       return false;
     }
 
@@ -206,7 +186,7 @@ const handleSubmit = async () => {
 
   if (!user) {
     console.error('❌ [SUBMIT] No user logged in');
-    toast.error('Please login first');
+    toast.error('Silakan login dulu');
     return;
   }
   console.log('✅ [SUBMIT] User check passed:', user.id);
@@ -246,11 +226,7 @@ const handleSubmit = async () => {
 
     if (totalPhotos === 0) {
       console.error('❌ [SUBMIT] No photos found!');
-      toast.error(
-        genZMode
-          ? '📸 Wajib upload minimal 1 foto!'
-          : 'Please add at least one photo'
-      );
+      toast.error('📸 Wajib upload minimal 1 foto!');
       setIsSubmitting(false);
       return;
     }
@@ -261,11 +237,7 @@ const handleSubmit = async () => {
     // Cloudinary will optimize on their servers (faster & saves battery)
     console.log('☁️ [SUBMIT] Starting direct upload to Cloudinary (server will optimize)...');
 
-    const toastId = toast.loading(
-      genZMode
-        ? `☁️ Upload ${totalPhotos} foto...`
-        : `☁️ Uploading ${totalPhotos} photos...`
-    );
+    const toastId = toast.loading(`☁️ Upload ${totalPhotos} foto...`);
 
     setUploadProgress({
       current: 0,
@@ -285,12 +257,7 @@ const handleSubmit = async () => {
             percentage: uploadPercent
           });
 
-          toast.loading(
-            genZMode
-              ? `☁️ Upload ${current}/${total} foto...`
-              : `☁️ Uploading ${current}/${total} photos...`,
-            { id: toastId }
-          );
+          toast.loading(`☁️ Upload ${current}/${total} foto...`, { id: toastId });
         }
       }
     );
@@ -300,11 +267,7 @@ const handleSubmit = async () => {
     // ⚠️ VALIDATION: Check if photo upload failed
     if (totalPhotos > 0 && uploadedUrls.length === 0) {
       console.error('❌ [SUBMIT] All photo uploads failed!');
-      throw new Error(
-        genZMode
-          ? 'Gagal upload foto! Coba lagi atau cek koneksi internet.'
-          : 'Failed to upload photos! Please try again or check your internet connection.'
-      );
+      throw new Error('Gagal upload foto! Coba lagi atau cek koneksi internet.');
     }
 
     if (uploadedUrls.length < totalPhotos) {
@@ -313,10 +276,7 @@ const handleSubmit = async () => {
 
     // Update toast - saving
     console.log('💾 [SUBMIT] Preparing to save to database...');
-    toast.loading(
-      genZMode ? '💾 Nyimpen inspection...' : '💾 Saving inspection...',
-      { id: toastId }
-    );
+    toast.loading('💾 Nyimpen inspection...', { id: toastId });
 
     setUploadProgress(null); // Clear upload progress
 
@@ -367,9 +327,7 @@ const handleSubmit = async () => {
 
     // Success - show modal with options
     toast.success(
-      genZMode
-        ? `🎉 Sukses! Score: ${currentScore}`
-        : `✅ Inspection saved! Score: ${currentScore}`,
+      `🎉 Sukses! Score: ${currentScore}`,
       { id: toastId, duration: 2000 }
     );
 
@@ -382,16 +340,11 @@ const handleSubmit = async () => {
     setUploadProgress(null); // Clear progress on error
 
     // Show detailed error modal instead of simple toast
-    setErrorMessage(error.message || 'Failed to submit inspection');
+    setErrorMessage(error.message || 'Gagal submit inspection');
     setShowFailedModal(true);
 
     // Keep toast for quick notification
-    toast.error(
-      genZMode
-        ? '😢 Gagal submit!'
-        : 'Submission failed',
-      { duration: 2000 }
-    );
+    toast.error('😢 Gagal submit!', { duration: 2000 });
   } finally {
     setIsSubmitting(false);
     setUploadProgress(null); // Clear progress
@@ -419,7 +372,7 @@ const handleSubmit = async () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-2" />
-          <p className="text-gray-700">Location not found</p>
+          <p className="text-gray-700">Lokasi tidak ditemukan</p>
         </div>
       </div>
     );
@@ -475,7 +428,7 @@ const handleSubmit = async () => {
             <div className={genZMode ? 'text-white' : 'text-gray-900'}>
               <h1 className="font-bold text-lg">{location.name}</h1>
               <p className={`text-sm ${genZMode ? 'text-white/80' : 'text-gray-600'}`}>
-                {[location.building, location.floor, location.area].filter(Boolean).join(' • ') || 'Location details'}
+                {[location.building, location.floor, location.area].filter(Boolean).join(' • ') || 'Detail lokasi'}
               </p>
             </div>
           </div>
@@ -483,9 +436,7 @@ const handleSubmit = async () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className={genZMode ? 'text-white/90' : 'text-gray-600'}>
-                {genZMode
-                  ? `Progress ${completedCount}/${INSPECTION_COMPONENTS.length}`
-                  : `${completedCount} of ${INSPECTION_COMPONENTS.length} completed`}
+                Progress {completedCount}/{INSPECTION_COMPONENTS.length}
               </span>
               {currentScore > 0 && (
                 <span className={`font-bold ${genZMode ? 'text-white' : 'text-blue-600'}`}>
@@ -602,7 +553,7 @@ const handleSubmit = async () => {
                     }
                   `}
                 >
-                  {genZMode ? '↑ Minimize' : '↑ Collapse'}
+                  ↑ Minimize
                 </button>
               )}
             </div>
@@ -621,16 +572,13 @@ const handleSubmit = async () => {
             <div className="flex items-center space-x-2 mb-2">
               <Camera className={`w-5 h-5 ${genZMode ? 'text-blue-700' : 'text-blue-700'}`} />
               <h3 className="font-bold text-gray-900">
-                {genZMode ? '📸 Foto Dokumentasi' : '📸 Documentation Photos'}
+                📸 Foto Dokumentasi
                 <span className="text-red-500 ml-1">*</span>
               </h3>
             </div>
 
             <p className={`text-sm mb-4 ${genZMode ? 'text-blue-900' : 'text-blue-900'}`}>
-              {genZMode 
-                ? '⚠️ WAJIB minimal 1 foto! Auto watermark: Tanggal, Jam, GPS, Nama Toilet.'
-                : '⚠️ REQUIRED: Minimum 1 photo! Auto watermark: Date, Time, GPS, Toilet Name.'
-              }
+              ⚠️ WAJIB minimal 1 foto! Auto watermark: Tanggal, Jam, GPS, Nama Toilet.
             </p>
 
             <GeneralPhotoUpload
@@ -651,7 +599,7 @@ const handleSubmit = async () => {
         >
           <label className="flex items-center justify-between mb-3">
             <span className="font-semibold text-gray-900">
-              {genZMode ? '⚠️ Ada masalah yang ditemukan?' : 'Issues Found?'}
+              ⚠️ Ada masalah yang ditemukan?
             </span>
             <input
               type="checkbox"
@@ -665,9 +613,7 @@ const handleSubmit = async () => {
             <textarea
               value={issueDescription}
               onChange={(e) => setIssueDescription(e.target.value)}
-              placeholder={
-                genZMode ? 'Jelasin masalahnya...' : 'Describe the issues found...'
-              }
+              placeholder="Jelasin masalahnya..."
               className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 resize-none"
               rows={3}
             />
@@ -682,7 +628,7 @@ const handleSubmit = async () => {
         >
           <label className="flex items-center justify-between mb-3">
             <span className="font-semibold text-gray-900">
-              {genZMode ? '🔧 Perlu maintenance?' : 'Requires Maintenance?'}
+              🔧 Perlu maintenance?
             </span>
             <input
               type="checkbox"
@@ -728,14 +674,12 @@ const handleSubmit = async () => {
           } rounded-2xl p-4 shadow-sm border border-gray-100`}
         >
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            {genZMode ? '📝 Catatan tambahan (opsional)' : 'General Notes (Optional)'}
+            📝 Catatan tambahan (opsional)
           </label>
           <textarea
             value={generalNotes}
             onChange={(e) => setGeneralNotes(e.target.value)}
-            placeholder={
-              genZMode ? 'Ada yang mau ditambahin?' : 'Any additional observations...'
-            }
+            placeholder="Ada yang mau ditambahin?"
             className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 resize-none"
             rows={3}
           />
@@ -773,10 +717,10 @@ const handleSubmit = async () => {
           </svg>
         </div>
         <h3 className="text-lg font-bold text-gray-900 mb-1">
-          {genZMode ? 'Upload Foto...' : 'Uploading Photos...'}
+          Upload Foto...
         </h3>
         <p className="text-sm text-gray-600">
-          {uploadProgress?.current || 0} of {uploadProgress?.total || 0} photos
+          {uploadProgress?.current || 0} dari {uploadProgress?.total || 0} foto
         </p>
       </div>
 
@@ -797,9 +741,7 @@ const handleSubmit = async () => {
 
       {/* Info Text */}
       <p className="text-xs text-gray-500 text-center mt-4">
-        {genZMode 
-          ? 'Sabar ya, lagi upload...' 
-          : 'Please wait while we upload your photos...'}
+        Sabar ya, lagi upload...
       </p>
     </div>
   </div>
@@ -824,31 +766,21 @@ const handleSubmit = async () => {
         >
           {isSubmitting
             ? (uploadProgress?.total || 0) > 0
-              ? genZMode
-                ? `📸 Upload ${uploadProgress?.current || 0}/${uploadProgress?.total || 0}...`
-                : `Uploading ${uploadProgress?.current || 0}/${uploadProgress?.total || 0} photos...`
-              : genZMode
-                ? '⏳ Submitting...'
-                : 'Submitting...'
-            : genZMode
-              ? `🚀 Submit (Score: ${currentScore})`
-              : `Submit Inspection (Score: ${currentScore})`}
+              ? `📸 Upload ${uploadProgress?.current || 0}/${uploadProgress?.total || 0}...`
+              : '⏳ Submitting...'
+            : `🚀 Submit (Score: ${currentScore})`}
         </button>
 
         {(completedCount < totalRequired || generalPhotos.length === 0) && (
           <div className="text-center text-sm text-red-600 mt-2 space-y-1">
             {completedCount < totalRequired && (
               <p>
-                {genZMode
-                  ? `❌ Masih kurang ${totalRequired - completedCount} komponen wajib`
-                  : `❌ ${totalRequired - completedCount} required components remaining`}
+                ❌ Masih kurang {totalRequired - completedCount} komponen wajib
               </p>
             )}
             {generalPhotos.length === 0 && (
               <p>
-                {genZMode
-                  ? '📸 Wajib upload minimal 1 foto dokumentasi'
-                  : '📸 At least 1 documentation photo required'}
+                📸 Wajib upload minimal 1 foto dokumentasi
               </p>
             )}
           </div>
