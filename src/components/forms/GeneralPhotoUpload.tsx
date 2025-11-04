@@ -32,47 +32,63 @@ export const GeneralPhotoUpload = ({
     setIsProcessing(true);
     setPermissionError(null);
 
-    const watermarkPromise = addWatermarkToPhoto(file, {
-      timestamp: new Date().toISOString(),
-      locationName,
-    });
-
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Watermark timeout')), 2000) // 2s only
-    );
-
     try {
-      const watermarkedBlob = await Promise.race([watermarkPromise, timeoutPromise]);
-
-      const preview = URL.createObjectURL(watermarkedBlob);
-      const watermarkedFile = new File([watermarkedBlob], `camera_${Date.now()}.jpg`, {
-        type: 'image/jpeg',
-        lastModified: Date.now()
+      const watermarkPromise = addWatermarkToPhoto(file, {
+        timestamp: new Date().toISOString(),
+        locationName,
       });
 
-      onPhotosChange([...photos, {
-        file: watermarkedFile,
-        preview,
-        timestamp: new Date().toISOString(),
-      }]);
-    } catch (error: any) {
-      // Timeout or error - use original without watermark
-      console.warn('⚠️ Watermark failed, using original photo');
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Watermark timeout')), 2000)
+      );
 
-      onPhotosChange([...photos, {
-        file,
-        preview: URL.createObjectURL(file),
-        timestamp: new Date().toISOString(),
-      }]);
-    }
+      try {
+        const watermarkedBlob = await Promise.race([watermarkPromise, timeoutPromise]);
 
-    if ('vibrate' in navigator) {
-      navigator.vibrate(100);
-    }
+        const preview = URL.createObjectURL(watermarkedBlob);
+        const watermarkedFile = new File([watermarkedBlob], `camera_${Date.now()}.jpg`, {
+          type: 'image/jpeg',
+          lastModified: Date.now()
+        });
 
-    setIsProcessing(false);
-    if (cameraInputRef.current) {
-      cameraInputRef.current.value = '';
+        onPhotosChange([...photos, {
+          file: watermarkedFile,
+          preview,
+          timestamp: new Date().toISOString(),
+        }]);
+      } catch (watermarkError) {
+        // Watermark failed - use original
+        console.warn('⚠️ Watermark failed, using original');
+
+        onPhotosChange([...photos, {
+          file,
+          preview: URL.createObjectURL(file),
+          timestamp: new Date().toISOString(),
+        }]);
+      }
+
+      if ('vibrate' in navigator) {
+        navigator.vibrate(100);
+      }
+    } catch (fatalError) {
+      // CATCH ALL - prevent page crash
+      console.error('Camera capture fatal error:', fatalError);
+
+      // Still add photo even if everything fails
+      try {
+        onPhotosChange([...photos, {
+          file,
+          preview: URL.createObjectURL(file),
+          timestamp: new Date().toISOString(),
+        }]);
+      } catch (e) {
+        console.error('Failed to add photo:', e);
+      }
+    } finally {
+      setIsProcessing(false);
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = '';
+      }
     }
   };
 
