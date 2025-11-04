@@ -34,19 +34,28 @@ export const useInspection = (inspectionId?: string) => {
     queryKey: ['inspection', inspectionId],
     queryFn: async () => {
       if (!inspectionId) return null;
-      
-      const { data, error } = await supabase
-        .from('inspection_records')
-        .select('*')
-        .eq('id', inspectionId)
-        .single();
 
-      if (error) {
-        logger.error('Failed to fetch inspection', error);
-        throw new Error(`Failed to fetch inspection: ${error.message}`);
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('No authentication token');
       }
-      
-      return data as InspectionComponent;
+
+      const response = await fetch(`/api/inspections?id=${inspectionId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        logger.error('Failed to fetch inspection via API', errorData);
+        throw new Error(`Failed to fetch inspection: ${errorData.error || response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.data as InspectionComponent;
     },
     enabled: !!inspectionId,
   });
@@ -54,15 +63,11 @@ export const useInspection = (inspectionId?: string) => {
   const getDefaultTemplate = useQuery({
     queryKey: ['default-template'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('inspection_templates')
-        .select('*')
-        .eq('is_default', true)
-        .eq('is_active', true)
-        .single();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) {
-        logger.warn('Using fallback template', error);
+      if (!token) {
+        logger.warn('No auth token for template fetch, using fallback');
         return {
           id: 'comprehensive-template',
           name: 'Comprehensive Inspection',
@@ -80,7 +85,39 @@ export const useInspection = (inspectionId?: string) => {
           updated_at: new Date().toISOString()
         };
       }
-      return data;
+
+      try {
+        const response = await fetch('/api/templates', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch template');
+        }
+
+        const result = await response.json();
+        return result.data;
+      } catch (error) {
+        logger.warn('Template fetch failed, using fallback', error);
+        return {
+          id: 'comprehensive-template',
+          name: 'Comprehensive Inspection',
+          description: 'Default comprehensive inspection template',
+          fields: {
+            components: [],
+            requiredPhotos: 0,
+            maxPhotos: 10,
+            allowNotes: true
+          },
+          estimated_time: 300,
+          is_active: true,
+          is_default: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+      }
     },
     retry: 1,
   });
@@ -90,45 +127,27 @@ export const useInspection = (inspectionId?: string) => {
     queryFn: async () => {
       if (!locationId) throw new Error('Location ID is required');
 
-      const { data, error } = await supabase
-        .from('locations')
-        .select(`
-          id,
-          name,
-          floor,
-          area,
-          code,
-          building_id,
-          organization_id,
-          qr_code,
-          is_active,
-          buildings!building_id (
-            name
-          )
-        `)
-        .eq('id', locationId)
-        .single();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) {
-        logger.error('Failed to fetch location', error);
-        throw new Error(`Failed to fetch location: ${error.message}`);
+      if (!token) {
+        throw new Error('No authentication token');
       }
 
-      // Transform data to flatten building name
-      const transformed: LocationWithDetails = {
-        id: data.id,
-        name: data.name,
-        floor: data.floor,
-        area: data.area,
-        code: data.code,
-        building_id: data.building_id,
-        organization_id: data.organization_id,
-        qr_code: data.qr_code,
-        is_active: data.is_active,
-        building: (data as any).buildings?.name || null,
-      };
+      const response = await fetch(`/api/locations?id=${locationId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-      return transformed;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        logger.error('Failed to fetch location via API', errorData);
+        throw new Error(`Failed to fetch location: ${errorData.error || response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.data as LocationWithDetails;
     },
     enabled: !!locationId,
   });
