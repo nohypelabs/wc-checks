@@ -252,21 +252,34 @@ export const useInspection = (inspectionId?: string) => {
         score
       });
 
-      // Wrap getSession with timeout - THIS IS THE HANG POINT!
+      // SKIP getSession() - it hangs! Get token from localStorage directly
       const apiCall = (async () => {
-        console.log('🔐 Getting token...');
+        console.log('🔐 Getting token from localStorage...');
 
-        const sessionPromise = supabase.auth.getSession();
-        const sessionTimeout = new Promise((_, reject) =>
-          setTimeout(() => {
-            console.error('⏰ getSession HUNG after 5s!');
-            reject(new Error('getSession hung'));
-          }, 5000)
-        );
+        // Get Supabase project ID from URL
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+        const projectId = supabaseUrl.split('//')[1]?.split('.')[0];
 
-        const { data: { session } } = await Promise.race([sessionPromise, sessionTimeout]) as any;
-        const token = session?.access_token;
-        if (!token) throw new Error('No token');
+        if (!projectId) {
+          throw new Error('Invalid Supabase URL');
+        }
+
+        // Construct localStorage key
+        const storageKey = `sb-${projectId}-auth-token`;
+        const sessionStr = localStorage.getItem(storageKey);
+
+        if (!sessionStr) {
+          throw new Error('No session in localStorage');
+        }
+
+        const sessionData = JSON.parse(sessionStr);
+        const token = sessionData?.access_token;
+
+        if (!token) {
+          throw new Error('No access token in session');
+        }
+
+        console.log('✅ Got token from localStorage');
 
         console.log('📤 Calling /api/inspections...');
         const response = await fetch('/api/inspections', {
