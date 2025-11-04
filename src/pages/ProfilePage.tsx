@@ -330,7 +330,11 @@ export const ProfilePage = () => {
                   <div className="flex-1">
                     <div className="text-xs text-gray-500">Bergabung Sejak</div>
                     <div className="font-medium text-gray-900">
-                      {formatDate(profile.created_at)}
+                      {formatDate(profile.created_at) !== 'N/A'
+                        ? formatDate(profile.created_at)
+                        : formatDate(user.created_at) !== 'N/A'
+                        ? formatDate(user.created_at)
+                        : 'Baru bergabung'}
                     </div>
                   </div>
                 </div>
