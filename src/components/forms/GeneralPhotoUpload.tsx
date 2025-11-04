@@ -24,19 +24,47 @@ export const GeneralPhotoUpload = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  // ✅ Handle CAMERA capture - NO WATERMARK for reliability
+  // ✅ Handle CAMERA capture - Watermark with 2s timeout
   const handleCameraCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsProcessing(true);
+    setPermissionError(null);
 
-    // Just use original photo - no watermark, no processing
-    onPhotosChange([...photos, {
-      file,
-      preview: URL.createObjectURL(file),
+    const watermarkPromise = addWatermarkToPhoto(file, {
       timestamp: new Date().toISOString(),
-    }]);
+      locationName,
+    });
+
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Watermark timeout')), 2000) // 2s only
+    );
+
+    try {
+      const watermarkedBlob = await Promise.race([watermarkPromise, timeoutPromise]);
+
+      const preview = URL.createObjectURL(watermarkedBlob);
+      const watermarkedFile = new File([watermarkedBlob], `camera_${Date.now()}.jpg`, {
+        type: 'image/jpeg',
+        lastModified: Date.now()
+      });
+
+      onPhotosChange([...photos, {
+        file: watermarkedFile,
+        preview,
+        timestamp: new Date().toISOString(),
+      }]);
+    } catch (error: any) {
+      // Timeout or error - use original without watermark
+      console.warn('⚠️ Watermark failed, using original photo');
+
+      onPhotosChange([...photos, {
+        file,
+        preview: URL.createObjectURL(file),
+        timestamp: new Date().toISOString(),
+      }]);
+    }
 
     if ('vibrate' in navigator) {
       navigator.vibrate(100);
