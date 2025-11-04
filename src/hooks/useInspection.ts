@@ -282,7 +282,7 @@ export const useInspection = (inspectionId?: string) => {
         }
 
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
         const response = await fetch('/api/inspections', {
           method: 'POST',
@@ -296,26 +296,9 @@ export const useInspection = (inspectionId?: string) => {
 
         clearTimeout(timeout);
 
-        const apiDuration = ((Date.now() - apiStartTime) / 1000).toFixed(2);
-        console.log(`🌐 [API] Request completed in ${apiDuration}s`);
-
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: response.statusText }));
-          console.error('❌ [API] Request failed:', errorData);
-          endTimer();
-          logger.error('Failed to submit inspection via API', errorData);
-
-          // Provide user-friendly error message
-          let userMessage = errorData.error || 'Failed to save inspection.';
-          if (response.status === 401 || response.status === 403) {
-            userMessage = 'Authentication failed. Please log in again.';
-          } else if (response.status === 400) {
-            userMessage = `Invalid data: ${errorData.error}`;
-          } else if (response.status >= 500) {
-            userMessage = 'Server error. Please try again later.';
-          }
-
-          throw new Error(userMessage);
+          throw new Error(errorData.error || `Failed (${response.status})`);
         }
 
         const result = await response.json();
