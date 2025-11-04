@@ -198,7 +198,7 @@ export function useCreateLocation() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch('/api/admin/locations', {
+      const response = await fetch('/api/admin/resources?type=locations', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

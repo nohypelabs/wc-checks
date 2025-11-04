@@ -38,7 +38,7 @@ export function useOrganizations() {
 
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch('/api/admin/organizations', {
+      const response = await fetch('/api/admin/resources?type=organizations', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
@@ -64,7 +64,7 @@ export function useCreateOrganization() {
 
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch('/api/admin/organizations', {
+      const response = await fetch('/api/admin/resources?type=organizations', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

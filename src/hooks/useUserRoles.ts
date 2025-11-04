@@ -45,7 +45,7 @@ export function useUsers() {
       }
 
       // ✅ Call backend API instead of direct Supabase query
-      const response = await fetch('/api/admin/list-users', {
+      const response = await fetch('/api/admin/users', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -84,7 +84,7 @@ export function useRoles() {
       }
 
       // ✅ Call backend API instead of direct Supabase query
-      const response = await fetch('/api/admin/list-roles', {
+      const response = await fetch('/api/admin/users?roles=true', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -129,7 +129,7 @@ export function useAssignRole() {
       }
 
       // Call backend API with server-side validation
-      const response = await fetch('/api/admin/assign-role', {
+      const response = await fetch('/api/admin/users?action=assign-role', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -171,7 +171,7 @@ export function useToggleUserStatus() {
       }
 
       // Call backend API with server-side validation
-      const response = await fetch('/api/admin/toggle-user-status', {
+      const response = await fetch('/api/admin/users?action=toggle-status', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
