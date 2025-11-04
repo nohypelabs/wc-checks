@@ -59,11 +59,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw error;
     }
 
-    // If no default template found, return fallback
+    // If no default template found, auto-create one
     if (!defaultTemplate) {
-      console.warn('[templates] No default template found, returning fallback');
-      const fallback = {
-        id: 'comprehensive-template',
+      console.warn('[templates] No default template found, creating one...');
+
+      const newTemplate = {
         name: 'Comprehensive Inspection',
         description: 'Default comprehensive inspection template',
         fields: {
@@ -75,10 +75,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         estimated_time: 300,
         is_active: true,
         is_default: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_by: auth.userId,
       };
-      return successResponse(res, fallback, 'Default template (fallback)');
+
+      const { data: createdTemplate, error: createError } = await supabase
+        .from('inspection_templates')
+        .insert([newTemplate])
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('[templates] Failed to create default template:', createError);
+        throw createError;
+      }
+
+      console.log('[templates] Default template created:', createdTemplate.id);
+      return successResponse(res, createdTemplate, 'Default template created');
     }
 
     return successResponse(res, defaultTemplate, 'Default template retrieved');
