@@ -288,49 +288,85 @@ const createPhotoWithOverlay = async (
   file: File,
   metadata: { timestamp: string; location?: { lat: number; lng: number; address?: string } }
 ): Promise<string> => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
     const reader = new FileReader();
+
+    // Set 10s timeout to prevent infinite hanging
+    const timeoutId = setTimeout(() => {
+      console.error('❌ Photo overlay timeout - using original photo');
+      resolve(URL.createObjectURL(file));
+    }, 10000);
 
     reader.onload = (e) => {
       img.src = e.target?.result as string;
     };
 
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        resolve(URL.createObjectURL(file));
-        return;
-      }
-
-      // Draw image
-      ctx.drawImage(img, 0, 0);
-
-      // Add overlay
-      const overlayHeight = 60;
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-      ctx.fillRect(0, canvas.height - overlayHeight, canvas.width, overlayHeight);
-
-      // Add text
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 16px Arial';
-      
-      const timestamp = format(new Date(metadata.timestamp), 'dd/MM/yyyy HH:mm:ss');
-      ctx.fillText(timestamp, 10, canvas.height - 35);
-
-      if (metadata.location) {
-        ctx.font = '14px Arial';
-        ctx.fillText(`📍 ${metadata.location.lat.toFixed(5)}, ${metadata.location.lng.toFixed(5)}`, 10, canvas.height - 10);
-      }
-
-      resolve(canvas.toDataURL('image/jpeg', 0.9));
+    // ✅ Add error handler for FileReader
+    reader.onerror = (error) => {
+      clearTimeout(timeoutId);
+      console.error('❌ FileReader error:', error);
+      // Fallback: use original file without overlay
+      resolve(URL.createObjectURL(file));
     };
 
-    reader.readAsDataURL(file);
+    img.onload = () => {
+      clearTimeout(timeoutId);
+
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.error('❌ Canvas context unavailable');
+          resolve(URL.createObjectURL(file));
+          return;
+        }
+
+        // Draw image
+        ctx.drawImage(img, 0, 0);
+
+        // Add overlay
+        const overlayHeight = 60;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(0, canvas.height - overlayHeight, canvas.width, overlayHeight);
+
+        // Add text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 16px Arial';
+
+        const timestamp = format(new Date(metadata.timestamp), 'dd/MM/yyyy HH:mm:ss');
+        ctx.fillText(timestamp, 10, canvas.height - 35);
+
+        if (metadata.location) {
+          ctx.font = '14px Arial';
+          ctx.fillText(`📍 ${metadata.location.lat.toFixed(5)}, ${metadata.location.lng.toFixed(5)}`, 10, canvas.height - 10);
+        }
+
+        resolve(canvas.toDataURL('image/jpeg', 0.9));
+      } catch (error) {
+        console.error('❌ Canvas processing error:', error);
+        resolve(URL.createObjectURL(file));
+      }
+    };
+
+    // ✅ Add error handler for Image loading
+    img.onerror = (error) => {
+      clearTimeout(timeoutId);
+      console.error('❌ Image load error:', error);
+      // Fallback: use original file without overlay
+      resolve(URL.createObjectURL(file));
+    };
+
+    try {
+      reader.readAsDataURL(file);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error('❌ readAsDataURL error:', error);
+      resolve(URL.createObjectURL(file));
+    }
   });
 };
 
