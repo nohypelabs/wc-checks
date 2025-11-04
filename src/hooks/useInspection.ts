@@ -252,10 +252,19 @@ export const useInspection = (inspectionId?: string) => {
         score
       });
 
-      // FORCE TIMEOUT with Promise.race - GUARANTEED to resolve
+      // Wrap getSession with timeout - THIS IS THE HANG POINT!
       const apiCall = (async () => {
         console.log('🔐 Getting token...');
-        const { data: { session } } = await supabase.auth.getSession();
+
+        const sessionPromise = supabase.auth.getSession();
+        const sessionTimeout = new Promise((_, reject) =>
+          setTimeout(() => {
+            console.error('⏰ getSession HUNG after 5s!');
+            reject(new Error('getSession hung'));
+          }, 5000)
+        );
+
+        const { data: { session } } = await Promise.race([sessionPromise, sessionTimeout]) as any;
         const token = session?.access_token;
         if (!token) throw new Error('No token');
 
@@ -282,9 +291,9 @@ export const useInspection = (inspectionId?: string) => {
 
       const timeout = new Promise((_, reject) =>
         setTimeout(() => {
-          console.error('⏰ TIMEOUT after 15s');
+          console.error('⏰ OVERALL TIMEOUT after 20s');
           reject(new Error('TIMEOUT'));
-        }, 15000) // 15s HARD LIMIT
+        }, 20000)
       );
 
       try {
