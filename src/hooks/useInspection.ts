@@ -184,9 +184,7 @@ export const useInspection = (inspectionId?: string) => {
         console.log('✅ All photo URLs validated');
       }
 
-      // Skip template fetch - use fallback directly
-      const templateId = 'comprehensive-template';
-
+      // No template_id for now - database expects UUID or NULL
       const now = new Date();
       const inspection_date = now.toISOString().split('T')[0];
       const inspection_time = now.toTimeString().split(' ')[0];
@@ -194,7 +192,7 @@ export const useInspection = (inspectionId?: string) => {
 
       const score = responses.score || 0;
       let overall_status = 'satisfactory';
-      
+
       if (score >= 90) overall_status = 'excellent';
       else if (score >= 75) overall_status = 'good';
       else if (score >= 60) overall_status = 'fair';
@@ -204,7 +202,7 @@ export const useInspection = (inspectionId?: string) => {
       const inspectionRecord: TablesInsert<'inspection_records'> = {
         location_id,
         user_id,
-        template_id: templateId,
+        template_id: null,
         inspection_date,
         inspection_time,
         overall_status,
