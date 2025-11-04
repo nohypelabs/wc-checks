@@ -154,16 +154,16 @@ export const EnhancedPhotoUpload = ({
           {isProcessing ? (
             <>
               <Loader2 className="w-8 h-8 text-gray-400 animate-spin mb-2" />
-              <span className="text-sm text-gray-500">Processing...</span>
+              <span className="text-sm text-gray-500">Memproses...</span>
             </>
           ) : (
             <>
               <Camera className={`w-8 h-8 mb-2 ${genZMode ? 'text-purple-500' : 'text-gray-400'}`} />
               <span className={`text-sm font-medium ${genZMode ? 'text-purple-600' : 'text-gray-600'}`}>
-                {genZMode ? '📸 Foto yuk!' : 'Take Photo'}
+                📸 Foto yuk!
               </span>
               <span className="text-xs text-gray-400 mt-1">
-                {photos.length}/{maxPhotos} photos
+                {photos.length}/{maxPhotos} foto
               </span>
             </>
           )}
@@ -199,28 +199,28 @@ export const EnhancedPhotoUpload = ({
 
             {/* Text Content */}
             <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Processing Photo
+              Memproses Foto
             </h3>
             <p className="text-gray-600 mb-1">
-              Adding watermark with GPS location...
+              Menambahkan watermark dengan lokasi GPS...
             </p>
             <p className="text-sm text-gray-500">
-              Please wait 3-4 seconds
+              Tunggu 3-4 detik
             </p>
 
             {/* Progress Steps */}
             <div className="mt-6 space-y-2 text-left">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                <span>Getting GPS coordinates...</span>
+                <span>Mengambil koordinat GPS...</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <span>Applying watermark...</span>
+                <span>Menambahkan watermark...</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <div className="w-2 h-2 bg-blue-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                <span>Finalizing image...</span>
+                <span>Finalisasi gambar...</span>
               </div>
             </div>
           </div>
