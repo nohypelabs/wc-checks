@@ -19,17 +19,24 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
  * POST /api/admin/users/toggle-status - Toggle user active status (admin+)
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { roles, action } = req.query;
-  const rolesParam = Array.isArray(roles) ? roles[0] : roles;
-  const actionParam = Array.isArray(action) ? action[0] : action;
+  console.log('[admin/users] 🔍 Request received:', { method: req.method, query: req.query });
 
-  // GET /api/admin/users?roles=true - List all roles
-  if (req.method === 'GET' && rolesParam === 'true') {
-    const auth = await validateAuth(req, 80); // Admin+
+  try {
+    const { roles, action } = req.query;
+    const rolesParam = Array.isArray(roles) ? roles[0] : roles;
+    const actionParam = Array.isArray(action) ? action[0] : action;
 
-    if (!auth || !supabase) {
-      return errorResponse(res, 403, 'Access denied - Admin privileges required');
-    }
+    // GET /api/admin/users?roles=true - List all roles
+    if (req.method === 'GET' && rolesParam === 'true') {
+      console.log('[admin/users] 📋 Fetching roles list...');
+      const auth = await validateAuth(req, 80); // Admin+
+
+      if (!auth || !supabase) {
+        console.error('[admin/users] ❌ Auth failed or supabase not initialized');
+        return errorResponse(res, 403, 'Access denied - Admin privileges required');
+      }
+
+      console.log('[admin/users] ✅ Auth validated:', { userId: auth.userId, level: auth.userRole.level });
 
     try {
       const { data: rolesList, error } = await supabase
@@ -48,11 +55,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // GET /api/admin/users - List all users
   if (req.method === 'GET') {
+    console.log('[admin/users] 👥 Fetching users list...');
     const auth = await validateAuth(req, 90); // Superadmin
 
     if (!auth || !supabase) {
+      console.error('[admin/users] ❌ Auth failed or supabase not initialized');
       return errorResponse(res, 403, 'Access denied - Superadmin privileges required');
     }
+
+    console.log('[admin/users] ✅ Auth validated:', { userId: auth.userId, level: auth.userRole.level });
 
     try {
       // Fetch all users
@@ -313,4 +324,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   return errorResponse(res, 405, 'Method not allowed');
+  } catch (error: any) {
+    console.error('[admin/users] ❌ FATAL ERROR:', error.message);
+    console.error('[admin/users] Error stack:', error.stack);
+    return errorResponse(res, 500, 'Internal server error: ' + error.message);
+  }
 }
