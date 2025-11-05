@@ -16,7 +16,6 @@ import {
   Activity,
   Menu
 } from 'lucide-react';
-import { format, subDays, startOfWeek, endOfWeek, startOfMonth } from 'date-fns';
 
 // Components
 import { Card, CardHeader } from '../components/ui/Card';
@@ -75,7 +74,7 @@ export const AnalyticsPage = () => {
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Fetch analytics data
+  // ✅ FIX: Fetch analytics data via API endpoint (no direct Supabase query)
   const { data: analytics, isLoading, error } = useQuery({
     queryKey: ['analytics', user?.id, selectedPeriod, isAdmin],
     queryFn: async (): Promise<AnalyticsData> => {
@@ -83,297 +82,54 @@ export const AnalyticsPage = () => {
         throw new Error('User not authenticated');
       }
 
-      const now = new Date();
-      let startDate: string;
-      let endDate: string = format(now, 'yyyy-MM-dd');
-
-      // Determine date range based on period
-      switch (selectedPeriod) {
-        case 'week':
-          startDate = format(startOfWeek(now), 'yyyy-MM-dd');
-          break;
-        case 'month':
-          startDate = format(startOfMonth(now), 'yyyy-MM-dd');
-          break;
-        case 'year':
-          startDate = format(new Date(now.getFullYear(), 0, 1), 'yyyy-MM-dd');
-          break;
-        default:
-          startDate = format(startOfWeek(now), 'yyyy-MM-dd');
-      }
-
-      // 🔍 DEBUG: Log admin status
-      console.log('[Analytics] 🔐 Fetching analytics:', {
+      console.log('[Analytics] 🚀 Fetching via API:', {
         userId: user.id,
         isAdmin,
         period: selectedPeriod,
-        dateRange: `${startDate} to ${endDate}`,
         willSeeAllUsers: isAdmin,
       });
 
-      // Build query
-      let query = supabase
-        .from('inspection_records')
-        .select(`
-          id,
-          inspection_date,
-          inspection_time,
-          responses,
-          location_id,
-          user_id,
-          locations (
-            id,
-            name,
-            building,
-            floor
-          )
-        `)
-        .gte('inspection_date', startDate)
-        .lte('inspection_date', endDate)
-        .order('inspection_date', { ascending: true });
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      // ✅ FIX: Only filter by user_id if NOT admin
-      if (!isAdmin) {
-        query = query.eq('user_id', user.id);
-        console.log('[Analytics] ❌ Non-admin - filtering to own data only');
-      } else {
-        console.log('[Analytics] ✅ Admin - fetching ALL users data');
+      if (!token) {
+        throw new Error('No authentication token');
       }
 
-      const { data: inspections, error: fetchError } = await query;
+      // Build API URL
+      let apiUrl = `/api/analytics?period=${selectedPeriod}`;
 
-      if (fetchError) {
-        console.error('Error fetching inspections:', fetchError);
-        throw fetchError;
+      // Admin sees ALL users (no userId param), regular users see only their own (backend handles this)
+      // We don't pass userId param, backend will check isAdmin and filter accordingly
+
+      console.log('[Analytics] API call:', { apiUrl, isAdmin });
+
+      // Call API endpoint
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        console.error('[Analytics] API error:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch analytics');
       }
 
-      // Robust score calculation function
-      const calculateScore = (responses: any): number => {
-        try {
-          if (!responses || typeof responses !== 'object') return 0;
-          
-          const values = Object.values(responses);
-          if (values.length === 0) return 0;
-          
-          const goodCount = values.filter(v => {
-            if (typeof v === 'boolean') return v;
-            if (typeof v === 'string') {
-              const lowerVal = v.toLowerCase().trim();
-              return ['good', 'excellent', 'baik', 'bersih', 'ada', 'yes', 'true', 'ok', 'lengkap'].includes(lowerVal);
-            }
-            if (typeof v === 'number') return v > 0;
-            return false;
-          }).length;
-          
-          return Math.round((goodCount / values.length) * 100);
-        } catch (error) {
-          console.warn('Error calculating score:', error);
-          return 0;
-        }
-      };
+      const result = await response.json();
+      const analyticsData: AnalyticsData = result.data;
 
-      // Daily trend calculation
-      const dailyMap = new Map<string, { count: number; totalScore: number }>();
-      inspections?.forEach(insp => {
-        try {
-          const date = insp.inspection_date;
-          const score = calculateScore(insp.responses);
-          if (!dailyMap.has(date)) {
-            dailyMap.set(date, { count: 0, totalScore: 0 });
-          }
-          const data = dailyMap.get(date)!;
-          data.count++;
-          data.totalScore += score;
-        } catch (error) {
-          console.warn('Error processing inspection for daily trend:', error);
-        }
+      console.log('[Analytics] ✅ Received analytics data:', {
+        totalInspections: analyticsData.totalInspections,
+        avgScore: analyticsData.avgScore,
       });
 
-      const dailyTrend = Array.from(dailyMap.entries()).map(([date, data]) => ({
-        date,
-        count: data.count,
-        avgScore: data.count > 0 ? Math.round(data.totalScore / data.count) : 0
-      }));
-
-      // Hourly distribution - ROBUST VERSION
-      const hourlyMap = new Map<number, number>();
-      inspections?.forEach(insp => {
-        try {
-          if (insp.inspection_time && typeof insp.inspection_time === 'string') {
-            const timeParts = insp.inspection_time.split(':');
-            if (timeParts.length > 0) {
-              const hourStr = timeParts[0];
-              const hour = parseInt(hourStr);
-              if (!isNaN(hour) && hour >= 0 && hour <= 23) {
-                hourlyMap.set(hour, (hourlyMap.get(hour) || 0) + 1);
-              }
-            }
-          }
-        } catch (error) {
-          console.warn('Error processing inspection time:', error);
-        }
-      });
-
-      const hourlyDistribution = Array.from(hourlyMap.entries())
-        .map(([hour, count]) => ({ hour, count }))
-        .sort((a, b) => a.hour - b.hour);
-
-      // Peak hour calculation
-      const peakHour = hourlyDistribution.length > 0
-        ? hourlyDistribution.reduce((max, curr) => curr.count > max.count ? curr : max)
-        : null;
-
-      // Location performance calculation
-      const locationMap = new Map<string, { 
-        name: string; 
-        scores: number[]; 
-        building?: string; 
-        floor?: string;
-        count: number;
-      }>();
-      
-      inspections?.forEach(insp => {
-        try {
-          if (!insp.locations) return;
-          const locId = insp.location_id;
-          const score = calculateScore(insp.responses);
-          
-          if (!locationMap.has(locId)) {
-            locationMap.set(locId, { 
-              name: insp.locations.name || 'Unknown Location',
-              building: insp.locations.building || undefined,
-              floor: insp.locations.floor || undefined,
-              scores: [],
-              count: 0
-            });
-          }
-          const locationData = locationMap.get(locId)!;
-          locationData.scores.push(score);
-          locationData.count++;
-        } catch (error) {
-          console.warn('Error processing location performance:', error);
-        }
-      });
-
-      const locationPerformance = Array.from(locationMap.entries())
-        .map(([id, data]) => {
-          const avgScore = data.scores.length > 0 
-            ? Math.round(data.scores.reduce((a, b) => a + b, 0) / data.scores.length)
-            : 0;
-            
-          const trend = data.scores.length >= 2 
-            ? data.scores[data.scores.length - 1] - data.scores[0]
-            : 0;
-
-          return {
-            id,
-            name: data.name,
-            building: data.building,
-            floor: data.floor,
-            avgScore,
-            count: data.count,
-            trend
-          };
-        })
-        .sort((a, b) => b.avgScore - a.avgScore);
-
-      // Score distribution calculation
-      const scoreRanges = {
-        excellent: 0, // 85-100
-        good: 0,      // 70-84
-        fair: 0,      // 50-69
-        poor: 0       // 0-49
-      };
-
-      inspections?.forEach(insp => {
-        try {
-          const score = calculateScore(insp.responses);
-          if (score >= 85) scoreRanges.excellent++;
-          else if (score >= 70) scoreRanges.good++;
-          else if (score >= 50) scoreRanges.fair++;
-          else scoreRanges.poor++;
-        } catch (error) {
-          console.warn('Error calculating score range:', error);
-        }
-      });
-
-      // Overall stats
-      const totalInspections = inspections?.length || 0;
-      const avgScore = totalInspections > 0
-        ? Math.round(inspections!.reduce((sum, i) => sum + calculateScore(i.responses), 0) / totalInspections)
-        : 0;
-
-      // Previous period comparison
-      let prevStart: string;
-      let prevEnd: string;
-
-      try {
-        switch (selectedPeriod) {
-          case 'week':
-            prevStart = format(subDays(startOfWeek(now), 7), 'yyyy-MM-dd');
-            prevEnd = format(subDays(endOfWeek(now), 7), 'yyyy-MM-dd');
-            break;
-          case 'month':
-            const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            prevStart = format(prevMonth, 'yyyy-MM-dd');
-            prevEnd = format(new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 0), 'yyyy-MM-dd');
-            break;
-          case 'year':
-            prevStart = format(new Date(now.getFullYear() - 1, 0, 1), 'yyyy-MM-dd');
-            prevEnd = format(new Date(now.getFullYear() - 1, 11, 31), 'yyyy-MM-dd');
-            break;
-          default:
-            prevStart = format(subDays(startOfWeek(now), 7), 'yyyy-MM-dd');
-            prevEnd = format(subDays(endOfWeek(now), 7), 'yyyy-MM-dd');
-        }
-
-        const { data: prevInspections } = await supabase
-          .from('inspection_records')
-          .select('id, responses')
-          .eq('user_id', user.id)
-          .gte('inspection_date', prevStart)
-          .lte('inspection_date', prevEnd);
-
-        const prevTotalInspections = prevInspections?.length || 0;
-        const prevAvgScore = prevTotalInspections > 0
-          ? Math.round(prevInspections!.reduce((sum, i) => sum + calculateScore(i.responses), 0) / prevTotalInspections)
-          : 0;
-
-        const scoreChange = avgScore - prevAvgScore;
-        const countChange = totalInspections - prevTotalInspections;
-
-        return {
-          totalInspections,
-          avgScore,
-          scoreChange,
-          countChange,
-          dailyTrend,
-          hourlyDistribution,
-          peakHour,
-          locationPerformance,
-          scoreRanges,
-          topPerformer: locationPerformance[0] || null,
-          needsAttention: locationPerformance.filter(l => l.avgScore < 70)
-        };
-      } catch (comparisonError) {
-        console.warn('Error calculating period comparison:', comparisonError);
-        // Return data without comparison if there's an error
-        return {
-          totalInspections,
-          avgScore,
-          scoreChange: 0,
-          countChange: 0,
-          dailyTrend,
-          hourlyDistribution,
-          peakHour,
-          locationPerformance,
-          scoreRanges,
-          topPerformer: locationPerformance[0] || null,
-          needsAttention: locationPerformance.filter(l => l.avgScore < 70)
-        };
-      }
+      return analyticsData;
     },
-    enabled: !!user?.id,
+    // ✅ Wait for admin check to complete before fetching
+    enabled: !!user?.id && !adminLoading,
     retry: 2,
   });
 
@@ -406,12 +162,15 @@ export const AnalyticsPage = () => {
     );
   }
 
-  if (isLoading) {
+  // ✅ Show loading while admin check OR data fetch is in progress
+  if (adminLoading || isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-sm">Memuat analitik...</p>
+          <p className="text-gray-600 text-sm">
+            {adminLoading ? 'Memeriksa hak akses...' : 'Memuat analitik...'}
+          </p>
         </div>
       </div>
     );
