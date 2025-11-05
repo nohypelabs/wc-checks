@@ -70,14 +70,35 @@ export function useIsAdmin() {
 
       try {
         // ATTEMPT 1: Backend API (preferred - server-side validated)
-        const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token;
+        // ✅ FIX: Use localStorage token instead of getSession() to avoid hang
+        console.log('🔐 Getting token from localStorage for role verification...');
+
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+        const projectId = supabaseUrl.split('//')[1]?.split('.')[0];
+
+        if (!projectId) {
+          console.error('[useIsAdmin] Invalid Supabase URL');
+          return await fallbackRoleCheck(user.id);
+        }
+
+        const storageKey = `sb-${projectId}-auth-token`;
+        const sessionStr = localStorage.getItem(storageKey);
+
+        if (!sessionStr) {
+          console.error('[useIsAdmin] No session in localStorage');
+          return await fallbackRoleCheck(user.id);
+        }
+
+        const sessionData = JSON.parse(sessionStr);
+        const token = sessionData?.access_token;
 
         if (!token) {
-          console.error('[useIsAdmin] No access token available');
+          console.error('[useIsAdmin] No access token in session');
           // Fallback to direct query
           return await fallbackRoleCheck(user.id);
         }
+
+        console.log('✅ Got token from localStorage for role check');
 
         // Call backend API for server-side role verification
         const response = await fetch('/api/auth/verify-role', {

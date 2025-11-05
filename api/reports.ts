@@ -32,6 +32,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const isAdmin = auth.userRole.level >= 80;
   const currentUserId = auth.userId;
 
+  // 🔍 DEBUG: Log auth details
+  console.log('[reports] 🔐 Auth details:', {
+    userId: currentUserId,
+    role: auth.userRole.name,
+    level: auth.userRole.level,
+    isAdmin,
+    monthParam: monthStr,
+    dateParam: dateStr,
+    userIdParam: userIdStr,
+  });
+
   try {
     // Determine which user's data to fetch
     let targetUserId: string | undefined = undefined;
@@ -112,7 +123,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw error;
     }
 
-    console.log(`[reports] Fetched ${data?.length || 0} inspections`);
+    // 🔍 DEBUG: Show what we fetched
+    const uniqueUserIds = [...new Set((data || []).map((item: any) => item.user?.id))].filter(Boolean);
+    console.log(`[reports] ✅ Fetched ${data?.length || 0} inspections from ${uniqueUserIds.length} unique users:`, uniqueUserIds);
+    console.log(`[reports] 📊 Applied filter: targetUserId=${targetUserId || 'NONE (ALL users)'}, isAdmin=${isAdmin}`);
 
     // Transform data to match frontend format
     const inspections = (data || []).map((item: any) => ({
