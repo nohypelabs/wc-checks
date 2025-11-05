@@ -34,6 +34,11 @@ export const UserManagement = () => {
   // ✅ FIXED: Use backend API for role check instead of direct query
   const { isSuperAdmin, loading: roleLoading } = useIsAdmin();
 
+  console.log('🔵 [UserManagement] useIsAdmin result:', {
+    isSuperAdmin,
+    roleLoading,
+  });
+
   const { data: users, isLoading: usersLoading } = useUsers();
   const { data: roles } = useRoles();
   const assignRoleMutation = useAssignRole();
@@ -41,7 +46,13 @@ export const UserManagement = () => {
 
   // Security check: Only superadmin can access
   useEffect(() => {
-    console.log('🟢 [UserManagement] useEffect TRIGGERED');
+    console.log('🟢 [UserManagement] useEffect TRIGGERED', {
+      authLoading,
+      roleLoading,
+      hasUser: !!user,
+      userId: user?.id,
+      isSuperAdmin,
+    });
 
     // Wait for auth and role check to complete
     if (authLoading || roleLoading) {
@@ -56,7 +67,10 @@ export const UserManagement = () => {
     }
 
     if (!isSuperAdmin) {
-      console.log('🔴 [UserManagement] Not superadmin - ACCESS DENIED - redirecting to home');
+      console.log('🔴 [UserManagement] Not superadmin - ACCESS DENIED - redirecting to home', {
+        isSuperAdmin,
+        userId: user.id,
+      });
       navigate('/');
       return;
     }
