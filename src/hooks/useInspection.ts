@@ -221,7 +221,11 @@ export const useInspection = (inspectionId?: string) => {
       }
 
       const now = new Date();
-      const inspection_date = now.toISOString().split('T')[0];
+      // ✅ FIX: Use local date, not UTC date to avoid timezone issues
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const inspection_date = `${year}-${month}-${day}`;
       const inspection_time = now.toTimeString().split(' ')[0];
       const submitted_at = now.toISOString();
 

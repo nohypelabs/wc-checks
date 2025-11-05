@@ -52,23 +52,41 @@ interface InspectionRecord {
   } | null;
 }
 
-// Score calculation helper
+// Score calculation helper - matches the format used in inspection submissions
 const calculateScore = (responses: any): number => {
   try {
     if (!responses || typeof responses !== 'object') return 0;
 
-    const values = Object.values(responses);
+    // ✅ FIX: Check for direct score field first (new format)
+    if (typeof responses.score === 'number') {
+      return responses.score;
+    }
+
+    // ✅ FIX: Calculate from ratings array (new format with weights)
+    if (Array.isArray(responses.ratings) && responses.ratings.length > 0) {
+      const totalWeight = responses.ratings.reduce((sum: number, r: any) => sum + (r.weight || 1), 0);
+      const weightedSum = responses.ratings.reduce((sum: number, r: any) => {
+        const score = r.score || 0;
+        const weight = r.weight || 1;
+        return sum + (score * weight);
+      }, 0);
+      return Math.round(weightedSum / totalWeight);
+    }
+
+    // Fallback: Old format - count good responses
+    const values = Object.values(responses).filter(v =>
+      typeof v === 'string' || typeof v === 'boolean'
+    );
+
     if (values.length === 0) return 0;
 
-    const goodCount = values.filter(v => {
-      if (typeof v === 'boolean') return v;
-      if (typeof v === 'string') {
-        const lowerVal = v.toLowerCase().trim();
-        return ['good', 'excellent', 'baik', 'bersih', 'ada', 'yes', 'true', 'ok', 'lengkap'].includes(lowerVal);
-      }
-      if (typeof v === 'number') return v > 0;
-      return false;
-    }).length;
+    const goodCount = values.filter(v =>
+      v === true ||
+      v === 'good' ||
+      v === 'excellent' ||
+      v === 'baik' ||
+      v === 'bersih'
+    ).length;
 
     return Math.round((goodCount / values.length) * 100);
   } catch (error) {
