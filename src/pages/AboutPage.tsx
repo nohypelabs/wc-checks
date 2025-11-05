@@ -20,7 +20,7 @@ export const AboutPage = () => {
           </button>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Tentang Aplikasi</h1>
-            <p className="text-sm text-gray-500">Informasi WC Check</p>
+            <p className="text-sm text-gray-500">Informasi Proservice Indonesia</p>
           </div>
         </div>
       </div>
@@ -33,7 +33,7 @@ export const AboutPage = () => {
             <div className="w-20 h-20 bg-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
               <span className="text-4xl">🚽</span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">WC Check</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Proservice Indonesia</h2>
             <p className="text-gray-600 mb-4">Sistem Inspeksi Toilet Terintegrasi</p>
             <div className="inline-block px-4 py-2 bg-blue-50 rounded-full">
               <span className="text-sm font-medium text-blue-600">Versi 1.0.0</span>
@@ -43,9 +43,9 @@ export const AboutPage = () => {
 
         {/* Description */}
         <Card>
-          <h3 className="font-bold text-gray-900 mb-3">Tentang WC Check</h3>
+          <h3 className="font-bold text-gray-900 mb-3">Tentang Proservice Indonesia</h3>
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
-            WC Check adalah aplikasi manajemen inspeksi toilet yang membantu organisasi
+            Proservice Indonesia adalah aplikasi manajemen inspeksi toilet yang membantu organisasi
             memantau dan meningkatkan standar kebersihan fasilitas sanitasi mereka
             secara real-time dengan teknologi QR code.
           </p>
@@ -147,7 +147,7 @@ export const AboutPage = () => {
         {/* Legal */}
         <Card>
           <div className="text-center text-xs text-gray-500 space-y-1">
-            <p>© 2025 WC Check. All rights reserved.</p>
+            <p>© 2025 Proservice Indonesia. All rights reserved.</p>
             <div className="flex justify-center gap-4">
               <a href="#" className="hover:text-blue-600">Privacy Policy</a>
               <span>•</span>

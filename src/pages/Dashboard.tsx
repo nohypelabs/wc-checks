@@ -211,7 +211,7 @@ export const Dashboard = () => {
             <div className="flex items-center gap-2">
               <img
                 src="/logo.png"
-                alt="WC Check"
+                alt="Proservice Indonesia"
                 className="h-8 w-auto"
                 onError={(e) => {
                   // If logo fails to load, hide it (text will remain)
@@ -220,7 +220,7 @@ export const Dashboard = () => {
                 }}
               />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">WC Check</h1>
+                <h1 className="text-xl font-bold text-gray-900">Proservice Indonesia</h1>
                 <p className="text-sm text-gray-500">
                   Hai, {profile?.full_name || user?.email?.split('@')[0] || 'Pengguna'}
                 </p>
