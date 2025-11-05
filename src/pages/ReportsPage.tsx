@@ -235,7 +235,7 @@ export const ReportsPage = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-sm">Loading reports...</p>
+          <p className="text-gray-600 text-sm">Memuat laporan...</p>
         </div>
       </div>
     );
@@ -257,8 +257,8 @@ export const ReportsPage = () => {
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Reports</h1>
-              <p className="text-sm text-gray-500">Inspection history & analytics</p>
+              <h1 className="text-xl font-bold text-gray-900">Laporan</h1>
+              <p className="text-sm text-gray-500">Riwayat & analitik inspeksi</p>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -287,23 +287,23 @@ export const ReportsPage = () => {
           <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-4">
             <div className="flex items-center space-x-2 mb-1">
               <FileText className="w-4 h-4 text-blue-600" />
-              <span className="text-xs text-gray-500">This Month</span>
+              <span className="text-xs text-gray-500">Bulan Ini</span>
             </div>
             <div className="text-2xl font-bold text-gray-900">
               {totalInspections}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Inspections</div>
+            <div className="text-xs text-gray-500 mt-1">Inspeksi</div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-4">
             <div className="flex items-center space-x-2 mb-1">
               <TrendingUp className="w-4 h-4 text-green-600" />
-              <span className="text-xs text-gray-500">Average</span>
+              <span className="text-xs text-gray-500">Rata-rata</span>
             </div>
             <div className="text-2xl font-bold text-gray-900">
               {averageScore}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Score</div>
+            <div className="text-xs text-gray-500 mt-1">Skor</div>
           </div>
         </div>
       </div>
@@ -316,13 +316,13 @@ export const ReportsPage = () => {
             <div className="text-2xl">💡</div>
             <div className="flex-1">
               <p className="text-sm font-medium text-blue-900 mb-1">
-                Tap a date to view inspections
+                Ketuk tanggal untuk lihat inspeksi
               </p>
               <p className="text-xs text-blue-700">
-                Colored dots indicate average scores:
-                <span className="font-semibold"> Green</span> (excellent),
-                <span className="font-semibold"> Yellow</span> (good),
-                <span className="font-semibold"> Red</span> (needs work)
+                Titik berwarna menunjukkan skor rata-rata:
+                <span className="font-semibold"> Hijau</span> (sangat baik),
+                <span className="font-semibold"> Kuning</span> (baik),
+                <span className="font-semibold"> Merah</span> (perlu perbaikan)
               </p>
             </div>
           </div>
@@ -340,9 +340,9 @@ export const ReportsPage = () => {
         {(!monthlyData || monthlyData.length === 0) && (
           <div className="bg-white rounded-xl p-8 text-center">
             <div className="text-6xl mb-4">📅</div>
-            <h3 className="font-bold text-gray-900 mb-2">No inspections yet</h3>
+            <h3 className="font-bold text-gray-900 mb-2">Belum ada inspeksi</h3>
             <p className="text-gray-600 text-sm">
-              Start inspecting locations to see them here
+              Mulai inspeksi lokasi untuk melihatnya di sini
             </p>
           </div>
         )}
