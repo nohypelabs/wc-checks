@@ -109,8 +109,6 @@ export function useAuth(): UseAuthReturn {
     }
     initRef.current = true;
 
-    let mounted = true;
-
     const initAuth = async () => {
       console.log('🔐 Initializing auth...');
 
@@ -126,13 +124,6 @@ export function useAuth(): UseAuthReturn {
         console.log('[useAuth] getSession() returned:', JSON.stringify({ hasSession: !!session, hasError: !!sessionError }));
 
         clearTimeout(timeoutId);
-
-        if (!mounted) {
-          console.log('[useAuth] Component unmounted during auth - completing anyway');
-          // ✅ FIX: Still set loading to false even if unmounted (React Strict Mode)
-          setLoading(false);
-          return;
-        }
 
         if (sessionError || !session?.user) {
           console.log('[useAuth] No session');
@@ -155,21 +146,19 @@ export function useAuth(): UseAuthReturn {
           updated_at: session.user.updated_at,
         };
 
+        // ✅ FIX: Set user state immediately, React handles unmounted components safely
         setUser(appUser);
-
-        // Fetch profile WITHOUT blocking
-        fetchUserProfile(session.user.id).then(profileData => {
-          if (mounted) {
-            setProfile(profileData);
-          }
-        });
-
         setLoading(false);
+
+        // Fetch profile in background (non-blocking)
+        fetchUserProfile(session.user.id).then(profileData => {
+          setProfile(profileData);
+        });
       } catch (err) {
         console.error('❌ Auth init error:', err);
         setUser(null);
         setProfile(null);
-        setLoading(false); // ✅ Always set loading false on error
+        setLoading(false);
       }
     };
 
@@ -177,7 +166,6 @@ export function useAuth(): UseAuthReturn {
 
     return () => {
       console.log('🔍 Auth cleanup - resetting for React Strict Mode');
-      mounted = false;
       // ✅ FIX: Reset initRef so remount can run (React 18 Strict Mode)
       initRef.current = false;
     };
