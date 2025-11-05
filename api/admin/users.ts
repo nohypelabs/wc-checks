@@ -21,10 +21,9 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('[admin/users] 🔍 Request received:', { method: req.method, query: req.query });
 
-  try {
-    const { roles, action } = req.query;
-    const rolesParam = Array.isArray(roles) ? roles[0] : roles;
-    const actionParam = Array.isArray(action) ? action[0] : action;
+  const { roles, action } = req.query;
+  const rolesParam = Array.isArray(roles) ? roles[0] : roles;
+  const actionParam = Array.isArray(action) ? action[0] : action;
 
     // GET /api/admin/users?roles=true - List all roles
     if (req.method === 'GET' && rolesParam === 'true') {
@@ -324,9 +323,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   return errorResponse(res, 405, 'Method not allowed');
-  } catch (error: any) {
-    console.error('[admin/users] ❌ FATAL ERROR:', error.message);
-    console.error('[admin/users] Error stack:', error.stack);
-    return errorResponse(res, 500, 'Internal server error: ' + error.message);
-  }
 }
