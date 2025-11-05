@@ -50,7 +50,7 @@ async function fallbackRoleCheck(userId: string): Promise<{ isAdmin: boolean; is
 
     return {
       isAdmin: level >= 80,
-      isSuperAdmin: level >= 100,
+      isSuperAdmin: level >= 90, // Super admin level: 90+ (superadmin & system_admin)
     };
   } catch (error) {
     console.error('[useIsAdmin] Fallback error:', error);

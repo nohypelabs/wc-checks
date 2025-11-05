@@ -52,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userId: auth.userId,
       role: auth.userRole,
       isAdmin: auth.userRole.level >= 80, // Admin level: 80+
-      isSuperAdmin: auth.userRole.level >= 100, // Super admin level: 100
+      isSuperAdmin: auth.userRole.level >= 90, // Super admin level: 90+ (superadmin & system_admin)
     });
   } catch (error: any) {
     console.error('[verify-role] ❌ Unexpected error:', error.message);
