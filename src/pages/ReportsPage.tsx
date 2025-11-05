@@ -23,14 +23,16 @@ export const ReportsPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Fetch monthly data
+  // Admin sees ALL inspections (undefined), regular users see only their own (user.id)
   const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
-    user?.id,
+    isAdmin ? undefined : user?.id,
     currentDate
   );
 
   // Fetch specific date data when date is selected
+  // Admin sees ALL inspections (undefined), regular users see only their own (user.id)
   const { data: dateInspections } = useDateInspections(
-    user?.id,
+    isAdmin ? undefined : user?.id,
     selectedDate || ''
   );
 
