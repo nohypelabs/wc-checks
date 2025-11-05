@@ -60,83 +60,71 @@ export const ReportsPage = () => {
       )
     : 0;
 
-  // Export current month's inspections
+  // ✅ Export current month's inspections via backend API
   const handleExportMonth = async () => {
     if (!user?.id) return;
 
     toast.loading('Preparing export...');
 
     try {
-      const startDate = format(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1), 'yyyy-MM-dd');
-      const endDate = format(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0), 'yyyy-MM-dd');
+      const month = format(currentDate, 'yyyy-MM');
 
-      // Fetch all inspections for current month with related data
-      const { data, error } = await supabase
-        .from('inspection_records')
-        .select(`
-          *,
-          users!inspection_records_user_id_fkey (full_name, email, phone, occupation_id),
-          locations!inner (
-            name,
-            floor,
-            area,
-            section,
-            building_id,
-            buildings!inner (name, organization_id, organizations!inner (name))
-          )
-        `)
-        .eq('user_id', user.id)
-        .gte('inspection_date', startDate)
-        .lte('inspection_date', endDate)
-        .order('inspection_date', { ascending: false });
+      // ✅ Use backend API instead of direct query
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) throw error;
+      if (!token) {
+        throw new Error('No authentication token');
+      }
 
-      if (!data || data.length === 0) {
+      // Fetch through backend API - will only return current user's data
+      const response = await fetch(`/api/reports?month=${month}&userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch' }));
+        throw new Error(errorData.error || 'Failed to fetch inspections');
+      }
+
+      const result = await response.json();
+      const monthData: any[] = result.data; // DateInspections[]
+
+      // Flatten inspections from all dates
+      const allInspections = monthData.flatMap(d => d.inspections || []);
+
+      if (allInspections.length === 0) {
         toast.dismiss();
         toast.error('No inspections to export for this month');
         return;
       }
 
       // Format data for export
-      const exportData: ExportInspectionData[] = await Promise.all(
-        data.map(async (inspection: any) => {
-          // Get occupation name
-          let occupationName = 'N/A';
-          if (inspection.users?.occupation_id) {
-            const { data: occupation } = await supabase
-              .from('user_occupations')
-              .select('display_name')
-              .eq('id', inspection.users.occupation_id)
-              .single();
-            if (occupation) occupationName = occupation.display_name;
-          }
-
-          return {
-            inspection_id: inspection.id,
-            inspection_date: inspection.inspection_date || '',
-            inspection_time: inspection.inspection_time || '',
-            submitted_at: inspection.submitted_at ? format(new Date(inspection.submitted_at), 'yyyy-MM-dd HH:mm:ss') : '',
-            overall_status: inspection.overall_status || '',
-            notes: inspection.notes || '',
-            user_full_name: inspection.users?.full_name || '',
-            user_email: inspection.users?.email || '',
-            user_phone: inspection.users?.phone || '',
-            user_occupation: occupationName,
-            location_name: inspection.locations?.name || '',
-            building_name: inspection.locations?.buildings?.name || '',
-            organization_name: inspection.locations?.buildings?.organizations?.name || '',
-            floor: inspection.locations?.floor || '',
-            area: inspection.locations?.area || '',
-            section: inspection.locations?.section || '',
-            photo_urls: (inspection.photo_urls || []).join('; '),
-            responses: JSON.stringify(inspection.responses || {}),
-          };
-        })
-      );
+      const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
+        inspection_id: inspection.id,
+        inspection_date: inspection.inspection_date || '',
+        inspection_time: inspection.inspection_time || '',
+        submitted_at: '', // Not returned by API, keep empty
+        overall_status: inspection.overall_status || '',
+        notes: inspection.notes || '',
+        user_full_name: inspection.user?.full_name || '',
+        user_email: inspection.user?.email || '',
+        user_phone: '', // Not returned by API
+        user_occupation: inspection.occupation?.display_name || 'N/A',
+        location_name: inspection.location?.name || '',
+        building_name: inspection.location?.building || '',
+        organization_name: '', // Not in current API response
+        floor: inspection.location?.floor || '',
+        area: '', // Not in current API response
+        section: '', // Not in current API response
+        photo_urls: (inspection.photo_urls || []).join('; '),
+        responses: JSON.stringify(inspection.responses || {}),
+      }));
 
       toast.dismiss();
-      exportToCSV(exportData, `inspections_${format(currentDate, 'yyyy-MM')}.csv`);
+      exportToCSV(exportData, `inspections_${month}.csv`);
       toast.success(`✅ Berhasil mengekspor ${exportData.length} inspeksi`);
     } catch (error: any) {
       toast.dismiss();
@@ -145,7 +133,7 @@ export const ReportsPage = () => {
     }
   };
 
-  // 👑 ADMIN ONLY: Export ALL users' inspections for current month
+  // ✅ ADMIN ONLY (level 80+): Export ALL users' inspections for current month
   const handleExportAllUsers = async () => {
     if (!user?.id || !isAdmin) {
       toast.error('Akses administrator diperlukan');
@@ -155,75 +143,64 @@ export const ReportsPage = () => {
     toast.loading('Menyiapkan ekspor untuk semua pengguna...');
 
     try {
-      const startDate = format(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1), 'yyyy-MM-dd');
-      const endDate = format(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0), 'yyyy-MM-dd');
+      const month = format(currentDate, 'yyyy-MM');
 
-      // Fetch ALL inspections for current month (no user_id filter)
-      const { data, error } = await supabase
-        .from('inspection_records')
-        .select(`
-          *,
-          users!inspection_records_user_id_fkey (full_name, email, phone, occupation_id),
-          locations!inner (
-            name,
-            floor,
-            area,
-            section,
-            building_id,
-            buildings!inner (name, organization_id, organizations!inner (name))
-          )
-        `)
-        .gte('inspection_date', startDate)
-        .lte('inspection_date', endDate)
-        .order('inspection_date', { ascending: false });
+      // ✅ Use backend API - admin can fetch ALL users' data by not passing userId
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (error) throw error;
+      if (!token) {
+        throw new Error('No authentication token');
+      }
 
-      if (!data || data.length === 0) {
+      // Fetch ALL users' data through backend API (no userId param = ALL)
+      const response = await fetch(`/api/reports?month=${month}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch' }));
+        throw new Error(errorData.error || 'Failed to fetch inspections');
+      }
+
+      const result = await response.json();
+      const monthData: any[] = result.data; // DateInspections[]
+
+      // Flatten inspections from all dates
+      const allInspections = monthData.flatMap(d => d.inspections || []);
+
+      if (allInspections.length === 0) {
         toast.dismiss();
         toast.error('No inspections to export for this month');
         return;
       }
 
       // Format data for export
-      const exportData: ExportInspectionData[] = await Promise.all(
-        data.map(async (inspection: any) => {
-          // Get occupation name
-          let occupationName = 'N/A';
-          if (inspection.users?.occupation_id) {
-            const { data: occupation } = await supabase
-              .from('user_occupations')
-              .select('display_name')
-              .eq('id', inspection.users.occupation_id)
-              .single();
-            if (occupation) occupationName = occupation.display_name;
-          }
-
-          return {
-            inspection_id: inspection.id,
-            inspection_date: inspection.inspection_date || '',
-            inspection_time: inspection.inspection_time || '',
-            submitted_at: inspection.submitted_at ? format(new Date(inspection.submitted_at), 'yyyy-MM-dd HH:mm:ss') : '',
-            overall_status: inspection.overall_status || '',
-            notes: inspection.notes || '',
-            user_full_name: inspection.users?.full_name || '',
-            user_email: inspection.users?.email || '',
-            user_phone: inspection.users?.phone || '',
-            user_occupation: occupationName,
-            location_name: inspection.locations?.name || '',
-            building_name: inspection.locations?.buildings?.name || '',
-            organization_name: inspection.locations?.buildings?.organizations?.name || '',
-            floor: inspection.locations?.floor || '',
-            area: inspection.locations?.area || '',
-            section: inspection.locations?.section || '',
-            photo_urls: (inspection.photo_urls || []).join('; '),
-            responses: JSON.stringify(inspection.responses || {}),
-          };
-        })
-      );
+      const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
+        inspection_id: inspection.id,
+        inspection_date: inspection.inspection_date || '',
+        inspection_time: inspection.inspection_time || '',
+        submitted_at: '', // Not returned by API, keep empty
+        overall_status: inspection.overall_status || '',
+        notes: inspection.notes || '',
+        user_full_name: inspection.user?.full_name || '',
+        user_email: inspection.user?.email || '',
+        user_phone: '', // Not returned by API
+        user_occupation: inspection.occupation?.display_name || 'N/A',
+        location_name: inspection.location?.name || '',
+        building_name: inspection.location?.building || '',
+        organization_name: '', // Not in current API response
+        floor: inspection.location?.floor || '',
+        area: '', // Not in current API response
+        section: '', // Not in current API response
+        photo_urls: (inspection.photo_urls || []).join('; '),
+        responses: JSON.stringify(inspection.responses || {}),
+      }));
 
       toast.dismiss();
-      exportToCSV(exportData, `SEMUA_INSPEKSI_${format(currentDate, 'yyyy-MM')}.csv`);
+      exportToCSV(exportData, `SEMUA_INSPEKSI_${month}.csv`);
       toast.success(`✅ Berhasil mengekspor ${exportData.length} inspeksi dari semua pengguna`);
     } catch (error: any) {
       toast.dismiss();
