@@ -50,7 +50,7 @@ export function useLocations({
       if (buildingId) params.append('building_id', buildingId);
       if (organizationId) params.append('organization_id', organizationId);
 
-      const url = `/api/admin/locations${params.toString() ? '?' + params.toString() : ''}`;
+      const url = `/api/admin/resources?type=locations${params.toString() ? '&' + params.toString() : ''}`;
 
       const response = await fetch(url, {
         headers: {
@@ -96,7 +96,7 @@ export function useLocation(locationId?: string) {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/locations?id=${locationId}`, {
+      const response = await fetch(`/api/admin/resources?type=locations&id=${locationId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -149,7 +149,7 @@ export function useLocationByCode(
       if (buildingId) params.append('building_id', buildingId);
       if (organizationId) params.append('organization_id', organizationId);
 
-      const url = `/api/admin/locations${params.toString() ? '?' + params.toString() : ''}`;
+      const url = `/api/admin/resources?type=locations${params.toString() ? '&' + params.toString() : ''}`;
 
       const response = await fetch(url, {
         headers: {
@@ -261,7 +261,7 @@ export function useUpdateLocation() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/locations?id=${locationId}`, {
+      const response = await fetch(`/api/admin/resources?type=locations&id=${locationId}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -311,7 +311,7 @@ export function useDeleteLocation() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/locations?id=${locationId}`, {
+      const response = await fetch(`/api/admin/resources?type=locations&id=${locationId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
