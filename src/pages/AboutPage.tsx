@@ -30,8 +30,22 @@ export const AboutPage = () => {
         {/* App Logo & Version */}
         <Card>
           <div className="text-center py-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <span className="text-5xl">🚽</span>
+            <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg border-2 border-gray-100">
+              <img
+                src="/logo.png"
+                alt="Proservice Indonesia Logo"
+                className="h-20 w-auto"
+                onError={(e) => {
+                  // If logo fails to load, show fallback
+                  const img = e.target as HTMLImageElement;
+                  img.style.display = 'none';
+                  const parent = img.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<span class="text-5xl">🚽</span>';
+                    parent.className = 'w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg';
+                  }
+                }}
+              />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Proservice Indonesia</h2>
             <p className="text-gray-600 mb-4">Sistem Inspeksi & Monitoring Toilet Terintegrasi</p>
