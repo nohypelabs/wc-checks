@@ -18,45 +18,15 @@ interface VerifyRoleResponse {
 }
 
 /**
- * Fallback: Direct database query if backend API fails
- * This ensures admin access doesn't break even if backend has issues
+ * ✅ SECURITY: All role checks MUST go through backend API
+ *
+ * NO direct database queries allowed to prevent:
+ * - Frontend authorization bypass
+ * - Inconsistent role validation
+ * - Missing audit logs
+ *
+ * If backend API fails, return false (deny access) instead of fallback
  */
-async function fallbackRoleCheck(userId: string): Promise<{ isAdmin: boolean; isSuperAdmin: boolean }> {
-  console.warn('[useIsAdmin] ⚠️ Using fallback - direct database query');
-
-  try {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select(`
-        role_id,
-        roles!user_roles_role_id_fkey (
-          id,
-          name,
-          level
-        )
-      `)
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (error || !data) {
-      console.error('[useIsAdmin] Fallback query error:', error);
-      return { isAdmin: false, isSuperAdmin: false };
-    }
-
-    const role = data.roles as { id: string; name: string; level: number } | null;
-    const level = role?.level || 0;
-
-    console.log('[useIsAdmin] ✅ Fallback result:', { role: role?.name, level });
-
-    return {
-      isAdmin: level >= 80,
-      isSuperAdmin: level >= 90, // Super admin level: 90+ (superadmin & system_admin)
-    };
-  } catch (error) {
-    console.error('[useIsAdmin] Fallback error:', error);
-    return { isAdmin: false, isSuperAdmin: false };
-  }
-}
 
 export function useIsAdmin() {
   const { user, loading: authLoading } = useAuth();
@@ -72,33 +42,31 @@ export function useIsAdmin() {
       }
 
       try {
-        // ATTEMPT 1: Backend API (preferred - server-side validated)
-        // ✅ FIX: Use localStorage token instead of getSession() to avoid hang
+        // ✅ BACKEND API ONLY - No direct database queries
         console.log('[useIsAdmin] 🔐 Getting token from localStorage for role verification...');
 
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
         const projectId = supabaseUrl.split('//')[1]?.split('.')[0];
 
         if (!projectId) {
-          console.error('[useIsAdmin] Invalid Supabase URL');
-          return await fallbackRoleCheck(user.id);
+          console.error('[useIsAdmin] ❌ Invalid Supabase URL - DENYING ACCESS');
+          return { isAdmin: false, isSuperAdmin: false };
         }
 
         const storageKey = `sb-${projectId}-auth-token`;
         const sessionStr = localStorage.getItem(storageKey);
 
         if (!sessionStr) {
-          console.error('[useIsAdmin] No session in localStorage');
-          return await fallbackRoleCheck(user.id);
+          console.error('[useIsAdmin] ❌ No session in localStorage - DENYING ACCESS');
+          return { isAdmin: false, isSuperAdmin: false };
         }
 
         const sessionData = JSON.parse(sessionStr);
         const token = sessionData?.access_token;
 
         if (!token) {
-          console.error('[useIsAdmin] No access token in session');
-          // Fallback to direct query
-          return await fallbackRoleCheck(user.id);
+          console.error('[useIsAdmin] ❌ No access token in session - DENYING ACCESS');
+          return { isAdmin: false, isSuperAdmin: false };
         }
 
         console.log('[useIsAdmin] ✅ Got token from localStorage for role check');
@@ -116,24 +84,24 @@ export function useIsAdmin() {
         console.log('[useIsAdmin] 📡 Backend API response status:', response.status);
 
         if (!response.ok) {
-          console.error('[useIsAdmin] ❌ API error:', response.status);
+          console.error('[useIsAdmin] ❌ API error:', response.status, '- DENYING ACCESS');
 
-          // ATTEMPT 2: Fallback to direct database query
+          // ✅ NO FALLBACK - Always deny access if backend API fails
+          // This ensures proper authorization and audit logging
           if (response.status >= 500) {
-            console.warn('[useIsAdmin] ⚠️ Backend error (500+), using fallback');
-            return await fallbackRoleCheck(user.id);
+            console.error('[useIsAdmin] ❌ Backend server error (500+) - DENYING ACCESS');
+          } else {
+            console.error('[useIsAdmin] ❌ Unauthorized (401/403) - DENYING ACCESS');
           }
 
-          // For 401/403, don't fallback - user really is unauthorized
-          console.log('[useIsAdmin] ❌ Auth error (401/403), returning false');
           return { isAdmin: false, isSuperAdmin: false };
         }
 
         // Check if response is JSON before parsing
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-          console.warn('[useIsAdmin] Non-JSON response, using fallback');
-          return await fallbackRoleCheck(user.id);
+          console.error('[useIsAdmin] ❌ Non-JSON response from backend - DENYING ACCESS');
+          return { isAdmin: false, isSuperAdmin: false };
         }
 
         const result: VerifyRoleResponse = await response.json();
@@ -158,11 +126,12 @@ export function useIsAdmin() {
           isSuperAdmin: result.data.isSuperAdmin,
         };
       } catch (error) {
-        console.error('[useIsAdmin] Unexpected error:', error);
+        console.error('[useIsAdmin] ❌ Unexpected error:', error);
 
-        // ATTEMPT 3: Final fallback
-        console.warn('[useIsAdmin] Exception caught, using fallback');
-        return await fallbackRoleCheck(user.id);
+        // ✅ NO FALLBACK - Deny access on any error
+        // All authorization must go through backend API for security
+        console.error('[useIsAdmin] ❌ Exception caught - DENYING ACCESS');
+        return { isAdmin: false, isSuperAdmin: false };
       }
     },
     enabled: !!user?.id, // Only run when user is available

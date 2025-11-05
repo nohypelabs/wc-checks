@@ -198,40 +198,25 @@ export function useToggleUserStatus() {
 }
 
 /**
- * @deprecated This function makes direct database queries and bypasses backend validation.
- * Use the `useIsAdmin()` hook instead, which calls the backend API.
+ * ✅ REMOVED: getUserRoleLevel() has been deleted
  *
- * This function is kept for backward compatibility but should not be used in new code.
- * All role checks should go through the backend API to ensure:
- * - Consistent validation
- * - Audit logging
- * - Single source of truth
+ * This function was making direct database queries and bypassing backend validation.
+ * ALL role checks must go through backend API for security.
  *
- * Example migration:
+ * Migration guide:
  * ```
- * // ❌ OLD (bypasses backend)
+ * // ❌ OLD (REMOVED - bypassed backend)
  * const level = await getUserRoleLevel(user.id);
  * const isAdmin = level >= 80;
  *
- * // ✅ NEW (uses backend)
+ * // ✅ NEW (uses backend API)
+ * import { useIsAdmin } from '@/hooks/useIsAdmin';
  * const { isAdmin, isSuperAdmin } = useIsAdmin();
  * ```
+ *
+ * Why removed:
+ * - Direct database queries bypass backend authorization
+ * - No audit logging for role checks
+ * - Security risk - frontend can manipulate queries
+ * - Not single source of truth
  */
-export async function getUserRoleLevel(userId: string): Promise<number> {
-  console.warn('⚠️ DEPRECATED: getUserRoleLevel() bypasses backend. Use useIsAdmin() hook instead.');
-
-  const { data, error } = await supabase
-    .from('user_roles')
-    .select('roles!user_roles_role_id_fkey (level)')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (error || !data) {
-    console.error('❌ getUserRoleLevel error:', error);
-    return 0;
-  }
-
-  const level = (data.roles as any)?.level || 0;
-  console.log('✅ getUserRoleLevel success:', { userId, level });
-  return level;
-}
