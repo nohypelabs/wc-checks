@@ -106,7 +106,7 @@ export const SettingsPage = () => {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Versi</span>
-              <span className="font-medium text-gray-900">1.0.0</span>
+              <span className="font-medium text-gray-900">3.0.0</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Email</span>
