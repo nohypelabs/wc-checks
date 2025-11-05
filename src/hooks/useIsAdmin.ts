@@ -132,6 +132,11 @@ export function useIsAdmin() {
         const result: VerifyRoleResponse = await response.json();
 
         console.log('[useIsAdmin] ✅ Backend verified role:', result.data.role);
+        console.log('[useIsAdmin] 🔍 Result:', {
+          isAdmin: result.data.isAdmin,
+          isSuperAdmin: result.data.isSuperAdmin,
+          level: result.data.role.level,
+        });
 
         return {
           isAdmin: result.data.isAdmin,
