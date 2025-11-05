@@ -16,23 +16,47 @@ import toast from 'react-hot-toast';
 
 export const ReportsPage = () => {
   const { user } = useAuth();
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin, isSuperAdmin } = useIsAdmin();
+
+  // 🔍 DEBUG: Log role status
+  console.log('📊 [ReportsPage] Role check:', {
+    userId: user?.id,
+    isAdmin,
+    isSuperAdmin,
+    willFetchAllUsers: isAdmin,
+  });
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedInspection, setSelectedInspection] = useState<InspectionReport | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   // Fetch monthly data
   // Admin sees ALL inspections (undefined), regular users see only their own (user.id)
+  const filterUserId = isAdmin ? undefined : user?.id;
+
+  console.log('📊 [ReportsPage] Fetching monthly data with filter:', {
+    isAdmin,
+    filterUserId: filterUserId || 'ALL USERS',
+  });
+
   const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
-    isAdmin ? undefined : user?.id,
+    filterUserId,
     currentDate
   );
 
   // Fetch specific date data when date is selected
   // Admin sees ALL inspections (undefined), regular users see only their own (user.id)
+  const dateFilterUserId = isAdmin ? undefined : user?.id;
+
+  console.log('📊 [ReportsPage] Fetching date inspections with filter:', {
+    isAdmin,
+    dateFilterUserId: dateFilterUserId || 'ALL USERS',
+    selectedDate,
+  });
+
   const { data: dateInspections } = useDateInspections(
-    isAdmin ? undefined : user?.id,
+    dateFilterUserId,
     selectedDate || ''
   );
 

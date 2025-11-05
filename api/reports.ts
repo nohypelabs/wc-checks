@@ -32,16 +32,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const isAdmin = auth.userRole.level >= 80;
   const currentUserId = auth.userId;
 
-  // 🔍 DEBUG: Log auth details
+  // 🔍 DEBUG: Log auth details with detailed role check
   console.log('[reports] 🔐 Auth details:', {
     userId: currentUserId,
     role: auth.userRole.name,
     level: auth.userRole.level,
+    'level >= 80': auth.userRole.level >= 80,
     isAdmin,
     monthParam: monthStr,
     dateParam: dateStr,
     userIdParam: userIdStr,
   });
+
+  // 🔍 DEBUG: Extra check for level 80 specifically
+  if (auth.userRole.level === 80) {
+    console.log('[reports] 🎯 LEVEL 80 USER DETECTED:', {
+      userId: currentUserId,
+      role: auth.userRole.name,
+      level: auth.userRole.level,
+      isAdmin,
+      shouldSeeAllData: isAdmin,
+    });
+  }
 
   try {
     // Determine which user's data to fetch
@@ -50,16 +62,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!isAdmin) {
       // Non-admin: ALWAYS filter to their own data
       targetUserId = currentUserId;
-      console.log(`[reports] Non-admin user ${currentUserId} - filtering to own data`);
+      console.log(`[reports] ❌ Non-admin user ${currentUserId} (level ${auth.userRole.level}) - filtering to own data`);
     } else if (userIdStr) {
       // Admin with userId param: filter to specific user
       targetUserId = userIdStr;
-      console.log(`[reports] Admin ${currentUserId} requesting data for user ${targetUserId}`);
+      console.log(`[reports] ✅ Admin ${currentUserId} (level ${auth.userRole.level}) requesting data for user ${targetUserId}`);
     } else {
       // Admin without userId param: get ALL users' data
       targetUserId = undefined;
-      console.log(`[reports] Admin ${currentUserId} requesting ALL users' data`);
+      console.log(`[reports] ✅ Admin ${currentUserId} (level ${auth.userRole.level}) requesting ALL users' data`);
     }
+
+    // 🔍 DEBUG: Show final decision
+    console.log('[reports] 📊 Final filter decision:', {
+      isAdmin,
+      level: auth.userRole.level,
+      targetUserId: targetUserId || 'NONE (fetching ALL users)',
+      willFetchAllUsers: targetUserId === undefined,
+    });
 
     // Security check: prevent non-admin from requesting other user's data
     if (!isAdmin && userIdStr && userIdStr !== currentUserId) {
