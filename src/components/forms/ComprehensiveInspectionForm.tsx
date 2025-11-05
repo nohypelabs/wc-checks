@@ -29,8 +29,8 @@ interface ComprehensiveInspectionFormProps {
 export const ComprehensiveInspectionForm = ({
   locationId,
 }: ComprehensiveInspectionFormProps) => {
-  // Use professional mode for enterprise-friendly language
-  const genZMode = false;
+  // Use Indonesian mode for all users
+  const genZMode = true;
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { getLocation, submitInspection } = useInspection();
@@ -517,7 +517,7 @@ const handleSubmit = async () => {
                       })()
                     )}
                     <span className="font-medium text-gray-900">
-                      {genZMode ? component.labelGenZ : component.label}
+                      {component.labelGenZ}
                     </span>
                   </div>
                   {rating ? (
@@ -640,27 +640,32 @@ const handleSubmit = async () => {
 
           {requiresMaintenance && (
             <div className="grid grid-cols-2 gap-2">
-              {['low', 'medium', 'high', 'urgent'].map((priority) => (
+              {[
+                { value: 'low', label: 'Rendah' },
+                { value: 'medium', label: 'Sedang' },
+                { value: 'high', label: 'Tinggi' },
+                { value: 'urgent', label: 'Mendesak' }
+              ].map(({ value, label }) => (
                 <button
-                  key={priority}
+                  key={value}
                   type="button"
-                  onClick={() => setMaintenancePriority(priority as any)}
+                  onClick={() => setMaintenancePriority(value as any)}
                   className={`
-                    py-2 px-3 rounded-xl text-sm font-medium capitalize
+                    py-2 px-3 rounded-xl text-sm font-medium
                     ${
-                      maintenancePriority === priority
-                        ? priority === 'urgent'
+                      maintenancePriority === value
+                        ? value === 'urgent'
                           ? 'bg-red-100 text-red-700 border-2 border-red-500'
-                          : priority === 'high'
+                          : value === 'high'
                             ? 'bg-orange-100 text-orange-700 border-2 border-orange-500'
-                            : priority === 'medium'
+                            : value === 'medium'
                               ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
                               : 'bg-blue-100 text-blue-700 border-2 border-blue-500'
                         : 'bg-gray-100 text-gray-700 border-2 border-gray-200'
                     }
                   `}
                 >
-                  {priority}
+                  {label}
                 </button>
               ))}
             </div>
