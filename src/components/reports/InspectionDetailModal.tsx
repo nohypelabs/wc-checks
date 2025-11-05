@@ -101,6 +101,21 @@ const getChoiceColor = (choice: string): string => {
   }
 };
 
+const getChoiceLabel = (choice: string): string => {
+  switch (choice) {
+    case 'good':
+      return 'Baik';
+    case 'normal':
+      return 'Normal';
+    case 'bad':
+      return 'Buruk';
+    case 'other':
+      return 'Lainnya';
+    default:
+      return choice;
+  }
+};
+
 export const InspectionDetailModal = ({
   isOpen,
   onClose,
@@ -204,7 +219,7 @@ export const InspectionDetailModal = ({
                     <Clock className="w-5 h-5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-blue-600 mb-1">Date & Time</p>
+                    <p className="text-xs font-medium text-blue-600 mb-1">Tanggal & Waktu</p>
                     <p className="font-semibold text-gray-900 text-sm truncate">{formattedDate}</p>
                     <p className="text-sm text-gray-600 mt-0.5">{inspection.inspection_time}</p>
                   </div>
@@ -218,7 +233,7 @@ export const InspectionDetailModal = ({
                     <User className="w-5 h-5 text-purple-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-purple-600 mb-1">Inspector</p>
+                    <p className="text-xs font-medium text-purple-600 mb-1">Inspektur</p>
                     <p className="font-semibold text-gray-900 text-sm truncate">{inspection.user?.full_name}</p>
                     <p className="text-xs text-gray-600 truncate mt-0.5">{inspection.user?.email}</p>
                     {inspection.occupation && (
@@ -243,7 +258,7 @@ export const InspectionDetailModal = ({
             <div>
               <h3 className="font-bold text-gray-900 mb-3 flex items-center space-x-2">
                 <span>📋</span>
-                <span>Component Ratings</span>
+                <span>Penilaian Komponen</span>
               </h3>
               <div className="space-y-3">
                 {ratings.map((rating: ComponentRating, index: number) => {
@@ -259,7 +274,7 @@ export const InspectionDetailModal = ({
                               {inspectionMode === 'genz' ? component.iconGenZ : component.icon}
                             </span>
                             <span className="font-medium text-gray-900">
-                              {component.label}
+                              {component.labelGenZ || component.label}
                             </span>
                           </div>
                           {rating.notes && (
@@ -272,8 +287,8 @@ export const InspectionDetailModal = ({
                           <span className="text-2xl">
                             {getChoiceEmoji(rating.choice, component.category)}
                           </span>
-                          <span className="text-sm font-medium capitalize">
-                            {rating.choice}
+                          <span className="text-sm font-medium">
+                            {getChoiceLabel(rating.choice)}
                           </span>
                         </div>
                       </div>
@@ -289,7 +304,7 @@ export const InspectionDetailModal = ({
                 <div className="flex items-start space-x-2">
                   <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-orange-900 mb-1">Issues Found</h4>
+                    <h4 className="font-semibold text-orange-900 mb-1">Masalah Ditemukan</h4>
                     <p className="text-sm text-orange-800">{issues.description}</p>
                   </div>
                 </div>
@@ -313,10 +328,10 @@ export const InspectionDetailModal = ({
                   <span className="text-xl">🔧</span>
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-1">
-                      Maintenance Required
+                      Perlu Perbaikan
                     </h4>
                     <p className="text-sm text-gray-700">
-                      Priority: <span className="font-semibold capitalize">{maintenance.priority}</span>
+                      Prioritas: <span className="font-semibold capitalize">{maintenance.priority}</span>
                     </p>
                   </div>
                 </div>
@@ -360,7 +375,7 @@ export const InspectionDetailModal = ({
                 <div className="flex items-start space-x-2">
                   <FileText className="w-5 h-5 text-gray-600 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">General Notes</h4>
+                    <h4 className="font-semibold text-gray-900 mb-1">Catatan Umum</h4>
                     <p className="text-sm text-gray-700">{inspection.notes}</p>
                   </div>
                 </div>

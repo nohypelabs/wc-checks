@@ -83,9 +83,12 @@ export const InspectionDrawer = ({
 
       {/* Drawer */}
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col transition-transform"
+        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col transition-transform duration-200 ease-out"
         style={{
-          transform: `translateY(${currentY}px)`,
+          transform: `translateY(${currentY}px) translateZ(0)`,
+          willChange: isDragging ? 'transform' : 'auto',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
         }}
       >
         {/* Drag Handle */}
@@ -103,14 +106,14 @@ export const InspectionDrawer = ({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-gray-900">
-                Inspections
+                Inspeksi
               </h2>
               <p className="text-sm text-gray-600 mt-0.5">
                 {formattedDate}
               </p>
               <div className="flex items-center space-x-2 mt-2">
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                  {inspections.length} inspection{inspections.length > 1 ? 's' : ''}
+                  {inspections.length} inspeksi
                 </span>
               </div>
             </div>
@@ -124,7 +127,13 @@ export const InspectionDrawer = ({
         </div>
 
         {/* Inspection List */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+        <div
+          className="flex-1 overflow-y-auto px-6 py-4 space-y-3 overscroll-contain"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            willChange: 'scroll-position',
+          }}
+        >
           {inspections.map((inspection) => {
             const score = (inspection.responses as any)?.score || 0;
             const scoreColor = getScoreColor(score);
@@ -162,7 +171,7 @@ export const InspectionDrawer = ({
                     {inspection.photo_urls.length > 0 && (
                       <div className="mt-2">
                         <span className="text-xs text-gray-500">
-                          📸 {inspection.photo_urls.length} photo{inspection.photo_urls.length > 1 ? 's' : ''}
+                          📸 {inspection.photo_urls.length} foto
                         </span>
                       </div>
                     )}
@@ -178,7 +187,7 @@ export const InspectionDrawer = ({
                       <span className="text-lg">{emoji}</span>
                       <span className="text-xl">{score}</span>
                     </div>
-                    <span className="text-xs text-gray-500 mt-1">Score</span>
+                    <span className="text-xs text-gray-500 mt-1">Skor</span>
                   </div>
                 </div>
 
