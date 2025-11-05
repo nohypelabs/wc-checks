@@ -98,4 +98,4 @@ Keyboard navigation support. Clear visual feedback for all actions. High contras
 
 **Technology Stack:** React + TypeScript, Supabase (PostgreSQL), Cloudinary, Tailwind CSS, React Query
 
-**Version:** 1.0.0 | **License:** Proprietary | **Last Updated:** October 2025
+**Version:** 3.0.0 | **License:** Proprietary | **Last Updated:** November 2025

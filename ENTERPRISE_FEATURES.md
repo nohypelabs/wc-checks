@@ -472,5 +472,5 @@ ORDER BY created_at DESC;
 
 ---
 
-**Last Updated:** 2025-11-02
-**Version:** 1.0.0
+**Last Updated:** 2025-11-05
+**Version:** 3.0.0
