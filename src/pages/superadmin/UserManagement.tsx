@@ -32,10 +32,11 @@ export const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
 
   // ✅ FIXED: Use backend API for role check instead of direct query
-  const { isSuperAdmin, loading: roleLoading } = useIsAdmin();
+  const { isSuperAdmin, loading: roleLoading, isAdmin } = useIsAdmin();
 
   console.log('🔵 [UserManagement] useIsAdmin result:', {
     isSuperAdmin,
+    isAdmin,
     roleLoading,
   });
 

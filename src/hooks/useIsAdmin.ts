@@ -59,9 +59,9 @@ async function fallbackRoleCheck(userId: string): Promise<{ isAdmin: boolean; is
 }
 
 export function useIsAdmin() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isFetching, error, dataUpdatedAt, fetchStatus } = useQuery({
     queryKey: ['verify-role', user?.id],
     queryFn: async (): Promise<{ isAdmin: boolean; isSuperAdmin: boolean }> => {
       console.log('[useIsAdmin] 🚀 Query function called for user:', user?.id);
@@ -165,7 +165,7 @@ export function useIsAdmin() {
         return await fallbackRoleCheck(user.id);
       }
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id, // Only run when user is available
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2, // Retry twice before giving up
     retryDelay: 1000, // Wait 1s between retries
@@ -178,11 +178,31 @@ export function useIsAdmin() {
     console.error('[useIsAdmin] Query error:', error);
   }
 
+  // ✅ FIX: Calculate real loading state
+  // We're loading if:
+  // 1. Auth is still loading, OR
+  // 2. Query is loading/fetching, OR
+  // 3. We have a user but haven't fetched data yet (dataUpdatedAt === 0)
+  const hasNeverFetched = dataUpdatedAt === 0;
+  const isReallyLoading = authLoading || isLoading || isFetching || (!!user?.id && hasNeverFetched);
+
+  // ✅ DEBUG: Log query state
+  console.log('[useIsAdmin] 🔍 Query state:', {
+    authLoading,
+    isLoading,
+    isFetching,
+    fetchStatus,
+    hasUser: !!user?.id,
+    hasData: !!data,
+    hasNeverFetched,
+    dataUpdatedAt,
+  });
+
   // ✅ DEBUG: Log what we're returning
   console.log('[useIsAdmin] 📤 Returning:', {
     isAdmin: data?.isAdmin ?? false,
     isSuperAdmin: data?.isSuperAdmin ?? false,
-    loading: isLoading,
+    loading: isReallyLoading,
     hasData: !!data,
     hasError: !!error,
   });
@@ -191,7 +211,7 @@ export function useIsAdmin() {
   return {
     isAdmin: data?.isAdmin ?? false,
     isSuperAdmin: data?.isSuperAdmin ?? false,
-    loading: isLoading,
+    loading: isReallyLoading, // ✅ Use real loading state
     error: error ? String(error) : null,
   };
 }
