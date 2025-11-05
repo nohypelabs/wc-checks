@@ -36,19 +36,19 @@ export const InspectionFailedModal = ({
   const ErrorIcon = getErrorIcon();
 
   const getErrorTitle = () => {
-    if (isNetworkError) return 'Connection Lost';
-    if (isUploadError) return 'Upload Failed';
-    return 'Submission Failed';
+    if (isNetworkError) return 'Koneksi Terputus';
+    if (isUploadError) return 'Upload Gagal';
+    return 'Submit Gagal';
   };
 
   const getErrorDescription = () => {
     if (isNetworkError) {
-      return 'Unable to connect to the server. Please check your internet connection and try again.';
+      return 'Gak bisa konek ke server. Cek koneksi internet lo dan coba lagi.';
     }
     if (isUploadError) {
-      return 'Failed to upload photos. Please check your connection and try again.';
+      return 'Gagal upload foto. Cek koneksi internet lo dan coba lagi.';
     }
-    return 'Something went wrong while saving your inspection. Your data is safe and you can try again.';
+    return 'Ada yang salah pas nyimpen inspeksi lo. Data lo aman kok, tinggal coba lagi aja.';
   };
 
   return (
@@ -76,7 +76,7 @@ export const InspectionFailedModal = ({
               </h2>
 
               <p className="text-white/90 text-sm">
-                Don't worry, your inspection data is safe
+                Tenang, data inspeksi lo aman kok
               </p>
             </div>
           </div>
@@ -94,7 +94,7 @@ export const InspectionFailedModal = ({
             {errorMessage && (
               <details className="text-xs">
                 <summary className="text-gray-600 cursor-pointer hover:text-gray-900 font-medium">
-                  Technical details
+                  Detail teknis
                 </summary>
                 <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <p className="text-gray-700 break-words font-mono">
@@ -107,25 +107,25 @@ export const InspectionFailedModal = ({
             {/* Tips */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <p className="text-sm font-semibold text-blue-900 mb-2">
-                💡 What to do:
+                💡 Apa yang harus dilakukan:
               </p>
               <ul className="text-sm text-blue-800 space-y-1.5">
                 {isNetworkError && (
                   <>
-                    <li>• Check your internet connection</li>
-                    <li>• Make sure you have stable WiFi or data</li>
-                    <li>• Try moving to a better signal area</li>
+                    <li>• Cek koneksi internet lo</li>
+                    <li>• Pastiin WiFi atau data lo stabil</li>
+                    <li>• Coba pindah ke tempat dengan sinyal lebih bagus</li>
                   </>
                 )}
                 {isUploadError && (
                   <>
-                    <li>• Check your internet speed</li>
-                    <li>• Make sure photos aren't too large</li>
-                    <li>• Try with fewer photos if possible</li>
+                    <li>• Cek kecepatan internet lo</li>
+                    <li>• Pastiin foto gak terlalu gede</li>
+                    <li>• Coba dengan foto lebih sedikit</li>
                   </>
                 )}
-                <li>• Your inspection data is saved locally</li>
-                <li>• Click "Try Again" when ready</li>
+                <li>• Data inspeksi lo udah kesimpen lokal</li>
+                <li>• Klik "Coba Lagi" kalo udah siap</li>
               </ul>
             </div>
 
@@ -137,7 +137,7 @@ export const InspectionFailedModal = ({
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
               >
                 <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-                <span>Try Again</span>
+                <span>Coba Lagi</span>
               </button>
 
               {/* Back Button */}
@@ -146,7 +146,7 @@ export const InspectionFailedModal = ({
                 className="w-full bg-white hover:bg-gray-50 text-gray-700 py-4 rounded-xl font-semibold border-2 border-gray-200 hover:border-gray-300 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
               >
                 <ArrowLeft className="w-5 h-5" />
-                <span>Go Back</span>
+                <span>Kembali</span>
               </button>
             </div>
 

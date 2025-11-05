@@ -32,10 +32,10 @@ export const InspectionSuccessModal = ({
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 90) return 'Excellent!';
-    if (score >= 75) return 'Good Job!';
-    if (score >= 60) return 'Satisfactory';
-    return 'Needs Improvement';
+    if (score >= 90) return 'Luar Biasa!';
+    if (score >= 75) return 'Bagus!';
+    if (score >= 60) return 'Cukup Memuaskan';
+    return 'Perlu Ditingkatkan';
   };
 
   return (
@@ -59,12 +59,12 @@ export const InspectionSuccessModal = ({
               </div>
 
               <h2 className="text-2xl font-bold text-white mb-2">
-                Inspection Complete!
+                Inspeksi Selesai!
               </h2>
 
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
                 <TrendingUp className="w-5 h-5 text-white" />
-                <span className="text-white font-semibold">Score: {score}</span>
+                <span className="text-white font-semibold">Skor: {score}</span>
               </div>
 
               <p className="text-white/90 text-sm mt-2 font-medium">
@@ -75,14 +75,14 @@ export const InspectionSuccessModal = ({
 
           {/* Location Info */}
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
-            <p className="text-sm text-gray-600">Inspection completed for:</p>
+            <p className="text-sm text-gray-600">Inspeksi selesai untuk:</p>
             <p className="font-semibold text-gray-900 truncate">{locationName}</p>
           </div>
 
           {/* Action Buttons */}
           <div className="p-6 space-y-3">
             <p className="text-center text-sm text-gray-600 mb-4">
-              What would you like to do next?
+              Mau ngapain selanjutnya?
             </p>
 
             {/* Dashboard Button */}
@@ -91,7 +91,7 @@ export const InspectionSuccessModal = ({
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
             >
               <Home className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span>View Dashboard</span>
+              <span>Lihat Dashboard</span>
             </button>
 
             {/* Scan Next Button */}
@@ -100,12 +100,12 @@ export const InspectionSuccessModal = ({
               className="w-full bg-white hover:bg-gray-50 text-gray-700 py-4 rounded-xl font-semibold border-2 border-gray-200 hover:border-gray-300 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
             >
               <QrCode className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span>Scan Next Location</span>
+              <span>Scan Lokasi Berikutnya</span>
             </button>
 
             {/* Hint Text */}
             <p className="text-xs text-gray-500 text-center pt-2">
-              💡 Tip: Dashboard shows your latest results and statistics
+              💡 Tip: Dashboard nampilin hasil dan statistik terbaru lo
             </p>
           </div>
         </div>

@@ -64,7 +64,7 @@ export const RatingSelector = ({
               {label}
               {config.required && <span className="text-red-500 ml-1">*</span>}
             </h3>
-            {!config.required && <span className="text-xs text-gray-500">Optional</span>}
+            {!config.required && <span className="text-xs text-gray-500">Opsional</span>}
           </div>
         </div>
 
@@ -144,12 +144,8 @@ export const RatingSelector = ({
             onChange={(e) => onNotesChange?.(e.target.value)}
             placeholder={
               value === 'other'
-                ? genZMode
-                  ? 'Jelasin detailnya dong...'
-                  : 'Please specify the details...'
-                : genZMode
-                  ? 'Catatan tambahan (opsional)...'
-                  : 'Additional notes (optional)...'
+                ? 'Jelasin detailnya dong...'
+                : 'Catatan tambahan (opsional)...'
             }
             className={`
               w-full px-3 py-2 border rounded-xl focus:ring-2 resize-none
@@ -168,7 +164,7 @@ export const RatingSelector = ({
               onClick={() => setShowNotes(false)}
               className="text-sm text-gray-500 hover:text-gray-700 mt-1"
             >
-              × Hide notes
+              × Sembunyikan catatan
             </button>
           )}
         </div>
@@ -188,7 +184,7 @@ export const RatingSelector = ({
             }
           `}
         >
-          + Add notes
+          + Tambah catatan
         </button>
       )}
     </div>

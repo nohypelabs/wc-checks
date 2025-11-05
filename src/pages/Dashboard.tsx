@@ -26,8 +26,9 @@ export const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const haptic = useHaptic();
 
-  // Request GPS permission on mount
+  // Request GPS & Camera permissions on mount
   useEffect(() => {
+    // Request GPS permission
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         () => {
@@ -38,6 +39,19 @@ export const Dashboard = () => {
         },
         { enableHighAccuracy: false, timeout: 5000 }
       );
+    }
+
+    // Request Camera permission
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+          console.log('📸 Camera permission granted');
+          // Stop the stream immediately (we just needed permission)
+          stream.getTracks().forEach(track => track.stop());
+        })
+        .catch((error) => {
+          console.warn('📸 Camera permission denied or unavailable:', error.message);
+        });
     }
   }, []);
 
