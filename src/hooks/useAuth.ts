@@ -164,11 +164,8 @@ export function useAuth(): UseAuthReturn {
 
     initAuth();
 
-    return () => {
-      console.log('🔍 Auth cleanup - resetting for React Strict Mode');
-      // ✅ FIX: Reset initRef so remount can run (React 18 Strict Mode)
-      initRef.current = false;
-    };
+    // ✅ FIX: Don't reset initRef in cleanup to prevent infinite loop
+    // React Strict Mode will remount, but we want to keep initRef.current = true
   }, []); // ✅ Empty deps - run ONCE only
 
   // ✅ Handle auth changes

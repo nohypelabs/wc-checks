@@ -64,14 +64,17 @@ export function useIsAdmin() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['verify-role', user?.id],
     queryFn: async (): Promise<{ isAdmin: boolean; isSuperAdmin: boolean }> => {
+      console.log('[useIsAdmin] 🚀 Query function called for user:', user?.id);
+
       if (!user?.id) {
+        console.log('[useIsAdmin] ❌ No user ID, returning false');
         return { isAdmin: false, isSuperAdmin: false };
       }
 
       try {
         // ATTEMPT 1: Backend API (preferred - server-side validated)
         // ✅ FIX: Use localStorage token instead of getSession() to avoid hang
-        console.log('🔐 Getting token from localStorage for role verification...');
+        console.log('[useIsAdmin] 🔐 Getting token from localStorage for role verification...');
 
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
         const projectId = supabaseUrl.split('//')[1]?.split('.')[0];
@@ -98,9 +101,10 @@ export function useIsAdmin() {
           return await fallbackRoleCheck(user.id);
         }
 
-        console.log('✅ Got token from localStorage for role check');
+        console.log('[useIsAdmin] ✅ Got token from localStorage for role check');
 
         // Call backend API for server-side role verification
+        console.log('[useIsAdmin] 📡 Calling backend API /api/auth/verify-role...');
         const response = await fetch('/api/auth/verify-role', {
           method: 'GET',
           headers: {
@@ -109,16 +113,19 @@ export function useIsAdmin() {
           },
         });
 
+        console.log('[useIsAdmin] 📡 Backend API response status:', response.status);
+
         if (!response.ok) {
-          console.error('[useIsAdmin] API error:', response.status);
+          console.error('[useIsAdmin] ❌ API error:', response.status);
 
           // ATTEMPT 2: Fallback to direct database query
           if (response.status >= 500) {
-            console.warn('[useIsAdmin] Backend error (500+), using fallback');
+            console.warn('[useIsAdmin] ⚠️ Backend error (500+), using fallback');
             return await fallbackRoleCheck(user.id);
           }
 
           // For 401/403, don't fallback - user really is unauthorized
+          console.log('[useIsAdmin] ❌ Auth error (401/403), returning false');
           return { isAdmin: false, isSuperAdmin: false };
         }
 
@@ -131,11 +138,19 @@ export function useIsAdmin() {
 
         const result: VerifyRoleResponse = await response.json();
 
-        console.log('[useIsAdmin] ✅ Backend verified role:', result.data.role);
+        console.log('[useIsAdmin] ✅ Backend verified role:', JSON.stringify(result.data.role));
         console.log('[useIsAdmin] 🔍 Result:', {
           isAdmin: result.data.isAdmin,
           isSuperAdmin: result.data.isSuperAdmin,
           level: result.data.role.level,
+          roleName: result.data.role.name,
+        });
+
+        // ✅ EXTRA DEBUG: Log the actual comparison
+        console.log('[useIsAdmin] 🔍 Level check:', {
+          level: result.data.role.level,
+          'level >= 90': result.data.role.level >= 90,
+          'result.isSuperAdmin': result.data.isSuperAdmin,
         });
 
         return {
@@ -162,6 +177,15 @@ export function useIsAdmin() {
   if (error) {
     console.error('[useIsAdmin] Query error:', error);
   }
+
+  // ✅ DEBUG: Log what we're returning
+  console.log('[useIsAdmin] 📤 Returning:', {
+    isAdmin: data?.isAdmin ?? false,
+    isSuperAdmin: data?.isSuperAdmin ?? false,
+    loading: isLoading,
+    hasData: !!data,
+    hasError: !!error,
+  });
 
   // Always return safe defaults - never undefined
   return {

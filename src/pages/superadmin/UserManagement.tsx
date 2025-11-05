@@ -54,18 +54,22 @@ export const UserManagement = () => {
       isSuperAdmin,
     });
 
-    // Wait for auth and role check to complete
+    // ✅ FIX: Wait for BOTH auth and role to complete loading
+    // Don't redirect until we have definitive results
     if (authLoading || roleLoading) {
       console.log('[UserManagement] Still loading auth or role...');
       return;
     }
 
+    // ✅ FIX: Only redirect if we're sure there's no user
     if (!user?.id) {
       console.log('🔴 [UserManagement] No user ID - redirecting to login');
       navigate('/login');
       return;
     }
 
+    // ✅ FIX: Only redirect if we have a definitive answer AND it's false
+    // This prevents premature redirects before role check completes
     if (!isSuperAdmin) {
       console.log('🔴 [UserManagement] Not superadmin - ACCESS DENIED - redirecting to home', {
         isSuperAdmin,
