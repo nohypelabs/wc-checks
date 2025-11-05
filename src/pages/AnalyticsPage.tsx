@@ -1,6 +1,7 @@
 // src/pages/AnalyticsPage.tsx - WITH SIDEBAR
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useIsAdmin } from '../hooks/useIsAdmin';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import {
@@ -69,13 +70,14 @@ interface AnalyticsData {
 
 export const AnalyticsPage = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('week');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Fetch analytics data
   const { data: analytics, isLoading, error } = useQuery({
-    queryKey: ['analytics', user?.id, selectedPeriod],
+    queryKey: ['analytics', user?.id, selectedPeriod, isAdmin],
     queryFn: async (): Promise<AnalyticsData> => {
       if (!user?.id) {
         throw new Error('User not authenticated');
@@ -100,8 +102,17 @@ export const AnalyticsPage = () => {
           startDate = format(startOfWeek(now), 'yyyy-MM-dd');
       }
 
-      // Fetch inspections
-      const { data: inspections, error: fetchError } = await supabase
+      // 🔍 DEBUG: Log admin status
+      console.log('[Analytics] 🔐 Fetching analytics:', {
+        userId: user.id,
+        isAdmin,
+        period: selectedPeriod,
+        dateRange: `${startDate} to ${endDate}`,
+        willSeeAllUsers: isAdmin,
+      });
+
+      // Build query
+      let query = supabase
         .from('inspection_records')
         .select(`
           id,
@@ -109,6 +120,7 @@ export const AnalyticsPage = () => {
           inspection_time,
           responses,
           location_id,
+          user_id,
           locations (
             id,
             name,
@@ -116,10 +128,19 @@ export const AnalyticsPage = () => {
             floor
           )
         `)
-        .eq('user_id', user.id)
         .gte('inspection_date', startDate)
         .lte('inspection_date', endDate)
         .order('inspection_date', { ascending: true });
+
+      // ✅ FIX: Only filter by user_id if NOT admin
+      if (!isAdmin) {
+        query = query.eq('user_id', user.id);
+        console.log('[Analytics] ❌ Non-admin - filtering to own data only');
+      } else {
+        console.log('[Analytics] ✅ Admin - fetching ALL users data');
+      }
+
+      const { data: inspections, error: fetchError } = await query;
 
       if (fetchError) {
         console.error('Error fetching inspections:', fetchError);
