@@ -2,47 +2,38 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { validateAuth, supabase, successResponse, errorResponse } from './middleware/role-guard.js';
 
-// ===== ANALYTICS TYPES =====
-interface AnalyticsData {
+// ===== ANALYTICS TYPES (SIMPLIFIED) =====
+interface SimpleAnalytics {
+  // Overview
   totalInspections: number;
   avgScore: number;
-  scoreChange: number;
-  countChange: number;
-  dailyTrend: Array<{ date: string; count: number; avgScore: number }>;
-  hourlyDistribution: Array<{ hour: number; count: number }>;
-  peakHour: { hour: number; count: number } | null;
-  locationPerformance: Array<{
-    id: string;
-    name: string;
-    building?: string;
-    floor?: string;
-    avgScore: number;
-    count: number;
-    trend: number;
-  }>;
-  scoreRanges: {
-    excellent: number;
-    good: number;
-    fair: number;
-    poor: number;
+  trend: 'up' | 'down' | 'stable';
+  trendPercentage: number;
+
+  // Status Breakdown
+  statusBreakdown: {
+    excellent: { count: number; percentage: number };
+    good: { count: number; percentage: number };
+    fair: { count: number; percentage: number };
+    poor: { count: number; percentage: number };
   };
-  topPerformer: {
-    id: string;
+
+  // Top 3 best locations
+  topLocations: Array<{
     name: string;
     building?: string;
     floor?: string;
     avgScore: number;
-    count: number;
-    trend: number;
-  } | null;
-  needsAttention: Array<{
-    id: string;
+    inspectionCount: number;
+  }>;
+
+  // Top 3 worst locations (need attention)
+  worstLocations: Array<{
     name: string;
     building?: string;
     floor?: string;
     avgScore: number;
-    count: number;
-    trend: number;
+    inspectionCount: number;
   }>;
 }
 
@@ -86,66 +77,49 @@ const calculateScore = (responses: any): number => {
   }
 };
 
-// Analytics handler function
+// Analytics handler function (SIMPLIFIED)
 async function handleAnalytics(
-  req: VercelRequest,
   res: VercelResponse,
-  auth: any,
   isAdmin: boolean,
   currentUserId: string,
   targetUserId: string | undefined,
-  periodStr: string | undefined
-): Promise<VercelResponse> {
+  monthStr: string | undefined
+): Promise<void> {
   if (!supabase) {
-    return errorResponse(res, 500, 'Database not initialized');
+    errorResponse(res, 500, 'Database not initialized');
+    return;
   }
 
-  // Validate period
-  if (!periodStr || !['week', 'month', 'year'].includes(periodStr)) {
-    return errorResponse(res, 400, 'Invalid period. Must be week, month, or year');
+  // Validate month format (yyyy-MM)
+  if (!monthStr || !/^\d{4}-\d{2}$/.test(monthStr)) {
+    errorResponse(res, 400, 'Invalid month format. Must be yyyy-MM (e.g., 2024-11)');
+    return;
   }
 
   console.log('[analytics] Request:', {
     currentUserId,
     isAdmin,
-    period: periodStr,
+    month: monthStr,
     targetUserId: targetUserId || 'ALL',
   });
 
   try {
-    // Calculate date range
-    const now = new Date();
-    let startDate: string;
-    const endDate: string = now.toISOString().split('T')[0];
-
-    switch (periodStr) {
-      case 'week':
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startDate = startOfWeek.toISOString().split('T')[0];
-        break;
-      case 'month':
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        break;
-      case 'year':
-        startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
-        break;
-      default:
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    }
+    // Calculate date range for selected month
+    const [year, month] = monthStr.split('-');
+    const startDate = `${year}-${month}-01`;
+    const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+    const endDate = `${year}-${month}-${lastDay.toString().padStart(2, '0')}`;
 
     console.log('[analytics] Date range:', { startDate, endDate });
 
-    // Build query
+    // Build query - fetch inspections for selected month
     let query = supabase
       .from('inspection_records')
       .select(`
         id,
         inspection_date,
-        inspection_time,
         responses,
         location_id,
-        user_id,
         locations (
           id,
           name,
@@ -154,8 +128,7 @@ async function handleAnalytics(
         )
       `)
       .gte('inspection_date', startDate)
-      .lte('inspection_date', endDate)
-      .order('inspection_date', { ascending: true });
+      .lte('inspection_date', endDate);
 
     // Filter by user if specified
     if (targetUserId) {
@@ -173,112 +146,49 @@ async function handleAnalytics(
 
     const records = inspections as InspectionRecord[] || [];
 
-    // Daily trend calculation
-    const dailyMap = new Map<string, { count: number; totalScore: number }>();
-    records.forEach((insp: InspectionRecord) => {
-      try {
-        const date = insp.inspection_date;
-        const score = calculateScore(insp.responses);
-        if (!dailyMap.has(date)) {
-          dailyMap.set(date, { count: 0, totalScore: 0 });
-        }
-        const data = dailyMap.get(date)!;
-        data.count++;
-        data.totalScore += score;
-      } catch (error) {
-        console.warn('[analytics] Error processing inspection for daily trend:', error);
-      }
-    });
+    // ===== 1. OVERVIEW STATS =====
+    const totalInspections = records.length;
+    const avgScore = totalInspections > 0
+      ? Math.round(records.reduce((sum: number, i: InspectionRecord) => sum + calculateScore(i.responses), 0) / totalInspections)
+      : 0;
 
-    const dailyTrend = Array.from(dailyMap.entries()).map(([date, data]) => ({
-      date,
-      count: data.count,
-      avgScore: data.count > 0 ? Math.round(data.totalScore / data.count) : 0
-    }));
+    // Get previous month for trend comparison
+    const prevMonthNum = parseInt(month) - 1;
+    const prevYear = prevMonthNum === 0 ? (parseInt(year) - 1).toString() : year;
+    const prevMonthStr = prevMonthNum === 0 ? '12' : prevMonthNum.toString().padStart(2, '0');
+    const prevStartDate = `${prevYear}-${prevMonthStr}-01`;
+    const prevLastDay = new Date(parseInt(prevYear), parseInt(prevMonthStr), 0).getDate();
+    const prevEndDate = `${prevYear}-${prevMonthStr}-${prevLastDay.toString().padStart(2, '0')}`;
 
-    // Hourly distribution
-    const hourlyMap = new Map<number, number>();
-    records.forEach((insp: InspectionRecord) => {
-      try {
-        if (insp.inspection_time && typeof insp.inspection_time === 'string') {
-          const timeParts = insp.inspection_time.split(':');
-          if (timeParts.length > 0) {
-            const hour = parseInt(timeParts[0]);
-            if (!isNaN(hour) && hour >= 0 && hour <= 23) {
-              hourlyMap.set(hour, (hourlyMap.get(hour) || 0) + 1);
-            }
-          }
-        }
-      } catch (error) {
-        console.warn('[analytics] Error processing inspection time:', error);
-      }
-    });
+    let prevQuery = supabase
+      .from('inspection_records')
+      .select('id, responses')
+      .gte('inspection_date', prevStartDate)
+      .lte('inspection_date', prevEndDate);
 
-    const hourlyDistribution = Array.from(hourlyMap.entries())
-      .map(([hour, count]) => ({ hour, count }))
-      .sort((a, b) => a.hour - b.hour);
+    if (targetUserId) {
+      prevQuery = prevQuery.eq('user_id', targetUserId);
+    }
 
-    // Peak hour
-    const peakHour = hourlyDistribution.length > 0
-      ? hourlyDistribution.reduce((max, curr) => curr.count > max.count ? curr : max)
-      : null;
+    const { data: prevInspections } = await prevQuery;
+    const prevRecords = prevInspections as InspectionRecord[] || [];
+    const prevTotalInspections = prevRecords.length;
+    const prevAvgScore = prevTotalInspections > 0
+      ? Math.round(prevRecords.reduce((sum: number, i: InspectionRecord) => sum + calculateScore(i.responses), 0) / prevTotalInspections)
+      : 0;
 
-    // Location performance
-    const locationMap = new Map<string, {
-      name: string;
-      scores: number[];
-      building?: string;
-      floor?: string;
-      count: number;
-    }>();
+    // Calculate trend
+    const scoreDiff = avgScore - prevAvgScore;
+    let trend: 'up' | 'down' | 'stable' = 'stable';
+    if (scoreDiff > 2) trend = 'up';
+    else if (scoreDiff < -2) trend = 'down';
 
-    records.forEach((insp: InspectionRecord) => {
-      try {
-        if (!insp.locations) return;
-        const locId = insp.location_id;
-        const score = calculateScore(insp.responses);
+    const trendPercentage = prevAvgScore > 0
+      ? Math.round((scoreDiff / prevAvgScore) * 100)
+      : 0;
 
-        if (!locationMap.has(locId)) {
-          locationMap.set(locId, {
-            name: insp.locations.name || 'Unknown Location',
-            building: insp.locations.building || undefined,
-            floor: insp.locations.floor || undefined,
-            scores: [],
-            count: 0
-          });
-        }
-        const locationData = locationMap.get(locId)!;
-        locationData.scores.push(score);
-        locationData.count++;
-      } catch (error) {
-        console.warn('[analytics] Error processing location performance:', error);
-      }
-    });
-
-    const locationPerformance = Array.from(locationMap.entries())
-      .map(([id, data]) => {
-        const avgScore = data.scores.length > 0
-          ? Math.round(data.scores.reduce((a, b) => a + b, 0) / data.scores.length)
-          : 0;
-
-        const trend = data.scores.length >= 2
-          ? data.scores[data.scores.length - 1] - data.scores[0]
-          : 0;
-
-        return {
-          id,
-          name: data.name,
-          building: data.building,
-          floor: data.floor,
-          avgScore,
-          count: data.count,
-          trend
-        };
-      })
-      .sort((a, b) => b.avgScore - a.avgScore);
-
-    // Score distribution
-    const scoreRanges = {
+    // ===== 2. STATUS BREAKDOWN =====
+    const statusCounts = {
       excellent: 0,
       good: 0,
       fair: 0,
@@ -286,114 +196,89 @@ async function handleAnalytics(
     };
 
     records.forEach((insp: InspectionRecord) => {
-      try {
-        const score = calculateScore(insp.responses);
-        if (score >= 85) scoreRanges.excellent++;
-        else if (score >= 70) scoreRanges.good++;
-        else if (score >= 50) scoreRanges.fair++;
-        else scoreRanges.poor++;
-      } catch (error) {
-        console.warn('[analytics] Error calculating score range:', error);
-      }
+      const score = calculateScore(insp.responses);
+      if (score >= 85) statusCounts.excellent++;
+      else if (score >= 70) statusCounts.good++;
+      else if (score >= 50) statusCounts.fair++;
+      else statusCounts.poor++;
     });
 
-    // Overall stats
-    const totalInspections = records.length;
-    const avgScore = totalInspections > 0
-      ? Math.round(records.reduce((sum: number, i: InspectionRecord) => sum + calculateScore(i.responses), 0) / totalInspections)
-      : 0;
-
-    // Previous period comparison
-    let prevStart: string;
-    let prevEnd: string;
-
-    try {
-      switch (periodStr) {
-        case 'week':
-          const prevWeekStart = new Date(now);
-          prevWeekStart.setDate(now.getDate() - now.getDay() - 7);
-          prevStart = prevWeekStart.toISOString().split('T')[0];
-          const prevWeekEnd = new Date(prevWeekStart);
-          prevWeekEnd.setDate(prevWeekStart.getDate() + 6);
-          prevEnd = prevWeekEnd.toISOString().split('T')[0];
-          break;
-        case 'month':
-          const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-          prevStart = prevMonth.toISOString().split('T')[0];
-          const prevMonthEnd = new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 0);
-          prevEnd = prevMonthEnd.toISOString().split('T')[0];
-          break;
-        case 'year':
-          prevStart = new Date(now.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
-          prevEnd = new Date(now.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
-          break;
-        default:
-          prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
-          prevEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+    const statusBreakdown = {
+      excellent: {
+        count: statusCounts.excellent,
+        percentage: totalInspections > 0 ? Math.round((statusCounts.excellent / totalInspections) * 100) : 0
+      },
+      good: {
+        count: statusCounts.good,
+        percentage: totalInspections > 0 ? Math.round((statusCounts.good / totalInspections) * 100) : 0
+      },
+      fair: {
+        count: statusCounts.fair,
+        percentage: totalInspections > 0 ? Math.round((statusCounts.fair / totalInspections) * 100) : 0
+      },
+      poor: {
+        count: statusCounts.poor,
+        percentage: totalInspections > 0 ? Math.round((statusCounts.poor / totalInspections) * 100) : 0
       }
+    };
 
-      let prevQuery = supabase
-        .from('inspection_records')
-        .select('id, responses')
-        .gte('inspection_date', prevStart)
-        .lte('inspection_date', prevEnd);
+    // ===== 3. LOCATION PERFORMANCE (TOP & WORST) =====
+    const locationMap = new Map<string, {
+      name: string;
+      building?: string;
+      floor?: string;
+      scores: number[];
+    }>();
 
-      if (targetUserId) {
-        prevQuery = prevQuery.eq('user_id', targetUserId);
+    records.forEach((insp: InspectionRecord) => {
+      if (!insp.locations) return;
+      const locId = insp.location_id;
+      const score = calculateScore(insp.responses);
+
+      if (!locationMap.has(locId)) {
+        locationMap.set(locId, {
+          name: insp.locations.name || 'Unknown',
+          building: insp.locations.building,
+          floor: insp.locations.floor,
+          scores: []
+        });
       }
+      locationMap.get(locId)!.scores.push(score);
+    });
 
-      const { data: prevInspections } = await prevQuery;
-      const prevRecords = prevInspections as InspectionRecord[] || [];
+    const locationScores = Array.from(locationMap.entries())
+      .map(([id, data]) => ({
+        name: data.name,
+        building: data.building,
+        floor: data.floor,
+        avgScore: Math.round(data.scores.reduce((a, b) => a + b, 0) / data.scores.length),
+        inspectionCount: data.scores.length
+      }))
+      .sort((a, b) => b.avgScore - a.avgScore);
 
-      const prevTotalInspections = prevRecords.length;
-      const prevAvgScore = prevTotalInspections > 0
-        ? Math.round(prevRecords.reduce((sum: number, i: InspectionRecord) => sum + calculateScore(i.responses), 0) / prevTotalInspections)
-        : 0;
+    // Top 3 best locations
+    const topLocations = locationScores.slice(0, 3);
 
-      const scoreChange = avgScore - prevAvgScore;
-      const countChange = totalInspections - prevTotalInspections;
+    // Top 3 worst locations
+    const worstLocations = locationScores.slice(-3).reverse();
 
-      const analyticsData: AnalyticsData = {
-        totalInspections,
-        avgScore,
-        scoreChange,
-        countChange,
-        dailyTrend,
-        hourlyDistribution,
-        peakHour,
-        locationPerformance,
-        scoreRanges,
-        topPerformer: locationPerformance[0] || null,
-        needsAttention: locationPerformance.filter(l => l.avgScore < 70)
-      };
+    // ===== RESPONSE =====
+    const analyticsData: SimpleAnalytics = {
+      totalInspections,
+      avgScore,
+      trend,
+      trendPercentage,
+      statusBreakdown,
+      topLocations,
+      worstLocations
+    };
 
-      console.log('[analytics] Success - returning analytics data');
-      return successResponse(res, analyticsData, 'Analytics retrieved successfully');
-
-    } catch (comparisonError) {
-      console.warn('[analytics] Error calculating period comparison:', comparisonError);
-      // Return data without comparison if there's an error
-      const analyticsData: AnalyticsData = {
-        totalInspections,
-        avgScore,
-        scoreChange: 0,
-        countChange: 0,
-        dailyTrend,
-        hourlyDistribution,
-        peakHour,
-        locationPerformance,
-        scoreRanges,
-        topPerformer: locationPerformance[0] || null,
-        needsAttention: locationPerformance.filter(l => l.avgScore < 70)
-      };
-
-      console.log('[analytics] Success - returning analytics data (without comparison)');
-      return successResponse(res, analyticsData, 'Analytics retrieved successfully');
-    }
+    console.log('[analytics] Success - returning simplified analytics');
+    successResponse(res, analyticsData, 'Analytics retrieved successfully');
 
   } catch (error: any) {
     console.error('[analytics] Error:', error);
-    return errorResponse(res, 500, 'Failed to retrieve analytics: ' + error.message);
+    errorResponse(res, 500, 'Failed to retrieve analytics: ' + error.message);
   }
 }
 
@@ -401,7 +286,7 @@ async function handleAnalytics(
  * GET /api/reports?month=yyyy-MM - Get monthly inspections
  * GET /api/reports?date=yyyy-MM-dd - Get inspections for specific date
  * GET /api/reports?userId=xxx&month=yyyy-MM - Admin: Get specific user's monthly inspections
- * GET /api/reports?analytics=true&period=week|month|year - Get analytics data
+ * GET /api/reports?analytics=true&month=yyyy-MM - Get analytics data for specific month
  *
  * Requirements:
  * - Authenticated user (level 0+)
@@ -420,12 +305,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return errorResponse(res, 401, 'Authentication required');
   }
 
-  const { month, date, userId, analytics, period } = req.query;
+  const { month, date, userId, analytics } = req.query;
   const monthStr = Array.isArray(month) ? month[0] : month;
   const dateStr = Array.isArray(date) ? date[0] : date;
   const userIdStr = Array.isArray(userId) ? userId[0] : userId;
   const analyticsStr = Array.isArray(analytics) ? analytics[0] : analytics;
-  const periodStr = Array.isArray(period) ? period[0] : period;
 
   const isAdmin = auth.userRole.level >= 80;
   const currentUserId = auth.userId;
@@ -486,7 +370,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ===== ANALYTICS MODE =====
     if (analyticsStr === 'true') {
-      return handleAnalytics(req, res, auth, isAdmin, currentUserId, targetUserId, periodStr);
+      await handleAnalytics(res, isAdmin, currentUserId, targetUserId, monthStr);
+      return; // handleAnalytics handles response
     }
 
     // ===== REPORTS MODE (existing logic) =====

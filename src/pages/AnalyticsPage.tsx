@@ -22,62 +22,56 @@ import { Card, CardHeader } from '../components/ui/Card';
 import { BottomNav } from '../components/mobile/BottomNav';
 import { Sidebar } from '../components/mobile/Sidebar';
 
-type TimePeriod = 'week' | 'month' | 'year';
-
-interface AnalyticsData {
+// ===== SIMPLIFIED ANALYTICS INTERFACE =====
+interface SimpleAnalytics {
+  // Overview
   totalInspections: number;
   avgScore: number;
-  scoreChange: number;
-  countChange: number;
-  dailyTrend: Array<{ date: string; count: number; avgScore: number }>;
-  hourlyDistribution: Array<{ hour: number; count: number }>;
-  peakHour: { hour: number; count: number } | null;
-  locationPerformance: Array<{
-    id: string;
-    name: string;
-    building?: string;
-    floor?: string;
-    avgScore: number;
-    count: number;
-    trend: number;
-  }>;
-  scoreRanges: {
-    excellent: number;
-    good: number;
-    fair: number;
-    poor: number;
+  trend: 'up' | 'down' | 'stable';
+  trendPercentage: number;
+
+  // Status Breakdown
+  statusBreakdown: {
+    excellent: { count: number; percentage: number };
+    good: { count: number; percentage: number };
+    fair: { count: number; percentage: number };
+    poor: { count: number; percentage: number };
   };
-  topPerformer: {
-    id: string;
+
+  // Top 3 best locations
+  topLocations: Array<{
     name: string;
     building?: string;
     floor?: string;
     avgScore: number;
-    count: number;
-    trend: number;
-  } | null;
-  needsAttention: Array<{
-    id: string;
+    inspectionCount: number;
+  }>;
+
+  // Top 3 worst locations (need attention)
+  worstLocations: Array<{
     name: string;
     building?: string;
     floor?: string;
     avgScore: number;
-    count: number;
-    trend: number;
+    inspectionCount: number;
   }>;
 }
 
 export const AnalyticsPage = () => {
   const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('week');
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
+
+  // Default to current month (yyyy-MM)
+  const now = new Date();
+  const defaultMonth = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+
+  const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // ✅ FIX: Fetch analytics data via API endpoint (no direct Supabase query)
+  // ✅ Fetch simplified analytics data via API
   const { data: analytics, isLoading, error } = useQuery({
-    queryKey: ['analytics', user?.id, selectedPeriod, isAdmin],
-    queryFn: async (): Promise<AnalyticsData> => {
+    queryKey: ['analytics', user?.id, selectedMonth, isAdmin],
+    queryFn: async (): Promise<SimpleAnalytics> => {
       if (!user?.id) {
         throw new Error('User not authenticated');
       }
@@ -85,7 +79,7 @@ export const AnalyticsPage = () => {
       console.log('[Analytics] 🚀 Fetching via API:', {
         userId: user.id,
         isAdmin,
-        period: selectedPeriod,
+        month: selectedMonth,
         willSeeAllUsers: isAdmin,
       });
 
@@ -97,11 +91,8 @@ export const AnalyticsPage = () => {
         throw new Error('No authentication token');
       }
 
-      // Build API URL - use /api/reports with analytics=true
-      let apiUrl = `/api/reports?analytics=true&period=${selectedPeriod}`;
-
-      // Admin sees ALL users (no userId param), regular users see only their own (backend handles this)
-      // We don't pass userId param, backend will check isAdmin and filter accordingly
+      // Build API URL - use /api/reports with analytics=true&month=yyyy-MM
+      const apiUrl = `/api/reports?analytics=true&month=${selectedMonth}`;
 
       console.log('[Analytics] API call:', { apiUrl, isAdmin });
 
@@ -119,11 +110,12 @@ export const AnalyticsPage = () => {
       }
 
       const result = await response.json();
-      const analyticsData: AnalyticsData = result.data;
+      const analyticsData: SimpleAnalytics = result.data;
 
       console.log('[Analytics] ✅ Received analytics data:', {
         totalInspections: analyticsData.totalInspections,
         avgScore: analyticsData.avgScore,
+        trend: analyticsData.trend,
       });
 
       return analyticsData;
@@ -133,10 +125,11 @@ export const AnalyticsPage = () => {
     retry: 2,
   });
 
-  const periodLabels = {
-    week: 'Minggu Ini',
-    month: 'Bulan Ini',
-    year: 'Tahun Ini'
+  // Format month display (2024-11 → November 2024)
+  const formatMonthDisplay = (monthStr: string) => {
+    const [year, month] = monthStr.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long' });
   };
 
   // Error state
