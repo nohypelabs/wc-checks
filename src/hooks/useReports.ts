@@ -46,8 +46,13 @@ export interface DateInspections {
  *   - Admin (level >= 80): fetches ALL users' inspections
  *   - Regular user: fetches their own inspections
  * @param currentDate - The month to fetch data for
+ * @param enabled - Whether to enable the query (default true)
  */
-export const useMonthlyInspections = (userId: string | undefined, currentDate: Date) => {
+export const useMonthlyInspections = (
+  userId: string | undefined,
+  currentDate: Date,
+  enabled: boolean = true
+) => {
   return useQuery({
     queryKey: ['monthly-inspections', userId || 'all', format(currentDate, 'yyyy-MM')],
     queryFn: async () => {
@@ -90,8 +95,8 @@ export const useMonthlyInspections = (userId: string | undefined, currentDate: D
 
       return dateInspections;
     },
-    // Always enabled - backend will handle auth/permissions
-    enabled: true,
+    // ✅ FIX: Wait for admin check to complete before fetching
+    enabled: enabled,
   });
 };
 
@@ -102,8 +107,13 @@ export const useMonthlyInspections = (userId: string | undefined, currentDate: D
  *   - Admin (level >= 80): fetches ALL users' inspections
  *   - Regular user: fetches their own inspections
  * @param date - The specific date to fetch data for
+ * @param enabled - Whether to enable the query (default true)
  */
-export const useDateInspections = (userId: string | undefined, date: string) => {
+export const useDateInspections = (
+  userId: string | undefined,
+  date: string,
+  enabled: boolean = true
+) => {
   return useQuery({
     queryKey: ['date-inspections', userId || 'all', date],
     queryFn: async () => {
@@ -149,6 +159,7 @@ export const useDateInspections = (userId: string | undefined, date: string) => 
 
       return inspections;
     },
-    enabled: !!date,
+    // ✅ FIX: Wait for admin check to complete AND date to be selected
+    enabled: enabled && !!date,
   });
 };

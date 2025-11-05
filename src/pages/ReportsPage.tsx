@@ -16,13 +16,14 @@ import toast from 'react-hot-toast';
 
 export const ReportsPage = () => {
   const { user } = useAuth();
-  const { isAdmin, isSuperAdmin } = useIsAdmin();
+  const { isAdmin, isSuperAdmin, loading: adminLoading } = useIsAdmin();
 
   // 🔍 DEBUG: Log role status
   console.log('📊 [ReportsPage] Role check:', {
     userId: user?.id,
     isAdmin,
     isSuperAdmin,
+    adminLoading,
     willFetchAllUsers: isAdmin,
   });
 
@@ -40,9 +41,11 @@ export const ReportsPage = () => {
     filterUserId: filterUserId || 'ALL USERS',
   });
 
+  // ✅ FIX: Only fetch after admin check completes to ensure correct filter
   const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
     filterUserId,
-    currentDate
+    currentDate,
+    !adminLoading  // Wait for admin check to complete
   );
 
   // Fetch specific date data when date is selected
@@ -51,13 +54,16 @@ export const ReportsPage = () => {
 
   console.log('📊 [ReportsPage] Fetching date inspections with filter:', {
     isAdmin,
+    adminLoading,
     dateFilterUserId: dateFilterUserId || 'ALL USERS',
     selectedDate,
   });
 
+  // ✅ FIX: Only fetch after admin check completes
   const { data: dateInspections } = useDateInspections(
     dateFilterUserId,
-    selectedDate || ''
+    selectedDate || '',
+    !adminLoading  // Wait for admin check to complete
   );
 
   const handleDateClick = (date: string) => {
@@ -233,12 +239,15 @@ export const ReportsPage = () => {
     }
   };
 
-  if (monthlyLoading) {
+  // ✅ FIX: Show loading while admin check OR monthly data is loading
+  if (adminLoading || monthlyLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-sm">Memuat laporan...</p>
+          <p className="text-gray-600 text-sm">
+            {adminLoading ? 'Memeriksa hak akses...' : 'Memuat laporan...'}
+          </p>
         </div>
       </div>
     );

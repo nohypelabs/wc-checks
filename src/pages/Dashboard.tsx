@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useIsAdmin } from '../hooks/useIsAdmin';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import {
@@ -22,6 +23,7 @@ import { useHaptic } from '../hooks/useHaptic';
 
 export const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const haptic = useHaptic();
@@ -55,16 +57,24 @@ export const Dashboard = () => {
     }
   }, []);
 
-  // ✅ WAIT for auth to complete AND user to exist
-  const isAuthReady = !authLoading && !!user?.id;
+  // ✅ WAIT for auth to complete AND user to exist AND admin check to complete
+  const isAuthReady = !authLoading && !adminLoading && !!user?.id;
 
   // Fetch user statistics - OPTIMIZED FOR PERFORMANCE
   const { data: stats, isLoading: statsLoading, error } = useQuery({
-    queryKey: ['dashboard-stats', user?.id],
+    queryKey: ['dashboard-stats', user?.id, isAdmin],
     queryFn: async () => {
       if (!user?.id) return null;
 
-      const { data: inspections, error: fetchError } = await supabase
+      // 🔍 DEBUG: Log admin status
+      console.log('[Dashboard] 🔐 Fetching stats:', {
+        userId: user.id,
+        isAdmin,
+        willSeeAllUsers: isAdmin,
+      });
+
+      // Build query
+      let query = supabase
         .from('inspection_records')
         .select(`
           id,
@@ -73,6 +83,7 @@ export const Dashboard = () => {
           inspection_time,
           responses,
           location_id,
+          user_id,
           locations (
             id,
             name,
@@ -80,9 +91,18 @@ export const Dashboard = () => {
             building
           )
         `)
-        .eq('user_id', user.id)
         .order('inspection_date', { ascending: false })
         .limit(50);
+
+      // ✅ FIX: Only filter by user_id if NOT admin
+      if (!isAdmin) {
+        query = query.eq('user_id', user.id);
+        console.log('[Dashboard] ❌ Non-admin - filtering to own data only');
+      } else {
+        console.log('[Dashboard] ✅ Admin - fetching ALL users data');
+      }
+
+      const { data: inspections, error: fetchError } = await query;
 
       if (fetchError) {
         console.error('Dashboard query error:', fetchError);
