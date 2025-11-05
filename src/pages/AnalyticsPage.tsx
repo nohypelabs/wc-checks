@@ -97,8 +97,8 @@ export const AnalyticsPage = () => {
         throw new Error('No authentication token');
       }
 
-      // Build API URL
-      let apiUrl = `/api/analytics?period=${selectedPeriod}`;
+      // Build API URL - use /api/reports with analytics=true
+      let apiUrl = `/api/reports?analytics=true&period=${selectedPeriod}`;
 
       // Admin sees ALL users (no userId param), regular users see only their own (backend handles this)
       // We don't pass userId param, backend will check isAdmin and filter accordingly
