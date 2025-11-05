@@ -101,7 +101,7 @@ export function LoginPage() {
           <div className="inline-flex items-center justify-center mb-4">
             <img
               src="/logo.png"
-              alt="WC Check Logo"
+              alt="Proservice Indonesia Logo"
               className="h-20 w-auto"
               onError={(e) => {
                 // If logo fails, hide and show text fallback
@@ -116,7 +116,7 @@ export function LoginPage() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            WC Check
+            Proservice Indonesia
           </h1>
           <p className="text-gray-600">
             Masuk untuk mengelola fasilitas Anda
@@ -268,7 +268,7 @@ export function LoginPage() {
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-600">
           <p>
-            © 2025 WC Check. Hak cipta dilindungi.
+            © 2025 Proservice Indonesia. Hak cipta dilindungi.
           </p>
           <p className="mt-2">
             <a href="#" className="text-blue-600 hover:text-blue-700">
