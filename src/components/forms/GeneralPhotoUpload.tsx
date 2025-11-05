@@ -33,9 +33,29 @@ export const GeneralPhotoUpload = ({
     setPermissionError(null);
 
     try {
+      // Get GPS coordinates
+      let gpsCoords: string | undefined;
+      if ('geolocation' in navigator) {
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 3000,
+              maximumAge: 0
+            });
+          });
+          gpsCoords = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+          console.log('📍 GPS coords:', gpsCoords);
+        } catch (gpsError) {
+          console.warn('📍 GPS unavailable:', gpsError);
+          gpsCoords = undefined;
+        }
+      }
+
       const watermarkPromise = addWatermarkToPhoto(file, {
         timestamp: new Date().toISOString(),
         locationName,
+        gpsCoords,
       });
 
       const timeoutPromise = new Promise<never>((_, reject) =>
@@ -104,10 +124,30 @@ export const GeneralPhotoUpload = ({
       const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
       console.log(`🖼️ Gallery photo: ${fileSizeMB}MB (will be optimized by Cloudinary on upload)`);
 
+      // Get GPS coordinates
+      let gpsCoords: string | undefined;
+      if ('geolocation' in navigator) {
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 3000,
+              maximumAge: 0
+            });
+          });
+          gpsCoords = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+          console.log('📍 GPS coords:', gpsCoords);
+        } catch (gpsError) {
+          console.warn('📍 GPS unavailable:', gpsError);
+          gpsCoords = undefined;
+        }
+      }
+
       // Add watermark to original file (compression happens server-side later)
       const watermarkedBlob = await addWatermarkToPhoto(file, {
         timestamp: new Date().toISOString(),
         locationName,
+        gpsCoords,
       });
       console.log(`🏷️ Watermarked: ${(watermarkedBlob.size / 1024 / 1024).toFixed(2)}MB`);
 
@@ -423,6 +463,7 @@ const addWatermarkToPhoto = async (
   metadata: {
     timestamp: string;
     locationName: string;
+    gpsCoords?: string;
   }
 ): Promise<Blob> => {
   console.log(`🏷️ [WATERMARK] Starting watermark for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
@@ -549,11 +590,16 @@ const addWatermarkToPhoto = async (
         const date = format(new Date(metadata.timestamp), 'dd/MM/yyyy');
         const time = format(new Date(metadata.timestamp), 'HH:mm:ss');
 
-        // ✅ Simple watermark: Location (from database) + Date + Time
+        // ✅ Simple watermark: Location (from database) + Date + Time + GPS
         const lines = [
           `📍 ${metadata.locationName}`,
           `📅 ${date} ⏰ ${time}`,
         ];
+
+        // Add GPS coordinates if available
+        if (metadata.gpsCoords) {
+          lines.push(`🌍 ${metadata.gpsCoords}`);
+        }
 
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
         const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));

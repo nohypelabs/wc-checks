@@ -1,5 +1,5 @@
 // src/pages/Dashboard.tsx - WITH SIDEBAR
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -25,6 +25,21 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const haptic = useHaptic();
+
+  // Request GPS permission on mount
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          console.log('📍 GPS permission granted');
+        },
+        (error) => {
+          console.warn('📍 GPS permission denied or unavailable:', error.message);
+        },
+        { enableHighAccuracy: false, timeout: 5000 }
+      );
+    }
+  }, []);
 
   // ✅ WAIT for auth to complete AND user to exist
   const isAuthReady = !authLoading && !!user?.id;
