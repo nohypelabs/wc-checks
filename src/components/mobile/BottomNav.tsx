@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Calendar, QrCode, MapPin, User } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ScanModal } from './ScanModal';
+import { useHaptic } from '../../hooks/useHaptic';
 
 interface NavItem {
   id: string;
@@ -51,6 +52,7 @@ export const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [scanModalOpen, setScanModalOpen] = useState(false);
+  const haptic = useHaptic();
 
   const handleScanSuccess = (locationId: string) => {
     setScanModalOpen(false);
@@ -71,7 +73,10 @@ export const BottomNav = () => {
               return (
                 <div key={item.id} className="flex-1 flex justify-center">
                   <button
-                    onClick={() => setScanModalOpen(true)}
+                    onClick={() => {
+                      haptic.medium();
+                      setScanModalOpen(true);
+                    }}
                     className="
                       w-14 h-14
                       bg-gradient-to-br from-blue-600 to-blue-400
@@ -96,11 +101,14 @@ export const BottomNav = () => {
           return (
             <button
               key={item.id}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                haptic.light();
+                navigate(item.path);
+              }}
               className={clsx(
                 'flex-1 flex flex-col items-center justify-center gap-1 py-2 px-2 rounded-xl transition-all duration-200',
-                isActive 
-                  ? 'text-blue-600' 
+                isActive
+                  ? 'text-blue-600'
                   : 'text-gray-500 hover:text-gray-700 active:scale-95'
               )}
               aria-label={item.label}
@@ -143,6 +151,7 @@ export const BottomNav = () => {
 export const BottomNavMinimal = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const haptic = useHaptic();
 
   const minimalItems = [
     { icon: Home, label: 'Beranda', path: '/' },
@@ -163,11 +172,14 @@ export const BottomNavMinimal = () => {
           return (
             <button
               key={index}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                haptic.light();
+                navigate(item.path);
+              }}
               className={clsx(
                 'flex flex-col items-center gap-0.5 p-2 rounded-xl transition-all min-w-[60px]',
-                isActive 
-                  ? 'text-blue-600 bg-blue-50' 
+                isActive
+                  ? 'text-blue-600 bg-blue-50'
                   : 'text-gray-500'
               )}
             >
@@ -185,6 +197,7 @@ export const BottomNavMinimal = () => {
 export const BottomNavLivin = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const haptic = useHaptic();
 
   const livinItems = [
     { icon: Home, label: 'Beranda', path: '/' },
@@ -206,13 +219,16 @@ export const BottomNavLivin = () => {
             return (
               <div key={index} className="flex-1 flex justify-center">
                 <button
-                  onClick={() => navigate(item.path)}
+                  onClick={() => {
+                    haptic.medium();
+                    navigate(item.path);
+                  }}
                   className="
-                    w-16 h-16 
+                    w-16 h-16
                     bg-gradient-to-br from-cyan-500 to-blue-600
-                    rounded-full 
-                    flex items-center justify-center 
-                    text-white 
+                    rounded-full
+                    flex items-center justify-center
+                    text-white
                     shadow-2xl shadow-blue-500/40
                     -mt-8
                     border-4 border-white
@@ -232,7 +248,10 @@ export const BottomNavLivin = () => {
           return (
             <button
               key={index}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                haptic.light();
+                navigate(item.path);
+              }}
               className="flex-1 flex flex-col items-center justify-center gap-1 h-full"
             >
               <div className={clsx(
