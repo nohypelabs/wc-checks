@@ -502,73 +502,109 @@ function addSignaturePage(
  * Helper: Prepare score table data
  */
 function prepareScoreTable(data: PDFReportData): PDFScoreTableRow[] {
-  const locationMap = new Map<string, PDFScoreTableRow>();
+  // Temporary structure to collect all scores per location per day
+  const locationScores = new Map<string, {
+    location: string;
+    building: string;
+    dailyScores: Map<number, number[]>; // day => array of scores
+  }>();
 
+  // Collect all scores
   data.dateInspections.forEach((dateInsp) => {
     const day = parseInt(dateInsp.date.split('-')[2], 10);
 
     dateInsp.inspections.forEach((inspection) => {
       const locationKey = `${inspection.location.name}|${inspection.location.building}`;
 
-      if (!locationMap.has(locationKey)) {
-        locationMap.set(locationKey, {
+      if (!locationScores.has(locationKey)) {
+        locationScores.set(locationKey, {
           location: inspection.location.name,
           building: inspection.location.building || '-',
-          scores: {},
+          dailyScores: new Map<number, number[]>(),
         });
       }
 
-      const row = locationMap.get(locationKey)!;
+      const locData = locationScores.get(locationKey)!;
 
       // Calculate score from responses
       const score = calculateInspectionScore(inspection);
 
-      // Average if multiple inspections for same location on same day
-      if (row.scores[day]) {
-        row.scores[day] = Math.round((row.scores[day]! + score) / 2);
-      } else {
-        row.scores[day] = score;
+      // Collect score for this day
+      if (!locData.dailyScores.has(day)) {
+        locData.dailyScores.set(day, []);
       }
+      locData.dailyScores.get(day)!.push(score);
     });
   });
 
-  return Array.from(locationMap.values()).sort((a, b) =>
-    a.location.localeCompare(b.location)
-  );
+  // Calculate averages and create final table structure
+  const scoreTable: PDFScoreTableRow[] = [];
+
+  locationScores.forEach((locData) => {
+    const scores: { [date: string]: number | null | undefined } = {};
+
+    // Calculate average for each day
+    locData.dailyScores.forEach((scoresArray, day) => {
+      const totalScore = scoresArray.reduce((sum, s) => sum + s, 0);
+      scores[day] = Math.round(totalScore / scoresArray.length);
+    });
+
+    scoreTable.push({
+      location: locData.location,
+      building: locData.building,
+      scores,
+    });
+  });
+
+  return scoreTable.sort((a, b) => a.location.localeCompare(b.location));
 }
 
 /**
  * Helper: Calculate inspection score from responses
+ * (Uses same logic as API to ensure consistency)
  */
 function calculateInspectionScore(inspection: InspectionReport): number {
-  // If overall_status exists and contains a score, try to extract it
-  // Otherwise, calculate from responses
-  const responses = inspection.responses || {};
+  try {
+    const responses = inspection.responses;
 
-  // Simple scoring: count good/normal/bad responses
-  const scoreMap: { [key: string]: number } = {
-    good: 100,
-    normal: 60,
-    bad: 20,
-    other: 40,
-  };
+    if (!responses || typeof responses !== 'object') return 0;
 
-  const values = Object.values(responses);
-  if (values.length === 0) return 0;
-
-  const totalScore = values.reduce((sum, value: any) => {
-    // Check for null and valid choice property
-    if (value?.choice && scoreMap[value.choice] !== undefined) {
-      return sum + scoreMap[value.choice];
+    // Check for direct score field first (new format)
+    if (typeof responses.score === 'number') {
+      return responses.score;
     }
-    return sum;
-  }, 0);
 
-  // Count only valid responses for average
-  const validResponses = values.filter((v: any) => v?.choice && scoreMap[v.choice] !== undefined);
-  if (validResponses.length === 0) return 0;
+    // Calculate from ratings array (new format with weights)
+    if (Array.isArray(responses.ratings) && responses.ratings.length > 0) {
+      const totalWeight = responses.ratings.reduce((sum: number, r: any) => sum + (r.weight || 1), 0);
+      const weightedSum = responses.ratings.reduce((sum: number, r: any) => {
+        const score = r.score || 0;
+        const weight = r.weight || 1;
+        return sum + (score * weight);
+      }, 0);
+      return Math.round(weightedSum / totalWeight);
+    }
 
-  return Math.round(totalScore / validResponses.length);
+    // Fallback: Old format - count good responses
+    const values = Object.values(responses).filter(v =>
+      typeof v === 'string' || typeof v === 'boolean'
+    );
+
+    if (values.length === 0) return 0;
+
+    const goodCount = values.filter(v =>
+      v === true ||
+      v === 'good' ||
+      v === 'excellent' ||
+      v === 'baik' ||
+      v === 'bersih'
+    ).length;
+
+    return Math.round((goodCount / values.length) * 100);
+  } catch (error) {
+    console.warn('[PDF] Error calculating score:', error);
+    return 0;
+  }
 }
 
 /**
