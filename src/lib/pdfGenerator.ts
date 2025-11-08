@@ -181,7 +181,8 @@ async function addScoreTablePage(
     const rowData = [row.location, row.building];
     for (let day = 1; day <= daysInMonth; day++) {
       const score = row.scores[day];
-      rowData.push(score !== null ? score.toString() : '-');
+      // Handle both null and undefined
+      rowData.push(score !== null && score !== undefined ? score.toString() : '-');
     }
     return rowData;
   });

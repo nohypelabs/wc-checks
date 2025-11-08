@@ -20,7 +20,7 @@ export interface DateInspections {
 export interface PDFScoreTableRow {
   location: string;
   building: string;
-  scores: { [date: string]: number | null }; // date (1-31) => score
+  scores: { [date: string]: number | null | undefined }; // date (1-31) => score
 }
 
 export interface PDFPhotoItem {
@@ -54,15 +54,15 @@ export const SCORE_COLORS = {
   none: [229, 231, 235], // Gray for no data
 } as const;
 
-export function getScoreColor(score: number | null): number[] {
-  if (score === null) return SCORE_COLORS.none as unknown as number[];
+export function getScoreColor(score: number | null | undefined): number[] {
+  if (score === null || score === undefined) return SCORE_COLORS.none as unknown as number[];
   if (score >= 95) return SCORE_COLORS.excellent as unknown as number[];
   if (score >= 90) return SCORE_COLORS.good as unknown as number[];
   return SCORE_COLORS.poor as unknown as number[];
 }
 
-export function getScoreColorString(score: number | null): string {
-  if (score === null) return '#E5E7EB';
+export function getScoreColorString(score: number | null | undefined): string {
+  if (score === null || score === undefined) return '#E5E7EB';
   if (score >= 95) return '#22C55E'; // Green
   if (score >= 90) return '#FACC15'; // Yellow
   return '#EF4444'; // Red
