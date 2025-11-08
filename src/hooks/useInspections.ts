@@ -42,6 +42,41 @@ export function useInspections() {
 }
 
 /**
+ * Fetch all inspections via ADMIN API
+ * Only admins can access this endpoint - returns all users' inspections
+ */
+export function useAdminInspections(limit: number = 100) {
+  return useQuery({
+    queryKey: ['admin-inspections', limit],
+    queryFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('No authentication token');
+      }
+
+      const response = await fetch(`/api/admin/inspections?limit=${limit}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to fetch admin inspections');
+      }
+
+      const result = await response.json();
+      return result.data.inspections as InspectionRecord[];
+    },
+    staleTime: 30 * 1000, // 30 seconds
+  });
+}
+
+/**
  * Fetch single inspection by ID via BACKEND API
  * User can only access their own inspections
  */
