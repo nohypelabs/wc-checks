@@ -198,6 +198,7 @@ async function addScoreTablePage(
       cellPadding: 1.5,
       halign: 'center',
       valign: 'middle',
+      minCellWidth: 5.5, // Wider cells to fit 3-digit scores (100)
     },
     headStyles: {
       fillColor: [59, 130, 246], // Blue
@@ -206,8 +207,8 @@ async function addScoreTablePage(
       fontSize: 7,
     },
     columnStyles: {
-      0: { halign: 'left', cellWidth: 30 }, // Location
-      1: { halign: 'left', cellWidth: 25 }, // Building
+      0: { halign: 'left', cellWidth: 28 }, // Location - slightly reduced
+      1: { halign: 'left', cellWidth: 22 }, // Building - slightly reduced
     },
     didParseCell: function (data) {
       // Color code score cells
@@ -456,8 +457,8 @@ function addSignaturePage(
   pdf.setDrawColor(150, 150, 150);
   pdf.line(marginLeft + 5, yPos + 40, marginLeft + boxWidth - 5, yPos + 40);
 
-  pdf.text('Nama:', marginLeft + 5, yPos + 45);
-  pdf.text('Tanggal:', marginLeft + 5, yPos + 52);
+  pdf.text('Nama: Office Operation', marginLeft + 5, yPos + 45);
+  pdf.text('Tanggal: _______________', marginLeft + 5, yPos + 52);
 
   // Right box: "Disetujui oleh"
   const rightX = marginLeft + boxWidth + 20;
@@ -479,8 +480,8 @@ function addSignaturePage(
   pdf.setDrawColor(150, 150, 150);
   pdf.line(rightX + 5, yPos + 40, rightX + boxWidth - 5, yPos + 40);
 
-  pdf.text('Nama:', rightX + 5, yPos + 45);
-  pdf.text('Tanggal:', rightX + 5, yPos + 52);
+  pdf.text('Nama: Direktur', rightX + 5, yPos + 45);
+  pdf.text('Tanggal: _______________', rightX + 5, yPos + 52);
 
   // Footer
   yPos = config.pageHeight - config.marginBottom - 10;
