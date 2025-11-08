@@ -556,13 +556,18 @@ function calculateInspectionScore(inspection: InspectionReport): number {
   if (values.length === 0) return 0;
 
   const totalScore = values.reduce((sum, value: any) => {
-    if (typeof value === 'object' && value.choice) {
-      return sum + (scoreMap[value.choice] || 0);
+    // Check for null and valid choice property
+    if (value?.choice && scoreMap[value.choice] !== undefined) {
+      return sum + scoreMap[value.choice];
     }
     return sum;
   }, 0);
 
-  return Math.round(totalScore / values.length);
+  // Count only valid responses for average
+  const validResponses = values.filter((v: any) => v?.choice && scoreMap[v.choice] !== undefined);
+  if (validResponses.length === 0) return 0;
+
+  return Math.round(totalScore / validResponses.length);
 }
 
 /**
