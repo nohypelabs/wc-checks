@@ -133,29 +133,46 @@ export function useDeleteOrganization() {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      console.log('🗑️ [useDeleteOrganization] Starting delete for organization:', id);
+
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      if (!token) throw new Error('No authentication token');
+      if (!token) {
+        console.error('❌ [useDeleteOrganization] No authentication token');
+        throw new Error('No authentication token');
+      }
+
+      console.log('📡 [useDeleteOrganization] Sending DELETE request to:', `/api/admin/organizations?id=${id}`);
 
       const response = await fetch(`/api/admin/organizations?id=${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
+      console.log('📨 [useDeleteOrganization] Response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to delete organization' }));
-        throw new Error(error.error || 'Failed to delete organization');
+        const errorData = await safeJsonParse(response).catch((e) => {
+          console.error('❌ [useDeleteOrganization] Failed to parse error response:', e);
+          return { error: 'Failed to delete organization' };
+        });
+        console.error('❌ [useDeleteOrganization] Delete failed:', errorData);
+        throw new Error(errorData.error || 'Failed to delete organization');
       }
 
-      return safeJsonParse(response);
+      const result = await safeJsonParse(response);
+      console.log('✅ [useDeleteOrganization] Delete successful:', result);
+      return result;
     },
     onSuccess: () => {
+      console.log('✅ [useDeleteOrganization] onSuccess callback triggered');
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
-      toast.success('Organization deleted successfully!');
+      toast.success('Organisasi berhasil dihapus!');
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete organization');
+      console.error('❌ [useDeleteOrganization] onError callback triggered:', error);
+      toast.error(error.message || 'Gagal menghapus organisasi');
     },
   });
 }

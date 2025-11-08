@@ -284,14 +284,19 @@ export function useDeleteBuilding() {
 
   return useMutation({
     mutationFn: async (buildingId: string) => {
+      console.log('🗑️ [useDeleteBuilding] Starting delete for building:', buildingId);
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
       const token = session?.access_token;
 
       if (!token) {
+        console.error('❌ [useDeleteBuilding] No authentication token');
         throw new Error('No authentication token');
       }
+
+      console.log('📡 [useDeleteBuilding] Sending DELETE request to:', `/api/admin/buildings?id=${buildingId}`);
 
       const response = await fetch(`/api/admin/buildings?id=${buildingId}`, {
         method: 'DELETE',
@@ -300,19 +305,29 @@ export function useDeleteBuilding() {
         },
       });
 
+      console.log('📨 [useDeleteBuilding] Response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to delete building' }));
-        throw new Error(error.error || 'Failed to delete building');
+        const errorData = await safeJsonParse(response).catch((e) => {
+          console.error('❌ [useDeleteBuilding] Failed to parse error response:', e);
+          return { error: 'Failed to delete building' };
+        });
+        console.error('❌ [useDeleteBuilding] Delete failed:', errorData);
+        throw new Error(errorData.error || 'Failed to delete building');
       }
 
-      return safeJsonParse(response);
+      const result = await safeJsonParse(response);
+      console.log('✅ [useDeleteBuilding] Delete successful:', result);
+      return result;
     },
     onSuccess: () => {
+      console.log('✅ [useDeleteBuilding] onSuccess callback triggered');
       queryClient.invalidateQueries({ queryKey: ['buildings'] });
-      toast.success('Building deleted successfully!');
+      toast.success('Gedung berhasil dihapus!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete building');
+      console.error('❌ [useDeleteBuilding] onError callback triggered:', error);
+      toast.error(error.message || 'Gagal menghapus gedung');
     },
   });
 }
