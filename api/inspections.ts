@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (inspectionId) {
         const { data: inspection, error } = await supabase
           .from('inspection_records')
-          .select('*, locations!inner(id, name, floor, buildings(name)), users(full_name)')
+          .select('*, locations!inner(id, name, floor, buildings(name)), users!inspection_records_user_id_fkey(full_name)')
           .eq('id', inspectionId)
           .eq('user_id', userId) // Users can only see their own
           .single();
