@@ -188,11 +188,19 @@ function AppContent() {
         />
         <Route
           path="/locations/add"
-          element={user ? <AddLocationPage /> : <Navigate to="/login" replace />}
+          element={user ? (
+            <ErrorBoundary>
+              <AddLocationPage />
+            </ErrorBoundary>
+          ) : <Navigate to="/login" replace />}
         />
         <Route
           path="/admin/locations"
-          element={user ? <LocationsManager /> : <Navigate to="/login" replace />}
+          element={user ? (
+            <ErrorBoundary>
+              <LocationsManager />
+            </ErrorBoundary>
+          ) : <Navigate to="/login" replace />}
         />
         <Route
           path="/admin/organizations"
