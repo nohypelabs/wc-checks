@@ -74,11 +74,25 @@ Sistem monitoring kebersihan toilet yang efektif, efisien, dan mudah digunakan d
    ```
 
 4. **Run development server**
+
+   **IMPORTANT:** This project uses Vercel serverless functions for the API. You must use `vercel dev` to run both the frontend AND backend:
+
+   ```bash
+   # Install Vercel CLI globally (first time only)
+   npm install -g vercel
+
+   # Run with Vercel dev server (starts both frontend + API)
+   vercel dev
+   ```
+
+   **OR** if you only want to run the frontend (API calls will fail):
    ```bash
    npm run dev
    ```
 
-   Buka [http://localhost:3000](http://localhost:3000)
+   Buka [http://localhost:3000](http://localhost:3000) (Vercel Dev)
+
+   atau [http://localhost:5174](http://localhost:5174) (Vite only, no API)
 
 ## 🗄️ Database Setup
 
