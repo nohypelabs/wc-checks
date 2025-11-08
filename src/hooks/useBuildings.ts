@@ -91,7 +91,7 @@ export function useBuilding(buildingId?: string) {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/buildings?id=${buildingId}`, {
+      const response = await fetch(`/api/admin/resources?type=buildings&id=${buildingId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -240,7 +240,7 @@ export function useUpdateBuilding() {
         throw new Error('No authentication token');
       }
 
-      const response = await fetch(`/api/admin/buildings?id=${buildingId}`, {
+      const response = await fetch(`/api/admin/resources?type=buildings&id=${buildingId}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -296,9 +296,9 @@ export function useDeleteBuilding() {
         throw new Error('No authentication token');
       }
 
-      console.log('📡 [useDeleteBuilding] Sending DELETE request to:', `/api/admin/buildings?id=${buildingId}`);
+      console.log('📡 [useDeleteBuilding] Sending DELETE request to:', `/api/admin/resources?type=buildings&id=${buildingId}`);
 
-      const response = await fetch(`/api/admin/buildings?id=${buildingId}`, {
+      const response = await fetch(`/api/admin/resources?type=buildings&id=${buildingId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -101,7 +101,7 @@ export function useUpdateOrganization() {
 
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch(`/api/admin/organizations?id=${id}`, {
+      const response = await fetch(`/api/admin/resources?type=organizations&id=${id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -143,9 +143,9 @@ export function useDeleteOrganization() {
         throw new Error('No authentication token');
       }
 
-      console.log('📡 [useDeleteOrganization] Sending DELETE request to:', `/api/admin/organizations?id=${id}`);
+      console.log('📡 [useDeleteOrganization] Sending DELETE request to:', `/api/admin/resources?type=organizations&id=${id}`);
 
-      const response = await fetch(`/api/admin/organizations?id=${id}`, {
+      const response = await fetch(`/api/admin/resources?type=organizations&id=${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
