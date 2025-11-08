@@ -1,6 +1,6 @@
 // PDF Report Generator for WC Check Monthly Reports
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import autoTable, { type UserOptions } from 'jspdf-autotable';
 import { format, getDaysInMonth } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
 import type {

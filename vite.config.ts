@@ -58,7 +58,12 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('date-fns')) {
             return 'date-vendor';
           }
-          
+
+          // PDF Generation
+          if (id.includes('jspdf')) {
+            return 'pdf-vendor';
+          }
+
           // QR Code
           if (id.includes('html5-qrcode') || id.includes('qrcode')) {
             return 'qr-vendor';
@@ -111,6 +116,8 @@ export default defineConfig(({ mode }) => ({
       'date-fns',
       'lucide-react',
       '@supabase/supabase-js',
+      'jspdf',
+      'jspdf-autotable',
     ],
   },
 }));
