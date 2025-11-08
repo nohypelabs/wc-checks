@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (inspectionId) {
       const { data: inspection, error } = await supabase
         .from('inspection_records')
-        .select('*, locations(name, floor, buildings(name)), users(full_name, email)')
+        .select('*, locations!inner(id, name, floor, buildings!building_id(name)), users(full_name, email)')
         .eq('id', inspectionId)
         .single();
 
@@ -52,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // List inspections with filters
     let query = supabase
       .from('inspection_records')
-      .select('*, locations(name, floor), users(full_name, email)')
+      .select('*, locations!inner(id, name, floor, buildings!building_id(name)), users(full_name, email)')
       .order('inspection_date', { ascending: false })
       .limit(parseInt(resultLimit, 10));
 

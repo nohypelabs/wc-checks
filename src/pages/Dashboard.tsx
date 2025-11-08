@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useIsAdmin } from '../hooks/useIsAdmin';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
+import { useInspections, useAdminInspections } from '../hooks/useInspections';
 import {
   QrCode,
   MapPin,
@@ -60,73 +59,30 @@ export const Dashboard = () => {
   // ✅ WAIT for auth to complete AND user to exist AND admin check to complete
   const isAuthReady = !authLoading && !adminLoading && !!user?.id;
 
-  // Fetch user statistics - OPTIMIZED FOR PERFORMANCE
-  const { data: stats, isLoading: statsLoading, error } = useQuery({
-    queryKey: ['dashboard-stats', user?.id, isAdmin],
-    queryFn: async () => {
-      if (!user?.id) return null;
+  // 🔍 DEBUG: Log admin status
+  console.log('[Dashboard] 🔐 Admin status:', {
+    userId: user?.id,
+    isAdmin,
+    willSeeAllUsers: isAdmin,
+  });
 
-      // 🔍 DEBUG: Log admin status
-      console.log('[Dashboard] 🔐 Fetching stats:', {
-        userId: user.id,
-        isAdmin,
-        willSeeAllUsers: isAdmin,
-      });
+  // Fetch inspections via API - admin or user endpoint
+  const { data: userInspections, isLoading: userInspectionsLoading } = useInspections();
+  const { data: adminInspections, isLoading: adminInspectionsLoading } = useAdminInspections(100);
 
-      // Build query
-      let query = supabase
-        .from('inspection_records')
-        .select(`
-          id,
-          overall_status,
-          inspection_date,
-          inspection_time,
-          responses,
-          location_id,
-          user_id,
-          locations (
-            id,
-            name,
-            floor,
-            building
-          )
-        `)
-        .order('inspection_date', { ascending: false })
-        .limit(50);
+  // Use admin data if admin, otherwise use user data
+  const inspections = isAdmin ? adminInspections : userInspections;
+  const statsLoading = isAdmin ? adminInspectionsLoading : userInspectionsLoading;
 
-      // ✅ FIX: Only filter by user_id if NOT admin
-      if (!isAdmin) {
-        query = query.eq('user_id', user.id);
-        console.log('[Dashboard] ❌ Non-admin - filtering to own data only');
-      } else {
-        console.log('[Dashboard] ✅ Admin - fetching ALL users data');
-      }
+  // Calculate stats from inspections
+  const stats = inspections ? (() => {
+    const total = inspections.length;
 
-      const { data: inspections, error: fetchError } = await query;
+    // ✅ Better date handling - account for timezone
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
 
-      if (fetchError) {
-        console.error('Dashboard query error:', fetchError);
-        // Return empty stats instead of throwing (prevents ErrorBoundary)
-        return {
-          total: 0,
-          todayCount: 0,
-          completed: 0,
-          avgScore: 0,
-          weeklyBreakdown: { excellent: 0, good: 0, fair: 0, poor: 0, total: 0 },
-          recent: [],
-        };
-      }
-
-      const total = inspections?.length || 0;
-
-      // ✅ Better date handling - account for timezone
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
-
-      // Also check for dates that might be stored in local timezone
-      const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-      const todayCount = inspections?.filter(i => {
+    const todayCount = inspections.filter((i: any) => {
         if (!i.inspection_date) return false;
         // Try multiple date comparison methods
         if (i.inspection_date === todayStr) return true;
@@ -141,67 +97,61 @@ export const Dashboard = () => {
         } catch {
           return false;
         }
-      }).length || 0;
+    }).length;
 
-      const completed = inspections?.filter(i => {
-        return i.overall_status === 'completed' ||
-               i.overall_status === 'excellent' ||
-               i.overall_status === 'good' ||
-               (i.responses?.score && i.responses.score >= 60);
-      }).length || 0;
+    const completed = inspections.filter((i: any) => {
+      return i.overall_status === 'completed' ||
+             i.overall_status === 'excellent' ||
+             i.overall_status === 'good' ||
+             (i.responses?.score && i.responses.score >= 60);
+    }).length;
 
-      // Calculate average score
-      const avgScore = inspections && inspections.length > 0
-        ? Math.round(
-            inspections.reduce((sum, inspection) => {
-              // Try to get score from responses
-              const score = inspection.responses?.score ||
-                           (inspection.overall_status === 'excellent' ? 95 :
-                            inspection.overall_status === 'good' ? 80 :
-                            inspection.overall_status === 'fair' ? 65 : 50);
-              return sum + score;
-            }, 0) / inspections.length
-          )
-        : 0;
+    // Calculate average score
+    const avgScore = inspections.length > 0
+      ? Math.round(
+          inspections.reduce((sum: number, inspection: any) => {
+            // Try to get score from responses
+            const score = inspection.responses?.score ||
+                         (inspection.overall_status === 'excellent' ? 95 :
+                          inspection.overall_status === 'good' ? 80 :
+                          inspection.overall_status === 'fair' ? 65 : 50);
+            return sum + score;
+          }, 0) / inspections.length
+        )
+      : 0;
 
-      // Weekly insights - breakdown by status
-      const now = new Date();
-      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
+    // Weekly insights - breakdown by status
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
 
-      const weeklyInspections = inspections?.filter(i =>
-        i.inspection_date >= oneWeekAgoStr
-      ) || [];
+    const weeklyInspections = inspections.filter((i: any) =>
+      i.inspection_date >= oneWeekAgoStr
+    );
 
-      const weeklyBreakdown = {
-        excellent: weeklyInspections.filter(i => i.overall_status === 'excellent').length,
-        good: weeklyInspections.filter(i => i.overall_status === 'good').length,
-        fair: weeklyInspections.filter(i => i.overall_status === 'fair').length,
-        poor: weeklyInspections.filter(i =>
-          i.overall_status !== 'excellent' &&
-          i.overall_status !== 'good' &&
-          i.overall_status !== 'fair'
-        ).length,
-        total: weeklyInspections.length,
-      };
+    const weeklyBreakdown = {
+      excellent: weeklyInspections.filter((i: any) => i.overall_status === 'excellent').length,
+      good: weeklyInspections.filter((i: any) => i.overall_status === 'good').length,
+      fair: weeklyInspections.filter((i: any) => i.overall_status === 'fair').length,
+      poor: weeklyInspections.filter((i: any) =>
+        i.overall_status !== 'excellent' &&
+        i.overall_status !== 'good' &&
+        i.overall_status !== 'fair'
+      ).length,
+      total: weeklyInspections.length,
+    };
 
-      const recentData = inspections?.slice(0, 3) || [];
+    const recentData = inspections.slice(0, 3);
 
-      return {
-        total,
-        todayCount,
-        completed,
-        avgScore,
-        weeklyBreakdown,
-        recent: recentData,
-      };
-    },
-    enabled: isAuthReady,
-    // ⚡ PERFORMANCE: Cache dashboard stats - rarely changes
-    staleTime: 3 * 60 * 1000, // Cache 3 minutes - stats don't change often
-    gcTime: 10 * 60 * 1000, // Keep 10 minutes - quick navigation back
-    // Still refetch on mount/focus (from global config)
-  });
+    return {
+      total,
+      todayCount,
+      completed,
+      avgScore,
+      weeklyBreakdown,
+      recent: recentData,
+    };
+  })() : null;
 
   // ✅ Use default empty stats if no data (removed redundant auth check - handled by App.tsx routing)
   const dashboardStats = stats || {
@@ -399,9 +349,10 @@ export const Dashboard = () => {
               {dashboardStats.recent.slice(0, 3).map((inspection: any) => {
                 const location = inspection.locations;
                 const locationName = location?.name || 'Lokasi tidak diketahui';
+                const buildingName = location?.buildings?.name || '';
                 const locationDetail = location?.floor
-                  ? `${location.building || ''} • ${location.floor}`.trim().replace(/^• /, '')
-                  : location?.building || '';
+                  ? `${buildingName} • ${location.floor}`.trim().replace(/^• /, '')
+                  : buildingName;
 
                 // Format time nicely
                 const isToday = inspection.inspection_date === new Date().toISOString().split('T')[0];
