@@ -265,7 +265,7 @@ async function handleAnalytics(
     });
 
     const locationScores = Array.from(locationMap.entries())
-      .map(([id, data]) => ({
+      .map(([_id, data]) => ({
         name: data.name,
         building: data.building,
         floor: data.floor,
