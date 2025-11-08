@@ -179,49 +179,51 @@ async function addScoreTablePage(
   // Get number of days in month
   const daysInMonth = getDaysInMonth(new Date(data.month + '-01'));
 
-  // Create table headers (dates 1-31)
-  const headers = ['Lokasi', 'Gedung'];
-  for (let day = 1; day <= daysInMonth; day++) {
-    headers.push(day.toString());
+  // Split into two tables: 1-15 and 16-end
+  let startY = marginTop + 12;
+
+  // TABLE 1: Days 1-15
+  const headers1 = ['Lokasi', 'Gedung', 'Lantai'];
+  for (let day = 1; day <= Math.min(15, daysInMonth); day++) {
+    headers1.push(day.toString());
   }
 
-  // Create table body
-  const tableBody = scoreTable.map((row) => {
-    const rowData = [row.location, row.building];
-    for (let day = 1; day <= daysInMonth; day++) {
+  const tableBody1 = scoreTable.map((row) => {
+    const rowData = [row.location, row.building, row.floor];
+    for (let day = 1; day <= Math.min(15, daysInMonth); day++) {
       const score = row.scores[day];
-      // Handle both null and undefined
       rowData.push(score !== null && score !== undefined ? score.toString() : '-');
     }
     return rowData;
   });
 
-  // Use autoTable for table generation
+  // Render first table
   autoTable(pdf, {
-    head: [headers],
-    body: tableBody,
-    startY: marginTop + 12,
+    head: [headers1],
+    body: tableBody1,
+    startY: startY,
     theme: 'grid',
     styles: {
-      fontSize: 8, // Slightly larger font for landscape
-      cellPadding: 2,
+      fontSize: 7,
+      cellPadding: 1.5,
       halign: 'center',
       valign: 'middle',
-      minCellWidth: 8.5, // Even wider cells for 3-digit scores (100)
+      minCellWidth: 9, // Wider for 3-digit scores
     },
     headStyles: {
       fillColor: [59, 130, 246], // Blue
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 8,
+      fontSize: 7,
     },
     columnStyles: {
-      0: { halign: 'left', cellWidth: 50 }, // Location - wider
-      1: { halign: 'left', cellWidth: 40 }, // Building - wider
+      0: { halign: 'left', cellWidth: 45 }, // Location
+      1: { halign: 'left', cellWidth: 35 }, // Building
+      2: { halign: 'center', cellWidth: 20 }, // Floor
     },
     didParseCell: function (data) {
-      // Color code score cells
-      if (data.section === 'body' && data.column.index >= 2) {
+      // Color code score cells (starting from column 3 = index 3)
+      if (data.section === 'body' && data.column.index >= 3) {
         const cellValue = data.cell.raw;
         if (cellValue && cellValue !== '-') {
           const score = parseInt(cellValue as string, 10);
@@ -239,6 +241,71 @@ async function addScoreTablePage(
     },
     margin: { left: marginLeft, right: config.marginRight },
   });
+
+  // If more than 15 days, create second table
+  if (daysInMonth > 15) {
+    const finalY1 = (pdf as any).lastAutoTable.finalY;
+
+    // TABLE 2: Days 16-31
+    const headers2 = ['Lokasi', 'Gedung', 'Lantai'];
+    for (let day = 16; day <= daysInMonth; day++) {
+      headers2.push(day.toString());
+    }
+
+    const tableBody2 = scoreTable.map((row) => {
+      const rowData = [row.location, row.building, row.floor];
+      for (let day = 16; day <= daysInMonth; day++) {
+        const score = row.scores[day];
+        rowData.push(score !== null && score !== undefined ? score.toString() : '-');
+      }
+      return rowData;
+    });
+
+    // Render second table
+    autoTable(pdf, {
+      head: [headers2],
+      body: tableBody2,
+      startY: finalY1 + 8, // 8mm gap between tables
+      theme: 'grid',
+      styles: {
+        fontSize: 7,
+        cellPadding: 1.5,
+        halign: 'center',
+        valign: 'middle',
+        minCellWidth: 9,
+      },
+      headStyles: {
+        fillColor: [59, 130, 246], // Blue
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7,
+      },
+      columnStyles: {
+        0: { halign: 'left', cellWidth: 45 }, // Location
+        1: { halign: 'left', cellWidth: 35 }, // Building
+        2: { halign: 'center', cellWidth: 20 }, // Floor
+      },
+      didParseCell: function (data) {
+        // Color code score cells
+        if (data.section === 'body' && data.column.index >= 3) {
+          const cellValue = data.cell.raw;
+          if (cellValue && cellValue !== '-') {
+            const score = parseInt(cellValue as string, 10);
+            const color = getScoreColorString(score);
+            data.cell.styles.fillColor = hexToRgb(color);
+
+            // Set text color based on background
+            if (score >= 90) {
+              data.cell.styles.textColor = [0, 0, 0]; // Black text on green/yellow
+            } else {
+              data.cell.styles.textColor = [255, 255, 255]; // White text on red
+            }
+          }
+        }
+      },
+      margin: { left: marginLeft, right: config.marginRight },
+    });
+  }
 
   // Add legend
   const legendY = (pdf as any).lastAutoTable.finalY + 5;
@@ -518,20 +585,21 @@ function prepareScoreTable(data: PDFReportData): PDFScoreTableRow[] {
   const locationScores = new Map<string, {
     location: string;
     building: string;
+    floor: string;
     dailyScores: Map<number, number[]>; // day => array of scores
   }>();
 
   // Collect all scores
   data.dateInspections.forEach((dateInsp) => {
-    const day = parseInt(dateInsp.date.split('-')[2], 10);
-
     dateInsp.inspections.forEach((inspection) => {
-      const locationKey = `${inspection.location.name}|${inspection.location.building}`;
+      const day = parseInt(dateInsp.date.split('-')[2], 10);
+      const locationKey = `${inspection.location.name}|${inspection.location.building}|${inspection.location.floor}`;
 
       if (!locationScores.has(locationKey)) {
         locationScores.set(locationKey, {
           location: inspection.location.name,
           building: inspection.location.building?.trim() || '-',
+          floor: inspection.location.floor?.trim() || '-',
           dailyScores: new Map<number, number[]>(),
         });
       }
@@ -564,6 +632,7 @@ function prepareScoreTable(data: PDFReportData): PDFScoreTableRow[] {
     scoreTable.push({
       location: locData.location,
       building: locData.building,
+      floor: locData.floor,
       scores,
     });
   });

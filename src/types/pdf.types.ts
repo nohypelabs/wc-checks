@@ -20,6 +20,7 @@ export interface DateInspections {
 export interface PDFScoreTableRow {
   location: string;
   building: string;
+  floor: string;
   scores: { [date: string]: number | null | undefined }; // date (1-31) => score
 }
 
