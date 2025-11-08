@@ -207,7 +207,7 @@ async function addScoreTablePage(
       cellPadding: 2,
       halign: 'center',
       valign: 'middle',
-      minCellWidth: 7, // Wider cells for 3-digit scores with more space
+      minCellWidth: 8.5, // Even wider cells for 3-digit scores (100)
     },
     headStyles: {
       fillColor: [59, 130, 246], // Blue
@@ -216,8 +216,8 @@ async function addScoreTablePage(
       fontSize: 8,
     },
     columnStyles: {
-      0: { halign: 'left', cellWidth: 45 }, // Location - wider in landscape
-      1: { halign: 'left', cellWidth: 35 }, // Building - wider in landscape
+      0: { halign: 'left', cellWidth: 50 }, // Location - wider
+      1: { halign: 'left', cellWidth: 40 }, // Building - wider
     },
     didParseCell: function (data) {
       // Color code score cells
@@ -531,7 +531,7 @@ function prepareScoreTable(data: PDFReportData): PDFScoreTableRow[] {
       if (!locationScores.has(locationKey)) {
         locationScores.set(locationKey, {
           location: inspection.location.name,
-          building: inspection.location.building || '-',
+          building: inspection.location.building?.trim() || '-',
           dailyScores: new Map<number, number[]>(),
         });
       }
