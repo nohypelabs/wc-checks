@@ -12,6 +12,8 @@ import { Button } from '../../components/ui/Button';
 import { QRCodeGenerator } from './QRCodeGenerator';
 import { Sidebar } from '../../components/mobile/Sidebar';
 import { BottomNav } from '../../components/mobile/BottomNav';
+import { supabase } from '../../lib/supabase';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 type Location = Tables<'locations'>;
 type LocationInsert = TablesInsert<'locations'>;
@@ -688,10 +690,11 @@ interface LocationFormModalProps {
 const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  
+
   const [organizations, setOrganizations] = useState<any[]>([]);
   const [buildings, setBuildings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingOrganizations, setLoadingOrganizations] = useState(true);
 
   const [formData, setFormData] = useState<Partial<LocationInsert>>({
     name: location?.name || '',
@@ -707,18 +710,24 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
   // Fetch organizations
   useEffect(() => {
     const fetchOrganizations = async () => {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) {
+      setLoadingOrganizations(true);
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('*')
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) throw error;
+
+        setOrganizations(data || []);
+      } catch (error: any) {
         console.error('Error fetching organizations:', error);
-        return;
+        toast.error('Gagal memuat daftar organisasi: ' + (error.message || 'Unknown error'));
+        setOrganizations([]); // Set empty array on error
+      } finally {
+        setLoadingOrganizations(false);
       }
-      
-      setOrganizations(data || []);
     };
     fetchOrganizations();
   }, []);
@@ -732,19 +741,24 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
       }
 
       setLoading(true);
-      const { data, error } = await supabase
-        .from('buildings')
-        .select('*')
-        .eq('organization_id', formData.organization_id)
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching buildings:', error);
-      } else {
+      try {
+        const { data, error } = await supabase
+          .from('buildings')
+          .select('*')
+          .eq('organization_id', formData.organization_id)
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) throw error;
+
         setBuildings(data || []);
+      } catch (error: any) {
+        console.error('Error fetching buildings:', error);
+        toast.error('Gagal memuat daftar gedung: ' + (error.message || 'Unknown error'));
+        setBuildings([]); // Set empty array on error
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchBuildings();
   }, [formData.organization_id]);

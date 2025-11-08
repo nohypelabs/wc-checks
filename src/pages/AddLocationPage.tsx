@@ -55,6 +55,7 @@ export const AddLocationPage = () => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [loadingBuildings, setLoadingBuildings] = useState(false);
+  const [loadingOrganizations, setLoadingOrganizations] = useState(true);
 
   const [formData, setFormData] = useState({
     organization_id: '',
@@ -70,19 +71,24 @@ export const AddLocationPage = () => {
   // Fetch organizations on mount
   useEffect(() => {
     const fetchOrganizations = async () => {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('is_active', true)
-        .order('name');
+      setLoadingOrganizations(true);
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('*')
+          .eq('is_active', true)
+          .order('name');
 
-      if (error) {
+        if (error) throw error;
+
+        setOrganizations(data || []);
+      } catch (error: any) {
         console.error('Error fetching organizations:', error);
-        toast.error('Failed to load organizations');
-        return;
+        toast.error('Gagal memuat daftar organisasi: ' + (error.message || 'Unknown error'));
+        setOrganizations([]); // Set empty array on error
+      } finally {
+        setLoadingOrganizations(false);
       }
-
-      setOrganizations(data || []);
     };
 
     fetchOrganizations();
@@ -97,20 +103,24 @@ export const AddLocationPage = () => {
       }
 
       setLoadingBuildings(true);
-      const { data, error } = await supabase
-        .from('buildings')
-        .select('*')
-        .eq('organization_id', formData.organization_id)
-        .eq('is_active', true)
-        .order('name');
+      try {
+        const { data, error } = await supabase
+          .from('buildings')
+          .select('*')
+          .eq('organization_id', formData.organization_id)
+          .eq('is_active', true)
+          .order('name');
 
-      if (error) {
-        console.error('Error fetching buildings:', error);
-        toast.error('Failed to load buildings');
-      } else {
+        if (error) throw error;
+
         setBuildings(data || []);
+      } catch (error: any) {
+        console.error('Error fetching buildings:', error);
+        toast.error('Gagal memuat daftar gedung: ' + (error.message || 'Unknown error'));
+        setBuildings([]); // Set empty array on error
+      } finally {
+        setLoadingBuildings(false);
       }
-      setLoadingBuildings(false);
     };
 
     fetchBuildings();
@@ -287,6 +297,41 @@ export const AddLocationPage = () => {
   }
 
   console.log('✅ Admin access granted - rendering form');
+
+  // Show loading UI while fetching data
+  if (loadingOrganizations || loadingBuildings) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm">Memuat data formulir...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no organizations available
+  if (!loadingOrganizations && organizations.length === 0) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <Building2 className="w-20 h-20 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            Tidak Ada Organisasi
+          </h2>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            Anda perlu membuat organisasi terlebih dahulu sebelum menambahkan lokasi.
+          </p>
+          <button
+            onClick={() => navigate('/admin/organizations')}
+            className="bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-md"
+          >
+            Buat Organisasi
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-24">
