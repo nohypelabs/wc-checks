@@ -447,7 +447,7 @@ function addSignaturePage(
 
   // Signature boxes
   const boxWidth = contentWidth / 2 - 10;
-  const boxHeight = 60;
+  const boxHeight = 70; // Increased height for 4 lines
 
   // Left box: "Disusun oleh"
   pdf.setFontSize(11);
@@ -464,10 +464,11 @@ function addSignaturePage(
 
   // Placeholder for signature
   pdf.setDrawColor(150, 150, 150);
-  pdf.line(marginLeft + 5, yPos + 40, marginLeft + boxWidth - 5, yPos + 40);
+  pdf.line(marginLeft + 5, yPos + 30, marginLeft + boxWidth - 5, yPos + 30);
 
-  pdf.text('Nama: Office Operation', marginLeft + 5, yPos + 45);
-  pdf.text('Tanggal: _______________', marginLeft + 5, yPos + 52);
+  pdf.text('Nama: _______________', marginLeft + 5, yPos + 38);
+  pdf.text('Jabatan: Office Operation', marginLeft + 5, yPos + 48);
+  pdf.text('Tanggal: _______________', marginLeft + 5, yPos + 58);
 
   // Right box: "Disetujui oleh"
   const rightX = marginLeft + boxWidth + 20;
@@ -487,10 +488,11 @@ function addSignaturePage(
 
   // Placeholder for signature
   pdf.setDrawColor(150, 150, 150);
-  pdf.line(rightX + 5, yPos + 40, rightX + boxWidth - 5, yPos + 40);
+  pdf.line(rightX + 5, yPos + 30, rightX + boxWidth - 5, yPos + 30);
 
-  pdf.text('Nama: Direktur', rightX + 5, yPos + 45);
-  pdf.text('Tanggal: _______________', rightX + 5, yPos + 52);
+  pdf.text('Nama: _______________', rightX + 5, yPos + 38);
+  pdf.text('Jabatan: Direktur', rightX + 5, yPos + 48);
+  pdf.text('Tanggal: _______________', rightX + 5, yPos + 58);
 
   // Footer
   yPos = config.pageHeight - config.marginBottom - 10;
