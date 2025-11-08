@@ -56,20 +56,29 @@ export async function generateMonthlyReport(
   // Page 1: Cover Page
   await addCoverPage(pdf, reportData, config);
 
-  // Page 2: Score Table
-  pdf.addPage();
-  await addScoreTablePage(pdf, reportData, config);
+  // Page 2: Score Table (LANDSCAPE for better fit)
+  pdf.addPage('a4', 'landscape');
+  const landscapeConfig: PDFConfig = {
+    pageWidth: 297, // A4 landscape width
+    pageHeight: 210, // A4 landscape height
+    marginTop: 15,
+    marginRight: 15,
+    marginBottom: 15,
+    marginLeft: 15,
+    contentWidth: 267, // 297 - 30
+  };
+  await addScoreTablePage(pdf, reportData, landscapeConfig);
 
   // Page 3: Photo Documentation
-  pdf.addPage();
+  pdf.addPage('a4', 'portrait');
   await addPhotoDocumentationPage(pdf, reportData, config);
 
   // Page 4: Cleaner Stats
-  pdf.addPage();
+  pdf.addPage('a4', 'portrait');
   await addCleanerStatsPage(pdf, reportData, config);
 
   // Page 5: Signature Section
-  pdf.addPage();
+  pdf.addPage('a4', 'portrait');
   addSignaturePage(pdf, reportData, config);
 
   // Download PDF
@@ -194,21 +203,21 @@ async function addScoreTablePage(
     startY: marginTop + 12,
     theme: 'grid',
     styles: {
-      fontSize: 7,
-      cellPadding: 1.5,
+      fontSize: 8, // Slightly larger font for landscape
+      cellPadding: 2,
       halign: 'center',
       valign: 'middle',
-      minCellWidth: 5.5, // Wider cells to fit 3-digit scores (100)
+      minCellWidth: 7, // Wider cells for 3-digit scores with more space
     },
     headStyles: {
       fillColor: [59, 130, 246], // Blue
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 7,
+      fontSize: 8,
     },
     columnStyles: {
-      0: { halign: 'left', cellWidth: 28 }, // Location - slightly reduced
-      1: { halign: 'left', cellWidth: 22 }, // Building - slightly reduced
+      0: { halign: 'left', cellWidth: 45 }, // Location - wider in landscape
+      1: { halign: 'left', cellWidth: 35 }, // Building - wider in landscape
     },
     didParseCell: function (data) {
       // Color code score cells
