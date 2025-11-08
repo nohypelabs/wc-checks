@@ -8,8 +8,9 @@ import { InspectionDrawer } from '../components/reports/InspectionDrawer';
 import { InspectionDetailModal } from '../components/reports/InspectionDetailModal';
 import { Sidebar } from '../components/mobile/Sidebar';
 import { BottomNav } from '../components/mobile/BottomNav';
-import { Calendar, TrendingUp, FileText, Menu, Download, Users } from 'lucide-react';
+import { Calendar, TrendingUp, FileText, Menu, Download, Users, FileDown } from 'lucide-react';
 import { exportToCSV, type ExportInspectionData } from '../lib/exportUtils';
+import { generateMonthlyReport } from '../lib/pdfGenerator';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -163,6 +164,37 @@ export const ReportsPage = () => {
     }
   };
 
+  // ✅ Export PDF Report
+  const handleExportPDF = async () => {
+    if (!user?.id) return;
+
+    const loadingToast = toast.loading('Membuat laporan PDF...');
+
+    try {
+      // Use monthlyData that's already loaded
+      if (!monthlyData || monthlyData.length === 0) {
+        toast.dismiss(loadingToast);
+        toast.error('Tidak ada data untuk diekspor');
+        return;
+      }
+
+      // Generate PDF with current data
+      await generateMonthlyReport(
+        monthlyData,
+        currentDate,
+        'PT Prenacons Internusa',
+        'Semua Lokasi'
+      );
+
+      toast.dismiss(loadingToast);
+      toast.success('✅ Laporan PDF berhasil dibuat!');
+    } catch (error: any) {
+      toast.dismiss(loadingToast);
+      console.error('PDF Export error:', error);
+      toast.error('Gagal membuat PDF: ' + error.message);
+    }
+  };
+
   // ✅ ADMIN ONLY (level 80+): Export ALL users' inspections for current month
   const handleExportAllUsers = async () => {
     if (!user?.id || !isAdmin) {
@@ -274,6 +306,14 @@ export const ReportsPage = () => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-md text-xs"
+              disabled={totalInspections === 0}
+            >
+              <FileDown className="w-4 h-4" />
+              <span className="font-medium">Export PDF</span>
+            </button>
             <button
               onClick={handleExportMonth}
               className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-md text-xs"
