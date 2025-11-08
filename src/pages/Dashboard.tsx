@@ -73,7 +73,7 @@ export const Dashboard = () => {
         willSeeAllUsers: isAdmin,
       });
 
-      // Build query
+      // Build query - FIX: Join to buildings table instead of selecting building column
       let query = supabase
         .from('inspection_records')
         .select(`
@@ -84,11 +84,13 @@ export const Dashboard = () => {
           responses,
           location_id,
           user_id,
-          locations (
+          locations!inner (
             id,
             name,
             floor,
-            building
+            buildings!building_id (
+              name
+            )
           )
         `)
         .order('inspection_date', { ascending: false })
@@ -399,9 +401,10 @@ export const Dashboard = () => {
               {dashboardStats.recent.slice(0, 3).map((inspection: any) => {
                 const location = inspection.locations;
                 const locationName = location?.name || 'Lokasi tidak diketahui';
+                const buildingName = location?.buildings?.name || '';
                 const locationDetail = location?.floor
-                  ? `${location.building || ''} • ${location.floor}`.trim().replace(/^• /, '')
-                  : location?.building || '';
+                  ? `${buildingName} • ${location.floor}`.trim().replace(/^• /, '')
+                  : buildingName;
 
                 // Format time nicely
                 const isToday = inspection.inspection_date === new Date().toISOString().split('T')[0];
