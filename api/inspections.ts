@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (inspectionId) {
         const { data: inspection, error } = await supabase
           .from('inspection_records')
-          .select('*, locations!inner(id, name, floor, buildings!locations_building_id_fkey(name)), users(full_name)')
+          .select('*, locations!inner(id, name, floor, buildings(name)), users(full_name)')
           .eq('id', inspectionId)
           .eq('user_id', userId) // Users can only see their own
           .single();
@@ -45,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // List all inspections for current user
       const { data: inspections, error } = await supabase
         .from('inspection_records')
-        .select('*, locations!inner(id, name, floor, buildings!locations_building_id_fkey(name))')
+        .select('*, locations!inner(id, name, floor, buildings(name))')
         .eq('user_id', userId)
         .order('inspection_date', { ascending: false });
 
