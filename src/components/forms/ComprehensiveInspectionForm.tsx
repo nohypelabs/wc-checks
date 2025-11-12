@@ -101,6 +101,7 @@ export const ComprehensiveInspectionForm = ({
   const handleRatingChange = (componentId: InspectionComponent, choice: RatingChoice) => {
     const existing = ratings.get(componentId) || {
       component: componentId,
+      isAvailable: true, // Default to available
       choice: 'good',
     };
     setRatings(new Map(ratings.set(componentId, { ...existing, choice })));
@@ -115,6 +116,24 @@ export const ComprehensiveInspectionForm = ({
     } else {
       // All done, close all
       setExpandedComponent(null);
+    }
+  };
+
+  const handleAvailabilityChange = (componentId: InspectionComponent, isAvailable: boolean) => {
+    const existing = ratings.get(componentId) || {
+      component: componentId,
+      isAvailable: true,
+      choice: 'good',
+    };
+    setRatings(new Map(ratings.set(componentId, { ...existing, isAvailable })));
+
+    // If setting to unavailable, auto-expand next component
+    if (!isAvailable) {
+      const currentIndex = INSPECTION_COMPONENTS.findIndex((c) => c.id === componentId);
+      if (currentIndex < INSPECTION_COMPONENTS.length - 1) {
+        const nextComponent = INSPECTION_COMPONENTS[currentIndex + 1];
+        setExpandedComponent(nextComponent.id);
+      }
     }
   };
 
@@ -134,7 +153,13 @@ export const ComprehensiveInspectionForm = ({
 
   const validateForm = (): boolean => {
     const requiredComponents = INSPECTION_COMPONENTS.filter((c) => c.required);
-    const missingRatings = requiredComponents.filter((c) => !ratings.has(c.id));
+
+    // Only validate required components that are marked as available
+    const missingRatings = requiredComponents.filter((c) => {
+      const rating = ratings.get(c.id);
+      // Missing if: no rating OR (available but no choice)
+      return !rating || (rating.isAvailable && !rating.choice);
+    });
 
     if (missingRatings.length > 0) {
       const missing = missingRatings.map((c) => c.label).join(', ');
@@ -143,9 +168,9 @@ export const ComprehensiveInspectionForm = ({
       return false;
     }
 
-    // Validate "other" choice must have notes
+    // Validate "other" choice must have notes (only for available components)
     const otherWithoutNotes = Array.from(ratings.values()).filter(
-      (r) => r.choice === 'other' && !r.notes?.trim()
+      (r) => r.isAvailable && r.choice === 'other' && !r.notes?.trim()
     );
 
     if (otherWithoutNotes.length > 0) {
@@ -469,6 +494,8 @@ const handleSubmit = async () => {
               {isExpanded ? (
                 <RatingSelector
                   config={component}
+                  isAvailable={rating?.isAvailable ?? true}
+                  onAvailabilityChange={(available) => handleAvailabilityChange(component.id, available)}
                   value={rating?.choice || null}
                   onChange={(choice) => handleRatingChange(component.id, choice)}
                   onPhotoAdd={
@@ -491,13 +518,15 @@ const handleSubmit = async () => {
                     w-full p-4 rounded-2xl flex items-center justify-between
                     transition-all border-2
                     ${
-                      rating
-                        ? genZMode
-                          ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-400'
-                          : 'bg-green-50 border-green-500'
-                        : genZMode
-                          ? 'bg-white/80 border-blue-200 hover:border-blue-400'
-                          : 'bg-white border-gray-200 hover:border-gray-300'
+                      rating?.isAvailable === false
+                        ? 'bg-gray-50 border-gray-300'
+                        : rating
+                          ? genZMode
+                            ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-400'
+                            : 'bg-green-50 border-green-500'
+                          : genZMode
+                            ? 'bg-white/80 border-blue-200 hover:border-blue-400'
+                            : 'bg-white border-gray-200 hover:border-gray-300'
                     }
                   `}
                 >
@@ -516,11 +545,18 @@ const handleSubmit = async () => {
                         );
                       })()
                     )}
-                    <span className="font-medium text-gray-900">
-                      {component.labelGenZ}
-                    </span>
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium text-gray-900">
+                        {component.labelGenZ}
+                      </span>
+                      {rating?.isAvailable === false && (
+                        <span className="text-xs text-gray-500">Tidak Ada</span>
+                      )}
+                    </div>
                   </div>
-                  {rating ? (
+                  {rating?.isAvailable === false ? (
+                    <span className="text-sm text-gray-500">⏭️ Skip</span>
+                  ) : rating ? (
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
                   ) : component.required ? (
                     <span className="text-red-500">*</span>
