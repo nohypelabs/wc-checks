@@ -5,8 +5,9 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
 import { useLocations, useDeleteLocation } from '../../hooks/useLocations';
+import { useBuildings } from '../../hooks/useBuildings';
 import { Tables, TablesInsert } from '../../types/database.types';
-import { Plus, Edit2, Trash2, MapPin, QrCode, Search, MoreVertical, Copy, User, ShieldAlert, Menu, CheckSquare, Square, Download, BarChart3, X, Check, Power, PowerOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, MapPin, QrCode, Search, MoreVertical, Copy, User, ShieldAlert, Menu, CheckSquare, Square, Download, BarChart3, X, Check, Power, PowerOff, Building2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { QRCodeGenerator } from './QRCodeGenerator';
@@ -41,16 +42,25 @@ export const LocationsManager = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
 
   // Fetch locations via BACKEND API
   const { data: locations, isLoading } = useLocations({});
 
-  // Filter locations
-  const filteredLocations = locations?.filter(loc =>
-    loc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    loc.building?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    loc.code?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Fetch buildings for filter dropdown
+  const { data: buildings } = useBuildings({});
+
+  // Filter locations by search term and building
+  const filteredLocations = locations?.filter(loc => {
+    const matchesSearch =
+      loc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      loc.building?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      loc.code?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesBuilding = !selectedBuildingId || loc.building_id === selectedBuildingId;
+
+    return matchesSearch && matchesBuilding;
+  });
 
   // Backend API hook for delete
   const deleteLocation = useDeleteLocation();
@@ -78,11 +88,11 @@ export const LocationsManager = () => {
   };
 
   const handleBulkQR = () => {
-    if (!locations || locations.length === 0) {
-      toast.error('No locations available');
+    if (!filteredLocations || filteredLocations.length === 0) {
+      toast.error('No locations available for selected building');
       return;
     }
-    setQrLocations(locations);
+    setQrLocations(filteredLocations);
     setShowQRGenerator(true);
   };
 
@@ -346,6 +356,23 @@ export const LocationsManager = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+            </div>
+
+            {/* Building Filter */}
+            <div className="relative">
+              <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <select
+                value={selectedBuildingId}
+                onChange={(e) => setSelectedBuildingId(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              >
+                <option value="">Semua Gedung</option>
+                {buildings?.map((building) => (
+                  <option key={building.id} value={building.id}>
+                    {building.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Action Buttons */}
