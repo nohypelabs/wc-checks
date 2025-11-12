@@ -6,6 +6,8 @@ import * as Icons from 'lucide-react';
 
 interface RatingSelectorProps {
   config: InspectionComponentConfig;
+  isAvailable: boolean; // NEW: Track if component exists
+  onAvailabilityChange: (available: boolean) => void; // NEW: Toggle availability
   value: RatingChoice | null;
   onChange: (choice: RatingChoice) => void;
   onPhotoAdd?: () => void;
@@ -17,6 +19,8 @@ interface RatingSelectorProps {
 
 export const RatingSelector = ({
   config,
+  isAvailable,
+  onAvailabilityChange,
   value,
   onChange,
   onPhotoAdd,
@@ -69,7 +73,7 @@ export const RatingSelector = ({
         </div>
 
         {/* Photo Button */}
-        {config.allowPhoto && (
+        {config.allowPhoto && isAvailable && (
           <button
             type="button"
             onClick={onPhotoAdd}
@@ -89,55 +93,110 @@ export const RatingSelector = ({
         )}
       </div>
 
-      {/* 3-Choice Buttons */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        {(['good', 'normal', 'bad'] as RatingChoice[]).map((choice) => {
-          const isSelected = value === choice;
-          const buttonStyle = getChoiceStyle(choice, isSelected, genZMode);
-
-          return (
-            <button
-              key={choice}
-              type="button"
-              onClick={() => handleChoiceChange(choice)}
-              className={`
-                py-3 px-2 rounded-xl text-center transition-all
-                border-2 font-medium text-sm
-                ${buttonStyle}
-                ${isSelected ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.01]'}
-              `}
-            >
-              <div className="flex flex-col items-center space-y-1">
-                <span className="text-xl">{getChoiceEmoji(choice, config.category)}</span>
-                <span className="leading-tight">{choices[choice]}</span>
-              </div>
-            </button>
-          );
-        })}
+      {/* NEW: Availability Toggle */}
+      <div className="mb-4 pb-4 border-b border-gray-100">
+        <p className="text-sm text-gray-600 mb-2">
+          {genZMode ? 'Ada nggak nih komponennya?' : 'Is this component available?'}
+        </p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => onAvailabilityChange(true)}
+            className={`
+              flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all border-2
+              ${
+                isAvailable
+                  ? genZMode
+                    ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-400 text-green-900'
+                    : 'bg-green-50 border-green-500 text-green-900'
+                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+              }
+            `}
+          >
+            ✅ {genZMode ? 'Ada' : 'Available'}
+          </button>
+          <button
+            type="button"
+            onClick={() => onAvailabilityChange(false)}
+            className={`
+              flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all border-2
+              ${
+                !isAvailable
+                  ? genZMode
+                    ? 'bg-gradient-to-br from-gray-100 to-slate-100 border-gray-400 text-gray-900'
+                    : 'bg-gray-100 border-gray-500 text-gray-900'
+                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+              }
+            `}
+          >
+            ❌ {genZMode ? 'Tidak Ada' : 'Not Available'}
+          </button>
+        </div>
       </div>
 
-      {/* Other Button (Full Width) */}
-      <button
-        type="button"
-        onClick={() => handleChoiceChange('other')}
-        className={`
-          w-full py-3 rounded-xl text-center transition-all
-          border-2 font-medium text-sm flex items-center justify-center space-x-2
-          ${
-            value === 'other'
-              ? genZMode
-                ? 'bg-purple-50 border-purple-400 text-purple-700'
-                : 'bg-blue-50 border-blue-400 text-blue-700'
-              : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
-          }
-        `}
-      >
-        <MessageSquare className="w-4 h-4" />
-        <span>{choices.other}</span>
-      </button>
+      {/* Rating Section - Only show if component is available */}
+      {isAvailable ? (
+        <>
+          {/* 3-Choice Buttons */}
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            {(['good', 'normal', 'bad'] as RatingChoice[]).map((choice) => {
+              const isSelected = value === choice;
+              const buttonStyle = getChoiceStyle(choice, isSelected, genZMode);
 
-      {/* Notes Section (Required for "other") */}
-      {showNotes && (
+              return (
+                <button
+                  key={choice}
+                  type="button"
+                  onClick={() => handleChoiceChange(choice)}
+                  className={`
+                    py-3 px-2 rounded-xl text-center transition-all
+                    border-2 font-medium text-sm
+                    ${buttonStyle}
+                    ${isSelected ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.01]'}
+                  `}
+                >
+                  <div className="flex flex-col items-center space-y-1">
+                    <span className="text-xl">{getChoiceEmoji(choice, config.category)}</span>
+                    <span className="leading-tight">{choices[choice]}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Other Button (Full Width) */}
+          <button
+            type="button"
+            onClick={() => handleChoiceChange('other')}
+            className={`
+              w-full py-3 rounded-xl text-center transition-all
+              border-2 font-medium text-sm flex items-center justify-center space-x-2
+              ${
+                value === 'other'
+                  ? genZMode
+                    ? 'bg-purple-50 border-purple-400 text-purple-700'
+                    : 'bg-blue-50 border-blue-400 text-blue-700'
+                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+              }
+            `}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>{choices.other}</span>
+          </button>
+        </>
+      ) : (
+        <div className="text-center py-6 text-gray-500">
+          <p className="text-sm font-medium">
+            {genZMode ? '⏭️ Komponen ini tidak tersedia' : '⏭️ Component not available'}
+          </p>
+          <p className="text-xs mt-1">
+            {genZMode ? 'Tidak akan masuk penilaian' : 'Will not be included in scoring'}
+          </p>
+        </div>
+      )}
+
+      {/* Notes Section (Required for "other") - Only show if available */}
+      {isAvailable && showNotes && (
         <div className="mt-3 pt-3 border-t border-gray-100">
           <textarea
             value={notes || ''}
@@ -170,8 +229,8 @@ export const RatingSelector = ({
         </div>
       )}
 
-      {/* Show notes toggle (only when not "other" and notes hidden) */}
-      {value && value !== 'other' && !showNotes && (
+      {/* Show notes toggle (only when available, not "other" and notes hidden) */}
+      {isAvailable && value && value !== 'other' && !showNotes && (
         <button
           type="button"
           onClick={() => setShowNotes(true)}

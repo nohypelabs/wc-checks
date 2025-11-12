@@ -17,6 +17,7 @@ export type RatingChoice = 'good' | 'normal' | 'bad' | 'other';
 
 export interface ComponentRating {
   component: InspectionComponent;
+  isAvailable: boolean; // NEW: Track if component exists at this location
   choice: RatingChoice;
   notes?: string; // Required when choice === 'other'
   photo?: string;
@@ -348,6 +349,9 @@ export const calculateWeightedScore = (ratings: ComponentRating[]): number => {
   let weightedSum = 0;
 
   ratings.forEach((rating) => {
+    // Skip unavailable components from scoring
+    if (!rating.isAvailable) return;
+
     const component = INSPECTION_COMPONENTS.find((c) => c.id === rating.component);
     if (!component) return;
 

@@ -265,6 +265,32 @@ export const InspectionDetailModal = ({
                   const component = INSPECTION_COMPONENTS.find(c => c.id === rating.component);
                   if (!component) return null;
 
+                  // Handle unavailable components
+                  if (rating.isAvailable === false) {
+                    return (
+                      <div key={index} className="rounded-xl p-4 border-2 bg-gray-50 border-gray-300">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="text-xl">
+                                {inspectionMode === 'genz' ? component.iconGenZ : component.icon}
+                              </span>
+                              <span className="font-medium text-gray-900">
+                                {component.labelGenZ || component.label}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-1 flex-shrink-0 ml-3">
+                            <span className="text-xl">⏭️</span>
+                            <span className="text-sm font-medium text-gray-600">
+                              Tidak Ada
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div key={index} className={`rounded-xl p-4 border-2 ${getChoiceColor(rating.choice)}`}>
                       <div className="flex items-start justify-between">
