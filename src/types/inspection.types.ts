@@ -12,8 +12,9 @@ export type InspectionComponent =
   | 'air_freshener'
   | 'trash_bin_condition';
 
-// NEW: 3-choice rating system
-export type RatingChoice = 'good' | 'normal' | 'bad' | 'other';
+// NEW: 5-star rating system (1-5)
+// Backward compatibility: Also support old format for display
+export type RatingChoice = 1 | 2 | 3 | 4 | 5 | 'good' | 'normal' | 'bad' | 'other';
 
 export interface ComponentRating {
   component: InspectionComponent;
@@ -341,8 +342,83 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
 ];
 
 // ============================================
+// 5-STAR RATING CONFIGURATION
+// ============================================
+
+export interface StarRatingConfig {
+  value: 1 | 2 | 3 | 4 | 5;
+  label: string;
+  description: string;
+  color: string;
+  emoji: string;
+}
+
+export const STAR_RATINGS: StarRatingConfig[] = [
+  {
+    value: 5,
+    label: 'Sempurna',
+    description: 'Tidak ada noda, wangi, semua supplies full',
+    color: 'green',
+    emoji: '🌟',
+  },
+  {
+    value: 4,
+    label: 'Baik',
+    description: 'Bersih, minor imperfections, supplies cukup',
+    color: 'blue',
+    emoji: '😊',
+  },
+  {
+    value: 3,
+    label: 'Cukup',
+    description: 'Cukup bersih, ada noda kecil, supplies menipis',
+    color: 'yellow',
+    emoji: '😐',
+  },
+  {
+    value: 2,
+    label: 'Buruk',
+    description: 'Kurang bersih, noda terlihat, supplies hampir habis',
+    color: 'orange',
+    emoji: '😟',
+  },
+  {
+    value: 1,
+    label: 'Kritis',
+    description: 'Kotor, bau, supplies habis, perlu action immediate',
+    color: 'red',
+    emoji: '😨',
+  },
+];
+
+// ============================================
 // HELPER FUNCTIONS
 // ============================================
+
+/**
+ * Normalize old rating format to new 1-5 star format
+ * For backward compatibility with existing data
+ */
+export const normalizeRating = (choice: RatingChoice): 1 | 2 | 3 | 4 | 5 => {
+  if (typeof choice === 'number') return choice;
+
+  // Convert old format to new
+  switch(choice) {
+    case 'good': return 5;
+    case 'normal': return 3;
+    case 'bad': return 1;
+    case 'other': return 2;
+    default: return 3; // fallback
+  }
+};
+
+/**
+ * Get star rating config by value
+ */
+export const getStarRating = (choice: RatingChoice): StarRatingConfig => {
+  const normalized = normalizeRating(choice);
+  return STAR_RATINGS.find(r => r.value === normalized) || STAR_RATINGS[2]; // default to 3★
+};
 
 export const calculateWeightedScore = (ratings: ComponentRating[]): number => {
   let totalWeight = 0;
@@ -357,15 +433,13 @@ export const calculateWeightedScore = (ratings: ComponentRating[]): number => {
 
     totalWeight += component.weight;
 
-    // Scoring: good = 100, normal = 60, bad = 20, other = 40
-    const scoreMap: Record<RatingChoice, number> = {
-      good: 100,
-      normal: 60,
-      bad: 20,
-      other: 40,
-    };
+    // Normalize rating to 1-5 (handles both old and new format)
+    const normalizedChoice = normalizeRating(rating.choice);
 
-    weightedSum += scoreMap[rating.choice] * component.weight;
+    // Scoring: 1★=20, 2★=40, 3★=60, 4★=80, 5★=100
+    const score = normalizedChoice * 20;
+
+    weightedSum += score * component.weight;
   });
 
   if (totalWeight === 0) return 0;

@@ -1,7 +1,7 @@
 // src/components/forms/RatingSelector.tsx
 import { useState } from 'react';
-import { InspectionComponentConfig, RatingChoice } from '../../types/inspection.types';
-import { Camera, MessageSquare } from 'lucide-react';
+import { InspectionComponentConfig, RatingChoice, STAR_RATINGS } from '../../types/inspection.types';
+import { Camera, Star } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 interface RatingSelectorProps {
@@ -29,19 +29,15 @@ export const RatingSelector = ({
   notes,
   onNotesChange,
 }: RatingSelectorProps) => {
-  const [showNotes, setShowNotes] = useState(value === 'other');
-  const choices = genZMode ? config.choices.genZ : config.choices.professional;
+  const [showNotes, setShowNotes] = useState(false);
   const label = genZMode ? config.labelGenZ : config.label;
 
   // Get Lucide icon component for professional mode
   const IconComponent = !genZMode && config.icon ? (Icons as any)[config.icon] : null;
 
-  // Auto-show notes when "other" is selected
-  const handleChoiceChange = (choice: RatingChoice) => {
-    onChange(choice);
-    if (choice === 'other') {
-      setShowNotes(true);
-    }
+  // Handle star selection
+  const handleStarChange = (starValue: 1 | 2 | 3 | 4 | 5) => {
+    onChange(starValue);
   };
 
   return (
@@ -137,52 +133,69 @@ export const RatingSelector = ({
       {/* Rating Section - Only show if component is available */}
       {isAvailable ? (
         <>
-          {/* 3-Choice Buttons */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            {(['good', 'normal', 'bad'] as RatingChoice[]).map((choice) => {
-              const isSelected = value === choice;
-              const buttonStyle = getChoiceStyle(choice, isSelected, genZMode);
+          {/* 5-Star Rating Buttons */}
+          <div className="space-y-2">
+            {STAR_RATINGS.map((rating) => {
+              const isSelected = value === rating.value;
 
               return (
                 <button
-                  key={choice}
+                  key={rating.value}
                   type="button"
-                  onClick={() => handleChoiceChange(choice)}
+                  onClick={() => handleStarChange(rating.value)}
                   className={`
-                    py-3 px-2 rounded-xl text-center transition-all
-                    border-2 font-medium text-sm
-                    ${buttonStyle}
-                    ${isSelected ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.01]'}
+                    w-full p-4 rounded-xl text-left transition-all border-2
+                    ${isSelected
+                      ? getStarButtonStyle(rating.color, true, genZMode)
+                      : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }
                   `}
                 >
-                  <div className="flex flex-col items-center space-y-1">
-                    <span className="text-xl">{getChoiceEmoji(choice, config.category)}</span>
-                    <span className="leading-tight">{choices[choice]}</span>
+                  <div className="flex items-start gap-3">
+                    {/* Stars */}
+                    <div className="flex gap-0.5 flex-shrink-0 mt-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-5 h-5 ${
+                            i < rating.value
+                              ? isSelected
+                                ? 'fill-current text-yellow-500'
+                                : 'fill-current text-gray-400'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Label & Description */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">{rating.emoji}</span>
+                        <span className="font-semibold text-gray-900">
+                          {rating.label}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        {rating.description}
+                      </p>
+                    </div>
+
+                    {/* Selected indicator */}
+                    {isSelected && (
+                      <div className="flex-shrink-0">
+                        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </button>
               );
             })}
           </div>
-
-          {/* Other Button (Full Width) */}
-          <button
-            type="button"
-            onClick={() => handleChoiceChange('other')}
-            className={`
-              w-full py-3 rounded-xl text-center transition-all
-              border-2 font-medium text-sm flex items-center justify-center space-x-2
-              ${
-                value === 'other'
-                  ? genZMode
-                    ? 'bg-purple-50 border-purple-400 text-purple-700'
-                    : 'bg-blue-50 border-blue-400 text-blue-700'
-                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
-              }
-            `}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>{choices.other}</span>
-          </button>
         </>
       ) : (
         <div className="text-center py-6 text-gray-500">
@@ -195,42 +208,28 @@ export const RatingSelector = ({
         </div>
       )}
 
-      {/* Notes Section (Required for "other") - Only show if available */}
+      {/* Notes Section (Optional for any rating) - Only show if available */}
       {isAvailable && showNotes && (
         <div className="mt-3 pt-3 border-t border-gray-100">
           <textarea
             value={notes || ''}
             onChange={(e) => onNotesChange?.(e.target.value)}
-            placeholder={
-              value === 'other'
-                ? 'Jelasin detailnya dong...'
-                : 'Catatan tambahan (opsional)...'
-            }
-            className={`
-              w-full px-3 py-2 border rounded-xl focus:ring-2 resize-none
-              ${
-                value === 'other'
-                  ? 'border-orange-300 focus:ring-orange-500 focus:border-orange-500'
-                  : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-              }
-            `}
+            placeholder="Catatan tambahan (opsional)..."
+            className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
             rows={3}
-            required={value === 'other'}
           />
-          {value !== 'other' && (
-            <button
-              type="button"
-              onClick={() => setShowNotes(false)}
-              className="text-sm text-gray-500 hover:text-gray-700 mt-1"
-            >
-              × Sembunyikan catatan
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setShowNotes(false)}
+            className="text-sm text-gray-500 hover:text-gray-700 mt-1"
+          >
+            × Sembunyikan catatan
+          </button>
         </div>
       )}
 
-      {/* Show notes toggle (only when available, not "other" and notes hidden) */}
-      {isAvailable && value && value !== 'other' && !showNotes && (
+      {/* Show notes toggle (only when available and notes hidden) */}
+      {isAvailable && value && !showNotes && (
         <button
           type="button"
           onClick={() => setShowNotes(true)}
@@ -254,91 +253,40 @@ export const RatingSelector = ({
 // HELPER FUNCTIONS
 // ============================================
 
-const getChoiceStyle = (
-  choice: RatingChoice,
+const getStarButtonStyle = (
+  color: string,
   isSelected: boolean,
   genZMode: boolean
 ): string => {
-  if (!isSelected) {
-    return 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50';
-  }
-
   if (genZMode) {
-    switch (choice) {
-      case 'good':
-        return 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-400 text-green-900';
-      case 'normal':
-        return 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-400 text-yellow-900';
-      case 'bad':
-        return 'bg-gradient-to-br from-red-50 to-pink-50 border-red-400 text-red-900';
+    switch (color) {
+      case 'green':
+        return 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-400 shadow-md';
+      case 'blue':
+        return 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-400 shadow-md';
+      case 'yellow':
+        return 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-400 shadow-md';
+      case 'orange':
+        return 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-400 shadow-md';
+      case 'red':
+        return 'bg-gradient-to-br from-red-50 to-pink-50 border-red-400 shadow-md';
       default:
-        return 'bg-white border-gray-200 text-gray-700';
+        return 'bg-gray-50 border-gray-300';
     }
   } else {
-    switch (choice) {
-      case 'good':
-        return 'bg-green-50 border-green-500 text-green-900';
-      case 'normal':
-        return 'bg-yellow-50 border-yellow-500 text-yellow-900';
-      case 'bad':
-        return 'bg-red-50 border-red-500 text-red-900';
+    switch (color) {
+      case 'green':
+        return 'bg-green-50 border-green-500 shadow-md';
+      case 'blue':
+        return 'bg-blue-50 border-blue-500 shadow-md';
+      case 'yellow':
+        return 'bg-yellow-50 border-yellow-500 shadow-md';
+      case 'orange':
+        return 'bg-orange-50 border-orange-500 shadow-md';
+      case 'red':
+        return 'bg-red-50 border-red-500 shadow-md';
       default:
-        return 'bg-white border-gray-200 text-gray-700';
+        return 'bg-gray-50 border-gray-300';
     }
   }
-};
-
-const getChoiceEmoji = (
-  choice: RatingChoice,
-  category: 'aroma' | 'visual' | 'availability' | 'functional'
-): string => {
-  // Aroma category
-  if (category === 'aroma') {
-    switch (choice) {
-      case 'good':
-        return '🌸';
-      case 'normal':
-        return '😐';
-      case 'bad':
-        return '🤢';
-    }
-  }
-
-  // Visual category
-  if (category === 'visual') {
-    switch (choice) {
-      case 'good':
-        return '✨';
-      case 'normal':
-        return '😐';
-      case 'bad':
-        return '💩';
-    }
-  }
-
-  // Availability category
-  if (category === 'availability') {
-    switch (choice) {
-      case 'good':
-        return '✅';
-      case 'normal':
-        return '⚠️';
-      case 'bad':
-        return '❌';
-    }
-  }
-
-  // Functional category
-  if (category === 'functional') {
-    switch (choice) {
-      case 'good':
-        return '✅';
-      case 'normal':
-        return '⚠️';
-      case 'bad':
-        return '❌';
-    }
-  }
-
-  return '💬';
 };

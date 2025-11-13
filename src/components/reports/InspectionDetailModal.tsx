@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { X, MapPin, Clock, User, Camera, FileText, AlertCircle, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
-import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
+import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating, getStarRating, normalizeRating } from '../../types/inspection.types';
 import { PhotoReviewModal } from './PhotoReviewModal';
 
 // Helper to get score-based gradient (like SuccessModal)
@@ -52,67 +52,23 @@ const getScoreFromResponses = (responses: any): number => {
   return Math.round((goodCount / values.length) * 100);
 };
 
-const getChoiceEmoji = (choice: string, category: string): string => {
-  if (category === 'aroma') {
-    switch (choice) {
-      case 'good': return '🌸';
-      case 'normal': return '😐';
-      case 'bad': return '🤢';
-      case 'other': return '💬';
-      default: return '❓';
-    }
-  }
+// Helper to get color based on star rating (with backward compat)
+const getRatingColor = (choice: any): string => {
+  const starRating = getStarRating(choice);
 
-  if (category === 'visual') {
-    switch (choice) {
-      case 'good': return '✨';
-      case 'normal': return '😐';
-      case 'bad': return '💩';
-      case 'other': return '💬';
-      default: return '❓';
-    }
-  }
-
-  if (category === 'availability' || category === 'functional') {
-    switch (choice) {
-      case 'good': return '✅';
-      case 'normal': return '⚠️';
-      case 'bad': return '❌';
-      case 'other': return '💬';
-      default: return '❓';
-    }
-  }
-
-  return '❓';
-};
-
-const getChoiceColor = (choice: string): string => {
-  switch (choice) {
-    case 'good':
+  switch (starRating.color) {
+    case 'green':
       return 'bg-green-50 text-green-700 border-green-200';
-    case 'normal':
-      return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-    case 'bad':
-      return 'bg-red-50 text-red-700 border-red-200';
-    case 'other':
+    case 'blue':
       return 'bg-blue-50 text-blue-700 border-blue-200';
+    case 'yellow':
+      return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+    case 'orange':
+      return 'bg-orange-50 text-orange-700 border-orange-200';
+    case 'red':
+      return 'bg-red-50 text-red-700 border-red-200';
     default:
       return 'bg-gray-50 text-gray-700 border-gray-200';
-  }
-};
-
-const getChoiceLabel = (choice: string): string => {
-  switch (choice) {
-    case 'good':
-      return 'Baik';
-    case 'normal':
-      return 'Normal';
-    case 'bad':
-      return 'Buruk';
-    case 'other':
-      return 'Lainnya';
-    default:
-      return choice;
   }
 };
 
@@ -291,8 +247,12 @@ export const InspectionDetailModal = ({
                     );
                   }
 
+                  // Get star rating (handles both old and new format)
+                  const starRating = getStarRating(rating.choice);
+                  const normalizedValue = normalizeRating(rating.choice);
+
                   return (
-                    <div key={index} className={`rounded-xl p-4 border-2 ${getChoiceColor(rating.choice)}`}>
+                    <div key={index} className={`rounded-xl p-4 border-2 ${getRatingColor(rating.choice)}`}>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
@@ -309,13 +269,23 @@ export const InspectionDetailModal = ({
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center space-x-1 flex-shrink-0 ml-3">
-                          <span className="text-2xl">
-                            {getChoiceEmoji(rating.choice, component.category)}
-                          </span>
-                          <span className="text-sm font-medium">
-                            {getChoiceLabel(rating.choice)}
-                          </span>
+                        {/* Star Rating Display */}
+                        <div className="flex flex-col items-end flex-shrink-0 ml-3">
+                          <div className="flex gap-0.5 mb-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < normalizedValue
+                                    ? 'fill-current text-yellow-500'
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <div className="text-sm font-medium text-gray-700">
+                            {starRating.emoji} {starRating.label}
+                          </div>
                         </div>
                       </div>
                     </div>

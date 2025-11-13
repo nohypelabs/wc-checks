@@ -168,20 +168,6 @@ export const ComprehensiveInspectionForm = ({
       return false;
     }
 
-    // Validate "other" choice must have notes (only for available components)
-    const otherWithoutNotes = Array.from(ratings.values()).filter(
-      (r) => r.isAvailable && r.choice === 'other' && !r.notes?.trim()
-    );
-
-    if (otherWithoutNotes.length > 0) {
-      const component = INSPECTION_COMPONENTS.find(
-        (c) => c.id === otherWithoutNotes[0].component
-      );
-      toast.error(`"${component?.labelGenZ}" pilih "Lainnya" tapi belum dikasih penjelasan!`);
-      setExpandedComponent(otherWithoutNotes[0].component);
-      return false;
-    }
-
     // VALIDATE: General photos REQUIRED (min 1)
     if (generalPhotos.length === 0) {
       toast.error('📸 Wajib upload minimal 1 foto dokumentasi!');
