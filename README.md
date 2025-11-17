@@ -25,18 +25,19 @@ Sistem monitoring kebersihan toilet yang efektif, efisien, dan mudah digunakan d
 
 ## 🚀 Tech Stack
 
-- **Frontend Framework:** Next.js 14 (App Router)
+- **Frontend Framework:** React 18 + Vite (chose Vite over Next.js for faster HMR, see WHY-NOT-NEXTJS.md)
 - **Language:** TypeScript
-- **Database:** Supabase (PostgreSQL)
+- **Backend:** Vercel Serverless Functions (13 API endpoints)
+- **Database:** Supabase (PostgreSQL) with Row-Level Security
 - **Storage:** Cloudinary (untuk foto dan QR codes)
 - **Styling:** Tailwind CSS
-- **State Management:** Zustand
-- **Form Handling:** React Hook Form
+- **State Management:** Zustand + React Query
+- **Form Handling:** React Hook Form + Zod validation
 - **QR Scanner:** html5-qrcode
 - **QR Generator:** qrcode
 - **Date Handling:** date-fns
 - **Animation:** Framer Motion
-- **PWA:** next-pwa
+- **PWA:** Vite PWA Plugin
 
 ## 📦 Installation
 
