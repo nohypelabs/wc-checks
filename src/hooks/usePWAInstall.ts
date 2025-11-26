@@ -12,10 +12,28 @@ export const usePWAInstall = () => {
   const [hasShownPrompt, setHasShownPrompt] = useState(false);
 
   useEffect(() => {
-    // Check if prompt was already shown
-    const promptShown = localStorage.getItem('pwa-install-prompt-shown');
-    if (promptShown === 'true') {
+    // Check if already installed (running as PWA)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isInWebAppiOS = (window.navigator as any).standalone === true;
+    const isInstalled = isStandalone || isInWebAppiOS;
+
+    if (isInstalled) {
+      // App is already installed, don't show prompt
+      setIsInstallable(false);
       setHasShownPrompt(true);
+      localStorage.setItem('pwa-install-prompt-shown', 'true');
+      localStorage.setItem('pwa-installed', 'true');
+      return;
+    }
+
+    // Check if prompt was already shown or app was installed
+    const promptShown = localStorage.getItem('pwa-install-prompt-shown');
+    const wasInstalled = localStorage.getItem('pwa-installed');
+
+    if (promptShown === 'true' || wasInstalled === 'true') {
+      setHasShownPrompt(true);
+      setIsInstallable(false);
+      return;
     }
 
     // Listen for beforeinstallprompt event
@@ -28,15 +46,20 @@ export const usePWAInstall = () => {
       setIsInstallable(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
-
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Listen for app installed event
+    const appInstalledHandler = () => {
       setIsInstallable(false);
-    }
+      setHasShownPrompt(true);
+      localStorage.setItem('pwa-install-prompt-shown', 'true');
+      localStorage.setItem('pwa-installed', 'true');
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', appInstalledHandler);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', appInstalledHandler);
     };
   }, []);
 
