@@ -71,11 +71,14 @@ export const InspectionDrawer = ({
     };
   }, [isOpen]);
 
-  const formattedDate = format(new Date(selectedDate), 'EEEE, MMMM d, yyyy');
+  // Validate selectedDate before formatting
+  const formattedDate = selectedDate
+    ? format(new Date(selectedDate), 'EEEE, MMMM d, yyyy')
+    : '';
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && selectedDate && (
         <>
           {/* Backdrop with smooth fade */}
           <motion.div
