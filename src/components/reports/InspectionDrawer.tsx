@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
+import { slideUp, backdropFade, slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
 
 interface InspectionDrawerProps {
   isOpen: boolean;
@@ -78,25 +79,14 @@ export const InspectionDrawer = ({
         <>
           {/* Backdrop with smooth fade */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            {...backdropFade}
             className="fixed inset-0 bg-black/50 z-40"
             onClick={onClose}
           />
 
-          {/* Drawer with slide-up animation */}
+          {/* Drawer with smooth slide-up animation */}
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: currentY }}
-            exit={{ y: '100%' }}
-            transition={{
-              type: 'spring',
-              stiffness: 300,
-              damping: 30,
-              duration: 0.3,
-            }}
+            {...slideUp}
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.5 }}
@@ -140,10 +130,10 @@ export const InspectionDrawer = ({
             </div>
             <motion.button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              whileHover={{ scale: 1.05, rotate: 90 }}
+              whileTap={{ scale: 0.95 }}
+              transition={TAP_TRANSITION}
             >
               <X className="w-5 h-5 text-gray-600" />
             </motion.button>
@@ -167,17 +157,14 @@ export const InspectionDrawer = ({
               <motion.button
                 key={inspection.id}
                 onClick={() => onInspectionClick(inspection)}
-                className="w-full bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors text-left"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                className="w-full bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200 text-left"
+                {...slideInLeft}
                 transition={{
-                  delay: idx * 0.05,
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 20,
+                  ...slideInLeft.transition,
+                  delay: idx * STAGGER_DELAY,
                 }}
-                whileHover={{ scale: 1.02, x: 4 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.015, x: 2 }}
+                whileTap={{ scale: 0.99 }}
               >
                 <div className="flex items-start justify-between space-x-3">
                   {/* Left side - Location info */}

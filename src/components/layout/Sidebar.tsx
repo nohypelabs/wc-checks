@@ -22,6 +22,7 @@ import {
   Droplets
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { backdropFade, TAP_TRANSITION, HOVER_TRANSITION, SPRINGS } from '../../lib/animations';
 
 interface NavItem {
   id: string;
@@ -97,9 +98,9 @@ export const Sidebar = ({ className }: SidebarProps) => {
             : 'text-gray-700 hover:bg-gray-100',
           isCollapsed && 'justify-center px-2'
         )}
-        whileHover={{ scale: 1.02, x: isActive ? 0 : 4 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        whileHover={{ scale: 1.015, x: isActive ? 0 : 2 }}
+        whileTap={{ scale: 0.99 }}
+        transition={TAP_TRANSITION}
       >
         <Icon className={clsx('flex-shrink-0', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
         <AnimatePresence mode="wait">
@@ -146,10 +147,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            {...backdropFade}
             className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
             onClick={() => setIsOpen(false)}
           />
@@ -163,11 +161,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
           x: isOpen ? 0 : '-100%',
           width: isCollapsed ? 80 : 288, // 20rem = 80px collapsed, 72rem = 288px expanded
         }}
-        transition={{
-          type: 'spring',
-          stiffness: 300,
-          damping: 30,
-        }}
+        transition={SPRINGS.smooth}
         className={clsx(
           'fixed top-0 left-0 h-full bg-white shadow-xl z-50 flex flex-col',
           'lg:translate-x-0', // Desktop always visible
@@ -203,12 +197,13 @@ export const Sidebar = ({ className }: SidebarProps) => {
               <motion.button
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={TAP_TRANSITION}
               >
                 <motion.div
                   animate={{ rotate: isCollapsed ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <ChevronRight className="w-4 h-4" />
                 </motion.div>
@@ -216,8 +211,9 @@ export const Sidebar = ({ className }: SidebarProps) => {
               <motion.button
                 onClick={() => setIsOpen(false)}
                 className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500"
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05, rotate: 90 }}
+                whileTap={{ scale: 0.95 }}
+                transition={TAP_TRANSITION}
               >
                 <X className="w-5 h-5" />
               </motion.button>

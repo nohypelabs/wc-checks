@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
 import { PhotoReviewModal } from './PhotoReviewModal';
+import { scaleIn, backdropFade, slideInLeft, HOVER_TRANSITION, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
 
 // Helper to get score-based gradient (like SuccessModal)
 const getScoreGradient = (score: number) => {
@@ -148,25 +149,14 @@ export const InspectionDetailModal = ({
         <>
           {/* Backdrop with smooth fade animation */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            {...backdropFade}
             className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
             onClick={onClose}
           />
 
-          {/* Modal with spring scale animation - Proper spacing from all edges */}
+          {/* Modal with smooth scale animation */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{
-              type: 'spring',
-              stiffness: 300,
-              damping: 25,
-              duration: 0.3,
-            }}
+            {...scaleIn}
             className="fixed left-4 right-4 top-4 bottom-20 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh]"
             onClick={(e) => e.stopPropagation()}
           >
@@ -181,11 +171,11 @@ export const InspectionDetailModal = ({
 
             <motion.button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all z-20"
+              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-colors duration-200 z-20"
               type="button"
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              whileHover={{ scale: 1.05, rotate: 90 }}
+              whileTap={{ scale: 0.95 }}
+              transition={TAP_TRANSITION}
             >
               <X className="w-5 h-5" />
             </motion.button>
@@ -290,13 +280,10 @@ export const InspectionDetailModal = ({
                       <motion.div
                         key={index}
                         className="rounded-xl p-4 border-2 bg-gray-50 border-gray-300"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        {...slideInLeft}
                         transition={{
-                          delay: index * 0.05,
-                          type: 'spring',
-                          stiffness: 200,
-                          damping: 20,
+                          ...slideInLeft.transition,
+                          delay: index * STAGGER_DELAY,
                         }}
                       >
                         <div className="flex items-start justify-between">
@@ -325,15 +312,13 @@ export const InspectionDetailModal = ({
                     <motion.div
                       key={index}
                       className={`rounded-xl p-4 border-2 ${getChoiceColor(rating.choice)}`}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      {...slideInLeft}
                       transition={{
-                        delay: index * 0.05,
-                        type: 'spring',
-                        stiffness: 200,
-                        damping: 20,
+                        ...slideInLeft.transition,
+                        delay: index * STAGGER_DELAY,
                       }}
-                      whileHover={{ scale: 1.02, x: 4 }}
+                      whileHover={{ scale: 1.015, x: 2 }}
+                      whileTap={{ scale: 0.995 }}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -419,16 +404,15 @@ export const InspectionDetailModal = ({
                       key={idx}
                       onClick={() => handlePhotoClick(idx)}
                       className="w-full aspect-square rounded-xl overflow-hidden shadow-md cursor-pointer group relative"
-                      initial={{ opacity: 0, scale: 0.8 }}
+                      initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{
-                        delay: idx * 0.1,
-                        type: 'spring',
-                        stiffness: 260,
-                        damping: 20,
+                        delay: idx * STAGGER_DELAY * 2,
+                        duration: 0.4,
+                        ease: [0.16, 1, 0.3, 1],
                       }}
-                      whileHover={{ scale: 1.05, rotate: 1 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.97 }}
                     >
                       <img
                         src={url}
@@ -436,14 +420,9 @@ export const InspectionDetailModal = ({
                         className="w-full h-full object-cover"
                       />
                       {/* Hover Overlay */}
-                      <motion.div
-                        className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center"
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Camera className="w-8 h-8 text-white drop-shadow-lg" />
-                      </motion.div>
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center transition-colors duration-200">
+                        <Camera className="w-8 h-8 text-white drop-shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      </div>
                     </motion.button>
                   ))}
                 </div>

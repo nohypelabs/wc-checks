@@ -11,6 +11,7 @@ import {
   subMonths
 } from 'date-fns';
 import { DateInspections } from '../../hooks/useReports';
+import { TAP_TRANSITION, HOVER_TRANSITION } from '../../lib/animations';
 
 interface CalendarViewProps {
   currentDate: Date;
@@ -86,19 +87,19 @@ export const CalendarView = ({
         <div className="flex items-center justify-between">
           <motion.button
             onClick={handlePrevMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            whileHover={{ scale: 1.1, x: -2 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            whileHover={{ scale: 1.05, x: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={TAP_TRANSITION}
           >
             <ChevronLeft className="w-5 h-5 text-gray-600" />
           </motion.button>
 
           <motion.h2
             key={format(currentDate, 'yyyy-MM')}
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="text-lg font-bold text-gray-900"
           >
             {format(currentDate, 'MMMM yyyy')}
@@ -106,10 +107,10 @@ export const CalendarView = ({
 
           <motion.button
             onClick={handleNextMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            whileHover={{ scale: 1.1, x: 2 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            whileHover={{ scale: 1.05, x: 2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={TAP_TRANSITION}
           >
             <ChevronRight className="w-5 h-5 text-gray-600" />
           </motion.button>
@@ -147,17 +148,17 @@ export const CalendarView = ({
                 onClick={() => hasInspections && onDateClick(dateStr)}
                 disabled={!hasInspections}
                 className={`
-                  aspect-square p-1 rounded-xl transition-all relative flex items-center justify-center
+                  aspect-square p-1 rounded-xl transition-all duration-200 relative flex items-center justify-center
                   ${dayIsToday && hasInspections ? `ring-2 ${scoreStyle?.ring}` : ''}
                   ${dayIsToday && !hasInspections ? 'ring-2 ring-blue-500' : ''}
                   ${hasInspections
-                    ? `${scoreStyle?.bg} border-2 ${scoreStyle?.border} hover:shadow-lg cursor-pointer transform`
+                    ? `${scoreStyle?.bg} border-2 ${scoreStyle?.border} hover:shadow-lg cursor-pointer`
                     : 'cursor-default opacity-40'
                   }
                 `}
-                whileHover={hasInspections ? { scale: 1.1, rotate: 2 } : {}}
-                whileTap={hasInspections ? { scale: 0.95 } : {}}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                whileHover={hasInspections ? { scale: 1.05 } : {}}
+                whileTap={hasInspections ? { scale: 0.97 } : {}}
+                transition={hasInspections ? TAP_TRANSITION : undefined}
               >
                 {/* Date number - BOLD & COLORED for inspections */}
                 <div className="flex flex-col items-center justify-center h-full">
