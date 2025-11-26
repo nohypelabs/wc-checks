@@ -1,7 +1,8 @@
 // src/App.tsx - FIXED: Handle named exports for lazy loading
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AnimatePresence } from 'framer-motion';
 import { CustomToaster } from './lib/toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
@@ -139,10 +140,12 @@ function AppContent() {
   }
 
   console.log('[AppContent] Auth loaded, rendering routes');
+  const location = useLocation();
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
+    <AnimatePresence mode="wait">
+      <Suspense fallback={<PageLoader />}>
+        <Routes location={location} key={location.pathname}>
         {/* Public Routes */}
         <Route 
           path="/login" 
@@ -245,6 +248,7 @@ function AppContent() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
+    </AnimatePresence>
   );
 }
 

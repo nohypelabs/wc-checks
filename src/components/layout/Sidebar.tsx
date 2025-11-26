@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
   QrCode,
@@ -87,7 +88,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
     const Icon = item.icon;
 
     return (
-      <button
+      <motion.button
         onClick={() => handleNavClick(item.path)}
         className={clsx(
           'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group',
@@ -96,22 +97,38 @@ export const Sidebar = ({ className }: SidebarProps) => {
             : 'text-gray-700 hover:bg-gray-100',
           isCollapsed && 'justify-center px-2'
         )}
+        whileHover={{ scale: 1.02, x: isActive ? 0 : 4 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
         <Icon className={clsx('flex-shrink-0', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
-        {!isCollapsed && (
-          <>
-            <span className="font-medium flex-1 text-left">{item.label}</span>
-            {item.badge && item.badge > 0 && (
-              <span className={clsx(
-                'px-2 py-0.5 rounded-full text-xs font-semibold',
-                isActive ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-600'
-              )}>
-                {item.badge}
-              </span>
-            )}
-          </>
-        )}
-      </button>
+        <AnimatePresence mode="wait">
+          {!isCollapsed && (
+            <motion.div
+              key="nav-content"
+              className="flex items-center gap-2 flex-1"
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className="font-medium flex-1 text-left">{item.label}</span>
+              {item.badge && item.badge > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className={clsx(
+                    'px-2 py-0.5 rounded-full text-xs font-semibold',
+                    isActive ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-600'
+                  )}
+                >
+                  {item.badge}
+                </motion.span>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
     );
   };
 
@@ -126,58 +143,84 @@ export const Sidebar = ({ className }: SidebarProps) => {
       </button>
 
       {/* Backdrop Overlay (Mobile) */}
-      {isOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
-      <aside
+      <motion.aside
+        initial={false}
+        animate={{
+          x: isOpen ? 0 : '-100%',
+          width: isCollapsed ? 80 : 288, // 20rem = 80px collapsed, 72rem = 288px expanded
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 30,
+        }}
         className={clsx(
-          'fixed top-0 left-0 h-full bg-white shadow-xl z-50 flex flex-col transition-all duration-300',
-          // Mobile: slide in from left
-          'lg:translate-x-0',
-          isOpen ? 'translate-x-0' : '-translate-x-full',
-          // Desktop: collapsible width
-          isCollapsed ? 'lg:w-20' : 'lg:w-72',
-          'w-72', // Mobile width
+          'fixed top-0 left-0 h-full bg-white shadow-xl z-50 flex flex-col',
+          'lg:translate-x-0', // Desktop always visible
           className
         )}
       >
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            {!isCollapsed && (
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Droplets className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="font-bold text-gray-900">ToiletCheck</h1>
-                  <p className="text-xs text-gray-500">Monitoring System</p>
-                </div>
-              </div>
-            )}
+            <AnimatePresence mode="wait">
+              {!isCollapsed && (
+                <motion.div
+                  key="header-content"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-3"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                    <Droplets className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="font-bold text-gray-900">ToiletCheck</h1>
+                    <p className="text-xs text-gray-500">Monitoring System</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Close/Collapse Buttons */}
             <div className="flex items-center gap-1">
-              <button
+              <motion.button
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
-                <ChevronRight className={clsx(
-                  'w-4 h-4 transition-transform',
-                  isCollapsed && 'rotate-180'
-                )} />
-              </button>
-              <button
+                <motion.div
+                  animate={{ rotate: isCollapsed ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </motion.div>
+              </motion.button>
+              <motion.button
                 onClick={() => setIsOpen(false)}
                 className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500"
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
               >
                 <X className="w-5 h-5" />
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
