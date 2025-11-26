@@ -6,6 +6,7 @@ import { AnimatePresence } from 'framer-motion';
 import { CustomToaster } from './lib/toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
+import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { useAuth } from './hooks/useAuth';
 import { logger } from './lib/logger';
 import './App.css';
@@ -264,6 +265,7 @@ export default function App() {
       <Router>
         <ErrorBoundary>
           <AppContent />
+          <PWAInstallPrompt />
           <DebugPanel />
           <CustomToaster />
         </ErrorBoundary>
