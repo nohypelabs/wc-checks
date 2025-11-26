@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { Tables } from '../types/database.types';
-import { Eye, EyeOff, User, Mail, Phone, Briefcase, UserPlus, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Phone, Briefcase, UserPlus, Loader2, AlertCircle } from 'lucide-react';
 
 // Type dari database
 type Occupation = Tables<'user_occupations'>;
@@ -33,6 +33,8 @@ export const RegisterPage = () => {
   const [loadingOccupations, setLoadingOccupations] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const {
@@ -79,6 +81,8 @@ export const RegisterPage = () => {
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
     let userId: string | null = null;
 
     try {
@@ -127,8 +131,12 @@ export const RegisterPage = () => {
         );
       }
 
-      toast.success('Registration successful! Please check your email to verify your account.');
-      navigate('/login');
+      setSuccessMessage('Registrasi berhasil! Silakan periksa email Anda untuk verifikasi akun.');
+
+      // Redirect after showing success message
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
 
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -137,215 +145,296 @@ export const RegisterPage = () => {
 
       // Handle specific error cases
       if (error.message.includes('password_hash')) {
-        userMessage = 'Database configuration error. Please contact administrator.';
+        userMessage = 'Kesalahan konfigurasi database. Silakan hubungi administrator.';
       } else if (error.message.includes('users_pkey')) {
-        userMessage = 'User already exists with this email.';
+        userMessage = 'Pengguna dengan email ini sudah ada.';
       } else if (error.message.includes('User already registered')) {
-        userMessage = 'This email is already registered. Please try logging in.';
+        userMessage = 'Email ini sudah terdaftar. Silakan coba masuk.';
       } else if (error.message.includes('Failed to create profile')) {
-        // Use the detailed error message from above
-        userMessage = error.message;
+        userMessage = 'Gagal membuat profil. Silakan coba lagi.';
       }
 
-      toast.error(userMessage);
+      setError(userMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 safe-area">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4">
-            <span className="text-white text-2xl font-bold">🚽</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+      {/* Signup Container */}
+      <div className="w-full max-w-md">
+        {/* Logo/Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center mb-4">
+            <img
+              src="/logo.png"
+              alt="Proservice Indonesia Logo"
+              className="h-20 w-auto"
+              onError={(e) => {
+                // If logo fails, hide and show text fallback
+                const img = e.target as HTMLImageElement;
+                img.style.display = 'none';
+                const fallback = img.nextElementSibling;
+                if (fallback) fallback.className = '';
+              }}
+            />
+            <div className="hidden w-16 h-16 bg-blue-600 rounded-2xl shadow-lg flex items-center justify-center">
+              <span className="text-3xl">🚽</span>
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-          <p className="mt-2 text-gray-600">Sign up to start inspections</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Proservice Indonesia
+          </h1>
+          <p className="text-gray-600">
+            Buat akun untuk memulai inspeksi
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
-          {/* Full Name */}
-          <div>
-            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
+        {/* Signup Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          {/* Error Alert */}
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-red-800">Kesalahan</p>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
               </div>
-              <input
-                {...register('full_name')}
-                type="text"
-                className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter your full name"
-              />
             </div>
-            {errors.full_name && (
-              <p className="mt-1 text-sm text-red-600">{errors.full_name.message}</p>
-            )}
-          </div>
+          )}
 
-          {/* Email */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
+          {/* Success Alert */}
+          {successMessage && (
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+              <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-white text-xs">✓</span>
               </div>
-              <input
-                {...register('email')}
-                type="email"
-                className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="your.email@example.com"
-              />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-green-800">Berhasil</p>
+                <p className="text-sm text-green-700 mt-1">{successMessage}</p>
+              </div>
             </div>
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-            )}
-          </div>
+          )}
 
-          {/* Phone Number */}
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number (Optional)
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Phone className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                {...register('phone')}
-                type="tel"
-                className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="081234567890"
-              />
-            </div>
-            {errors.phone && (
-              <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-            )}
-          </div>
-
-          {/* Occupation */}
-          <div>
-            <label htmlFor="occupation_id" className="block text-sm font-medium text-gray-700 mb-2">
-              Occupation (Optional)
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Briefcase className="h-5 w-5 text-gray-400" />
-              </div>
-              {loadingOccupations ? (
-                <div className="block w-full pl-10 pr-3 py-3 bg-gray-100 border border-gray-300 rounded-lg">
-                  <span className="text-gray-500">Loading...</span>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Full Name */}
+            <div>
+              <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
+                Nama Lengkap
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
                 </div>
-              ) : (
-                <select
-                  {...register('occupation_id')}
-                  className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer"
-                >
-                  <option value="">Select your occupation</option>
-                  {occupations.map((occ) => (
-                    <option key={occ.id} value={occ.id}>
-                      {occ.icon} {occ.display_name}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  {...register('full_name')}
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Masukkan nama lengkap Anda"
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.full_name && (
+                <p className="mt-1 text-sm text-red-600">{errors.full_name.message}</p>
               )}
             </div>
-          </div>
 
-          {/* Password */}
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                {...register('password')}
-                type={showPassword ? 'text' : 'password'}
-                className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-600 transition-colors"
-                tabIndex={-1}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Alamat Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  {...register('email')}
+                  type="email"
+                  className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="email.anda@example.com"
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-            )}
-          </div>
 
-          {/* Confirm Password */}
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                {...register('confirmPassword')}
-                type={showConfirmPassword ? 'text' : 'password'}
-                className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Confirm your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-600 transition-colors"
-                tabIndex={-1}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
+            {/* Phone Number */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                Nomor Telepon (Opsional)
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  {...register('phone')}
+                  type="tel"
+                  className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="081234567890"
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.phone && (
+                <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+              )}
             </div>
-            {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-            )}
+
+            {/* Occupation */}
+            <div>
+              <label htmlFor="occupation_id" className="block text-sm font-medium text-gray-700 mb-2">
+                Jabatan (Opsional)
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Briefcase className="h-5 w-5 text-gray-400" />
+                </div>
+                {loadingOccupations ? (
+                  <div className="block w-full pl-10 pr-3 py-3 bg-gray-100 border border-gray-300 rounded-lg">
+                    <span className="text-gray-500">Memuat...</span>
+                  </div>
+                ) : (
+                  <select
+                    {...register('occupation_id')}
+                    className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                    disabled={isLoading}
+                  >
+                    <option value="">Pilih jabatan Anda</option>
+                    {occupations.map((occ) => (
+                      <option key={occ.id} value={occ.id}>
+                        {occ.icon} {occ.display_name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Kata Sandi
+              </label>
+              <div className="relative">
+                <input
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Masukkan kata sandi Anda"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-600 transition-colors"
+                  disabled={isLoading}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                Konfirmasi Kata Sandi
+              </label>
+              <div className="relative">
+                <input
+                  {...register('confirmPassword')}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Konfirmasi kata sandi Anda"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-600 transition-colors"
+                  disabled={isLoading}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+              style={{
+                boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Membuat Akun...</span>
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-5 h-5" />
+                  <span>Buat Akun</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">
+                Sudah punya akun?
+              </span>
+            </div>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-            style={{
-              boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
-            }}
+          {/* Login Button */}
+          <Link
+            to="/login"
+            className="w-full bg-white hover:bg-gray-50 text-blue-600 font-semibold py-3 px-4 rounded-lg border-2 border-blue-600 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-150 flex items-center justify-center gap-2"
           >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Creating Account...</span>
-              </>
-            ) : (
-              <>
-                <UserPlus className="w-5 h-5" />
-                <span>Create Account</span>
-              </>
-            )}
-          </button>
-        </form>
+            <span>Masuk ke Akun</span>
+          </Link>
+        </div>
 
-        <div className="text-center">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-              Sign in
-            </Link>
+        {/* Footer */}
+        <div className="mt-8 text-center text-sm text-gray-600">
+          <p>
+            © 2025 Proservice Indonesia. Hak cipta dilindungi.
+          </p>
+          <p className="mt-2">
+            <a href="#" className="text-blue-600 hover:text-blue-700">
+              Kebijakan Privasi
+            </a>
+            {' · '}
+            <a href="#" className="text-blue-600 hover:text-blue-700">
+              Ketentuan Layanan
+            </a>
           </p>
         </div>
       </div>
