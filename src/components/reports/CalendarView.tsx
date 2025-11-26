@@ -12,6 +12,7 @@ import {
 } from 'date-fns';
 import { DateInspections } from '../../hooks/useReports';
 import { TAP_TRANSITION, HOVER_TRANSITION } from '../../lib/animations';
+import { useHaptic } from '../../hooks/useHaptic';
 
 interface CalendarViewProps {
   currentDate: Date;
@@ -57,6 +58,7 @@ export const CalendarView = ({
   dateInspections,
   onDateClick,
 }: CalendarViewProps) => {
+  const haptic = useHaptic();
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -68,10 +70,12 @@ export const CalendarView = ({
   const emptyDays = Array(firstDayOfMonth).fill(null);
 
   const handlePrevMonth = () => {
+    haptic.light();
     onDateChange(subMonths(currentDate, 1));
   };
 
   const handleNextMonth = () => {
+    haptic.light();
     onDateChange(addMonths(currentDate, 1));
   };
 
@@ -145,7 +149,12 @@ export const CalendarView = ({
             return (
               <motion.button
                 key={day.toISOString()}
-                onClick={() => hasInspections && onDateClick(dateStr)}
+                onClick={() => {
+                  if (hasInspections) {
+                    haptic.medium();
+                    onDateClick(dateStr);
+                  }
+                }}
                 disabled={!hasInspections}
                 className={`
                   aspect-square p-1 rounded-xl transition-all duration-200 relative flex items-center justify-center

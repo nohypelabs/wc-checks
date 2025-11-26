@@ -1,4 +1,4 @@
-// src/pages/RegisterPage.tsx - FIXED
+// src/pages/RegisterPage.tsx - IMPROVED
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { Tables } from '../types/database.types';
+import { Eye, EyeOff, User, Mail, Phone, Briefcase, UserPlus, Loader2 } from 'lucide-react';
 
 // Type dari database
 type Occupation = Tables<'user_occupations'>;
@@ -30,6 +31,8 @@ export const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [occupations, setOccupations] = useState<Occupation[]>([]);
   const [loadingOccupations, setLoadingOccupations] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -51,9 +54,13 @@ export const RegisterPage = () => {
           .order('display_name');
 
         if (error) throw error;
-        
+
+        // Filter to only show allowed occupations (exclude administrator)
+        const allowedOccupations = ['cleaning_staff', 'doctor', 'visitor', 'nurse', 'staff', 'supervisor'];
+        const filteredData = (data || []).filter(occ => allowedOccupations.includes(occ.name));
+
         // Transform dengan default values
-        setOccupations((data || []).map(occ => ({
+        setOccupations(filteredData.map(occ => ({
           ...occ,
           icon: occ.icon || '👤',
           color: occ.color || '#3B82F6',
@@ -160,15 +167,20 @@ export const RegisterPage = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
           {/* Full Name */}
           <div>
-            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
               Full Name
             </label>
-            <input
-              {...register('full_name')}
-              type="text"
-              className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your full name"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...register('full_name')}
+                type="text"
+                className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Enter your full name"
+              />
+            </div>
             {errors.full_name && (
               <p className="mt-1 text-sm text-red-600">{errors.full_name.message}</p>
             )}
@@ -176,15 +188,20 @@ export const RegisterPage = () => {
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
-            <input
-              {...register('email')}
-              type="email"
-              className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your email"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...register('email')}
+                type="email"
+                className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="your.email@example.com"
+              />
+            </div>
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
             )}
@@ -192,15 +209,20 @@ export const RegisterPage = () => {
 
           {/* Phone Number */}
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
               Phone Number (Optional)
             </label>
-            <input
-              {...register('phone')}
-              type="tel"
-              className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Example: 081234567890"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...register('phone')}
+                type="tel"
+                className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="081234567890"
+              />
+            </div>
             {errors.phone && (
               <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
             )}
@@ -208,39 +230,58 @@ export const RegisterPage = () => {
 
           {/* Occupation */}
           <div>
-            <label htmlFor="occupation_id" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="occupation_id" className="block text-sm font-medium text-gray-700 mb-2">
               Occupation (Optional)
             </label>
-            {loadingOccupations ? (
-              <div className="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-2xl">
-                <span className="text-gray-500">Loading...</span>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Briefcase className="h-5 w-5 text-gray-400" />
               </div>
-            ) : (
-              <select
-                {...register('occupation_id')}
-                className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select your occupation</option>
-                {occupations.map((occ) => (
-                  <option key={occ.id} value={occ.id}>
-                    {occ.icon} {occ.display_name}
-                  </option>
-                ))}
-              </select>
-            )}
+              {loadingOccupations ? (
+                <div className="block w-full pl-10 pr-3 py-3 bg-gray-100 border border-gray-300 rounded-lg">
+                  <span className="text-gray-500">Loading...</span>
+                </div>
+              ) : (
+                <select
+                  {...register('occupation_id')}
+                  className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                >
+                  <option value="">Select your occupation</option>
+                  {occupations.map((occ) => (
+                    <option key={occ.id} value={occ.id}>
+                      {occ.icon} {occ.display_name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
-            <input
-              {...register('password')}
-              type="password"
-              className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your password"
-            />
+            <div className="relative">
+              <input
+                {...register('password')}
+                type={showPassword ? 'text' : 'password'}
+                className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
+            </div>
             {errors.password && (
               <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
             )}
@@ -248,15 +289,29 @@ export const RegisterPage = () => {
 
           {/* Confirm Password */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
               Confirm Password
             </label>
-            <input
-              {...register('confirmPassword')}
-              type="password"
-              className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Confirm your password"
-            />
+            <div className="relative">
+              <input
+                {...register('confirmPassword')}
+                type={showConfirmPassword ? 'text' : 'password'}
+                className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Confirm your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
+            </div>
             {errors.confirmPassword && (
               <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
             )}
@@ -266,9 +321,22 @@ export const RegisterPage = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-2xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            style={{
+              boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
+            }}
           >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="w-5 h-5" />
+                <span>Create Account</span>
+              </>
+            )}
           </button>
         </form>
 

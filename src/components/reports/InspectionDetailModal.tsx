@@ -7,6 +7,7 @@ import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
 import { PhotoReviewModal } from './PhotoReviewModal';
 import { scaleIn, backdropFade, slideInLeft, HOVER_TRANSITION, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
+import { useHaptic } from '../../hooks/useHaptic';
 
 // Helper to get score-based gradient (like SuccessModal)
 const getScoreGradient = (score: number) => {
@@ -123,6 +124,7 @@ export const InspectionDetailModal = ({
   onClose,
   inspection,
 }: InspectionDetailModalProps) => {
+  const haptic = useHaptic();
   const [photoReviewOpen, setPhotoReviewOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
@@ -139,6 +141,7 @@ export const InspectionDetailModal = ({
   const formattedDate = format(new Date(inspection.inspection_date), 'EEEE, MMMM d, yyyy');
 
   const handlePhotoClick = (index: number) => {
+    haptic.light();
     setSelectedPhotoIndex(index);
     setPhotoReviewOpen(true);
   };
@@ -157,7 +160,7 @@ export const InspectionDetailModal = ({
           {/* Modal with smooth scale animation */}
           <motion.div
             {...scaleIn}
-            className="fixed left-4 right-4 top-4 bottom-20 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh]"
+            className="fixed left-4 right-4 top-4 bottom-16 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh]"
             onClick={(e) => e.stopPropagation()}
           >
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col">
@@ -443,7 +446,7 @@ export const InspectionDetailModal = ({
             )}
 
             {/* Bottom spacer - prevents content from sticking to BottomNav */}
-            <div className="h-20" />
+            <div className="h-16" />
           </div>
         </div>
       </motion.div>

@@ -1,10 +1,11 @@
 // src/components/reports/InspectionDrawer.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { slideUp, backdropFade, slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
+import { useHaptic } from '../../hooks/useHaptic';
 
 interface InspectionDrawerProps {
   isOpen: boolean;
@@ -33,9 +34,13 @@ export const InspectionDrawer = ({
   selectedDate,
   onInspectionClick,
 }: InspectionDrawerProps) => {
+  const haptic = useHaptic();
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [startY, setStartY] = useState(0);
   const [currentY, setCurrentY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const lastScrollTop = useRef(0);
+  const hasReachedBottom = useRef(false);
 
   // Handle swipe to close
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -60,9 +65,39 @@ export const InspectionDrawer = ({
     setCurrentY(0);
   };
 
+  // Handle scroll boundary haptic feedback
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const element = e.currentTarget;
+    const scrollTop = element.scrollTop;
+    const scrollHeight = element.scrollHeight;
+    const clientHeight = element.clientHeight;
+
+    // Check if scrolled to bottom (with 5px threshold for smooth detection)
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+
+    // Detect scroll direction
+    const isScrollingDown = scrollTop > lastScrollTop.current;
+
+    // Trigger haptic only once when reaching bottom while scrolling down
+    if (isAtBottom && isScrollingDown && !hasReachedBottom.current) {
+      haptic.light();
+      hasReachedBottom.current = true;
+    }
+
+    // Reset flag when scrolling back up
+    if (!isAtBottom && hasReachedBottom.current) {
+      hasReachedBottom.current = false;
+    }
+
+    lastScrollTop.current = scrollTop;
+  };
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      // Reset scroll state when drawer opens
+      hasReachedBottom.current = false;
+      lastScrollTop.current = 0;
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -145,6 +180,8 @@ export const InspectionDrawer = ({
 
         {/* Inspection List */}
         <div
+          ref={scrollRef}
+          onScroll={handleScroll}
           className="flex-1 overflow-y-auto px-6 pt-4 pb-24 space-y-3 overscroll-contain"
           style={{
             WebkitOverflowScrolling: 'touch',
@@ -159,7 +196,10 @@ export const InspectionDrawer = ({
             return (
               <motion.button
                 key={inspection.id}
-                onClick={() => onInspectionClick(inspection)}
+                onClick={() => {
+                  haptic.medium();
+                  onInspectionClick(inspection);
+                }}
                 className="w-full bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200 text-left"
                 {...slideInLeft}
                 transition={{
