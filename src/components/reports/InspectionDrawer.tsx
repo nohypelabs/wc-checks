@@ -145,7 +145,7 @@ export const InspectionDrawer = ({
 
         {/* Inspection List */}
         <div
-          className="flex-1 overflow-y-auto px-6 py-4 space-y-3 overscroll-contain"
+          className="flex-1 overflow-y-auto px-6 pt-4 pb-24 space-y-3 overscroll-contain"
           style={{
             WebkitOverflowScrolling: 'touch',
             willChange: 'scroll-position',
