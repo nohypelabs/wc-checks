@@ -1,5 +1,6 @@
 // src/components/reports/InspectionDrawer.tsx
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
@@ -69,28 +70,48 @@ export const InspectionDrawer = ({
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const formattedDate = format(new Date(selectedDate), 'EEEE, MMMM d, yyyy');
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 z-40 transition-opacity"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop with smooth fade */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={onClose}
+          />
 
-      {/* Drawer */}
-      <div
-        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col transition-transform duration-200 ease-out"
-        style={{
-          transform: `translateY(${currentY}px) translateZ(0)`,
-          willChange: isDragging ? 'transform' : 'auto',
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden',
-        }}
-      >
+          {/* Drawer with slide-up animation */}
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: currentY }}
+            exit={{ y: '100%' }}
+            transition={{
+              type: 'spring',
+              stiffness: 300,
+              damping: 30,
+              duration: 0.3,
+            }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.5 }}
+            onDragEnd={(e, { offset, velocity }) => {
+              if (offset.y > 100 || velocity.y > 500) {
+                onClose();
+              }
+            }}
+            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col"
+            style={{
+              willChange: isDragging ? 'transform' : 'auto',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+            }}
+          >
         {/* Drag Handle */}
         <div
           className="py-3 flex justify-center cursor-grab active:cursor-grabbing"
@@ -117,12 +138,15 @@ export const InspectionDrawer = ({
                 </span>
               </div>
             </div>
-            <button
+            <motion.button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
               <X className="w-5 h-5 text-gray-600" />
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -134,16 +158,26 @@ export const InspectionDrawer = ({
             willChange: 'scroll-position',
           }}
         >
-          {inspections.map((inspection) => {
+          {inspections.map((inspection, idx) => {
             const score = (inspection.responses as any)?.score || 0;
             const scoreColor = getScoreColor(score);
             const emoji = getScoreEmoji(score);
 
             return (
-              <button
+              <motion.button
                 key={inspection.id}
                 onClick={() => onInspectionClick(inspection)}
-                className="w-full bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors active:scale-[0.98] text-left"
+                className="w-full bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors text-left"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  delay: idx * 0.05,
+                  type: 'spring',
+                  stiffness: 200,
+                  damping: 20,
+                }}
+                whileHover={{ scale: 1.02, x: 4 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <div className="flex items-start justify-between space-x-3">
                   {/* Left side - Location info */}
@@ -199,11 +233,13 @@ export const InspectionDrawer = ({
                     </p>
                   </div>
                 )}
-              </button>
+              </motion.button>
             );
           })}
         </div>
-      </div>
-    </>
+      </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };

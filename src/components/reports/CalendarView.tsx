@@ -1,13 +1,14 @@
 // src/components/reports/CalendarView.tsx - FIXED: Remove unused imports
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { 
-  format, 
-  startOfMonth, 
-  endOfMonth, 
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
   eachDayOfInterval,
   isToday,
   addMonths,
-  subMonths 
+  subMonths
 } from 'date-fns';
 import { DateInspections } from '../../hooks/useReports';
 
@@ -83,23 +84,35 @@ export const CalendarView = ({
       {/* Header */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <button
+          <motion.button
             onClick={handlePrevMonth}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            whileHover={{ scale: 1.1, x: -2 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           >
             <ChevronLeft className="w-5 h-5 text-gray-600" />
-          </button>
+          </motion.button>
 
-          <h2 className="text-lg font-bold text-gray-900">
+          <motion.h2
+            key={format(currentDate, 'yyyy-MM')}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-lg font-bold text-gray-900"
+          >
             {format(currentDate, 'MMMM yyyy')}
-          </h2>
+          </motion.h2>
 
-          <button
+          <motion.button
             onClick={handleNextMonth}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            whileHover={{ scale: 1.1, x: 2 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           >
             <ChevronRight className="w-5 h-5 text-gray-600" />
-          </button>
+          </motion.button>
         </div>
 
         {/* Weekday headers */}
@@ -129,7 +142,7 @@ export const CalendarView = ({
             const scoreStyle = hasInspections ? getScoreStyle(dateData.averageScore) : null;
 
             return (
-              <button
+              <motion.button
                 key={day.toISOString()}
                 onClick={() => hasInspections && onDateClick(dateStr)}
                 disabled={!hasInspections}
@@ -138,10 +151,13 @@ export const CalendarView = ({
                   ${dayIsToday && hasInspections ? `ring-2 ${scoreStyle?.ring}` : ''}
                   ${dayIsToday && !hasInspections ? 'ring-2 ring-blue-500' : ''}
                   ${hasInspections
-                    ? `${scoreStyle?.bg} border-2 ${scoreStyle?.border} hover:shadow-lg cursor-pointer active:scale-95 transform`
+                    ? `${scoreStyle?.bg} border-2 ${scoreStyle?.border} hover:shadow-lg cursor-pointer transform`
                     : 'cursor-default opacity-40'
                   }
                 `}
+                whileHover={hasInspections ? { scale: 1.1, rotate: 2 } : {}}
+                whileTap={hasInspections ? { scale: 0.95 } : {}}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               >
                 {/* Date number - BOLD & COLORED for inspections */}
                 <div className="flex flex-col items-center justify-center h-full">
@@ -163,7 +179,7 @@ export const CalendarView = ({
                     </div>
                   )}
                 </div>
-              </button>
+              </motion.button>
             );
           })}
         </div>

@@ -1,5 +1,6 @@
 // src/components/reports/InspectionDetailModal.tsx - MODERN REDESIGN
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Clock, User, Camera, FileText, AlertCircle, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
@@ -142,18 +143,33 @@ export const InspectionDetailModal = ({
   };
 
   return (
-    <>
-      {/* Backdrop with animation */}
-      <div
-        className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm animate-fadeIn"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop with smooth fade animation */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+            onClick={onClose}
+          />
 
-      {/* Modal with scale animation - Proper spacing from all edges */}
-      <div
-        className="fixed left-4 right-4 top-4 bottom-20 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh] animate-scaleIn"
-        onClick={(e) => e.stopPropagation()}
-      >
+          {/* Modal with spring scale animation - Proper spacing from all edges */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{
+              type: 'spring',
+              stiffness: 300,
+              damping: 25,
+              duration: 0.3,
+            }}
+            className="fixed left-4 right-4 top-4 bottom-20 max-w-2xl mx-auto my-auto z-[60] max-h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col">
           {/* Header - Dynamic gradient based on score */}
           <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-6 text-white relative overflow-hidden rounded-t-3xl flex-shrink-0`}>
@@ -163,13 +179,16 @@ export const InspectionDetailModal = ({
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full blur-2xl animate-pulse delay-700" />
             </div>
 
-            <button
+            <motion.button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all z-20 active:scale-95"
+              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all z-20"
               type="button"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
               <X className="w-5 h-5" />
-            </button>
+            </motion.button>
 
             {/* Location info with better spacing */}
             <div className="relative z-10">
@@ -268,7 +287,18 @@ export const InspectionDetailModal = ({
                   // Handle unavailable components
                   if (rating.isAvailable === false) {
                     return (
-                      <div key={index} className="rounded-xl p-4 border-2 bg-gray-50 border-gray-300">
+                      <motion.div
+                        key={index}
+                        className="rounded-xl p-4 border-2 bg-gray-50 border-gray-300"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          delay: index * 0.05,
+                          type: 'spring',
+                          stiffness: 200,
+                          damping: 20,
+                        }}
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-1">
@@ -287,12 +317,24 @@ export const InspectionDetailModal = ({
                             </span>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   }
 
                   return (
-                    <div key={index} className={`rounded-xl p-4 border-2 ${getChoiceColor(rating.choice)}`}>
+                    <motion.div
+                      key={index}
+                      className={`rounded-xl p-4 border-2 ${getChoiceColor(rating.choice)}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        delay: index * 0.05,
+                        type: 'spring',
+                        stiffness: 200,
+                        damping: 20,
+                      }}
+                      whileHover={{ scale: 1.02, x: 4 }}
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
@@ -318,7 +360,7 @@ export const InspectionDetailModal = ({
                           </span>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -373,10 +415,20 @@ export const InspectionDetailModal = ({
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 place-items-center">
                   {inspection.photo_urls.map((url, idx) => (
-                    <button
+                    <motion.button
                       key={idx}
                       onClick={() => handlePhotoClick(idx)}
-                      className="w-full aspect-square rounded-xl overflow-hidden hover:opacity-80 hover:scale-105 transition-all shadow-md hover:shadow-xl cursor-pointer group relative"
+                      className="w-full aspect-square rounded-xl overflow-hidden shadow-md cursor-pointer group relative"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{
+                        delay: idx * 0.1,
+                        type: 'spring',
+                        stiffness: 260,
+                        damping: 20,
+                      }}
+                      whileHover={{ scale: 1.05, rotate: 1 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <img
                         src={url}
@@ -384,12 +436,15 @@ export const InspectionDetailModal = ({
                         className="w-full h-full object-cover"
                       />
                       {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Camera className="w-8 h-8 text-white drop-shadow-lg" />
-                        </div>
-                      </div>
-                    </button>
+                      <motion.div
+                        className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center"
+                        initial={{ opacity: 0 }}
+                        whileHover={{ opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Camera className="w-8 h-8 text-white drop-shadow-lg" />
+                      </motion.div>
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -412,7 +467,7 @@ export const InspectionDetailModal = ({
             <div className="h-20" />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Photo Review Modal */}
       <PhotoReviewModal
@@ -421,6 +476,8 @@ export const InspectionDetailModal = ({
         photos={inspection.photo_urls || []}
         initialIndex={selectedPhotoIndex}
       />
-    </>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
