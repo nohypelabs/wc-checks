@@ -102,7 +102,6 @@ async function handleAnalytics(
   currentUserId: string,
   targetUserId: string | undefined,
   monthStr: string | undefined,
-  organizationIdStr?: string,
   buildingIdStr?: string
 ): Promise<void> {
   if (!supabase) {
@@ -157,11 +156,6 @@ async function handleAnalytics(
       query = query.eq('user_id', targetUserId);
     }
 
-    // Apply organization filter
-    if (organizationIdStr) {
-      query = query.eq('locations.organization_id', organizationIdStr);
-    }
-
     // Apply building filter
     if (buildingIdStr) {
       query = query.eq('locations.building_id', buildingIdStr);
@@ -208,11 +202,6 @@ async function handleAnalytics(
 
     if (targetUserId) {
       prevQuery = prevQuery.eq('user_id', targetUserId);
-    }
-
-    // Apply organization filter for previous month too
-    if (organizationIdStr) {
-      prevQuery = prevQuery.eq('locations.organization_id', organizationIdStr);
     }
 
     // Apply building filter for previous month too
@@ -355,12 +344,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return errorResponse(res, 401, 'Authentication required');
   }
 
-  const { month, date, userId, analytics, organizationId, buildingId } = req.query;
+  const { month, date, userId, analytics, buildingId } = req.query;
   const monthStr = Array.isArray(month) ? month[0] : month;
   const dateStr = Array.isArray(date) ? date[0] : date;
   const userIdStr = Array.isArray(userId) ? userId[0] : userId;
   const analyticsStr = Array.isArray(analytics) ? analytics[0] : analytics;
-  const organizationIdStr = Array.isArray(organizationId) ? organizationId[0] : organizationId;
   const buildingIdStr = Array.isArray(buildingId) ? buildingId[0] : buildingId;
 
   const isAdmin = auth.userRole.level >= 80;
@@ -376,7 +364,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     monthParam: monthStr,
     dateParam: dateStr,
     userIdParam: userIdStr,
-    organizationIdParam: organizationIdStr || 'ALL',
     buildingIdParam: buildingIdStr || 'ALL',
   });
 
@@ -424,7 +411,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ===== ANALYTICS MODE =====
     if (analyticsStr === 'true') {
-      await handleAnalytics(res, isAdmin, currentUserId, targetUserId, monthStr, organizationIdStr, buildingIdStr);
+      await handleAnalytics(res, isAdmin, currentUserId, targetUserId, monthStr, buildingIdStr);
       return; // handleAnalytics handles response
     }
 
@@ -458,12 +445,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       query = query.eq('user_id', targetUserId);
     }
     // else: no filter = ALL users (admin only)
-
-    // Apply organization filter via locations table
-    if (organizationIdStr) {
-      query = query.eq('location.organization_id', organizationIdStr);
-      console.log(`[reports] Filtering by organization: ${organizationIdStr}`);
-    }
 
     // Apply building filter via locations table
     if (buildingIdStr) {

@@ -8,13 +8,12 @@ import { InspectionDrawer } from '../components/reports/InspectionDrawer';
 import { InspectionDetailModal } from '../components/reports/InspectionDetailModal';
 import { Sidebar } from '../components/mobile/Sidebar';
 import { BottomNav } from '../components/mobile/BottomNav';
-import { Calendar, TrendingUp, FileText, Menu, Download, Users, FileDown, Building2, MapPin } from 'lucide-react';
+import { Calendar, TrendingUp, FileText, Menu, Download, Users, FileDown, Building2 } from 'lucide-react';
 import { exportToCSV, type ExportInspectionData } from '../lib/exportUtils';
 import { generateMonthlyReport } from '../lib/pdfGenerator';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import { useOrganizations } from '../hooks/useOrganizations';
 import { useBuildings } from '../hooks/useBuildings';
 
 export const ReportsPage = () => {
@@ -36,14 +35,11 @@ export const ReportsPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Filter states
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>('');
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
 
-  // Fetch organizations and buildings
-  const { data: organizations, isLoading: orgsLoading } = useOrganizations();
+  // Fetch buildings
   const { data: buildings, isLoading: buildingsLoading } = useBuildings({
-    organizationId: selectedOrganizationId || undefined,
-    enabled: true, // Always fetch buildings (will filter by org if selected)
+    enabled: true,
   });
 
   // Fetch monthly data
@@ -60,7 +56,6 @@ export const ReportsPage = () => {
     filterUserId,
     currentDate,
     !adminLoading,  // Wait for admin check to complete
-    selectedOrganizationId || undefined,
     selectedBuildingId || undefined
   );
 
@@ -73,7 +68,6 @@ export const ReportsPage = () => {
     adminLoading,
     dateFilterUserId: dateFilterUserId || 'ALL USERS',
     selectedDate,
-    organizationId: selectedOrganizationId || 'ALL',
     buildingId: selectedBuildingId || 'ALL',
   });
 
@@ -82,7 +76,6 @@ export const ReportsPage = () => {
     dateFilterUserId,
     selectedDate || '',
     !adminLoading,  // Wait for admin check to complete
-    selectedOrganizationId || undefined,
     selectedBuildingId || undefined
   );
 
@@ -197,18 +190,15 @@ export const ReportsPage = () => {
         return;
       }
 
-      // Get organization and building names for PDF
-      const selectedOrg = organizations?.find(org => org.id === selectedOrganizationId);
+      // Get building name for PDF
       const selectedBuilding = buildings?.find(b => b.id === selectedBuildingId);
-
-      const organizationName = selectedOrg?.name || 'Semua Organisasi';
       const siteName = selectedBuilding?.name || 'Semua Lokasi';
 
       // Generate PDF with current data
       await generateMonthlyReport(
         monthlyData,
         currentDate,
-        organizationName,
+        'PT Prenacons Internusa', // Default organization name
         siteName
       );
 
@@ -361,36 +351,12 @@ export const ReportsPage = () => {
         </div>
 
         {/* Filter Section */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {/* Organization Filter */}
-          <div>
-            <label className="flex items-center gap-2 text-xs text-gray-600 mb-1">
-              <Building2 className="w-3 h-3" />
-              <span>Organisasi</span>
-            </label>
-            <select
-              value={selectedOrganizationId}
-              onChange={(e) => {
-                setSelectedOrganizationId(e.target.value);
-                setSelectedBuildingId(''); // Reset building when org changes
-              }}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={orgsLoading}
-            >
-              <option value="">Semua Organisasi</option>
-              {organizations?.filter(org => org.is_active).map((org) => (
-                <option key={org.id} value={org.id}>
-                  {org.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
+        <div className="mb-4">
           {/* Building Filter */}
           <div>
             <label className="flex items-center gap-2 text-xs text-gray-600 mb-1">
-              <MapPin className="w-3 h-3" />
-              <span>Gedung</span>
+              <Building2 className="w-3 h-3" />
+              <span>Filter Gedung</span>
             </label>
             <select
               value={selectedBuildingId}

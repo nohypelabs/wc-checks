@@ -47,25 +47,22 @@ export interface DateInspections {
  *   - Regular user: fetches their own inspections
  * @param currentDate - The month to fetch data for
  * @param enabled - Whether to enable the query (default true)
- * @param organizationId - Optional. Filter by organization
  * @param buildingId - Optional. Filter by building
  */
 export const useMonthlyInspections = (
   userId: string | undefined,
   currentDate: Date,
   enabled: boolean = true,
-  organizationId?: string,
   buildingId?: string
 ) => {
   return useQuery({
-    queryKey: ['monthly-inspections', userId || 'all', format(currentDate, 'yyyy-MM'), organizationId, buildingId],
+    queryKey: ['monthly-inspections', userId || 'all', format(currentDate, 'yyyy-MM'), buildingId],
     queryFn: async () => {
       const month = format(currentDate, 'yyyy-MM');
 
       console.log('📅 Fetching monthly inspections:', {
         userId: userId || 'ALL',
         month,
-        organizationId: organizationId || 'ALL',
         buildingId: buildingId || 'ALL'
       });
 
@@ -81,9 +78,6 @@ export const useMonthlyInspections = (
       let apiUrl = `/api/reports?month=${month}`;
       if (userId) {
         apiUrl += `&userId=${userId}`;
-      }
-      if (organizationId) {
-        apiUrl += `&organizationId=${organizationId}`;
       }
       if (buildingId) {
         apiUrl += `&buildingId=${buildingId}`;
@@ -123,18 +117,16 @@ export const useMonthlyInspections = (
  *   - Regular user: fetches their own inspections
  * @param date - The specific date to fetch data for
  * @param enabled - Whether to enable the query (default true)
- * @param organizationId - Optional. Filter by organization
  * @param buildingId - Optional. Filter by building
  */
 export const useDateInspections = (
   userId: string | undefined,
   date: string,
   enabled: boolean = true,
-  organizationId?: string,
   buildingId?: string
 ) => {
   return useQuery({
-    queryKey: ['date-inspections', userId || 'all', date, organizationId, buildingId],
+    queryKey: ['date-inspections', userId || 'all', date, buildingId],
     queryFn: async () => {
       if (!date) {
         console.warn('⚠️ Missing date');
@@ -144,7 +136,6 @@ export const useDateInspections = (
       console.log('📅 Fetching inspections for date:', {
         userId: userId || 'ALL',
         date,
-        organizationId: organizationId || 'ALL',
         buildingId: buildingId || 'ALL'
       });
 
@@ -160,9 +151,6 @@ export const useDateInspections = (
       let apiUrl = `/api/reports?date=${date}`;
       if (userId) {
         apiUrl += `&userId=${userId}`;
-      }
-      if (organizationId) {
-        apiUrl += `&organizationId=${organizationId}`;
       }
       if (buildingId) {
         apiUrl += `&buildingId=${buildingId}`;
