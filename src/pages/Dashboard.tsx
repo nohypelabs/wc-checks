@@ -68,7 +68,7 @@ export const Dashboard = () => {
 
   // Fetch inspections via API - admin or user endpoint
   const { data: userInspections, isLoading: userInspectionsLoading } = useInspections();
-  const { data: adminInspections, isLoading: adminInspectionsLoading } = useAdminInspections(100);
+  const { data: adminInspections, isLoading: adminInspectionsLoading } = useAdminInspections(1000);
 
   // Use admin data if admin, otherwise use user data
   const inspections = isAdmin ? adminInspections : userInspections;

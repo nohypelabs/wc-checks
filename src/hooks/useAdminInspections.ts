@@ -42,7 +42,7 @@ export function useAdminInspections({
   userId,
   locationId,
   date,
-  limit = 100,
+  limit = 1000,
   enabled = true,
 }: UseAdminInspectionsOptions = {}) {
   return useQuery({
@@ -159,7 +159,7 @@ export function useLocationInspections(locationId?: string, limit = 50) {
 /**
  * Fetch inspections for a specific date (admin view)
  */
-export function useDateInspections(date?: string, limit = 100) {
+export function useDateInspections(date?: string, limit = 1000) {
   return useAdminInspections({
     date,
     limit,
