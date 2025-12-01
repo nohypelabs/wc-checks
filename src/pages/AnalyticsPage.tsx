@@ -189,15 +189,25 @@ export const AnalyticsPage = () => {
           <BarChart3 className="w-6 h-6 text-blue-600" />
         </div>
 
-        {/* Month Selector */}
-        <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-3 border border-gray-200">
-          <Calendar className="w-5 h-5 text-gray-600" />
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="flex-1 bg-transparent border-none outline-none font-medium text-gray-900"
-          />
+        {/* Month Selector - Simple approach with visible input */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Calendar className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <label htmlFor="analytics-month" className="block text-xs text-blue-600 font-medium mb-1">
+                Pilih Periode
+              </label>
+              <input
+                id="analytics-month"
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="w-full px-3 py-2 bg-white border border-blue-300 rounded-lg font-bold text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
