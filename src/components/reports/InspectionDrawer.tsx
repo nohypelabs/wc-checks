@@ -232,9 +232,9 @@ export const InspectionDrawer = ({
                           📍 {inspection.location.building_ref?.name || inspection.location.building} • {inspection.location.floor}
                         </p>
                       )}
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{inspection.inspection_time}</span>
+                      <div className="flex items-center space-x-1.5">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm font-medium">{inspection.inspection_time}</span>
                       </div>
                     </div>
 
