@@ -227,7 +227,7 @@ export const InspectionDrawer = ({
                         </p>
                       )}
                       {/* Building and Floor */}
-                      {inspection.location.building && (
+                      {(inspection.location.building_ref?.name || inspection.location.building) && (
                         <p className="truncate">
                           📍 {inspection.location.building_ref?.name || inspection.location.building} • {inspection.location.floor}
                         </p>
