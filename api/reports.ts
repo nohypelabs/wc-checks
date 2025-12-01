@@ -435,8 +435,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           floor,
           organization_id,
           building_id,
-          organization:organizations(id, name, code),
-          building_ref:buildings(id, name, code, type)
+          organization:organizations(id, name, short_code),
+          building_ref:buildings(id, name, short_code, type)
         ),
         user:users!inspection_records_user_id_fkey(
           id,

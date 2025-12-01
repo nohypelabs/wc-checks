@@ -19,12 +19,12 @@ export interface InspectionReport {
     organization?: {
       id: string;
       name: string;
-      code: string;
+      short_code: string;
     } | null;
     building_ref?: {
       id: string;
       name: string;
-      code: string;
+      short_code: string;
       type: string;
     } | null;
   };
