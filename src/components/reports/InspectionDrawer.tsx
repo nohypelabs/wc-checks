@@ -220,9 +220,16 @@ export const InspectionDrawer = ({
                     </div>
 
                     <div className="text-sm text-gray-600 space-y-1">
+                      {/* Organization */}
+                      {inspection.location.organization?.name && (
+                        <p className="truncate">
+                          🏢 {inspection.location.organization.name}
+                        </p>
+                      )}
+                      {/* Building and Floor */}
                       {inspection.location.building && (
                         <p className="truncate">
-                          🏢 {inspection.location.building} • {inspection.location.floor}
+                          📍 {inspection.location.building_ref?.name || inspection.location.building} • {inspection.location.floor}
                         </p>
                       )}
                       <div className="flex items-center space-x-1">
