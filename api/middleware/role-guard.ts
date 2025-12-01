@@ -90,46 +90,41 @@ export async function validateAuth(
       return null;
     }
 
-    // Verify user exists in database
-    const { data: user, error: userError } = await supabase
+    // Verify user exists and get role in SINGLE query (optimized)
+    const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id, email, is_active')
+      .select(`
+        id,
+        email,
+        is_active,
+        user_roles!user_roles_user_id_fkey (
+          role_id,
+          roles!user_roles_role_id_fkey (
+            id,
+            name,
+            level
+          )
+        )
+      `)
       .eq('id', userId)
       .single();
 
-    if (userError || !user) {
+    if (userError || !userData) {
       console.error('[validateAuth] User not found:', userError?.message);
       return null;
     }
 
-    if (!user.is_active) {
+    if (!userData.is_active) {
       console.error('[validateAuth] User is not active');
       return null;
     }
 
-    console.log('[validateAuth] User authenticated:', user.id);
+    console.log('[validateAuth] User authenticated:', userData.id);
 
-    // Get user's role from database (server-side validation)
-    const { data: userRoleData, error: roleError } = await supabase
-      .from('user_roles')
-      .select(`
-        role_id,
-        roles!user_roles_role_id_fkey (
-          id,
-          name,
-          level
-        )
-      `)
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (roleError) {
-      console.error('[validateAuth] Role query error:', roleError.message);
-      return null;
-    }
-
-    // Extract role data (handle Supabase typed response)
-    const roleData = userRoleData?.roles as { id: string; name: string; level: number } | null;
+    // Extract role data from nested join (handle Supabase typed response)
+    const userRoles = userData.user_roles as any[];
+    const firstRole = userRoles?.[0];
+    const roleData = firstRole?.roles as { id: string; name: string; level: number } | null;
 
     const roleLevel = roleData?.level || 0;
     const roleName = roleData?.name || 'user';
@@ -147,7 +142,7 @@ export async function validateAuth(
     }
 
     return {
-      userId: user.id,
+      userId: userData.id,
       userRole: {
         id: roleId,
         name: roleName,

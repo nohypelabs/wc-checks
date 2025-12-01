@@ -47,6 +47,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       level: auth.userRole.level,
     });
 
+    // Set cache headers for faster subsequent requests
+    // Cache for 15 minutes since role changes are rare
+    res.setHeader('Cache-Control', 's-maxage=900, stale-while-revalidate=1800');
+
     // Return role information
     return successResponse(res, {
       userId: auth.userId,
