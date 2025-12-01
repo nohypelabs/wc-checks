@@ -428,7 +428,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         responses,
         photo_urls,
         notes,
-        location:locations!inner(id, name, building, floor, organization_id, building_id),
+        location:locations!inner(
+          id,
+          name,
+          building,
+          floor,
+          organization_id,
+          building_id,
+          organization:organizations(id, name, code),
+          building_ref:buildings(id, name, code, type)
+        ),
         user:users!inspection_records_user_id_fkey(
           id,
           full_name,

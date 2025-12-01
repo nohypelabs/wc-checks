@@ -191,11 +191,21 @@ export const InspectionDetailModal = ({
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-1">{inspection.location?.name}</h2>
-                  <div className="flex items-center space-x-2 text-white/90 text-sm">
-                    <MapPin className="w-4 h-4" />
-                    <span>{inspection.location?.building}</span>
-                    <span>•</span>
-                    <span>{inspection.location?.floor}</span>
+                  <div className="space-y-1">
+                    {/* Organization */}
+                    {inspection.location?.organization?.name && (
+                      <div className="flex items-center space-x-2 text-white/90 text-sm">
+                        <span>🏢</span>
+                        <span>{inspection.location.organization.name}</span>
+                      </div>
+                    )}
+                    {/* Building and Floor */}
+                    <div className="flex items-center space-x-2 text-white/90 text-sm">
+                      <MapPin className="w-4 h-4" />
+                      <span>{inspection.location?.building_ref?.name || inspection.location?.building}</span>
+                      <span>•</span>
+                      <span>{inspection.location?.floor}</span>
+                    </div>
                   </div>
                 </div>
               </div>

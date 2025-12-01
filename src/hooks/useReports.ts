@@ -14,6 +14,19 @@ export interface InspectionReport {
     name: string;
     building: string;
     floor: string;
+    organization_id: string;
+    building_id: string;
+    organization?: {
+      id: string;
+      name: string;
+      code: string;
+    } | null;
+    building_ref?: {
+      id: string;
+      name: string;
+      code: string;
+      type: string;
+    } | null;
   };
   user: {
     id: string;
