@@ -18,11 +18,10 @@ import {
   ChevronRight,
   Shield,
   FileCode,
-  Bell,
   Droplets
 } from 'lucide-react';
 import { clsx } from 'clsx';
-import { backdropFade, TAP_TRANSITION, HOVER_TRANSITION, SPRINGS } from '../../lib/animations';
+import { backdropFade, TAP_TRANSITION, SPRINGS } from '../../lib/animations';
 
 interface NavItem {
   id: string;
@@ -40,7 +39,7 @@ interface SidebarProps {
 export const Sidebar = ({ className }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, profile, signOut } = useAuth();
+  const { profile, signOut } = useAuth();
   const { isAdmin, isSuperAdmin } = useIsAdmin();
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -92,34 +91,76 @@ export const Sidebar = ({ className }: SidebarProps) => {
       <motion.button
         onClick={() => handleNavClick(item.path)}
         className={clsx(
-          'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group',
+          'w-full flex items-center gap-3 px-4 py-3 rounded-xl relative overflow-hidden group',
           isActive
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
             : 'text-gray-700 hover:bg-gray-100',
           isCollapsed && 'justify-center px-2'
         )}
-        whileHover={{ scale: 1.015, x: isActive ? 0 : 2 }}
-        whileTap={{ scale: 0.99 }}
-        transition={TAP_TRANSITION}
+        whileHover={{
+          scale: 1.02,
+          x: isActive ? 0 : 4,
+          transition: { type: 'spring', stiffness: 400, damping: 25 }
+        }}
+        whileTap={{
+          scale: 0.97,
+          transition: { type: 'spring', stiffness: 500, damping: 30 }
+        }}
+        layout
+        layoutId={isActive ? 'active-nav' : undefined}
       >
-        <Icon className={clsx('flex-shrink-0', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
+        {/* Ripple effect on click */}
+        {!isActive && (
+          <motion.div
+            className="absolute inset-0 bg-blue-500/10 rounded-xl"
+            initial={{ scale: 0, opacity: 0 }}
+            whileTap={{ scale: 2, opacity: [0, 1, 0] }}
+            transition={{ duration: 0.4 }}
+          />
+        )}
+
+        {/* Active indicator bar */}
+        {isActive && (
+          <motion.div
+            layoutId="active-indicator"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"
+            initial={false}
+            transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+          />
+        )}
+
+        <motion.div
+          animate={{
+            rotate: isActive ? [0, -10, 10, -10, 0] : 0,
+            scale: isActive ? [1, 1.1, 1] : 1
+          }}
+          transition={{
+            duration: 0.5,
+            ease: 'easeInOut'
+          }}
+        >
+          <Icon className={clsx('flex-shrink-0 relative z-10', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
+        </motion.div>
+
         <AnimatePresence mode="wait">
           {!isCollapsed && (
             <motion.div
               key="nav-content"
               className="flex items-center gap-2 flex-1"
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: 'auto' }}
-              exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             >
-              <span className="font-medium flex-1 text-left">{item.label}</span>
+              <span className="font-medium flex-1 text-left relative z-10">{item.label}</span>
               {item.badge && item.badge > 0 && (
                 <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: 180 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                   className={clsx(
-                    'px-2 py-0.5 rounded-full text-xs font-semibold',
+                    'px-2 py-0.5 rounded-full text-xs font-semibold relative z-10',
                     isActive ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-600'
                   )}
                 >
@@ -136,12 +177,29 @@ export const Sidebar = ({ className }: SidebarProps) => {
   return (
     <>
       {/* Mobile Toggle Button */}
-      <button
+      <motion.button
         onClick={() => setIsOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-40 w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center"
+        whileHover={{
+          scale: 1.05,
+          rotate: 90,
+          transition: { type: 'spring', stiffness: 400, damping: 20 }
+        }}
+        whileTap={{
+          scale: 0.95,
+          transition: { type: 'spring', stiffness: 500, damping: 30 }
+        }}
+        animate={{
+          rotate: isOpen ? 90 : 0
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 25
+        }}
       >
         <Menu className="w-5 h-5 text-gray-700" />
-      </button>
+      </motion.button>
 
       {/* Backdrop Overlay (Mobile) */}
       <AnimatePresence>
@@ -256,62 +314,165 @@ export const Sidebar = ({ className }: SidebarProps) => {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {/* Main Navigation */}
-          <div className="space-y-1">
+          <motion.div
+            className="space-y-1"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.05
+                }
+              }
+            }}
+          >
             {!isCollapsed && (
-              <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <motion.div
+                className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 Main Menu
-              </div>
+              </motion.div>
             )}
-            {mainNavItems.map((item) => (
-              <NavItemComponent key={item.id} item={item} />
+            {mainNavItems.map((item, index) => (
+              <motion.div
+                key={item.id}
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  visible: { opacity: 1, x: 0 }
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 24,
+                  delay: index * 0.05
+                }}
+              >
+                <NavItemComponent item={item} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Admin Section - Only show for admins */}
           {showAdminItems && adminNavItems.length > 0 && (
-            <div className="mt-6 space-y-1">
+            <motion.div
+              className="mt-6 space-y-1"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.05,
+                    delayChildren: mainNavItems.length * 0.05
+                  }
+                }
+              }}
+            >
               {!isCollapsed && (
-                <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <motion.div
+                  className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   Admin
-                </div>
+                </motion.div>
               )}
               {adminNavItems.map((item) => (
-                <NavItemComponent key={item.id} item={item} />
+                <motion.div
+                  key={item.id}
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 }
+                  }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 24
+                  }}
+                >
+                  <NavItemComponent item={item} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </nav>
 
         {/* Bottom Actions */}
         <div className={clsx('p-4 border-t border-gray-200 space-y-2', isCollapsed && 'p-2')}>
           {/* Profile Button */}
-          <button
+          <motion.button
             onClick={() => handleNavClick('/profile')}
             className={clsx(
-              'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
+              'w-full flex items-center gap-3 px-4 py-3 rounded-xl relative overflow-hidden',
               'text-gray-700 hover:bg-gray-100',
               location.pathname === '/profile' && 'bg-gray-100',
               isCollapsed && 'justify-center px-2'
             )}
+            whileHover={{
+              scale: 1.02,
+              x: 2,
+              transition: { type: 'spring', stiffness: 400, damping: 25 }
+            }}
+            whileTap={{
+              scale: 0.97,
+              transition: { type: 'spring', stiffness: 500, damping: 30 }
+            }}
           >
-            <Settings className={clsx('flex-shrink-0', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
-            {!isCollapsed && <span className="font-medium">Settings</span>}
-          </button>
+            {/* Ripple effect */}
+            <motion.div
+              className="absolute inset-0 bg-gray-500/10 rounded-xl"
+              initial={{ scale: 0, opacity: 0 }}
+              whileTap={{ scale: 2, opacity: [0, 1, 0] }}
+              transition={{ duration: 0.4 }}
+            />
+            <motion.div
+              whileHover={{ rotate: 90 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <Settings className={clsx('flex-shrink-0 relative z-10', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
+            </motion.div>
+            {!isCollapsed && <span className="font-medium relative z-10">Settings</span>}
+          </motion.button>
 
           {/* Logout Button */}
-          <button
+          <motion.button
             onClick={handleSignOut}
             className={clsx(
-              'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
+              'w-full flex items-center gap-3 px-4 py-3 rounded-xl relative overflow-hidden',
               'text-red-600 hover:bg-red-50',
               isCollapsed && 'justify-center px-2'
             )}
+            whileHover={{
+              scale: 1.02,
+              x: 2,
+              backgroundColor: 'rgba(254, 226, 226, 0.5)', // red-50 on hover
+              transition: { type: 'spring', stiffness: 400, damping: 25 }
+            }}
+            whileTap={{
+              scale: 0.97,
+              transition: { type: 'spring', stiffness: 500, damping: 30 }
+            }}
           >
-            <LogOut className={clsx('flex-shrink-0', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
-            {!isCollapsed && <span className="font-medium">Logout</span>}
-          </button>
+            {/* Ripple effect */}
+            <motion.div
+              className="absolute inset-0 bg-red-500/10 rounded-xl"
+              initial={{ scale: 0, opacity: 0 }}
+              whileTap={{ scale: 2, opacity: [0, 1, 0] }}
+              transition={{ duration: 0.4 }}
+            />
+            <motion.div
+              whileHover={{ x: 2 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <LogOut className={clsx('flex-shrink-0 relative z-10', isCollapsed ? 'w-6 h-6' : 'w-5 h-5')} />
+            </motion.div>
+            {!isCollapsed && <span className="font-medium relative z-10">Logout</span>}
+          </motion.button>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* Spacer for desktop layout */}
       <div className={clsx(
