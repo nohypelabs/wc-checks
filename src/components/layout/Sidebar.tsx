@@ -219,7 +219,15 @@ export const Sidebar = ({ className }: SidebarProps) => {
           x: isOpen ? 0 : '-100%',
           width: isCollapsed ? 80 : 288, // 20rem = 80px collapsed, 72rem = 288px expanded
         }}
-        transition={SPRINGS.smooth}
+        transition={{
+          x: SPRINGS.smooth, // Mobile slide in/out - keep fast
+          width: {
+            type: 'spring',
+            stiffness: 180,
+            damping: 26,
+            mass: 0.8,
+          }, // Slower, smoother collapse/expand
+        }}
         className={clsx(
           'fixed top-0 left-0 h-full bg-white shadow-xl z-50 flex flex-col',
           'lg:translate-x-0', // Desktop always visible
@@ -475,10 +483,18 @@ export const Sidebar = ({ className }: SidebarProps) => {
       </motion.aside>
 
       {/* Spacer for desktop layout */}
-      <div className={clsx(
-        'hidden lg:block flex-shrink-0 transition-all duration-300',
-        isCollapsed ? 'w-20' : 'w-72'
-      )} />
+      <motion.div
+        className="hidden lg:block flex-shrink-0"
+        animate={{
+          width: isCollapsed ? 80 : 288
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 180,
+          damping: 26,
+          mass: 0.8,
+        }}
+      />
     </>
   );
 };
