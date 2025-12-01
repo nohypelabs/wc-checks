@@ -81,8 +81,13 @@ export async function generateMonthlyReport(
   pdf.addPage('a4', 'portrait');
   addSignaturePage(pdf, reportData, config);
 
-  // Download PDF
-  const filename = `Laporan_Kebersihan_${monthName}_${year}.pdf`;
+  // Download PDF with building name
+  // Sanitize siteName for filename (remove spaces and special chars)
+  const sanitizedSiteName = siteName
+    .replace(/\s+/g, '_')
+    .replace(/[^a-zA-Z0-9_-]/g, '');
+
+  const filename = `Laporan_Kebersihan_Bulanan_${sanitizedSiteName}_${monthName}_${year}.pdf`;
   pdf.save(filename);
 }
 
