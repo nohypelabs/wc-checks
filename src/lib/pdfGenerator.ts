@@ -13,6 +13,7 @@ import type {
 } from '../types/pdf.types';
 import { getScoreColorString } from '../types/pdf.types';
 import { InspectionReport } from '../hooks/useReports';
+import { INSPECTION_COMPONENTS } from '../types/inspection.types';
 
 /**
  * Generate monthly PDF report
@@ -598,12 +599,15 @@ function prepareScoreTable(data: PDFReportData): PDFScoreTableRow[] {
   data.dateInspections.forEach((dateInsp) => {
     dateInsp.inspections.forEach((inspection) => {
       const day = parseInt(dateInsp.date.split('-')[2], 10);
-      const locationKey = `${inspection.location.name}|${inspection.location.building}|${inspection.location.floor}`;
+
+      // ✅ FIX: Use building_ref.name first, fallback to building field
+      const buildingName = inspection.location.building_ref?.name || inspection.location.building || '-';
+      const locationKey = `${inspection.location.name}|${buildingName}|${inspection.location.floor}`;
 
       if (!locationScores.has(locationKey)) {
         locationScores.set(locationKey, {
           location: inspection.location.name,
-          building: inspection.location.building?.trim() || '-',
+          building: buildingName.trim(),
           floor: inspection.location.floor?.trim() || '-',
           dailyScores: new Map<number, number[]>(),
         });
@@ -647,7 +651,7 @@ function prepareScoreTable(data: PDFReportData): PDFScoreTableRow[] {
 
 /**
  * Helper: Calculate inspection score from responses
- * (Uses same logic as API to ensure consistency)
+ * (Uses same logic as UI to ensure consistency)
  */
 function calculateInspectionScore(inspection: InspectionReport): number {
   try {
@@ -661,13 +665,34 @@ function calculateInspectionScore(inspection: InspectionReport): number {
     }
 
     // Calculate from ratings array (new format with weights)
+    // ✅ FIX: Use the SAME logic as UI's calculateWeightedScore function
     if (Array.isArray(responses.ratings) && responses.ratings.length > 0) {
-      const totalWeight = responses.ratings.reduce((sum: number, r: any) => sum + (r.weight || 1), 0);
-      const weightedSum = responses.ratings.reduce((sum: number, r: any) => {
-        const score = r.score || 0;
-        const weight = r.weight || 1;
-        return sum + (score * weight);
-      }, 0);
+      let totalWeight = 0;
+      let weightedSum = 0;
+
+      responses.ratings.forEach((rating: any) => {
+        // Skip unavailable components from scoring
+        if (rating.isAvailable === false) return;
+
+        // Find component config to get weight
+        const component = INSPECTION_COMPONENTS.find((c: any) => c.id === rating.component);
+        if (!component) return;
+
+        totalWeight += component.weight;
+
+        // Scoring: good = 100, normal = 60, bad = 20, other = 40
+        const scoreMap: { [key: string]: number } = {
+          good: 100,
+          normal: 60,
+          bad: 20,
+          other: 40,
+        };
+
+        const score = scoreMap[rating.choice] || 0;
+        weightedSum += score * component.weight;
+      });
+
+      if (totalWeight === 0) return 0;
       return Math.round(weightedSum / totalWeight);
     }
 
