@@ -45,7 +45,7 @@ export function useInspections() {
  * Fetch all inspections via ADMIN API
  * Only admins can access this endpoint - returns all users' inspections
  */
-export function useAdminInspections(limit: number = 1000) {
+export function useAdminInspections(limit: number = 5000) {
   return useQuery({
     queryKey: ['admin-inspections', limit],
     queryFn: async () => {

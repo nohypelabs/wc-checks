@@ -24,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return errorResponse(res, 403, 'Access denied - Admin privileges required');
   }
 
-  const { id, user_id, location_id, date, limit = '1000' } = req.query;
+  const { id, user_id, location_id, date, limit = '5000' } = req.query;
   const inspectionId = Array.isArray(id) ? id[0] : id;
   const userId = Array.isArray(user_id) ? user_id[0] : user_id;
   const locationId = Array.isArray(location_id) ? location_id[0] : location_id;
