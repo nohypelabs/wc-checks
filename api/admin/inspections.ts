@@ -54,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .from('inspection_records')
       .select('*, locations!inner(id, name, floor, buildings(name)), users!inspection_records_user_id_fkey(full_name, email)')
       .order('inspection_date', { ascending: false })
-      .limit(parseInt(resultLimit, 10));
+      .range(0, parseInt(resultLimit, 10) - 1);
 
     if (userId) {
       query = query.eq('user_id', userId);
