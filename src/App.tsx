@@ -8,6 +8,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { useAuth } from './hooks/useAuth';
+import { useIsAdmin } from './hooks/useIsAdmin';
 import { logger } from './lib/logger';
 import './App.css';
 
@@ -17,9 +18,6 @@ import { RegisterPage } from './pages/RegisterPage';
 
 // LAZY LOAD: Heavy pages loaded on-demand
 // FIX: Handle named exports by mapping to default
-const Dashboard = lazy(() => 
-  import('./pages/Dashboard').then(module => ({ default: module.Dashboard }))
-);
 const ScanPage = lazy(() => 
   import('./pages/ScanPage').then(module => ({ default: module.ScanPage }))
 );
@@ -58,6 +56,12 @@ const QRCodeGenerator = lazy(() =>
 );
 const UserManagement = lazy(() =>
   import('./pages/superadmin/UserManagement').then(module => ({ default: module.UserManagement }))
+);
+const OccupationManagerPage = lazy(() =>
+  import('./pages/admin/OccupationManagerPage').then(module => ({ default: module.OccupationManagerPage }))
+);
+const TemplatesManager = lazy(() =>
+  import('./pages/admin/TemplatesManager').then(module => ({ default: module.TemplatesManager }))
 );
 const SettingsPage = lazy(() =>
   import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage }))
@@ -112,14 +116,17 @@ const AuthLoader = () => (
   </div>
 );
 
+// Main Dashboard - Accessible to all users (shows AdminDashboard which has role-based content)
+// No need for router - AdminDashboard already handles admin vs user content display
+
 // 404 Page
 const NotFoundPage = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
     <div className="text-center">
       <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
       <p className="text-gray-600 mb-4">Page not found</p>
-      <a 
-        href="/" 
+      <a
+        href="/"
         className="text-blue-600 hover:underline font-medium"
       >
         Back to Dashboard
@@ -158,13 +165,17 @@ function AppContent() {
         />
 
         {/* Protected Routes - Main */}
-        <Route 
-          path="/" 
-          element={user ? <Dashboard /> : <Navigate to="/login" replace />} 
+        <Route
+          path="/"
+          element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
         />
-        <Route 
-          path="/dashboard" 
-          element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} 
+        <Route
+          path="/dashboard"
+          element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/dashboard/user"
+          element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />}
         />
         <Route 
           path="/scan" 
@@ -235,14 +246,30 @@ function AppContent() {
           element={user ? <AboutPage /> : <Navigate to="/login" replace />}
         />
 
-        {/* Admin Routes */}
-        <Route 
-          path="/admin" 
-          element={user ? <AdminDashboard /> : <Navigate to="/login" replace />} 
+        {/* Admin Routes - Same as main dashboard (accessible to all users) */}
+        <Route
+          path="/admin"
+          element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
         />
-        <Route 
-          path="/admin/QRCodeGenerator" 
-          element={user ? <QRCodeGenerator /> : <Navigate to="/login" replace />} 
+        <Route
+          path="/admin/users"
+          element={user ? <UserManagement /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/occupations"
+          element={user ? <OccupationManagerPage /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/reports"
+          element={user ? <ReportsPage /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/templates"
+          element={user ? <TemplatesManager /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/QRCodeGenerator"
+          element={user ? <QRCodeGenerator /> : <Navigate to="/login" replace />}
         />
 
         {/* 404 */}

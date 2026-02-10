@@ -1,6 +1,8 @@
-// src/pages/admin/AdminDashboard.tsx - Main Admin Dashboard
+// src/pages/admin/AdminDashboard.tsx - Main Dashboard (Admin & User)
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useIsAdmin } from '../../hooks/useIsAdmin';
 import { useAdminStats } from '../../hooks/useAdminStats';
 import {
   Users,
@@ -14,17 +16,21 @@ import {
   Settings,
   BarChart3,
   Calendar,
-  ArrowLeft,
+  Menu,
   Shield
 } from 'lucide-react';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { Card, CardHeader } from '../../components/ui/Card';
-import { usePerformance } from '../../hooks/usePerformance'
+import { usePerformance } from '../../hooks/usePerformance';
+import { Sidebar } from '../../components/mobile/Sidebar';
+import { BottomNav } from '../../components/mobile/BottomNav';
 
 export const AdminDashboard = () => {
-   usePerformance('HomePage');
+  usePerformance('HomePage');
   const { profile } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // ✅ FIXED: Use backend API for dashboard stats
   const { data: stats, isLoading } = useAdminStats();
@@ -38,15 +44,18 @@ export const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
-      {/* Header with Gradient */}
-      <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 p-6 rounded-b-3xl shadow-lg">
-        <div className="flex items-center justify-between text-white mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-20">
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Header with Glass Effect */}
+      <div className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20">
+        <div className="flex items-center justify-between text-white mb-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => setSidebarOpen(true)}
             className="p-2 hover:bg-white/10 rounded-xl transition-colors"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <Menu className="w-6 h-6" />
           </button>
           <button
             onClick={() => navigate('/profile')}
@@ -56,22 +65,24 @@ export const AdminDashboard = () => {
           </button>
         </div>
 
-        <div className="flex items-center gap-3 text-white mb-2">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-            <Shield className="w-7 h-7" />
+        <div className="flex items-center gap-3 text-white">
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-1.5">
+            <img src="/logo.png" alt="Prenacons Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-purple-100">Welcome back, {profile?.full_name}!</p>
+            <h1 className="text-xl font-bold">Proservice Indonesia</h1>
+            <p className="text-sm text-blue-100">
+              Selamat datang, {isAdmin ? 'Admin' : 'User'} {profile?.full_name?.split(' ')[0] || ''}
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="px-6 -mt-8">
+      <div className="px-6 pt-4">
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {/* Today's Inspections */}
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-100">
+          <Card className="p-4 bg-white shadow-xl border-0">
             <div className="flex items-center justify-between mb-2">
               <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                 <Activity className="w-5 h-5 text-blue-600" />
@@ -90,7 +101,7 @@ export const AdminDashboard = () => {
           </Card>
 
           {/* Average Score */}
-          <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-green-100">
+          <Card className="p-4 bg-white shadow-xl border-0">
             <div className="flex items-center justify-between mb-2">
               <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-green-600" />
@@ -101,7 +112,7 @@ export const AdminDashboard = () => {
           </Card>
 
           {/* Total Users */}
-          <Card className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100">
+          <Card className="p-4 bg-white shadow-xl border-0">
             <div className="flex items-center justify-between mb-2">
               <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                 <Users className="w-5 h-5 text-purple-600" />
@@ -112,7 +123,7 @@ export const AdminDashboard = () => {
           </Card>
 
           {/* Active Users */}
-          <Card className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 border-orange-100">
+          <Card className="p-4 bg-white shadow-xl border-0">
             <div className="flex items-center justify-between mb-2">
               <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
                 <Activity className="w-5 h-5 text-orange-600" />
@@ -123,72 +134,74 @@ export const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Management Cards */}
-        <div className="mb-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">Management</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <AdminCard
-              icon={Users}
-              title="User Management"
-              description="Manage users, roles, and permissions"
-              path="/admin/users"
-              color="blue"
-              count={stats?.totalUsers}
-            />
+        {/* Management Cards - Admin Only */}
+        {isAdmin && (
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-white mb-3">Management</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <AdminCard
+                icon={Users}
+                title="User Management"
+                description="Manage users, roles, and permissions"
+                path="/admin/users"
+                color="blue"
+                count={stats?.totalUsers}
+              />
 
-            <AdminCard
-              icon={MapPin}
-              title="Locations"
-              description="Manage toilet locations and QR codes"
-              path="/admin/locations"
-              color="green"
-              count={stats?.totalLocations}
-            />
+              <AdminCard
+                icon={MapPin}
+                title="Locations"
+                description="Manage toilet locations and QR codes"
+                path="/admin/locations"
+                color="green"
+                count={stats?.totalLocations}
+              />
 
-            <AdminCard
-              icon={Briefcase}
-              title="Occupations"
-              description="Manage job titles and roles"
-              path="/admin/occupations"
-              color="purple"
-            />
+              <AdminCard
+                icon={Briefcase}
+                title="Occupations"
+                description="Manage job titles and roles"
+                path="/admin/occupations"
+                color="purple"
+              />
 
-            <AdminCard
-              icon={Building2}
-              title="Organizations"
-              description="Manage buildings and organizations"
-              path="/admin/organizations"
-              color="cyan"
-            />
+              <AdminCard
+                icon={Building2}
+                title="Organizations"
+                description="Manage buildings and organizations"
+                path="/admin/organizations"
+                color="cyan"
+              />
 
-            <AdminCard
-              icon={FileText}
-              title="Templates"
-              description="Manage inspection templates"
-              path="/admin/templates"
-              color="orange"
-            />
+              <AdminCard
+                icon={FileText}
+                title="Templates"
+                description="Manage inspection templates"
+                path="/admin/templates"
+                color="orange"
+              />
 
-            <AdminCard
-              icon={BarChart3}
-              title="Reports"
-              description="View detailed analytics and reports"
-              path="/admin/reports"
-              color="red"
-              count={stats?.totalInspections}
-            />
+              <AdminCard
+                icon={BarChart3}
+                title="Reports"
+                description="View detailed analytics and reports"
+                path="/admin/reports"
+                color="red"
+                count={stats?.totalInspections}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader 
+        <Card className="bg-white shadow-xl border-0">
+          <CardHeader
             title="System Overview"
             subtitle="Key metrics at a glance"
             icon={<Activity className="w-5 h-5 text-blue-600" />}
           />
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl">
               <div className="flex items-center gap-3">
                 <FileText className="w-5 h-5 text-gray-500" />
                 <span className="text-sm font-medium text-gray-900">Total Inspections</span>
@@ -196,7 +209,7 @@ export const AdminDashboard = () => {
               <span className="text-lg font-bold text-gray-900">{stats?.totalInspections || 0}</span>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-gray-500" />
                 <span className="text-sm font-medium text-gray-900">Active Locations</span>
@@ -204,7 +217,7 @@ export const AdminDashboard = () => {
               <span className="text-lg font-bold text-gray-900">{stats?.totalLocations || 0}</span>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl">
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-gray-500" />
                 <span className="text-sm font-medium text-gray-900">Today's Activity</span>
@@ -214,6 +227,9 @@ export const AdminDashboard = () => {
           </div>
         </Card>
       </div>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 };

@@ -85,18 +85,18 @@ export const CalendarView = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-100">
+    <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100">
+      {/* Header - Compact on Desktop */}
+      <div className="p-2.5 md:p-3 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <motion.button
             onClick={handlePrevMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
             whileHover={{ scale: 1.05, x: -2 }}
             whileTap={{ scale: 0.95 }}
             transition={TAP_TRANSITION}
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
           </motion.button>
 
           <motion.h2
@@ -104,35 +104,35 @@ export const CalendarView = ({
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="text-lg font-bold text-gray-900"
+            className="text-base md:text-lg font-bold text-gray-900"
           >
             {format(currentDate, 'MMMM yyyy')}
           </motion.h2>
 
           <motion.button
             onClick={handleNextMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
             whileHover={{ scale: 1.05, x: 2 }}
             whileTap={{ scale: 0.95 }}
             transition={TAP_TRANSITION}
           >
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
           </motion.button>
         </div>
 
-        {/* Weekday headers */}
-        <div className="grid grid-cols-7 gap-1 mt-4">
+        {/* Weekday headers - Compact on Desktop */}
+        <div className="grid grid-cols-7 gap-0.5 md:gap-1 mt-2 md:mt-3">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+            <div key={day} className="text-center text-[10px] md:text-xs font-medium text-gray-500 py-1 md:py-1.5">
               {day}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Calendar Grid */}
-      <div className="p-2">
-        <div className="grid grid-cols-7 gap-1">
+      {/* Calendar Grid - Compact on Desktop */}
+      <div className="p-1.5 md:p-2">
+        <div className="grid grid-cols-7 gap-0.5 md:gap-1">
           {/* Empty cells for days before month starts */}
           {emptyDays.map((_, index) => (
             <div key={`empty-${index}`} className="aspect-square" />
@@ -195,18 +195,18 @@ export const CalendarView = ({
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="p-4 border-t border-gray-100 flex items-center justify-center space-x-4 text-xs text-gray-600">
+      {/* Legend - Compact on Desktop */}
+      <div className="p-2 md:p-3 border-t border-gray-100 flex items-center justify-center space-x-3 md:space-x-4 text-[10px] md:text-xs text-gray-600">
         <div className="flex items-center space-x-1">
-          <div className="w-2 h-2 rounded-full bg-green-500" />
+          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500" />
           <span>Good (85+)</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="w-2 h-2 rounded-full bg-yellow-500" />
+          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500" />
           <span>Fair (70-84)</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="w-2 h-2 rounded-full bg-red-500" />
+          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500" />
           <span>Poor (&lt;70)</span>
         </div>
       </div>

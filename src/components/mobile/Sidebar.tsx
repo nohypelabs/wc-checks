@@ -77,30 +77,44 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-white z-50 shadow-2xl transform transition-transform">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100 p-6">
+        <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Menu</h2>
+            <div className="flex items-center gap-3 text-white">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1.5">
+                <img src="/logo.png" alt="Prenacons Logo" className="w-full h-full object-contain" />
+              </div>
+              <h2 className="text-xl font-bold">
+                {isAdmin ? 'Admin Dashboard' : 'User Dashboard'}
+              </h2>
+            </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+              className="p-2 hover:bg-white/10 rounded-xl transition-colors"
             >
-              <X className="w-6 h-6 text-gray-600" />
+              <X className="w-6 h-6 text-white" />
             </button>
           </div>
 
+          {/* Welcome Text */}
+          {profile && (
+            <p className="text-blue-100 text-sm mb-4">
+              Welcome back, {profile.full_name}!
+            </p>
+          )}
+
           {/* User Info */}
           {profile && (
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+              <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                 <span className="text-lg font-bold text-white">
                   {profile.full_name?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-gray-900 truncate">
+                <div className="font-semibold text-white truncate">
                   {profile.full_name}
                 </div>
-                <div className="text-xs text-gray-500 truncate">
+                <div className="text-xs text-blue-100 truncate">
                   {profile.email}
                 </div>
               </div>

@@ -217,7 +217,7 @@ export const ScanPage = () => {
           </button>
 
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
             className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-gray-50"
           >
             <TrendingUp className="w-7 h-7 text-green-600 mb-3" />
@@ -230,7 +230,7 @@ export const ScanPage = () => {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-gray-900">Recent</h3>
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/')}
               className="text-sm text-blue-600 font-medium"
             >
               View All

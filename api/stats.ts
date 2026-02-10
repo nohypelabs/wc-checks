@@ -1,13 +1,13 @@
-// api/admin/stats.ts - Admin Dashboard Statistics (ADMIN+ ONLY)
+// api/stats.ts - Dashboard Statistics (ALL AUTHENTICATED USERS)
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import {
   validateAuth,
   supabase,
   successResponse,
   errorResponse,
-} from '../middleware/role-guard.js';
+} from './middleware/role-guard.js';
 
-interface AdminStats {
+interface DashboardStats {
   totalUsers: number;
   totalLocations: number;
   totalInspections: number;
@@ -19,12 +19,12 @@ interface AdminStats {
 }
 
 /**
- * GET /api/admin/stats
+ * GET /api/stats
  *
- * Retrieves comprehensive admin dashboard statistics
+ * Retrieves comprehensive dashboard statistics
  *
  * Requirements:
- * - User must be level 80+ (admin or above)
+ * - User must be authenticated (any role)
  *
  * Response:
  * {
@@ -44,15 +44,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return errorResponse(res, 405, 'Method not allowed');
   }
 
-  // Validate authentication and require admin (level 80+)
-  const auth = await validateAuth(req, 80);
+  // Validate authentication (level 0 = any authenticated user)
+  const auth = await validateAuth(req, 0);
 
   if (!auth || !supabase) {
     console.error('[stats] Auth failed or Supabase not initialized');
-    return errorResponse(res, 403, 'Access denied - Admin privileges required');
+    return errorResponse(res, 401, 'Authentication required');
   }
 
-  console.log('[stats] Admin access granted:', {
+  console.log('[stats] Access granted:', {
     userId: auth.userId,
     role: auth.userRole.name,
     level: auth.userRole.level,
@@ -147,7 +147,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ? Math.round(((todayCount - yesterdayCount) / yesterdayCount) * 100)
         : 0;
 
-    const stats: AdminStats = {
+    const stats: DashboardStats = {
       totalUsers: usersCount.count || 0,
       totalLocations: locationsCount.count || 0,
       totalInspections: inspectionsCount.count || 0,
@@ -158,7 +158,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       inspectionGrowth,
     };
 
-    console.log('[stats] Success - returning dashboard statistics');
+    console.log('[stats] Success - returning dashboard statistics for user:', auth.userId);
 
     return successResponse(res, stats, 'Statistics retrieved successfully');
   } catch (error: any) {

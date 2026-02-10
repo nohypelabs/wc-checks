@@ -49,7 +49,7 @@ export function LoginPage() {
     if (data?.user) {
       setSuccessMessage('Berhasil masuk! Mengalihkan...');
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/');
       }, 500);
     }
   } catch (err: any) {

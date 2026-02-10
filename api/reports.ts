@@ -149,7 +149,8 @@ async function handleAnalytics(
         )
       `)
       .gte('inspection_date', startDate)
-      .lte('inspection_date', endDate);
+      .lte('inspection_date', endDate)
+      .range(0, 4999); // Fetch up to 5000 records (bypass Supabase 1000 row limit)
 
     // Filter by user if specified
     if (targetUserId) {
@@ -198,7 +199,8 @@ async function handleAnalytics(
         )
       `)
       .gte('inspection_date', prevStartDate)
-      .lte('inspection_date', prevEndDate);
+      .lte('inspection_date', prevEndDate)
+      .range(0, 4999); // Fetch up to 5000 records (bypass Supabase 1000 row limit)
 
     if (targetUserId) {
       prevQuery = prevQuery.eq('user_id', targetUserId);
@@ -447,7 +449,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         )
       `)
       .order('inspection_date', { ascending: false })
-      .order('inspection_time', { ascending: false });
+      .order('inspection_time', { ascending: false })
+      .range(0, 4999); // Fetch up to 5000 records (bypass Supabase 1000 row limit)
 
     // Apply user filter if targetUserId is set
     if (targetUserId) {

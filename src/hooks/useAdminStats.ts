@@ -1,4 +1,4 @@
-// src/hooks/useAdminStats.ts - Admin Dashboard Statistics via Backend API
+// src/hooks/useAdminStats.ts - Dashboard Statistics (All Users)
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 
@@ -13,19 +13,19 @@ export interface AdminStats {
   inspectionGrowth: number;
 }
 
-// Fetch admin dashboard statistics
+// Fetch dashboard statistics (available to all authenticated users)
 export function useAdminStats() {
   return useQuery({
-    queryKey: ['admin-stats'],
+    queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      console.log('[useAdminStats] Fetching from backend API...');
+      console.log('[useAdminStats] Fetching dashboard stats from /api/stats...');
 
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch('/api/admin/stats', {
+      const response = await fetch('/api/stats', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
@@ -36,7 +36,7 @@ export function useAdminStats() {
 
       const result = await response.json();
       console.log('[useAdminStats] Stats retrieved:', result.data);
-      
+
       return result.data as AdminStats;
     },
     staleTime: 60 * 1000, // 1 minute

@@ -306,62 +306,63 @@ export const ReportsPage = () => {
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Header - White Theme */}
-      <div className="bg-white p-6 border-b border-gray-100">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+      {/* Header - White Theme - Compact on Desktop */}
+      <div className="bg-white p-3 md:p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
+          <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+              className="w-9 h-9 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Laporan</h1>
-              <p className="text-sm text-gray-500">Riwayat & analitik inspeksi</p>
+              <h1 className="text-lg md:text-xl font-bold text-gray-900">Laporan</h1>
+              <p className="text-xs md:text-sm text-gray-500">Riwayat & analitik inspeksi</p>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          {/* Desktop: Horizontal layout, Mobile: Vertical */}
+          <div className="flex flex-col md:flex-row gap-2">
             <button
               onClick={handleExportPDF}
-              className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-md text-xs"
+              className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 bg-red-600 text-white rounded-lg md:rounded-xl hover:bg-red-700 transition-colors shadow-md text-xs whitespace-nowrap"
               disabled={totalInspections === 0}
             >
-              <FileDown className="w-4 h-4" />
+              <FileDown className="w-3.5 h-3.5 md:w-4 md:h-4" />
               <span className="font-medium">Export PDF</span>
             </button>
             <button
               onClick={handleExportMonth}
-              className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-md text-xs"
+              className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 bg-green-600 text-white rounded-lg md:rounded-xl hover:bg-green-700 transition-colors shadow-md text-xs whitespace-nowrap"
               disabled={totalInspections === 0}
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5 md:w-4 md:h-4" />
               <span className="font-medium">Data Saya</span>
             </button>
             {isAdmin && (
               <button
                 onClick={handleExportAllUsers}
-                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md text-xs"
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 bg-blue-600 text-white rounded-lg md:rounded-xl hover:bg-blue-700 transition-colors shadow-md text-xs whitespace-nowrap"
               >
-                <Users className="w-4 h-4" />
+                <Users className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span className="font-medium">Semua Pengguna</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Filter Section */}
-        <div className="mb-4">
+        {/* Filter Section - Compact on Desktop */}
+        <div className="mb-2 md:mb-3">
           {/* Building Filter */}
           <div>
-            <label className="flex items-center gap-2 text-xs text-gray-600 mb-1">
+            <label className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
               <Building2 className="w-3 h-3" />
               <span>Filter Gedung</span>
             </label>
             <select
               value={selectedBuildingId}
               onChange={(e) => setSelectedBuildingId(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={buildingsLoading}
             >
               <option value="">Semua Gedung</option>
@@ -374,43 +375,43 @@ export const ReportsPage = () => {
           </div>
         </div>
 
-        {/* Stats Cards - White Theme */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-4">
-            <div className="flex items-center space-x-2 mb-1">
-              <FileText className="w-4 h-4 text-blue-600" />
-              <span className="text-xs text-gray-500">Bulan Ini</span>
+        {/* Stats Cards - Compact on Desktop */}
+        <div className="grid grid-cols-2 gap-2 md:gap-3">
+          <div className="bg-white rounded-xl md:rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.06)] md:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-2.5 md:p-3">
+            <div className="flex items-center space-x-1.5 md:space-x-2 mb-0.5 md:mb-1">
+              <FileText className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" />
+              <span className="text-[10px] md:text-xs text-gray-500">Bulan Ini</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">
               {totalInspections}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Inspeksi</div>
+            <div className="text-[10px] md:text-xs text-gray-500 mt-0.5 md:mt-1">Inspeksi</div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-4">
-            <div className="flex items-center space-x-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-green-600" />
-              <span className="text-xs text-gray-500">Rata-rata</span>
+          <div className="bg-white rounded-xl md:rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.06)] md:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-2.5 md:p-3">
+            <div className="flex items-center space-x-1.5 md:space-x-2 mb-0.5 md:mb-1">
+              <TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
+              <span className="text-[10px] md:text-xs text-gray-500">Rata-rata</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">
               {averageScore}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Skor</div>
+            <div className="text-[10px] md:text-xs text-gray-500 mt-0.5 md:mt-1">Skor</div>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4 space-y-4">
-        {/* Instructions Card */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <div className="flex items-start space-x-3">
-            <div className="text-2xl">💡</div>
+      {/* Content - Compact padding on Desktop */}
+      <div className="p-3 md:p-4 space-y-2 md:space-y-3">
+        {/* Instructions Card - More compact on Desktop */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg md:rounded-xl p-2.5 md:p-3">
+          <div className="flex items-start space-x-2 md:space-x-3">
+            <div className="text-lg md:text-xl">💡</div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-blue-900 mb-1">
+              <p className="text-xs md:text-sm font-medium text-blue-900 mb-0.5 md:mb-1">
                 Ketuk tanggal untuk lihat inspeksi
               </p>
-              <p className="text-xs text-blue-700">
+              <p className="text-[10px] md:text-xs text-blue-700">
                 Titik berwarna menunjukkan skor rata-rata:
                 <span className="font-semibold"> Hijau</span> (sangat baik),
                 <span className="font-semibold"> Kuning</span> (baik),
