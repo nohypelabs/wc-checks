@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] - 2026-04-17
+
+### ✨ UI/UX — Kompaksi Layout & Navigasi
+
+#### Changed
+
+- **InspectionDetailModal — Layout lebih compact (less scrolling)**
+  - Header: padding `p-6` → `p-4`, icon toilet `w-16` → `w-11`, judul `text-2xl` → `text-lg`
+  - Score badge dipindah **inline** ke kanan header (bukan baris terpisah), hemat ~40px vertikal
+  - Metadata cards (Tanggal & Inspektur): selalu 2 kolom, padding `p-4` → `p-2.5`, icon `w-10` → `w-7`
+  - Email inspektur disembunyikan bila occupation tersedia (info duplikat)
+  - Component rating rows: card `p-4 rounded-xl border-2` → slim row `px-3 py-2 rounded-lg border`
+  - Section spacing: `space-y-6` → `space-y-3`; foto grid: `2-3 cols gap-3` → `3-4 cols gap-2`
+  - Issues & Maintenance: `p-4 border-2 rounded-xl` → `px-3 py-2 border rounded-lg`
+  - Bottom spacer: `h-16` → `h-2`; modal height: `max-h-[80vh]` → `max-h-[94vh]`
+  - File: `src/components/reports/InspectionDetailModal.tsx` (commit `615fae9`)
+
+- **ReportsPage — 3 export button digabung jadi 1 dropdown**
+  - Sebelum: button Export PDF (merah), Data Saya (hijau), Semua Pengguna (biru) — stack vertikal di mobile
+  - Sesudah: 1 button `Export ▾` → dropdown berisi semua opsi
+  - Dropdown tutup otomatis on outside click (`useEffect` + `useRef`)
+  - Chevron rotate 180° saat dropdown terbuka
+  - Disabled state tetap terjaga (`totalInspections === 0`)
+  - Opsi "Semua Pengguna" tetap hanya muncul untuk admin
+  - File: `src/pages/ReportsPage.tsx` (commit `2fa6a78`)
+
+> **Status:** Committed, belum dipush — menunggu sign-off client.
+
+---
+
 ## [3.0.0] - 2025-12-01
 
 ### 🎉 Major Release - Enterprise Features & Performance
