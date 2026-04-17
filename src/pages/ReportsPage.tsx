@@ -1,5 +1,5 @@
 // src/pages/ReportsPage.tsx - WITH SIDEBAR
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { useMonthlyInspections, useDateInspections, InspectionReport } from '../hooks/useReports';
@@ -8,7 +8,7 @@ import { InspectionDrawer } from '../components/reports/InspectionDrawer';
 import { InspectionDetailModal } from '../components/reports/InspectionDetailModal';
 import { Sidebar } from '../components/mobile/Sidebar';
 import { BottomNav } from '../components/mobile/BottomNav';
-import { Calendar, TrendingUp, FileText, Menu, Download, Users, FileDown, Building2 } from 'lucide-react';
+import { TrendingUp, FileText, Menu, Download, Users, FileDown, Building2, ChevronDown } from 'lucide-react';
 import { exportToCSV, type ExportInspectionData } from '../lib/exportUtils';
 import { generateMonthlyReport } from '../lib/pdfGenerator';
 import { supabase } from '../lib/supabase';
@@ -33,6 +33,18 @@ export const ReportsPage = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedInspection, setSelectedInspection] = useState<InspectionReport | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+        setExportMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Filter states
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
@@ -321,32 +333,49 @@ export const ReportsPage = () => {
               <p className="text-xs md:text-sm text-gray-500">Riwayat & analitik inspeksi</p>
             </div>
           </div>
-          {/* Desktop: Horizontal layout, Mobile: Vertical */}
-          <div className="flex flex-col md:flex-row gap-2">
+          {/* Export dropdown */}
+          <div className="relative" ref={exportMenuRef}>
             <button
-              onClick={handleExportPDF}
-              className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 bg-red-600 text-white rounded-lg md:rounded-xl hover:bg-red-700 transition-colors shadow-md text-xs whitespace-nowrap"
-              disabled={totalInspections === 0}
+              onClick={() => setExportMenuOpen(prev => !prev)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md text-xs font-medium whitespace-nowrap"
             >
-              <FileDown className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              <span className="font-medium">Export PDF</span>
+              <Download className="w-3.5 h-3.5" />
+              <span>Export</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
             </button>
-            <button
-              onClick={handleExportMonth}
-              className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 bg-green-600 text-white rounded-lg md:rounded-xl hover:bg-green-700 transition-colors shadow-md text-xs whitespace-nowrap"
-              disabled={totalInspections === 0}
-            >
-              <Download className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              <span className="font-medium">Data Saya</span>
-            </button>
-            {isAdmin && (
-              <button
-                onClick={handleExportAllUsers}
-                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 bg-blue-600 text-white rounded-lg md:rounded-xl hover:bg-blue-700 transition-colors shadow-md text-xs whitespace-nowrap"
-              >
-                <Users className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                <span className="font-medium">Semua Pengguna</span>
-              </button>
+
+            {exportMenuOpen && (
+              <div className="absolute right-0 top-full mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                <button
+                  onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
+                  disabled={totalInspections === 0}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <FileDown className="w-4 h-4 text-red-500 flex-shrink-0" />
+                  <span className="font-medium">Export PDF</span>
+                </button>
+                <div className="h-px bg-gray-100" />
+                <button
+                  onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
+                  disabled={totalInspections === 0}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Download className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  <span className="font-medium">Data Saya (CSV)</span>
+                </button>
+                {isAdmin && (
+                  <>
+                    <div className="h-px bg-gray-100" />
+                    <button
+                      onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                    >
+                      <Users className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                      <span className="font-medium">Semua Pengguna</span>
+                    </button>
+                  </>
+                )}
+              </div>
             )}
           </div>
         </div>
