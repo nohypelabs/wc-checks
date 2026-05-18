@@ -32,7 +32,6 @@ export const AdminDashboard = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // ✅ FIXED: Use backend API for dashboard stats
   const { data: stats, isLoading } = useAdminStats();
 
   if (isLoading) {
@@ -44,48 +43,73 @@ export const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-20">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-20 lg:pb-0">
+      {/* Sidebar - mobile only */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Header with Glass Effect */}
-      <div className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20">
-        <div className="flex items-center justify-between text-white mb-3">
+      {/* Header */}
+      <header className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none">
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-white lg:text-gray-900">
+          {/* Left Menu Button */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+            className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors lg:hidden"
           >
             <Menu className="w-6 h-6" />
           </button>
-          <button
-            onClick={() => navigate('/profile')}
-            className="p-2 hover:bg-white/10 rounded-xl transition-colors"
-          >
-            <Settings className="w-6 h-6" />
-          </button>
+
+          {/* Desktop: Logo left */}
+          <div className="hidden lg:flex items-center gap-3">
+            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center p-1.5">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <h1 className="text-base font-bold leading-tight text-gray-900">Proservice Indonesia</h1>
+              <p className="text-xs text-gray-500">Aplikasi Toilet Ceklis Real Time</p>
+            </div>
+          </div>
+
+          {/* Mobile: Centered Logo */}
+          <div className="lg:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1.5">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-lg font-bold whitespace-nowrap leading-tight">Proservice Indonesia</h1>
+              <p className="text-xs text-blue-100 whitespace-nowrap">Aplikasi Toilet Ceklis Real Time</p>
+            </div>
+          </div>
+
+          {/* Right: Welcome + Settings */}
+          <div className="flex items-center gap-3">
+            <span className="hidden lg:inline text-sm text-gray-600">
+              Selamat datang, {isAdmin ? 'Admin' : 'User'} <span className="font-semibold text-gray-900">{profile?.full_name?.split(' ')[0] || ''}</span>
+            </span>
+            <button
+              onClick={() => navigate('/profile')}
+              className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 text-white">
-          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-1.5">
-            <img src="/logo.png" alt="Prenacons Logo" className="w-full h-full object-contain" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold">Proservice Indonesia</h1>
-            <p className="text-sm text-blue-100">
-              Selamat datang, {isAdmin ? 'Admin' : 'User'} {profile?.full_name?.split(' ')[0] || ''}
-            </p>
-          </div>
+        {/* Mobile welcome */}
+        <div className="mt-2 text-center lg:hidden">
+          <p className="text-sm text-blue-100">
+            Selamat datang, {isAdmin ? 'Admin' : 'User'} {profile?.full_name?.split(' ')[0] || ''}
+          </p>
         </div>
-      </div>
+      </header>
 
-      <div className="px-6 pt-4">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {/* Today's Inspections */}
-          <Card className="p-4 bg-white shadow-xl border-0">
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Activity className="w-5 h-5 text-blue-600" />
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 pt-4 lg:pt-6">
+        {/* Quick Stats - 4 columns on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-4 lg:mb-6">
+          <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-blue-100 rounded-lg lg:rounded-lg flex items-center justify-center">
+                <Activity className="w-4 h-4 lg:w-4 lg:h-4 text-blue-600" />
               </div>
               {stats && stats.inspectionGrowth !== 0 && (
                 <div className={`flex items-center gap-1 text-xs font-medium ${
@@ -96,140 +120,129 @@ export const AdminDashboard = () => {
                 </div>
               )}
             </div>
-            <div className="text-2xl font-bold text-gray-900">{stats?.todayInspections || 0}</div>
-            <div className="text-xs text-gray-600">Today's Inspections</div>
+            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.todayInspections || 0}</div>
+            <div className="text-xs text-gray-500">Today's Inspections</div>
           </Card>
 
-          {/* Average Score */}
-          <Card className="p-4 bg-white shadow-xl border-0">
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-green-600" />
+          <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-green-600" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{stats?.avgScore || 0}</div>
-            <div className="text-xs text-gray-600">Average Score</div>
+            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.avgScore || 0}</div>
+            <div className="text-xs text-gray-500">Average Score</div>
           </Card>
 
-          {/* Total Users */}
-          <Card className="p-4 bg-white shadow-xl border-0">
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                <Users className="w-5 h-5 text-purple-600" />
+          <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Users className="w-4 h-4 text-purple-600" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{stats?.totalUsers || 0}</div>
-            <div className="text-xs text-gray-600">Total Users</div>
+            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.totalUsers || 0}</div>
+            <div className="text-xs text-gray-500">Total Users</div>
           </Card>
 
-          {/* Active Users */}
-          <Card className="p-4 bg-white shadow-xl border-0">
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-                <Activity className="w-5 h-5 text-orange-600" />
+          <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Activity className="w-4 h-4 text-orange-600" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{stats?.activeUsers || 0}</div>
-            <div className="text-xs text-gray-600">Active Users (7d)</div>
+            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.activeUsers || 0}</div>
+            <div className="text-xs text-gray-500">Active Users (7d)</div>
           </Card>
         </div>
 
-        {/* Management Cards - Admin Only */}
-        {isAdmin && (
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white mb-3">Management</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <AdminCard
-                icon={Users}
-                title="User Management"
-                description="Manage users, roles, and permissions"
-                path="/admin/users"
-                color="blue"
-                count={stats?.totalUsers}
-              />
-
-              <AdminCard
-                icon={MapPin}
-                title="Locations"
-                description="Manage toilet locations and QR codes"
-                path="/admin/locations"
-                color="green"
-                count={stats?.totalLocations}
-              />
-
-              <AdminCard
-                icon={Briefcase}
-                title="Occupations"
-                description="Manage job titles and roles"
-                path="/admin/occupations"
-                color="purple"
-              />
-
-              <AdminCard
-                icon={Building2}
-                title="Organizations"
-                description="Manage buildings and organizations"
-                path="/admin/organizations"
-                color="cyan"
-              />
-
-              <AdminCard
-                icon={FileText}
-                title="Templates"
-                description="Manage inspection templates"
-                path="/admin/templates"
-                color="orange"
-              />
-
-              <AdminCard
-                icon={BarChart3}
-                title="Reports"
-                description="View detailed analytics and reports"
-                path="/admin/reports"
-                color="red"
-                count={stats?.totalInspections}
-              />
+        {/* Two column layout on desktop: Management | Overview */}
+        <div className={`lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start ${isAdmin ? '' : ''}`}>
+          {/* Management Cards - Admin Only */}
+          {isAdmin && (
+            <div className="mb-4 lg:mb-0 lg:col-span-2">
+              <h2 className="text-lg font-bold text-white lg:text-gray-800 mb-3">Management</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-3">
+                <AdminCard
+                  icon={Users}
+                  title="User Management"
+                  description="Manage users & roles"
+                  path="/admin/users"
+                  color="blue"
+                  count={stats?.totalUsers}
+                />
+                <AdminCard
+                  icon={MapPin}
+                  title="Locations"
+                  description="Locations & QR codes"
+                  path="/admin/locations"
+                  color="green"
+                  count={stats?.totalLocations}
+                />
+                <AdminCard
+                  icon={Briefcase}
+                  title="Occupations"
+                  description="Job titles & roles"
+                  path="/admin/occupations"
+                  color="purple"
+                />
+                <AdminCard
+                  icon={Building2}
+                  title="Organizations"
+                  description="Buildings & orgs"
+                  path="/admin/organizations"
+                  color="cyan"
+                />
+                <AdminCard
+                  icon={FileText}
+                  title="Templates"
+                  description="Inspection templates"
+                  path="/admin/templates"
+                  color="orange"
+                />
+                <AdminCard
+                  icon={BarChart3}
+                  title="Reports"
+                  description="Analytics & reports"
+                  path="/admin/reports"
+                  color="red"
+                  count={stats?.totalInspections}
+                />
+              </div>
             </div>
+          )}
+
+          {/* System Overview */}
+          <div className={isAdmin ? 'lg:col-span-1' : 'lg:col-span-3 lg:max-w-md lg:mx-auto'}>
+            <Card className="bg-white shadow-xl border-0 lg:shadow-sm" padding="none">
+              <div className="p-4 lg:p-3 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-blue-600" />
+                  <h3 className="font-semibold text-gray-900 text-sm">System Overview</h3>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-50 lg:divide-y-0 lg:divide-x lg:divide-gray-100 lg:flex">
+                <div className="flex items-center justify-between p-3 lg:flex-1 lg:flex-col lg:gap-1 lg:py-3">
+                  <span className="text-xs text-gray-500">Total Inspections</span>
+                  <span className="text-lg font-bold text-gray-900">{stats?.totalInspections || 0}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 lg:flex-1 lg:flex-col lg:gap-1 lg:py-3">
+                  <span className="text-xs text-gray-500">Active Locations</span>
+                  <span className="text-lg font-bold text-gray-900">{stats?.totalLocations || 0}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 lg:flex-1 lg:flex-col lg:gap-1 lg:py-3">
+                  <span className="text-xs text-gray-500">Today's Activity</span>
+                  <span className="text-lg font-bold text-gray-900">{stats?.todayInspections || 0}</span>
+                </div>
+              </div>
+            </Card>
           </div>
-        )}
-
-        {/* Recent Activity */}
-        <Card className="bg-white shadow-xl border-0">
-          <CardHeader
-            title="System Overview"
-            subtitle="Key metrics at a glance"
-            icon={<Activity className="w-5 h-5 text-blue-600" />}
-          />
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl">
-              <div className="flex items-center gap-3">
-                <FileText className="w-5 h-5 text-gray-500" />
-                <span className="text-sm font-medium text-gray-900">Total Inspections</span>
-              </div>
-              <span className="text-lg font-bold text-gray-900">{stats?.totalInspections || 0}</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl">
-              <div className="flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-gray-500" />
-                <span className="text-sm font-medium text-gray-900">Active Locations</span>
-              </div>
-              <span className="text-lg font-bold text-gray-900">{stats?.totalLocations || 0}</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl">
-              <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-gray-500" />
-                <span className="text-sm font-medium text-gray-900">Today's Activity</span>
-              </div>
-              <span className="text-lg font-bold text-gray-900">{stats?.todayInspections || 0}</span>
-            </div>
-          </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <BottomNav />
+      {/* Bottom Nav - mobile only */}
+      <div className="lg:hidden">
+        <BottomNav />
+      </div>
     </div>
   );
 };
