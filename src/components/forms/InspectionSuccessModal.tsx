@@ -17,13 +17,6 @@ export const InspectionSuccessModal = ({
 
  if (!isOpen) return null;
 
- const getScoreColor = (score: number) => {
- if (score >= 90) return 'text-green-600';
- if (score >= 75) return 'text-blue-600';
- if (score >= 60) return 'text-yellow-600';
- return 'text-red-600';
- };
-
  const getScoreGradient = (score: number) => {
  if (score >= 90) return 'from-green-500 to-emerald-600';
  if (score >= 75) return 'from-blue-500 to-indigo-600';
@@ -54,8 +47,8 @@ export const InspectionSuccessModal = ({
 
  {/* Content */}
  <div className="relative z-10">
- <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 shadow-xl">
- <CheckCircle className="w-12 h-12 text-green-500" />
+ <div className="inline-flex items-center justify-center w-20 h-20 bg-white/15 backdrop-blur-sm rounded-full mb-4 shadow-xl border border-white/20">
+ <CheckCircle className="w-12 h-12 text-green-300" />
  </div>
 
  <h2 className="text-2xl font-bold text-white mb-2">

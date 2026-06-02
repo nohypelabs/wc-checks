@@ -67,8 +67,8 @@ export const InspectionFailedModal = ({
 
  {/* Content */}
  <div className="relative z-10">
- <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 shadow-xl">
- <ErrorIcon className="w-12 h-12 text-red-500" />
+ <div className="inline-flex items-center justify-center w-20 h-20 bg-white/15 backdrop-blur-sm rounded-full mb-4 shadow-xl border border-white/20">
+ <ErrorIcon className="w-12 h-12 text-red-300" />
  </div>
 
  <h2 className="text-2xl font-bold text-white mb-2">
@@ -84,8 +84,8 @@ export const InspectionFailedModal = ({
  {/* Error Details */}
  <div className="p-6 space-y-4">
  {/* Main Error Message */}
- <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
- <p className="text-sm text-red-800 leading-relaxed">
+ <div className="bg-red-500/15 border border-red-400/25 rounded-xl p-4">
+ <p className="text-sm text-red-200 leading-relaxed">
  {getErrorDescription()}
  </p>
  </div>
@@ -105,11 +105,11 @@ export const InspectionFailedModal = ({
  )}
 
  {/* Tips */}
- <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
- <p className="text-sm font-semibold text-blue-900 mb-2">
+ <div className="bg-blue-500/15 border border-blue-400/25 rounded-xl p-4">
+ <p className="text-sm font-semibold text-blue-200 mb-2">
  Apa yang harus dilakukan:
  </p>
- <ul className="text-sm text-blue-800 space-y-1.5">
+ <ul className="text-sm text-blue-200/80 space-y-1.5">
  {isNetworkError && (
  <>
  <li>• Cek koneksi internet lo</li>
