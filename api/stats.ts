@@ -18,6 +18,7 @@ interface DashboardStats {
   avgScore: number;
   userGrowth: number;
   inspectionGrowth: number;
+  dailyTrend: Array<{ date: string; count: number }>;
 }
 
 /**
@@ -70,6 +71,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('[stats] Date filters:', { today, yesterday, weekAgo, monthAgo });
 
+    // 30 days ago for trend
+    const thirtyDaysAgo = (() => { const d = new Date(now); d.setDate(d.getDate() - 30); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
+
     // Parallel queries for better performance
     const [
       usersCount,
@@ -81,6 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       inspections30dCount,
       activeUsersCount,
       recentInspections,
+      dailyTrendData,
     ] = await Promise.all([
       // Total active users
       supabase
@@ -140,6 +145,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .from('inspection_records')
         .select('responses')
         .limit(100),
+
+      // Daily trend — last 30 days
+      supabase
+        .from('inspection_records')
+        .select('inspection_date')
+        .gte('inspection_date', thirtyDaysAgo)
+        .order('inspection_date', { ascending: true })
+        .range(0, 9999),
     ]);
 
     // Calculate average score
@@ -179,6 +192,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ? Math.round(((todayCount - yesterdayCount) / yesterdayCount) * 100)
         : 0;
 
+    // Aggregate daily trend
+    const trendMap = new Map<string, number>();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      trendMap.set(key, 0);
+    }
+    (dailyTrendData.data || []).forEach((row: any) => {
+      const date = row.inspection_date;
+      if (trendMap.has(date)) {
+        trendMap.set(date, (trendMap.get(date) || 0) + 1);
+      }
+    });
+    const dailyTrend = Array.from(trendMap.entries()).map(([date, count]) => ({ date, count }));
+
     const stats: DashboardStats = {
       totalUsers: usersCount.count || 0,
       totalLocations: locationsCount.count || 0,
@@ -190,6 +219,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       avgScore,
       userGrowth: 0,
       inspectionGrowth,
+      dailyTrend,
     };
 
     console.log('[stats] Success - returning dashboard statistics for user:', auth.userId);

@@ -13,6 +13,7 @@ export interface AdminStats {
   avgScore: number;
   userGrowth: number;
   inspectionGrowth: number;
+  dailyTrend: Array<{ date: string; count: number }>;
 }
 
 function dateStr(d: Date) {

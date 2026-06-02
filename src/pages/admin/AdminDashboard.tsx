@@ -23,6 +23,7 @@ import { Card } from '../../components/ui/Card';
 import { usePerformance } from '../../hooks/usePerformance';
 import { Sidebar } from '../../components/mobile/Sidebar';
 import { BottomNav } from '../../components/mobile/BottomNav';
+import { InspectionTrendChart } from '../../components/dashboard/InspectionTrendChart';
 
 export const AdminDashboard = () => {
  usePerformance('HomePage');
@@ -96,6 +97,15 @@ export const AdminDashboard = () => {
 
  {/* Content */}
  <div className="max-w-7xl mx-auto px-3 lg:px-8 pt-3 lg:pt-5">
+ {/* Trend Chart */}
+ <div className="mb-3 lg:mb-5">
+ <InspectionTrendChart
+ data={stats?.dailyTrend || []}
+ totalInspections={stats?.totalInspections || 0}
+ inspectionGrowth={stats?.inspectionGrowth || 0}
+ />
+ </div>
+
  {/* Quick Stats — Glass effect on mobile */}
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4 mb-3 lg:mb-5">
  <Card className="p-2.5 lg:p-4 bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5">
