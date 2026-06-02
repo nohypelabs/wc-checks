@@ -8,7 +8,17 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { Tables } from '../types/database.types';
-import { Eye, EyeOff, User, Mail, Phone, Briefcase, UserPlus, Loader2, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Phone, Briefcase, UserPlus, Loader2, AlertCircle, Stethoscope, Heart, UserCircle, ShieldCheck, Sparkles, ChevronDown, Check } from 'lucide-react';
+
+// Map occupation names to Lucide icons
+const OCCUPATION_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  cleaning_staff: Sparkles,
+  doctor: Stethoscope,
+  visitor: UserCircle,
+  nurse: Heart,
+  staff: Briefcase,
+  supervisor: ShieldCheck,
+};
 
 // Type dari database
 type Occupation = Tables<'user_occupations'>;
@@ -33,6 +43,8 @@ export const RegisterPage = () => {
  const [loadingOccupations, setLoadingOccupations] = useState(true);
  const [showPassword, setShowPassword] = useState(false);
  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+ const [showOccupationDropdown, setShowOccupationDropdown] = useState(false);
+ const [selectedOccupation, setSelectedOccupation] = useState<Occupation | null>(null);
  const [error, setError] = useState<string | null>(null);
  const [successMessage, setSuccessMessage] = useState<string | null>(null);
  const navigate = useNavigate();
@@ -40,6 +52,7 @@ export const RegisterPage = () => {
  const {
  register,
  handleSubmit,
+ setValue,
  formState: { errors },
  } = useForm<RegisterForm>({
  resolver: zodResolver(registerSchema),
@@ -77,6 +90,18 @@ export const RegisterPage = () => {
  };
 
  fetchOccupations();
+ }, []);
+
+ // Close dropdown when clicking outside
+ useEffect(() => {
+ const handleClickOutside = (e: MouseEvent) => {
+ const target = e.target as HTMLElement;
+ if (!target.closest('[data-occupation-dropdown]')) {
+ setShowOccupationDropdown(false);
+ }
+ };
+ document.addEventListener('mousedown', handleClickOutside);
+ return () => document.removeEventListener('mousedown', handleClickOutside);
  }, []);
 
  const onSubmit = async (data: RegisterForm) => {
@@ -292,30 +317,82 @@ export const RegisterPage = () => {
 
  {/* Occupation */}
  <div>
- <label htmlFor="occupation_id" className="block text-sm font-medium text-white/80 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Jabatan (Opsional)
  </label>
- <div className="relative">
- <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <Briefcase className="h-5 w-5 text-white/50" />
- </div>
+ <div className="relative" data-occupation-dropdown>
+ <input type="hidden" {...register('occupation_id')} />
  {loadingOccupations ? (
  <div className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg">
  <span className="text-white/60">Memuat...</span>
  </div>
  ) : (
- <select
- {...register('occupation_id')}
- className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40 appearance-none cursor-pointer"
+ <>
+ <button
+ type="button"
+ onClick={() => setShowOccupationDropdown(!showOccupationDropdown)}
  disabled={isLoading}
+ className="w-full flex items-center gap-3 pl-10 pr-3 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all cursor-pointer text-left"
  >
- <option value="">Pilih jabatan Anda</option>
- {occupations.map((occ) => (
- <option key={occ.id} value={occ.id}>
- {occ.icon} {occ.display_name}
- </option>
- ))}
- </select>
+ <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+ <Briefcase className="h-5 w-5 text-white/50" />
+ </div>
+ {selectedOccupation ? (
+ <>
+ {(() => {
+ const IconComp = OCCUPATION_ICONS[selectedOccupation.name];
+ return IconComp ? <IconComp className="h-5 w-5 text-sky-400 ml-6" /> : null;
+ })()}
+ <span className="text-white">{selectedOccupation.display_name}</span>
+ </>
+ ) : (
+ <span className="text-white/40 ml-6">Pilih jabatan Anda</span>
+ )}
+ <ChevronDown className={`h-4 w-4 text-white/50 ml-auto transition-transform ${showOccupationDropdown ? 'rotate-180' : ''}`} />
+ </button>
+
+ {showOccupationDropdown && (
+ <div className="absolute z-50 w-full mt-1 bg-slate-800 border border-white/15 rounded-lg shadow-xl overflow-hidden">
+ <button
+ type="button"
+ onClick={() => {
+ setSelectedOccupation(null);
+ setValue('occupation_id', '');
+ setShowOccupationDropdown(false);
+ }}
+ className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors text-left"
+ >
+ <span className="text-white/40">Tidak dipilih</span>
+ {!selectedOccupation && <Check className="h-4 w-4 text-sky-400 ml-auto" />}
+ </button>
+ {occupations.map((occ) => {
+ const IconComp = OCCUPATION_ICONS[occ.name];
+ return (
+ <button
+ key={occ.id}
+ type="button"
+ onClick={() => {
+ setSelectedOccupation(occ);
+ setValue('occupation_id', occ.id);
+ setShowOccupationDropdown(false);
+ }}
+ className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors text-left"
+ >
+ {IconComp ? (
+ <IconComp className="h-5 w-5 text-sky-400" />
+ ) : (
+ <User className="h-5 w-5 text-white/50" />
+ )}
+ <span className="text-white">{occ.display_name}</span>
+ {selectedOccupation?.id === occ.id && (
+ <Check className="h-4 w-4 text-sky-400 ml-auto" />
+ )}
+ </button>
+ );
+ })}
+ </div>
+ )}
+ </>
  )}
  </div>
  </div>
