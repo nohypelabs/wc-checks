@@ -237,7 +237,7 @@ export const AdminDashboard = () => {
  rel="noopener noreferrer"
  className="text-white/50 hover:text-blue-300 transition-colors font-medium"
  >
- NypeLabs
+ NoHypeLabs
  </a>
  {' '}· v4.0.3
  </p>
