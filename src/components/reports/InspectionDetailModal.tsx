@@ -1,28 +1,34 @@
 // src/components/reports/InspectionDetailModal.tsx - MODERN REDESIGN
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Clock, User, Camera, FileText, AlertCircle, Star, ThumbsUp, ThumbsDown, Minus } from 'lucide-react';
+import { X, MapPin, Clock, User, Camera, FileText, AlertCircle, Building2, ClipboardList, Wrench, SkipForward, MessageSquare, Toilet, CheckCircle2, XCircle, AlertTriangle, HelpCircle, Briefcase } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
 import { PhotoReviewModal } from './PhotoReviewModal';
-import { scaleIn, backdropFade, slideInLeft, HOVER_TRANSITION, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
+import { scaleIn, backdropFade, slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
 import { useHaptic } from '../../hooks/useHaptic';
-
-// Helper to get score-based gradient (like SuccessModal)
-const getScoreGradient = (score: number) => {
- if (score >= 90) return 'from-green-500 via-emerald-500 to-teal-600';
- if (score >= 75) return 'from-blue-500 via-indigo-500 to-purple-600';
- if (score >= 60) return 'from-yellow-500 via-amber-500 to-orange-600';
- return 'from-red-500 via-rose-500 to-pink-600';
-};
 
 const getScoreTextColor = (score: number) => {
  if (score >= 90) return 'text-green-300';
  if (score >= 75) return 'text-white/80';
  if (score >= 60) return 'text-yellow-600';
  return 'text-red-300';
+};
+
+const getScoreGlassBg = (score: number) => {
+ if (score >= 90) return 'bg-green-500/20 backdrop-blur-xl border-b border-green-400/20';
+ if (score >= 75) return 'bg-blue-500/20 backdrop-blur-xl border-b border-blue-400/20';
+ if (score >= 60) return 'bg-yellow-500/20 backdrop-blur-xl border-b border-yellow-400/20';
+ return 'bg-red-500/20 backdrop-blur-xl border-b border-red-400/20';
+};
+
+const getScoreGlassBadge = (score: number) => {
+ if (score >= 90) return 'bg-green-500/25 backdrop-blur-xl border border-green-400/30';
+ if (score >= 75) return 'bg-blue-500/25 backdrop-blur-xl border border-blue-400/30';
+ if (score >= 60) return 'bg-yellow-500/25 backdrop-blur-xl border border-yellow-400/30';
+ return 'bg-red-500/25 backdrop-blur-xl border border-red-400/30';
 };
 
 interface InspectionDetailModalProps {
@@ -56,38 +62,24 @@ const getScoreFromResponses = (responses: any): number => {
  return Math.round((goodCount / values.length) * 100);
 };
 
-const getChoiceEmoji = (choice: string, category: string): string => {
- if (category === 'aroma') {
+const getChoiceIcon = (choice: string) => {
  switch (choice) {
- case 'good': return '🌸';
- case 'normal': return '😐';
- case 'bad': return '🤢';
- case 'other': return '💬';
- default: return '❓';
+ case 'good': return CheckCircle2;
+ case 'normal': return AlertTriangle;
+ case 'bad': return XCircle;
+ case 'other': return MessageSquare;
+ default: return HelpCircle;
  }
- }
+};
 
- if (category === 'visual') {
+const getChoiceIconColor = (choice: string): string => {
  switch (choice) {
- case 'good': return '✨';
- case 'normal': return '😐';
- case 'bad': return '💩';
- case 'other': return '💬';
- default: return '❓';
+ case 'good': return 'text-green-400';
+ case 'normal': return 'text-yellow-400';
+ case 'bad': return 'text-red-400';
+ case 'other': return 'text-blue-400';
+ default: return 'text-white/50';
  }
- }
-
- if (category === 'availability' || category === 'functional') {
- switch (choice) {
- case 'good': return '✅';
- case 'normal': return '⚠️';
- case 'bad': return '❌';
- case 'other': return '💬';
- default: return '❓';
- }
- }
-
- return '❓';
 };
 
 const getChoiceColor = (choice: string): string => {
@@ -165,37 +157,26 @@ export const InspectionDetailModal = ({
  onClick={(e) => e.stopPropagation()}
  >
  <div className="bg-white/8 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col border border-white/10">
- {/* Header - Dynamic gradient based on score */}
- <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-4 text-white relative overflow-hidden rounded-t-3xl flex-shrink-0`}>
- {/* Animated background pattern */}
+ {/* Header - Score-based glassmorphism */}
+ <div className={`p-4 text-white relative rounded-t-3xl flex-shrink-0 overflow-hidden ${getScoreGlassBg(score)}`}>
+ {/* Decorative glass circles */}
  <div className="absolute inset-0 opacity-10 pointer-events-none">
- <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse" />
- <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full blur-2xl animate-pulse delay-700" />
+ <div className="absolute -top-8 -right-8 w-32 h-32 bg-white rounded-full blur-2xl" />
+ <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white rounded-full blur-xl" />
  </div>
-
- <motion.button
- onClick={onClose}
- className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-xl transition-colors duration-200 z-20"
- type="button"
- whileHover={{ scale: 1.05, rotate: 90 }}
- whileTap={{ scale: 0.95 }}
- transition={TAP_TRANSITION}
- >
- <X className="w-5 h-5" />
- </motion.button>
 
  {/* Location info with better spacing */}
  <div className="relative z-10">
  <div className="flex items-center space-x-2 mb-3">
- <div className="w-11 h-11 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl border border-white/30 flex-shrink-0">
- 🚽
+ <div className="w-11 h-11 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 flex-shrink-0">
+ <Toilet className="w-5 h-5 text-white/80" />
  </div>
  <div className="flex-1 min-w-0">
  <h2 className="text-lg font-bold leading-tight truncate">{inspection.location?.name}</h2>
  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
  {inspection.location?.organization?.name && (
  <div className="flex items-center space-x-1 text-white/90 text-xs">
- <span>🏢</span>
+ <Building2 className="w-3 h-3" />
  <span className="truncate">{inspection.location.organization.name}</span>
  </div>
  )}
@@ -209,7 +190,7 @@ export const InspectionDetailModal = ({
  </div>
  {/* Score badge inline with header */}
  <div className="flex flex-col items-center flex-shrink-0 ml-1">
- <div className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl shadow-lg border border-white/50">
+ <div className={`${getScoreGlassBadge(score)} px-3 py-1.5 rounded-xl`}>
  <div className="flex items-baseline gap-1">
  <span className={`text-2xl font-extrabold ${getScoreTextColor(score)}`}>
  {score}
@@ -228,6 +209,17 @@ export const InspectionDetailModal = ({
  </div>
  </div>
  </div>
+
+ <motion.button
+ onClick={onClose}
+ className="absolute top-3 right-3 p-2 hover:bg-white/10 rounded-xl transition-colors duration-200 z-20"
+ type="button"
+ whileHover={{ scale: 1.05, rotate: 90 }}
+ whileTap={{ scale: 0.95 }}
+ transition={TAP_TRANSITION}
+ >
+ <X className="w-5 h-5" />
+ </motion.button>
  </div>
  </div>
 
@@ -260,9 +252,7 @@ export const InspectionDetailModal = ({
  <p className="font-semibold text-white text-xs truncate">{inspection.user?.full_name}</p>
  {inspection.occupation ? (
  <div className="flex items-center gap-1 mt-0.5">
- {inspection.occupation.icon && (
- <span className="text-xs">{inspection.occupation.icon}</span>
- )}
+ <Briefcase className="w-3 h-3 flex-shrink-0" style={{ color: inspection.occupation.color || '#6b7280' }} />
  <span
  className="text-xs font-semibold truncate"
  style={{ color: inspection.occupation.color || '#6b7280' }}
@@ -281,7 +271,7 @@ export const InspectionDetailModal = ({
  {/* Component Ratings */}
  <div>
  <h3 className="font-bold text-white mb-2 flex items-center space-x-1.5 text-sm">
- <span>📋</span>
+ <ClipboardList className="w-4 h-4" />
  <span>Penilaian Komponen</span>
  </h3>
  <div className="space-y-1.5">
@@ -303,15 +293,17 @@ export const InspectionDetailModal = ({
  >
  <div className="flex items-center justify-between">
  <div className="flex items-center space-x-1.5">
- <span className="text-base">
- {inspectionMode === 'genz' ? component.iconGenZ : component.icon}
- </span>
+ {(() => {
+  const iconName = inspectionMode === 'genz' ? component.iconGenZ : component.icon;
+  const IconComp = (Icons as any)[iconName];
+  return IconComp ? <IconComp className="w-4 h-4 text-white/80" /> : <HelpCircle className="w-4 h-4 text-white/80" />;
+ })()}
  <span className="text-sm font-medium text-white">
  {component.labelGenZ || component.label}
  </span>
  </div>
  <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
- <span className="text-base">⏭️</span>
+ <SkipForward className="w-4 h-4 text-white/50" />
  <span className="text-xs font-medium text-white/50">Tidak Ada</span>
  </div>
  </div>
@@ -334,23 +326,27 @@ export const InspectionDetailModal = ({
  <div className="flex items-center justify-between">
  <div className="flex-1">
  <div className="flex items-center space-x-1.5">
- <span className="text-base">
- {inspectionMode === 'genz' ? component.iconGenZ : component.icon}
- </span>
+ {(() => {
+  const iconName = inspectionMode === 'genz' ? component.iconGenZ : component.icon;
+  const IconComp = (Icons as any)[iconName];
+  return IconComp ? <IconComp className="w-4 h-4 text-white/80" /> : <HelpCircle className="w-4 h-4 text-white/80" />;
+ })()}
  <span className="text-sm font-medium text-white">
  {component.labelGenZ || component.label}
  </span>
  </div>
  {rating.notes && (
- <p className="text-xs text-white/70 mt-1 pl-6">
- 💬 {rating.notes}
- </p>
+ <div className="flex items-start gap-1.5 mt-1 pl-6">
+ <MessageSquare className="w-3 h-3 text-white/70 mt-0.5 flex-shrink-0" />
+ <p className="text-xs text-white/70">{rating.notes}</p>
+ </div>
  )}
  </div>
  <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
- <span className="text-lg">
- {getChoiceEmoji(rating.choice, component.category)}
- </span>
+ {(() => {
+  const ChoiceIcon = getChoiceIcon(rating.choice);
+  return <ChoiceIcon className={`w-4 h-4 ${getChoiceIconColor(rating.choice)}`} />;
+ })()}
  <span className="text-xs font-semibold">
  {getChoiceLabel(rating.choice)}
  </span>
@@ -364,7 +360,7 @@ export const InspectionDetailModal = ({
 
  {/* Issues Section */}
  {issues && (
- <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+ <div className="bg-orange-500/15 border border-orange-400/25 rounded-lg px-3 py-2">
  <div className="flex items-start space-x-2">
  <AlertCircle className="w-4 h-4 text-orange-300 mt-0.5 flex-shrink-0" />
  <div>
@@ -389,7 +385,7 @@ export const InspectionDetailModal = ({
  }
  `}>
  <div className="flex items-center space-x-2">
- <span className="text-base">🔧</span>
+ <Wrench className="w-4 h-4 text-white/80 flex-shrink-0" />
  <div>
  <h4 className="font-semibold text-white text-sm">Perlu Perbaikan</h4>
  <p className="text-xs text-white/80">
