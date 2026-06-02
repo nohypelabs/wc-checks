@@ -2,6 +2,31 @@
 
 All notable changes to WC-Checks will be documented in this file.
 
+## [4.0.2] - 2026-06-03
+
+### ✨ InspectionDetailModal - Glassmorphism & Icon Cleanup
+
+#### Header Redesign
+- **Score-based glassmorphism**: Header background uses translucent glass with score-based colors (green ≥90, blue ≥75, yellow ≥60, red <60)
+- **Glass score badge**: Replaced solid white (`bg-white/95`) badge with matching glass style (`bg-{color}-500/25 backdrop-blur-xl`)
+- **Decorative glass circles**: Added subtle blurred circles for depth effect
+- **Consistent border**: `border-b border-{color}-400/20` matches header tint
+
+#### Emoji → Lucide Icons (All Replaced)
+- **Toilet icon**: 🚽 → `<Toilet />` (header location)
+- **Building icon**: 🏢 → `<Building2 />` (organization name)
+- **Occupation icon**: `{emoji from DB}` → `<Briefcase />` (inspector role)
+- **Component icons**: `<span>{text}</span>` → Dynamic Lucide lookup via `(Icons as any)[iconName]`
+- **Choice indicators**: ✅⚠️❌🌸💩 → `<CheckCircle2>` / `<AlertTriangle>` / `<XCircle>` with per-choice colors
+- **Section headers**: 📋 → `<ClipboardList />`, 🔧 → `<Wrench />`, 💬 → `<MessageSquare />`
+- **Unavailable**: ⏭️ → `<SkipForward />`
+
+#### Bug Fixes
+- **Issues section**: Fixed light background (`bg-orange-50`) to dark glass style (`bg-orange-500/15`)
+- **Unused imports**: Cleaned up `Star`, `ThumbsUp`, `ThumbsDown`, `Minus`, `HOVER_TRANSITION`
+
+---
+
 ## [4.0.1] - 2026-06-03
 
 ### 🎨 UI/UX Overhaul - Dark Navy Theme
