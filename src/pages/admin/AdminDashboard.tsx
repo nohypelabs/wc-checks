@@ -35,14 +35,14 @@ export const AdminDashboard = () => {
 
  if (isLoading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
  </div>
  );
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-20 lg:pb-0">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-20 lg:pb-0">
  {/* Sidebar - mobile only */}
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
