@@ -8,7 +8,7 @@ export const InspectionPage = () => {
 
  if (!locationId) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-4">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
  <div className="text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
  <h2 className="text-xl font-bold text-white mb-2">Invalid Location</h2>

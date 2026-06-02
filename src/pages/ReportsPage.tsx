@@ -281,7 +281,7 @@ export const ReportsPage = () => {
 
  if (adminLoading || monthlyLoading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="w-12 h-12 border-3 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
  <p className="text-white/80 text-sm font-medium">
@@ -293,12 +293,12 @@ export const ReportsPage = () => {
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  {/* Sidebar */}
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Header */}
- <header className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20 lg:py-3">
+ <header className="bg-white/8 backdrop-blur-xl p-4 shadow-xl border-b border-white/10 lg:py-3">
  <div className="max-w-7xl mx-auto">
  <div className="flex items-center justify-between text-white">
  {/* Left: Menu + Title */}
@@ -332,7 +332,7 @@ export const ReportsPage = () => {
  <div className="relative" ref={exportMenuRef}>
  <motion.button
  onClick={() => setExportMenuOpen(prev => !prev)}
- className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm shadow-lg text-xs font-semibold whitespace-nowrap"
+ className="flex items-center gap-1.5 px-3.5 py-2 bg-white/10 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm shadow-lg text-xs font-semibold whitespace-nowrap"
  whileHover={{ scale: 1.02 }}
  whileTap={{ scale: 0.98 }}
  >
@@ -407,7 +407,7 @@ export const ReportsPage = () => {
  <select
  value={selectedBuildingId}
  onChange={(e) => setSelectedBuildingId(e.target.value)}
- className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/15 text-white border border-white/20 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm transition-all"
+ className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/8 text-white border border-white/10 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm transition-all"
  disabled={buildingsLoading}
  >
  <option value="" className="text-white/80">Semua Gedung</option>
@@ -425,12 +425,12 @@ export const ReportsPage = () => {
  <div className="grid grid-cols-3 gap-2 lg:gap-3">
  {/* Total Inspections */}
  <motion.div
- className="bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 p-3"
+ className="bg-white/8 backdrop-blur-sm rounded-2xl border border-white/10 p-3"
  whileHover={{ scale: 1.02, y: -2 }}
  transition={{ duration: 0.2 }}
  >
  <div className="flex items-center gap-2 mb-2">
- <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+ <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
  <FileText className="w-4 h-4 text-white" />
  </div>
  </div>
@@ -442,12 +442,12 @@ export const ReportsPage = () => {
 
  {/* Average Score */}
  <motion.div
- className="bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 p-3"
+ className="bg-white/8 backdrop-blur-sm rounded-2xl border border-white/10 p-3"
  whileHover={{ scale: 1.02, y: -2 }}
  transition={{ duration: 0.2 }}
  >
  <div className="flex items-center gap-2 mb-2">
- <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+ <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
  <TrendingUp className="w-4 h-4 text-white" />
  </div>
  </div>
@@ -459,12 +459,12 @@ export const ReportsPage = () => {
 
  {/* Active Days */}
  <motion.div
- className="bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 p-3"
+ className="bg-white/8 backdrop-blur-sm rounded-2xl border border-white/10 p-3"
  whileHover={{ scale: 1.02, y: -2 }}
  transition={{ duration: 0.2 }}
  >
  <div className="flex items-center gap-2 mb-2">
- <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+ <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
  <BarChart3 className="w-4 h-4 text-white" />
  </div>
  </div>
@@ -485,10 +485,10 @@ export const ReportsPage = () => {
  initial={{ opacity: 0, y: 10 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ delay: 0.1, duration: 0.4 }}
- className="bg-white/10 backdrop-blur-sm border border-white/15 lg:border-blue-200 rounded-2xl p-3 lg:p-3.5"
+ className="bg-white/8 backdrop-blur-sm border border-white/15 lg:border-blue-200 rounded-2xl p-3 lg:p-3.5"
  >
  <div className="flex items-start gap-3">
- <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+ <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
  <Info className="w-4 h-4 text-white" />
  </div>
  <div className="flex-1 min-w-0">
@@ -525,9 +525,9 @@ export const ReportsPage = () => {
  initial={{ opacity: 0, scale: 0.95 }}
  animate={{ opacity: 1, scale: 1 }}
  transition={{ delay: 0.3, duration: 0.4 }}
- className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-8 text-center"
+ className="bg-white/8 backdrop-blur-sm border border-white/15 rounded-2xl p-8 text-center"
  >
- <div className="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
+ <div className="w-16 h-16 bg-white/8 rounded-2xl flex items-center justify-center mx-auto mb-4">
  <span className="text-3xl">📅</span>
  </div>
  <h3 className="font-bold text-white mb-1.5">Belum ada inspeksi</h3>

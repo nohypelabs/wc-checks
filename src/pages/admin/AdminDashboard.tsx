@@ -70,7 +70,7 @@ export const AdminDashboard = () => {
 
  {/* Mobile: Centered Logo (compact) */}
  <div className="lg:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5">
- <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center p-1">
+ <div className="w-7 h-7 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center justify-center p-1">
  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
  </div>
  <div className="flex flex-col">

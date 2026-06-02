@@ -164,12 +164,12 @@ export const Dashboard = () => {
  };
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-20 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-20 lg:pb-6">
  {/* Sidebar */}
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Simple Header - White */}
- <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:py-3 lg:px-4">
+ <div className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3">
  <button
@@ -213,19 +213,19 @@ export const Dashboard = () => {
  <SkeletonStats />
  ) : (
  <div className="grid grid-cols-2 gap-3">
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
  <p className="text-3xl font-bold text-white">{dashboardStats.total}</p>
  <p className="text-xs text-gray-500 mt-1">Total</p>
  </div>
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
  <p className="text-3xl font-bold text-blue-600">{dashboardStats.todayCount}</p>
  <p className="text-xs text-gray-500 mt-1">Hari Ini</p>
  </div>
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
  <p className="text-3xl font-bold text-green-600">{dashboardStats.completed}</p>
  <p className="text-xs text-gray-500 mt-1">Selesai</p>
  </div>
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
  <p className="text-3xl font-bold text-purple-600">{dashboardStats.avgScore}</p>
  <p className="text-xs text-gray-500 mt-1">Rata-rata</p>
  </div>
@@ -239,7 +239,7 @@ export const Dashboard = () => {
  navigate('/scan');
  }}
  type="button"
- className="w-full bg-white/15 backdrop-blur-md rounded-3xl p-6 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 active:scale-98 transition-all border border-gray-100"
+ className="w-full bg-white/8 backdrop-blur-md rounded-3xl p-6 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 active:scale-98 transition-all border border-gray-100"
  >
  <div className="flex items-center gap-4">
  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -328,14 +328,14 @@ export const Dashboard = () => {
 
  {/* Recent Activity - Minimal */}
  {statsLoading ? (
- <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl shadow-lg border border-white/10 p-5">
  <div className="flex items-center justify-between mb-4">
  <h2 className="font-bold text-white">Terbaru</h2>
  </div>
  <SkeletonActivity />
  </div>
  ) : dashboardStats.recent && dashboardStats.recent.length > 0 && (
- <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl shadow-lg border border-white/10 p-5">
  <div className="flex items-center justify-between mb-4">
  <h2 className="font-bold text-white">Terbaru</h2>
  <button

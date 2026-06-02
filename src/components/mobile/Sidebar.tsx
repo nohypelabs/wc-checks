@@ -76,12 +76,12 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       />
 
       {/* Sidebar — Glass */}
-      <div className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-white/15 backdrop-blur-xl z-50 shadow-2xl transform transition-transform border-r border-white/20">
+      <div className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-white/8 backdrop-blur-xl z-50 shadow-2xl transform transition-transform border-r border-white/10">
         {/* Header */}
-        <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-6">
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3 text-white">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center p-1.5 border border-white/30">
+              <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center p-1.5 border border-white/30">
                 <img src="/logo.png" alt="Prenacons Logo" className="w-full h-full object-contain" />
               </div>
               <h2 className="text-xl font-bold">
@@ -105,8 +105,8 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
           {/* User Info */}
           {profile && (
-            <div className="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-white/8 backdrop-blur-sm rounded-xl border border-white/10">
+              <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
                 <span className="text-lg font-bold text-white">
                   {profile.full_name?.charAt(0).toUpperCase() || 'U'}
                 </span>
@@ -136,7 +136,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 className={`
                   w-full flex items-center gap-3 p-3.5 rounded-xl transition-all
                   ${active
-                    ? 'bg-white/20 text-white shadow-sm border border-white/20'
+                    ? 'bg-white/10 text-white shadow-sm border border-white/10'
                     : 'text-white/80 hover:bg-white/10'
                   }
                 `}
@@ -234,7 +234,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </div>
 
         {/* Footer - Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/10 backdrop-blur-md border-t border-white/15">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/8 backdrop-blur-md border-t border-white/15">
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 p-3.5 bg-red-500/15 border border-red-400/25 rounded-xl font-medium text-red-300 hover:bg-red-500/25 transition-colors"

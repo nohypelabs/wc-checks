@@ -9,14 +9,14 @@ export const AboutPage = () => {
  const [sidebarOpen, setSidebarOpen] = useState(false);
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  {/* Header */}
- <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 shadow-lg">
+ <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 shadow-lg">
  <div className="flex items-center gap-3 mb-4">
  <button
  onClick={() => setSidebarOpen(true)}
- className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20"
+ className="w-10 h-10 bg-white/8 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/10 transition-all border border-white/10"
  >
  <Menu className="w-5 h-5 text-white" />
  </button>

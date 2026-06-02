@@ -28,10 +28,10 @@ export const HelpPage = () => {
  ];
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  {/* Header */}
- <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:py-3 lg:px-4">
+ <div className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
  <div className="flex items-center gap-3">
  <button
  onClick={() => setSidebarOpen(true)}

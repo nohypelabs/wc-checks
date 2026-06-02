@@ -133,7 +133,7 @@ export const InspectionDrawer = ({
  onClose();
  }
  }}
- className="fixed bottom-0 left-0 right-0 bg-white/15 backdrop-blur-xl rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col border-t border-white/20"
+ className="fixed bottom-0 left-0 right-0 bg-white/8 backdrop-blur-xl rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col border-t border-white/10"
  style={{
  willChange: isDragging ? 'transform' : 'auto',
  backfaceVisibility: 'hidden',
@@ -161,14 +161,14 @@ export const InspectionDrawer = ({
  {formattedDate}
  </p>
  <div className="flex items-center space-x-2 mt-2">
- <span className="px-2 py-1 bg-white/20 text-white border border-white/30 text-xs font-medium rounded-full lg:text-blue-700 lg:border-blue-200">
+ <span className="px-2 py-1 bg-white/10 text-white border border-white/30 text-xs font-medium rounded-full lg:text-blue-700 lg:border-blue-200">
  {inspections.length} inspeksi
  </span>
  </div>
  </div>
  <motion.button
  onClick={onClose}
- className="p-2 hover:bg-white/15 rounded-lg transition-colors duration-200"
+ className="p-2 hover:bg-white/8 rounded-lg transition-colors duration-200"
  whileHover={{ scale: 1.05, rotate: 90 }}
  whileTap={{ scale: 0.95 }}
  transition={TAP_TRANSITION}
@@ -200,7 +200,7 @@ export const InspectionDrawer = ({
  haptic.medium();
  onInspectionClick(inspection);
  }}
- className="w-full bg-white/10 rounded-xl p-4 hover:bg-white/20 transition-colors duration-200 text-left border border-white/15"
+ className="w-full bg-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors duration-200 text-left border border-white/15"
  {...slideInLeft}
  transition={{
  ...slideInLeft.transition,

@@ -40,7 +40,7 @@ export const TestPage = () => {
  };
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-4">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
  <div className="max-w-md mx-auto bg-white rounded-2xl p-6 shadow-sm">
  <h1 className="text-2xl font-bold mb-4">Database Test</h1>
  <button

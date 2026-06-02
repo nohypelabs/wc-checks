@@ -82,7 +82,7 @@ export const LocationInspectionPage = () => {
 
  if (loading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
  </div>
  );
@@ -90,7 +90,7 @@ export const LocationInspectionPage = () => {
 
  if (!location) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <Card className="p-6 text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
  <h2 className="text-xl font-bold text-white mb-2">Lokasi Tidak Ditemukan</h2>
@@ -104,7 +104,7 @@ export const LocationInspectionPage = () => {
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
  {/* Header */}
  <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
  <div className="max-w-4xl mx-auto px-4 py-4">

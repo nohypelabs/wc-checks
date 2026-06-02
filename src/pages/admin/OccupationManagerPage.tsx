@@ -178,7 +178,7 @@ export const OccupationManagerPage = () => {
 
  if (isLoading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
  </div>
@@ -186,7 +186,7 @@ export const OccupationManagerPage = () => {
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  <div className="max-w-4xl mx-auto">
  {/* Header */}

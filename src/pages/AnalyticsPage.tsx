@@ -132,7 +132,7 @@ export const AnalyticsPage = () => {
  // Error state
  if (error) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-4">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
  <div className="text-center">
  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
  <AlertTriangle className="w-8 h-8 text-red-600" />
@@ -155,7 +155,7 @@ export const AnalyticsPage = () => {
  // ✅ Show loading while admin check OR data fetch is in progress
  if (adminLoading || isLoading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
  <p className="text-gray-600 text-sm">
@@ -167,12 +167,12 @@ export const AnalyticsPage = () => {
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  {/* Sidebar */}
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Header */}
- <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:py-3 lg:px-4">
+ <div className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-3">
  <button
@@ -216,14 +216,14 @@ export const AnalyticsPage = () => {
  {/* Overview Cards */}
  <div className="grid grid-cols-2 gap-3">
  {/* Total Inspections */}
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
  <div className="text-gray-500 text-xs mb-2">Total Inspeksi</div>
  <div className="text-3xl font-bold text-white">{analytics?.totalInspections || 0}</div>
  <div className="text-xs text-gray-500 mt-1">{formatMonthDisplay(selectedMonth)}</div>
  </div>
 
  {/* Average Score */}
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
  <div className="text-gray-500 text-xs mb-2">Rata-rata Skor</div>
  <div className="flex items-end gap-2">
  <span className="text-3xl font-bold text-white">{analytics?.avgScore || 0}</span>
@@ -241,7 +241,7 @@ export const AnalyticsPage = () => {
  </div>
 
  {/* Status Breakdown */}
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-white/10">
  <h2 className="font-bold text-white mb-4 flex items-center gap-2">
  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
  <BarChart3 className="w-4 h-4 text-purple-600" />
@@ -316,7 +316,7 @@ export const AnalyticsPage = () => {
  </div>
 
  {/* Top 3 Best Locations */}
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-white/10">
  <h2 className="font-bold text-white mb-4 flex items-center gap-2">
  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
  <Award className="w-4 h-4 text-green-600" />
@@ -354,7 +354,7 @@ export const AnalyticsPage = () => {
  </div>
 
  {/* Top 3 Worst Locations */}
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-white/20">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-white/10">
  <h2 className="font-bold text-white mb-4 flex items-center gap-2">
  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
  <AlertCircle className="w-4 h-4 text-red-600" />

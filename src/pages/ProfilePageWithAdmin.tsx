@@ -229,7 +229,7 @@ export const ProfilePageWithAdmin = () => {
 
  if (!profile) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
  </div>
@@ -237,10 +237,10 @@ export const ProfilePageWithAdmin = () => {
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  {/* Header */}
- <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 pt-12 pb-24 px-6">
+ <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 pt-12 pb-24 px-6">
  <div className="flex items-center justify-between text-white mb-6">
  <h1 className="text-2xl font-bold">Profile</h1>
  <button

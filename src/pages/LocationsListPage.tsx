@@ -110,7 +110,7 @@ export const LocationsListPage = () => {
 
  if (authLoading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="w-12 h-12 border-3 border-white/30 border-t-white rounded-full animate-spin" />
  </div>
  );
@@ -122,11 +122,11 @@ export const LocationsListPage = () => {
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Header */}
- <header className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:py-3 lg:px-4">
+ <header className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
  <div className="max-w-7xl mx-auto">
  <div className="flex items-center justify-between text-white">
  {/* Left: Menu + Title */}
@@ -160,7 +160,7 @@ export const LocationsListPage = () => {
  <div className="flex items-center gap-1.5">
  <motion.button
  onClick={() => navigate('/locations/add')}
- className="p-2 bg-white/20 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors"
+ className="p-2 bg-white/10 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors"
  whileHover={{ scale: 1.05 }}
  whileTap={{ scale: 0.95 }}
  >
@@ -168,7 +168,7 @@ export const LocationsListPage = () => {
  </motion.button>
  <motion.button
  onClick={() => navigate('/admin/locations')}
- className="p-2 bg-white/20 lg:bg-gray-200 text-white rounded-xl hover:bg-white/30 transition-colors"
+ className="p-2 bg-white/10 lg:bg-gray-200 text-white rounded-xl hover:bg-white/30 transition-colors"
  whileHover={{ scale: 1.05 }}
  whileTap={{ scale: 0.95 }}
  >
@@ -187,7 +187,7 @@ export const LocationsListPage = () => {
  placeholder="Cari lokasi..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-9 pr-4 py-2 text-xs bg-white/15 text-white placeholder-white/50 lg:placeholder-gray-400 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent backdrop-blur-sm transition-all"
+ className="w-full pl-9 pr-4 py-2 text-xs bg-white/8 text-white placeholder-white/50 lg:placeholder-gray-400 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent backdrop-blur-sm transition-all"
  />
  </div>
 
@@ -213,9 +213,9 @@ export const LocationsListPage = () => {
  <motion.div
  initial={{ opacity: 0, scale: 0.95 }}
  animate={{ opacity: 1, scale: 1 }}
- className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-8 text-center"
+ className="bg-white/8 backdrop-blur-sm border border-white/15 rounded-2xl p-8 text-center"
  >
- <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center mx-auto mb-3">
+ <div className="w-14 h-14 bg-white/8 rounded-2xl flex items-center justify-center mx-auto mb-3">
  <MapPin className="w-7 h-7 text-white/60" />
  </div>
  <h3 className="font-bold text-white mb-1">
@@ -236,7 +236,7 @@ export const LocationsListPage = () => {
  initial={{ opacity: 0, y: 10 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ delay: groupIdx * 0.05, duration: 0.3 }}
- className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl overflow-hidden"
+ className="bg-white/8 backdrop-blur-sm border border-white/15 rounded-2xl overflow-hidden"
  >
  {/* Building header — clickable */}
  <button
@@ -244,7 +244,7 @@ export const LocationsListPage = () => {
  className="w-full flex items-center justify-between px-3 py-2.5 lg:px-4 lg:py-3 hover:bg-white/10 transition-colors"
  >
  <div className="flex items-center gap-2">
- <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+ <div className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center">
  <Building2 className="w-3.5 h-3.5 text-white" />
  </div>
  <div className="text-left">
@@ -278,9 +278,9 @@ export const LocationsListPage = () => {
  animate={{ opacity: 1, x: 0 }}
  transition={{ delay: locIdx * 0.03, duration: 0.2 }}
  onClick={() => handleSelectLocation(location.id)}
- className="w-full flex items-center gap-2.5 px-3 py-2 lg:py-2.5 rounded-xl hover:bg-white/15 active:bg-white/20 transition-colors group text-left"
+ className="w-full flex items-center gap-2.5 px-3 py-2 lg:py-2.5 rounded-xl hover:bg-white/8 active:bg-white/10 transition-colors group text-left"
  >
- <div className="w-8 h-8 bg-white/15 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-white/25 lg:group-hover:bg-blue-100 transition-colors">
+ <div className="w-8 h-8 bg-white/8 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-white/25 lg:group-hover:bg-blue-100 transition-colors">
  <MapPin className="w-4 h-4 text-white/80" />
  </div>
  <div className="flex-1 min-w-0">

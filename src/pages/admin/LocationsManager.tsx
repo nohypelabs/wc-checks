@@ -245,7 +245,7 @@ export const LocationsManager = () => {
  if (authLoading || adminLoading) {
  console.log('🟡 Showing loading spinner');
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
  <p className="text-gray-600 text-sm">Checking permissions...</p>
@@ -259,7 +259,7 @@ export const LocationsManager = () => {
  if (!user || !isAdmin) {
  console.log('🔴 ACCESS DENIED - No user or not admin');
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
  <div className="text-center max-w-md">
  <ShieldAlert className="w-20 h-20 text-red-500 mx-auto mb-4" />
  <h2 className="text-2xl font-bold text-white mb-3">
@@ -288,16 +288,16 @@ export const LocationsManager = () => {
 
  if (isLoading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
  </div>
  );
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  {/* Header - Clean White Style */}
- <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:py-3 lg:px-4">
+ <div className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
  <div className="flex items-center justify-between mb-2">
  {/* Left: Menu + Title */}
  <div className="flex items-center gap-3">

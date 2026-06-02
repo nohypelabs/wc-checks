@@ -163,7 +163,7 @@ export const InspectionDetailModal = ({
  className="fixed left-3 right-3 top-3 bottom-3 max-w-2xl mx-auto my-auto z-[60] max-h-[94vh]"
  onClick={(e) => e.stopPropagation()}
  >
- <div className="bg-white/15 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col border border-white/20">
+ <div className="bg-white/8 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col border border-white/10">
  {/* Header - Dynamic gradient based on score */}
  <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-4 text-white relative overflow-hidden rounded-t-3xl flex-shrink-0`}>
  {/* Animated background pattern */}
@@ -174,7 +174,7 @@ export const InspectionDetailModal = ({
 
  <motion.button
  onClick={onClose}
- className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-colors duration-200 z-20"
+ className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-xl transition-colors duration-200 z-20"
  type="button"
  whileHover={{ scale: 1.05, rotate: 90 }}
  whileTap={{ scale: 0.95 }}
@@ -186,7 +186,7 @@ export const InspectionDetailModal = ({
  {/* Location info with better spacing */}
  <div className="relative z-10">
  <div className="flex items-center space-x-2 mb-3">
- <div className="w-11 h-11 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl border border-white/30 flex-shrink-0">
+ <div className="w-11 h-11 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl border border-white/30 flex-shrink-0">
  🚽
  </div>
  <div className="flex-1 min-w-0">
@@ -232,7 +232,7 @@ export const InspectionDetailModal = ({
  {/* Date & Time Card */}
  <div className="bg-white/10 rounded-xl p-2.5 border border-white/15">
  <div className="flex items-center space-x-2">
- <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
  <Clock className="w-4 h-4 text-white/80" />
  </div>
  <div className="flex-1 min-w-0">
@@ -246,7 +246,7 @@ export const InspectionDetailModal = ({
  {/* Inspector Card */}
  <div className="bg-white/10 rounded-xl p-2.5 border border-white/15">
  <div className="flex items-center space-x-2">
- <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
  <User className="w-4 h-4 text-white/80" />
  </div>
  <div className="flex-1 min-w-0">

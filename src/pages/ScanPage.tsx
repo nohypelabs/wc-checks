@@ -131,7 +131,7 @@ export const ScanPage = () => {
  // Show loading while auth completes
  if (authLoading) {
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
  <p className="text-gray-600">Loading...</p>
@@ -141,12 +141,12 @@ export const ScanPage = () => {
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-20 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-20 lg:pb-6">
  {/* Sidebar */}
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Simple Header - White */}
- <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:py-3 lg:px-4">
+ <div className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
  <div className="flex items-center justify-between mb-6">
  <div className="flex items-center gap-3">
  <button
@@ -166,19 +166,19 @@ export const ScanPage = () => {
 
  {/* Stats Cards - Simple 3D Shadow */}
  <div className="grid grid-cols-3 gap-3">
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/20 text-center">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/10 text-center">
  <div className="text-2xl font-bold text-white">
  {stats?.total || 0}
  </div>
  <div className="text-xs text-gray-500 mt-1">Total</div>
  </div>
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/20 text-center">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/10 text-center">
  <div className="text-2xl font-bold text-blue-600">
  {stats?.today || 0}
  </div>
  <div className="text-xs text-gray-500 mt-1">Today</div>
  </div>
- <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/20 text-center">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/10 text-center">
  <div className="text-2xl font-bold text-green-600">
  {stats ? Math.round((stats.completed / stats.total) * 100) || 0 : 0}%
  </div>
@@ -191,7 +191,7 @@ export const ScanPage = () => {
  {/* Scan Button - Big with 3D Shadow */}
  <button
  onClick={() => setShowScanner(true)}
- className="w-full bg-white/15 backdrop-blur-md rounded-3xl p-8 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-gray-100"
+ className="w-full bg-white/8 backdrop-blur-md rounded-3xl p-8 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-gray-100"
  >
  <div className="flex flex-col items-center space-y-4">
  <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -226,7 +226,7 @@ export const ScanPage = () => {
  </div>
 
  {/* Recent Inspections - Simple */}
- <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl shadow-lg border border-white/10 p-5">
  <div className="flex items-center justify-between mb-4">
  <h3 className="font-bold text-white">Recent</h3>
  <button

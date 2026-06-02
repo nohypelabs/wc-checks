@@ -11,7 +11,7 @@ export const TemplatesManager = () => {
  const [sidebarOpen, setSidebarOpen] = useState(false);
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-20 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-20 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  {/* Header */}
  <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-red-500 p-6 rounded-b-3xl shadow-lg">

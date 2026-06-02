@@ -85,7 +85,7 @@ export const CalendarView = ({
  };
 
  return (
- <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/15 overflow-hidden">
+ <div className="bg-white/8 backdrop-blur-sm rounded-2xl border border-white/15 overflow-hidden">
  {/* Header */}
  <div className="p-3 lg:p-4 border-b border-white/10">
  <div className="flex items-center justify-between">

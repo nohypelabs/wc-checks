@@ -134,7 +134,7 @@ export const UserManagement = () => {
  if (authLoading || !user || roleLoading) {
  console.log('⏳ [UserManagement] Showing loading screen - waiting for auth/user/role check');
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
@@ -154,7 +154,7 @@ export const UserManagement = () => {
  console.log('✅ [UserManagement] Rendering main content');
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  {/* Header */}
  <div className="bg-gradient-to-br from-purple-600 to-purple-800 text-white p-6">
@@ -167,7 +167,7 @@ export const UserManagement = () => {
  </button>
 
  <div className="flex items-center gap-3 mb-2">
- <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+ <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
  <Shield className="w-6 h-6" />
  </div>
  <div>
@@ -176,7 +176,7 @@ export const UserManagement = () => {
  </div>
  </div>
 
- <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mt-4">
+ <div className="bg-white/8 backdrop-blur-sm rounded-xl p-4 mt-4">
  <div className="grid grid-cols-3 gap-4 text-center">
  <div>
  <div className="text-2xl font-bold">{users?.length || 0}</div>
