@@ -252,12 +252,12 @@ export const ProfilePage = () => {
  {/* Role Badge */}
  <div className="flex items-center justify-center gap-2 flex-wrap">
  {isAdmin ? (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-100 to-purple-50 border border-purple-200 rounded-full text-sm text-purple-300 font-medium">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-purple-500/15 backdrop-blur-sm border border-purple-400/25 rounded-full text-sm text-purple-300 font-medium">
  <Shield className="w-4 h-4" />
  <span>Administrator</span>
  </div>
  ) : (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-sm text-blue-300 font-medium">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/15 backdrop-blur-sm border border-blue-400/25 rounded-full text-sm text-blue-300 font-medium">
  <UserIcon className="w-4 h-4" />
  <span>Pengguna</span>
  </div>
@@ -265,12 +265,12 @@ export const ProfilePage = () => {
 
  {/* Account Status */}
  {profile.is_active ? (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 border border-green-200 rounded-full text-xs text-green-300 font-medium">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/15 backdrop-blur-sm border border-green-400/25 rounded-full text-xs text-green-300 font-medium">
  <CheckCircle2 className="w-3 h-3" />
  <span>Aktif</span>
  </div>
  ) : (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-red-50 border border-red-200 rounded-full text-xs text-red-700 font-medium">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-red-500/15 backdrop-blur-sm border border-red-400/25 rounded-full text-xs text-red-300 font-medium">
  <XCircle className="w-3 h-3" />
  <span>Tidak Aktif</span>
  </div>
