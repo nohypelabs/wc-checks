@@ -181,13 +181,13 @@ export const LocationsListPage = () => {
  {/* Search + Stats row */}
  <div className="mt-2.5 lg:mt-3 space-y-2">
  <div className="relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 pointer-events-none" />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
  <input
  type="text"
  placeholder="Cari lokasi..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-9 pr-4 py-2 text-xs bg-white/8 text-white placeholder-white/50 lg:placeholder-white/40 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent backdrop-blur-sm transition-all"
+ className="w-full pl-9 pr-4 py-2.5 text-sm font-medium bg-slate-800/80 text-white placeholder-white/50 border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-md transition-all shadow-lg shadow-black/20"
  />
  </div>
 
