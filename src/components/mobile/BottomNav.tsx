@@ -81,15 +81,15 @@ export const BottomNav = () => {
  }}
  className="
  w-14 h-14
- bg-gradient-to-br from-blue-500 to-blue-600
+ bg-gradient-to-br from-cyan-400 to-blue-500
  rounded-2xl
  flex items-center justify-center
  text-white
- shadow-lg shadow-blue-500/30
+ shadow-lg shadow-cyan-500/30
  transition-all duration-200
  active:scale-95
- hover:shadow-xl hover:shadow-blue-500/40
- hover:from-blue-600 hover:to-blue-700
+ hover:shadow-xl hover:shadow-cyan-500/40
+ hover:from-cyan-500 hover:to-blue-600
  "
  aria-label={item.label}
  >
