@@ -347,7 +347,7 @@ export const AboutPage = () => {
  {/* Architecture */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <Database className="w-5 h-5 text-orange-300" />
  </div>
  <div>
@@ -494,7 +494,7 @@ export const AboutPage = () => {
  {/* Authentication & Security */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <Shield className="w-5 h-5 text-indigo-600" />
  </div>
  <div>
@@ -561,7 +561,7 @@ export const AboutPage = () => {
  {/* Deployment */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <Globe className="w-5 h-5 text-teal-600" />
  </div>
  <div>
