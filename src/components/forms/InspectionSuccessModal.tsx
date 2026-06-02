@@ -45,7 +45,7 @@ export const InspectionSuccessModal = ({
 
  {/* Modal */}
  <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
- <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn overflow-hidden">
+ <div className="bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn overflow-hidden">
  {/* Success Icon & Score */}
  <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-8 text-center relative overflow-hidden`}>
  {/* Decorative circles */}
@@ -74,14 +74,14 @@ export const InspectionSuccessModal = ({
  </div>
 
  {/* Location Info */}
- <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
- <p className="text-sm text-gray-600">Inspeksi selesai untuk:</p>
- <p className="font-semibold text-gray-900 truncate">{locationName}</p>
+ <div className="px-6 py-4 bg-white/5 border-b border-white/10">
+ <p className="text-sm text-white/60">Inspeksi selesai untuk:</p>
+ <p className="font-semibold text-white truncate">{locationName}</p>
  </div>
 
  {/* Action Buttons */}
  <div className="p-6 space-y-3">
- <p className="text-center text-sm text-gray-600 mb-4">
+ <p className="text-center text-sm text-white/60 mb-4">
  Mau ngapain selanjutnya?
  </p>
 
@@ -97,14 +97,14 @@ export const InspectionSuccessModal = ({
  {/* Scan Next Button */}
  <button
  onClick={() => navigate('/scan', { replace: true })}
- className="w-full bg-white hover:bg-gray-50 text-gray-700 py-4 rounded-xl font-semibold border-2 border-gray-200 hover:border-gray-300 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+ className="w-full bg-slate-800/80 hover:bg-slate-700/80 text-white py-4 rounded-xl font-semibold border-2 border-white/15 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
  >
  <QrCode className="w-5 h-5 group-hover:scale-110 transition-transform" />
  <span>Scan Lokasi Berikutnya</span>
  </button>
 
  {/* Hint Text */}
- <p className="text-xs text-gray-500 text-center pt-2">
+ <p className="text-xs text-white/50 text-center pt-2">
  Tip: Dashboard nampilin hasil dan statistik terbaru lo
  </p>
  </div>

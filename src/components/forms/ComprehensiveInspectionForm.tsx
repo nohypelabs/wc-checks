@@ -397,7 +397,7 @@ const handleSubmit = async () => {
  <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
  <div className="text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-2" />
- <p className="text-gray-700">Lokasi tidak ditemukan</p>
+ <p className="text-white/70">Lokasi tidak ditemukan</p>
  </div>
  </div>
  );
@@ -423,7 +423,7 @@ const handleSubmit = async () => {
  ${
  genZMode
  ? 'bg-gradient-to-r from-blue-600 to-cyan-600'
- : 'bg-white border-b border-gray-200'
+ : 'bg-white/8 border-b border-white/10'
  }
  shadow-sm
  `}
@@ -433,7 +433,7 @@ const handleSubmit = async () => {
  <button
  onClick={() => navigate(-1)}
  className={`p-2 rounded-xl ${
- genZMode ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700'
+ genZMode ? 'bg-white/20 text-white' : 'bg-gray-100 text-white/70'
  }`}
  >
  <ArrowLeft className="w-5 h-5" />
@@ -445,14 +445,14 @@ const handleSubmit = async () => {
  <div
  className={`
  w-12 h-12 rounded-xl flex items-center justify-center text-2xl
- ${genZMode ? 'bg-white/20' : 'bg-blue-100'}
+ ${genZMode ? 'bg-white/20' : 'bg-blue-500/20'}
  `}
  >
  🚽
  </div>
- <div className={genZMode ? 'text-white' : 'text-gray-900'}>
+ <div className={genZMode ? 'text-white' : 'text-white'}>
  <h1 className="font-bold text-lg">{location.name}</h1>
- <p className={`text-sm ${genZMode ? 'text-white/80' : 'text-gray-600'}`}>
+ <p className={`text-sm ${genZMode ? 'text-white/80' : 'text-white/60'}`}>
  {[location.building, location.floor, location.area].filter(Boolean).join(' • ') || 'Detail lokasi'}
  </p>
  </div>
@@ -460,7 +460,7 @@ const handleSubmit = async () => {
 
  <div className="space-y-2">
  <div className="flex items-center justify-between text-sm">
- <span className={genZMode ? 'text-white/90' : 'text-gray-600'}>
+ <span className={genZMode ? 'text-white/90' : 'text-white/60'}>
  Progress {completedCount}/{INSPECTION_COMPONENTS.length}
  </span>
  {currentScore > 0 && (
@@ -519,14 +519,14 @@ const handleSubmit = async () => {
  transition-all border-2
  ${
  rating?.isAvailable === false
- ? 'bg-gray-50 border-gray-300'
+ ? 'bg-white/5 border-white/15'
  : rating
  ? genZMode
  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-400'
- : 'bg-green-50 border-green-500'
+ : 'bg-green-500/10 border-green-500'
  : genZMode
- ? 'bg-white/80 border-blue-200 hover:border-blue-400'
- : 'bg-white border-gray-200 hover:border-gray-300'
+ ? 'bg-white/10 border-blue-500/30 hover:border-blue-500/50'
+ : 'bg-white/8 border-white/15 hover:border-white/30'
  }
  `}
  >
@@ -540,16 +540,16 @@ const handleSubmit = async () => {
  ) : null;
  })()}
  <div className="flex flex-col items-start">
- <span className="font-medium text-gray-900">
+ <span className="font-medium text-white">
  {component.labelGenZ}
  </span>
  {rating?.isAvailable === false && (
- <span className="text-xs text-gray-500">Tidak Ada</span>
+ <span className="text-xs text-white/50">Tidak Ada</span>
  )}
  </div>
  </div>
  {rating?.isAvailable === false ? (
- <span className="text-sm text-gray-500 flex items-center gap-1"><SkipForward className="w-4 h-4" /> Skip</span>
+ <span className="text-sm text-white/50 flex items-center gap-1"><SkipForward className="w-4 h-4" /> Skip</span>
  ) : rating ? (
  <CheckCircle2 className="w-5 h-5 text-green-600" />
  ) : component.required ? (
@@ -579,7 +579,7 @@ const handleSubmit = async () => {
  ${
  genZMode
  ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
- : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+ : 'bg-gray-100 text-white/70 hover:bg-gray-200'
  }
  `}
  >
@@ -594,14 +594,14 @@ const handleSubmit = async () => {
  {completedCount >= totalRequired && (
  <div
  className={`${
- genZMode ? 'bg-gradient-to-br from-blue-100 to-cyan-100' : 'bg-blue-50'
+ genZMode ? 'bg-blue-500/20' : 'bg-blue-500/10'
  } rounded-2xl p-4 shadow-sm border-2 ${
  genZMode ? 'border-blue-400' : 'border-blue-400'
  }`}
  >
  <div className="flex items-center space-x-2 mb-2">
  <Camera className={`w-5 h-5 ${genZMode ? 'text-blue-700' : 'text-blue-700'}`} />
- <h3 className="font-bold text-gray-900">
+ <h3 className="font-bold text-white">
  📸 Foto Dokumentasi
  <span className="text-red-500 ml-1">*</span>
  </h3>
@@ -628,7 +628,7 @@ const handleSubmit = async () => {
  } rounded-2xl p-4 shadow-sm border border-gray-100`}
  >
  <label className="flex items-center justify-between mb-3">
- <span className="font-semibold text-gray-900">
+ <span className="font-semibold text-white">
  <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-yellow-500" /> Ada masalah yang ditemukan?</div>
  </span>
  <input
@@ -657,7 +657,7 @@ const handleSubmit = async () => {
  } rounded-2xl p-4 shadow-sm border border-gray-100`}
  >
  <label className="flex items-center justify-between mb-3">
- <span className="font-semibold text-gray-900">
+ <span className="font-semibold text-white">
  🔧 Perlu maintenance?
  </span>
  <input
@@ -691,7 +691,7 @@ const handleSubmit = async () => {
  : value === 'medium'
  ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
  : 'bg-blue-100 text-blue-700 border-2 border-blue-500'
- : 'bg-gray-100 text-gray-700 border-2 border-gray-200'
+ : 'bg-gray-100 text-white/70 border-2 border-gray-200'
  }
  `}
  >
@@ -708,7 +708,7 @@ const handleSubmit = async () => {
  genZMode ? 'bg-white/80' : 'bg-white'
  } rounded-2xl p-4 shadow-sm border border-gray-100`}
  >
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/70 mb-2">
  📝 Catatan tambahan (opsional)
  </label>
  <textarea
@@ -751,10 +751,10 @@ const handleSubmit = async () => {
  />
  </svg>
  </div>
- <h3 className="text-lg font-bold text-gray-900 mb-1">
+ <h3 className="text-lg font-bold text-white mb-1">
  Upload Foto...
  </h3>
- <p className="text-sm text-gray-600">
+ <p className="text-sm text-white/60">
  {uploadProgress?.current || 0} dari {uploadProgress?.total || 0} foto
  </p>
  </div>
@@ -775,7 +775,7 @@ const handleSubmit = async () => {
  </div>
 
  {/* Info Text */}
- <p className="text-xs text-gray-500 text-center mt-4">
+ <p className="text-xs text-white/50 text-center mt-4">
  Sabar ya, lagi upload...
  </p>
  </div>

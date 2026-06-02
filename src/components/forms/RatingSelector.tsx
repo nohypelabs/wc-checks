@@ -45,14 +45,14 @@ export const RatingSelector = ({
  };
 
  return (
- <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+ <div className="bg-white/8 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/10">
  {/* Header */}
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center space-x-3">
  <div
  className={`
  w-12 h-12 rounded-xl flex items-center justify-center text-2xl
- ${genZMode ? 'bg-gradient-to-br from-purple-100 to-pink-100' : 'bg-blue-50'}
+ ${genZMode ? 'bg-purple-500/20' : 'bg-blue-500/20'}
  `}
  >
  {genZMode ? (
@@ -64,11 +64,11 @@ export const RatingSelector = ({
  )}
  </div>
  <div>
- <h3 className={`font-semibold ${genZMode ? 'text-purple-900' : 'text-gray-900'}`}>
+ <h3 className={`font-semibold ${genZMode ? 'text-white' : 'text-white'}`}>
  {label}
  {config.required && <span className="text-red-500 ml-1">*</span>}
  </h3>
- {!config.required && <span className="text-xs text-gray-500">Opsional</span>}
+ {!config.required && <span className="text-xs text-white/50">Opsional</span>}
  </div>
  </div>
 
@@ -84,7 +84,7 @@ export const RatingSelector = ({
  ? 'bg-green-100 text-green-600'
  : genZMode
  ? 'bg-purple-100 text-purple-600 hover:bg-purple-200'
- : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+ : 'bg-white/10 text-white/60 hover:bg-white/20'
  }
  `}
  >
@@ -94,8 +94,8 @@ export const RatingSelector = ({
  </div>
 
  {/* NEW: Availability Toggle */}
- <div className="mb-4 pb-4 border-b border-gray-100">
- <p className="text-sm text-gray-600 mb-2">
+ <div className="mb-4 pb-4 border-b border-white/10">
+ <p className="text-sm text-white/60 mb-2">
  {genZMode ? 'Ada nggak nih komponennya?' : 'Is this component available?'}
  </p>
  <div className="flex gap-3">
@@ -108,8 +108,8 @@ export const RatingSelector = ({
  isAvailable
  ? genZMode
  ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-400 text-green-900'
- : 'bg-green-50 border-green-500 text-green-900'
- : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+ : 'bg-green-500/10 border-green-500 text-green-400'
+ : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
  }
  `}
  >
@@ -123,9 +123,9 @@ export const RatingSelector = ({
  ${
  !isAvailable
  ? genZMode
- ? 'bg-gradient-to-br from-gray-100 to-slate-100 border-gray-400 text-gray-900'
- : 'bg-gray-100 border-gray-500 text-gray-900'
- : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+ ? 'bg-white/10 border-white/30 text-white'
+ : 'bg-white/10 border-white/30 text-white'
+ : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
  }
  `}
  >
@@ -181,8 +181,8 @@ export const RatingSelector = ({
  value === 'other'
  ? genZMode
  ? 'bg-purple-50 border-purple-400 text-purple-700'
- : 'bg-blue-50 border-blue-400 text-blue-700'
- : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+ : 'bg-blue-500/10 border-blue-500 text-blue-400'
+ : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
  }
  `}
  >
@@ -191,7 +191,7 @@ export const RatingSelector = ({
  </button>
  </>
  ) : (
- <div className="text-center py-6 text-gray-500">
+ <div className="text-center py-6 text-white/50">
  <p className="text-sm font-medium">
  {genZMode ? '⏭️ Komponen ini tidak tersedia' : '⏭️ Component not available'}
  </p>
@@ -203,7 +203,7 @@ export const RatingSelector = ({
 
  {/* Notes Section (Required for "other") - Only show if available */}
  {isAvailable && showNotes && (
- <div className="mt-3 pt-3 border-t border-gray-100">
+ <div className="mt-3 pt-3 border-t border-white/10">
  <textarea
  value={notes || ''}
  onChange={(e) => onNotesChange?.(e.target.value)}
@@ -217,7 +217,7 @@ export const RatingSelector = ({
  ${
  value === 'other'
  ? 'border-orange-300 focus:ring-orange-500 focus:border-orange-500'
- : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
+ : 'border-white/15 focus:ring-blue-500 focus:border-blue-500'
  }
  `}
  rows={3}
@@ -227,7 +227,7 @@ export const RatingSelector = ({
  <button
  type="button"
  onClick={() => setShowNotes(false)}
- className="text-sm text-gray-500 hover:text-gray-700 mt-1"
+ className="text-sm text-white/50 hover:text-white/70 mt-1"
  >
  × Sembunyikan catatan
  </button>
@@ -245,7 +245,7 @@ export const RatingSelector = ({
  ${
  genZMode
  ? 'text-purple-600 hover:bg-purple-50'
- : 'text-blue-600 hover:bg-blue-50'
+ : 'text-blue-400 hover:bg-blue-500/10'
  }
  `}
  >
@@ -266,7 +266,7 @@ const getChoiceStyle = (
  genZMode: boolean
 ): string => {
  if (!isSelected) {
- return 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50';
+ return 'bg-white/8 border-white/15 text-white/80 hover:border-white/30 hover:bg-white/10';
  }
 
  if (genZMode) {
@@ -283,7 +283,7 @@ const getChoiceStyle = (
  } else {
  switch (choice) {
  case 'good':
- return 'bg-green-50 border-green-500 text-green-900';
+ return 'bg-green-500/10 border-green-500 text-green-400';
  case 'normal':
  return 'bg-yellow-50 border-yellow-500 text-yellow-900';
  case 'bad':

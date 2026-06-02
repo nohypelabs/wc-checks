@@ -58,7 +58,7 @@ export const InspectionFailedModal = ({
 
  {/* Modal */}
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-shakeIn overflow-hidden">
+ <div className="bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full animate-shakeIn overflow-hidden">
  {/* Error Header */}
  <div className="bg-gradient-to-br from-red-500 to-rose-600 p-8 text-center relative overflow-hidden">
  {/* Decorative elements */}
@@ -93,11 +93,11 @@ export const InspectionFailedModal = ({
  {/* Technical Error (collapsible) */}
  {errorMessage && (
  <details className="text-xs">
- <summary className="text-gray-600 cursor-pointer hover:text-gray-900 font-medium">
+ <summary className="text-white/60 cursor-pointer hover:text-white font-medium">
  Detail teknis
  </summary>
- <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
- <p className="text-gray-700 break-words font-mono">
+ <div className="mt-2 p-3 bg-white/5 rounded-lg border border-white/10">
+ <p className="text-white/70 break-words font-mono">
  {errorMessage}
  </p>
  </div>
@@ -105,7 +105,7 @@ export const InspectionFailedModal = ({
  )}
 
  {/* Tips */}
- <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+ <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
  <p className="text-sm font-semibold text-blue-900 mb-2">
  Apa yang harus dilakukan:
  </p>
@@ -143,7 +143,7 @@ export const InspectionFailedModal = ({
  {/* Back Button */}
  <button
  onClick={onClose}
- className="w-full bg-white hover:bg-gray-50 text-gray-700 py-4 rounded-xl font-semibold border-2 border-gray-200 hover:border-gray-300 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+ className="w-full bg-slate-800/80 hover:bg-slate-700/80 text-white py-4 rounded-xl font-semibold border-2 border-white/15 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
  >
  <ArrowLeft className="w-5 h-5" />
  <span>Kembali</span>
