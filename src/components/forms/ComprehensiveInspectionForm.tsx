@@ -578,7 +578,7 @@ const handleSubmit = async () => {
  w-full mt-2 py-2 rounded-xl text-sm font-medium
  ${
  genZMode
- ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+ ? 'bg-blue-500/20 text-blue-700 hover:bg-blue-200'
  : 'bg-white/10 text-white/70 hover:bg-white/20'
  }
  `}
@@ -625,7 +625,7 @@ const handleSubmit = async () => {
  <div
  className={`${
  genZMode ? 'bg-white/10' : 'bg-white/10'
- } rounded-2xl p-4 shadow-sm border border-gray-100`}
+ } rounded-2xl p-4 shadow-sm border border-white/10`}
  >
  <label className="flex items-center justify-between mb-3">
  <span className="font-semibold text-white">
@@ -644,7 +644,7 @@ const handleSubmit = async () => {
  value={issueDescription}
  onChange={(e) => setIssueDescription(e.target.value)}
  placeholder="Jelasin masalahnya..."
- className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 resize-none"
+ className="w-full px-3 py-2 text-white bg-slate-800/80 border border-white/15 rounded-xl focus:ring-blue-500 focus:border-blue-500 resize-none placeholder-white/40"
  rows={3}
  />
  )}
@@ -654,7 +654,7 @@ const handleSubmit = async () => {
  <div
  className={`${
  genZMode ? 'bg-white/10' : 'bg-white/10'
- } rounded-2xl p-4 shadow-sm border border-gray-100`}
+ } rounded-2xl p-4 shadow-sm border border-white/10`}
  >
  <label className="flex items-center justify-between mb-3">
  <span className="font-semibold text-white">
@@ -690,7 +690,7 @@ const handleSubmit = async () => {
  ? 'bg-orange-100 text-orange-700 border-2 border-orange-500'
  : value === 'medium'
  ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
- : 'bg-blue-100 text-blue-700 border-2 border-blue-500'
+ : 'bg-blue-500/20 text-blue-700 border-2 border-blue-500'
  : 'bg-white/10 text-white/70 border-2 border-white/15'
  }
  `}
@@ -706,7 +706,7 @@ const handleSubmit = async () => {
  <div
  className={`${
  genZMode ? 'bg-white/10' : 'bg-white/10'
- } rounded-2xl p-4 shadow-sm border border-gray-100`}
+ } rounded-2xl p-4 shadow-sm border border-white/10`}
  >
  <label className="block text-sm font-medium text-white/70 mb-2">
  📝 Catatan tambahan (opsional)
@@ -715,7 +715,7 @@ const handleSubmit = async () => {
  value={generalNotes}
  onChange={(e) => setGeneralNotes(e.target.value)}
  placeholder="Ada yang mau ditambahin?"
- className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 resize-none"
+ className="w-full px-3 py-2 text-white bg-slate-800/80 border border-white/15 rounded-xl focus:ring-blue-500 focus:border-blue-500 resize-none placeholder-white/40"
  rows={3}
  />
  </div>
@@ -730,7 +730,7 @@ const handleSubmit = async () => {
  <div className="bg-slate-800/90 backdrop-blur-xl rounded-2xl p-6 max-w-sm w-full shadow-2xl">
  {/* Progress Title */}
  <div className="text-center mb-4">
- <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+ <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
  <svg 
  className="w-8 h-8 text-blue-600 animate-spin" 
  fill="none" 
