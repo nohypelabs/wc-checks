@@ -82,8 +82,10 @@ export const UpgradePage = () => {
           </div>
 
           <div className="mb-6">
-            <span className="text-4xl font-extrabold text-white">Rp 3.000.000</span>
+            <span className="text-sm text-white/40 line-through mr-2">Rp 5.000.000</span>
+            <span className="text-4xl font-extrabold text-white">Rp 2.999.000</span>
             <span className="text-white/50 text-sm"> /bulan</span>
+            <span className="ml-2 text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-bold">-40%</span>
           </div>
 
           {/* Benefits */}
