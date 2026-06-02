@@ -55,7 +55,7 @@ export const AdminCard = ({
  <button
  onClick={() => navigate(path)}
  className="
- relative w-full p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg
+ relative w-full p-2.5 lg:p-4 bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5
  rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
  transition-all duration-200
  text-left group
@@ -70,7 +70,7 @@ export const AdminCard = ({
 
  {/* Icon — glass on mobile, colored on desktop */}
  <div className={`
- w-8 h-8 lg:w-10 lg:h-10 bg-white/20 rounded-lg flex items-center justify-center mb-1.5 lg:mb-2
+ w-8 h-8 lg:w-10 lg:h-10 bg-white/10 rounded-lg flex items-center justify-center mb-1.5 lg:mb-2
  ${desktopIcon[color] || desktopIcon.blue}
  group-hover:scale-110 transition-transform
  `}>
@@ -80,7 +80,7 @@ export const AdminCard = ({
  {/* Content */}
  <div className="mb-1 lg:mb-1.5">
  <h3 className="text-xs lg:text-sm font-bold text-white leading-tight">{title}</h3>
- <p className="text-[10px] lg:text-xs text-white/50 mt-0.5 hidden lg:block">{description}</p>
+ <p className="text-[10px] lg:text-xs text-white/40 mt-0.5 hidden lg:block">{description}</p>
  </div>
 
  {/* Footer */}
@@ -90,11 +90,11 @@ export const AdminCard = ({
  )}
  <div className={`
  ml-auto flex items-center gap-0.5 text-[10px] lg:text-xs font-medium
- text-white/70 ${desktopManage[color] || desktopManage.blue}
+ text-white/60 ${desktopManage[color] || desktopManage.blue}
  group-hover:gap-1.5 transition-all
  `}>
  <span>Manage</span>
- <ChevronRight className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white/50" />
+ <ChevronRight className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white/40" />
  </div>
  </div>
  </button>

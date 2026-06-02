@@ -47,12 +47,12 @@ export const AdminDashboard = () => {
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Header - Compact */}
- <header className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:py-3 lg:px-4">
+ <header className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
  <div className="max-w-7xl mx-auto flex items-center justify-between text-white">
  {/* Left Menu Button */}
  <button
  onClick={() => setSidebarOpen(true)}
- className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+ className="p-1.5 hover:bg-white/15 rounded-lg transition-colors"
  >
  <Menu className="w-5 h-5" />
  </button>
@@ -86,7 +86,7 @@ export const AdminDashboard = () => {
  </span>
  <button
  onClick={() => navigate('/profile')}
- className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+ className="p-1.5 hover:bg-white/15 rounded-lg transition-colors"
  >
  <Settings className="w-4 h-4" />
  </button>
@@ -98,9 +98,9 @@ export const AdminDashboard = () => {
  <div className="max-w-7xl mx-auto px-3 lg:px-8 pt-3 lg:pt-5">
  {/* Quick Stats — Glass effect on mobile */}
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4 mb-3 lg:mb-5">
- <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+ <Card className="p-2.5 lg:p-4 bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5">
  <div className="flex items-center gap-1.5 mb-1">
- <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 rounded-md lg:rounded-lg flex items-center justify-center">
+ <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/10 rounded-md lg:rounded-lg flex items-center justify-center">
  <Activity className="w-3 h-3 lg:w-5 lg:h-5 text-white" />
  </div>
  {stats && stats.inspectionGrowth !== 0 && (
@@ -116,9 +116,9 @@ export const AdminDashboard = () => {
  <div className="text-[10px] lg:text-sm text-white/60 mt-0.5">Hari Ini</div>
  </Card>
 
- <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+ <Card className="p-2.5 lg:p-4 bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5">
  <div className="flex items-center gap-1.5 mb-1">
- <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 rounded-md lg:rounded-lg flex items-center justify-center">
+ <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/10 rounded-md lg:rounded-lg flex items-center justify-center">
  <Calendar className="w-3 h-3 lg:w-5 lg:h-5 text-white" />
  </div>
  </div>
@@ -126,9 +126,9 @@ export const AdminDashboard = () => {
  <div className="text-[10px] lg:text-sm text-white/60 mt-0.5">7 Hari</div>
  </Card>
 
- <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+ <Card className="p-2.5 lg:p-4 bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5">
  <div className="flex items-center gap-1.5 mb-1">
- <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 rounded-md lg:rounded-lg flex items-center justify-center">
+ <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/10 rounded-md lg:rounded-lg flex items-center justify-center">
  <Calendar className="w-3 h-3 lg:w-5 lg:h-5 text-white" />
  </div>
  </div>
@@ -136,9 +136,9 @@ export const AdminDashboard = () => {
  <div className="text-[10px] lg:text-sm text-white/60 mt-0.5">30 Hari</div>
  </Card>
 
- <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+ <Card className="p-2.5 lg:p-4 bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5">
  <div className="flex items-center gap-1.5 mb-1">
- <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 rounded-md lg:rounded-lg flex items-center justify-center">
+ <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/10 rounded-md lg:rounded-lg flex items-center justify-center">
  <BarChart3 className="w-3 h-3 lg:w-5 lg:h-5 text-white" />
  </div>
  </div>
@@ -205,7 +205,7 @@ export const AdminDashboard = () => {
 
  {/* System Overview */}
  <div className={isAdmin ? 'lg:col-span-1' : 'lg:col-span-3 lg:max-w-md lg:mx-auto'}>
- <Card className="bg-white/15 backdrop-blur-md border border-white/20 shadow-lg lg:h-full" padding="none">
+ <Card className="bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5 lg:h-full" padding="none">
  <div className="px-3 py-2 lg:px-4 lg:py-3 border-b border-white/10">
  <div className="flex items-center gap-1.5 lg:gap-2">
  <Activity className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-white" />
