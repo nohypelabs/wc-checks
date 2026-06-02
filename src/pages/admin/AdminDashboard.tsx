@@ -96,54 +96,54 @@ export const AdminDashboard = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-3 lg:px-8 pt-3 lg:pt-5">
-        {/* Quick Stats */}
+        {/* Quick Stats — Glass effect on mobile */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4 mb-3 lg:mb-5">
-          <Card className="p-2.5 lg:p-4 bg-white shadow-xl border-0 lg:shadow-sm">
+          <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <div className="flex items-center gap-1.5 mb-1">
-              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-blue-100 rounded-md lg:rounded-lg flex items-center justify-center">
-                <Activity className="w-3 h-3 lg:w-5 lg:h-5 text-blue-600" />
+              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 lg:bg-blue-100 rounded-md lg:rounded-lg flex items-center justify-center">
+                <Activity className="w-3 h-3 lg:w-5 lg:h-5 text-white lg:text-blue-600" />
               </div>
               {stats && stats.inspectionGrowth !== 0 && (
                 <div className={`flex items-center gap-0.5 text-[10px] lg:text-sm font-medium ${
-                  stats.inspectionGrowth > 0 ? 'text-green-600' : 'text-red-600'
+                  stats.inspectionGrowth > 0 ? 'text-green-300 lg:text-green-600' : 'text-red-300 lg:text-red-600'
                 }`}>
                   {stats.inspectionGrowth > 0 ? <TrendingUp className="w-2.5 h-2.5 lg:w-3.5 lg:h-3.5" /> : <TrendingDown className="w-2.5 h-2.5 lg:w-3.5 lg:h-3.5" />}
                   <span>{Math.abs(stats.inspectionGrowth)}%</span>
                 </div>
               )}
             </div>
-            <div className="text-xl lg:text-2xl font-bold text-gray-900 leading-none">{stats?.todayInspections || 0}</div>
-            <div className="text-[10px] lg:text-sm text-gray-500 mt-0.5">Hari Ini</div>
+            <div className="text-xl lg:text-2xl font-bold text-white lg:text-gray-900 leading-none">{stats?.todayInspections || 0}</div>
+            <div className="text-[10px] lg:text-sm text-white/60 lg:text-gray-500 mt-0.5">Hari Ini</div>
           </Card>
 
-          <Card className="p-2.5 lg:p-4 bg-white shadow-xl border-0 lg:shadow-sm">
+          <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <div className="flex items-center gap-1.5 mb-1">
-              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-green-100 rounded-md lg:rounded-lg flex items-center justify-center">
-                <Calendar className="w-3 h-3 lg:w-5 lg:h-5 text-green-600" />
+              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 lg:bg-green-100 rounded-md lg:rounded-lg flex items-center justify-center">
+                <Calendar className="w-3 h-3 lg:w-5 lg:h-5 text-white lg:text-green-600" />
               </div>
             </div>
-            <div className="text-xl lg:text-2xl font-bold text-gray-900 leading-none">{stats?.inspections7d || 0}</div>
-            <div className="text-[10px] lg:text-sm text-gray-500 mt-0.5">7 Hari</div>
+            <div className="text-xl lg:text-2xl font-bold text-white lg:text-gray-900 leading-none">{stats?.inspections7d || 0}</div>
+            <div className="text-[10px] lg:text-sm text-white/60 lg:text-gray-500 mt-0.5">7 Hari</div>
           </Card>
 
-          <Card className="p-2.5 lg:p-4 bg-white shadow-xl border-0 lg:shadow-sm">
+          <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <div className="flex items-center gap-1.5 mb-1">
-              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-purple-100 rounded-md lg:rounded-lg flex items-center justify-center">
-                <Calendar className="w-3 h-3 lg:w-5 lg:h-5 text-purple-600" />
+              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 lg:bg-purple-100 rounded-md lg:rounded-lg flex items-center justify-center">
+                <Calendar className="w-3 h-3 lg:w-5 lg:h-5 text-white lg:text-purple-600" />
               </div>
             </div>
-            <div className="text-xl lg:text-2xl font-bold text-gray-900 leading-none">{stats?.inspections30d || 0}</div>
-            <div className="text-[10px] lg:text-sm text-gray-500 mt-0.5">30 Hari</div>
+            <div className="text-xl lg:text-2xl font-bold text-white lg:text-gray-900 leading-none">{stats?.inspections30d || 0}</div>
+            <div className="text-[10px] lg:text-sm text-white/60 lg:text-gray-500 mt-0.5">30 Hari</div>
           </Card>
 
-          <Card className="p-2.5 lg:p-4 bg-white shadow-xl border-0 lg:shadow-sm">
+          <Card className="p-2.5 lg:p-4 bg-white/15 backdrop-blur-md border border-white/20 shadow-lg lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <div className="flex items-center gap-1.5 mb-1">
-              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-orange-100 rounded-md lg:rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-3 h-3 lg:w-5 lg:h-5 text-orange-600" />
+              <div className="w-6 h-6 lg:w-10 lg:h-10 bg-white/20 lg:bg-orange-100 rounded-md lg:rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-3 h-3 lg:w-5 lg:h-5 text-white lg:text-orange-600" />
               </div>
             </div>
-            <div className="text-xl lg:text-2xl font-bold text-gray-900 leading-none">{stats?.totalInspections || 0}</div>
-            <div className="text-[10px] lg:text-sm text-gray-500 mt-0.5">Total</div>
+            <div className="text-xl lg:text-2xl font-bold text-white lg:text-gray-900 leading-none">{stats?.totalInspections || 0}</div>
+            <div className="text-[10px] lg:text-sm text-white/60 lg:text-gray-500 mt-0.5">Total</div>
           </Card>
         </div>
 
@@ -205,25 +205,25 @@ export const AdminDashboard = () => {
 
           {/* System Overview */}
           <div className={isAdmin ? 'lg:col-span-1' : 'lg:col-span-3 lg:max-w-md lg:mx-auto'}>
-            <Card className="bg-white shadow-xl border-0 lg:shadow-sm lg:h-full" padding="none">
-              <div className="px-3 py-2 lg:px-4 lg:py-3 border-b border-gray-100">
+            <Card className="bg-white/15 backdrop-blur-md border border-white/20 shadow-lg lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none lg:h-full" padding="none">
+              <div className="px-3 py-2 lg:px-4 lg:py-3 border-b border-white/10 lg:border-gray-100">
                 <div className="flex items-center gap-1.5 lg:gap-2">
-                  <Activity className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-blue-600" />
-                  <h3 className="font-semibold text-gray-900 text-xs lg:text-base">System Overview</h3>
+                  <Activity className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-white lg:text-blue-600" />
+                  <h3 className="font-semibold text-white lg:text-gray-900 text-xs lg:text-base">System Overview</h3>
                 </div>
               </div>
-              <div className="divide-y divide-gray-50 lg:divide-y-0 lg:divide-x lg:divide-gray-100 lg:flex lg:flex-col">
+              <div className="divide-y divide-white/10 lg:divide-y-0 lg:divide-x lg:divide-gray-100 lg:flex lg:flex-col">
                 <div className="flex items-center justify-between px-3 py-2 lg:px-4 lg:py-3">
-                  <span className="text-[11px] lg:text-sm text-gray-500">Total Inspections</span>
-                  <span className="text-xs lg:text-base font-bold text-gray-900">{stats?.totalInspections || 0}</span>
+                  <span className="text-[11px] lg:text-sm text-white/60 lg:text-gray-500">Total Inspections</span>
+                  <span className="text-xs lg:text-base font-bold text-white lg:text-gray-900">{stats?.totalInspections || 0}</span>
                 </div>
                 <div className="flex items-center justify-between px-3 py-2 lg:px-4 lg:py-3">
-                  <span className="text-[11px] lg:text-sm text-gray-500">Active Locations</span>
-                  <span className="text-xs lg:text-base font-bold text-gray-900">{stats?.totalLocations || 0}</span>
+                  <span className="text-[11px] lg:text-sm text-white/60 lg:text-gray-500">Active Locations</span>
+                  <span className="text-xs lg:text-base font-bold text-white lg:text-gray-900">{stats?.totalLocations || 0}</span>
                 </div>
                 <div className="flex items-center justify-between px-3 py-2 lg:px-4 lg:py-3">
-                  <span className="text-[11px] lg:text-sm text-gray-500">Today's Activity</span>
-                  <span className="text-xs lg:text-base font-bold text-gray-900">{stats?.todayInspections || 0}</span>
+                  <span className="text-[11px] lg:text-sm text-white/60 lg:text-gray-500">Today's Activity</span>
+                  <span className="text-xs lg:text-base font-bold text-white lg:text-gray-900">{stats?.todayInspections || 0}</span>
                 </div>
               </div>
             </Card>
