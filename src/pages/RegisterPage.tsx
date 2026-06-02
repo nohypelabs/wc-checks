@@ -161,7 +161,7 @@ export const RegisterPage = () => {
  };
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
  {/* Signup Container */}
  <div className="w-full max-w-md">
  {/* Logo/Header */}
@@ -183,16 +183,16 @@ export const RegisterPage = () => {
  <span className="text-3xl">🚽</span>
  </div>
  </div>
- <h1 className="text-3xl font-bold text-gray-900 mb-2">
+ <h1 className="text-3xl font-bold text-white mb-2">
  Proservice Indonesia
  </h1>
- <p className="text-gray-600">
+ <p className="text-white/70">
  Buat akun untuk memulai inspeksi
  </p>
  </div>
 
  {/* Signup Card */}
- <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+ <div className="bg-white/8 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-white/10">
  {/* Error Alert */}
  {error && (
  <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
@@ -220,17 +220,17 @@ export const RegisterPage = () => {
  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
  {/* Full Name */}
  <div>
- <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
+ <label htmlFor="full_name" className="block text-sm font-medium text-white/80 mb-2">
  Nama Lengkap
  </label>
  <div className="relative">
  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <User className="h-5 w-5 text-gray-400" />
+ <User className="h-5 w-5 text-white/50" />
  </div>
  <input
  {...register('full_name')}
  type="text"
- className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  placeholder="Masukkan nama lengkap Anda"
  disabled={isLoading}
  />
@@ -242,17 +242,17 @@ export const RegisterPage = () => {
 
  {/* Email */}
  <div>
- <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+ <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
  Alamat Email
  </label>
  <div className="relative">
  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <Mail className="h-5 w-5 text-gray-400" />
+ <Mail className="h-5 w-5 text-white/50" />
  </div>
  <input
  {...register('email')}
  type="email"
- className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  placeholder="email.anda@example.com"
  disabled={isLoading}
  />
@@ -264,17 +264,17 @@ export const RegisterPage = () => {
 
  {/* Phone Number */}
  <div>
- <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+ <label htmlFor="phone" className="block text-sm font-medium text-white/80 mb-2">
  Nomor Telepon (Opsional)
  </label>
  <div className="relative">
  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <Phone className="h-5 w-5 text-gray-400" />
+ <Phone className="h-5 w-5 text-white/50" />
  </div>
  <input
  {...register('phone')}
  type="tel"
- className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  placeholder="081234567890"
  disabled={isLoading}
  />
@@ -286,21 +286,21 @@ export const RegisterPage = () => {
 
  {/* Occupation */}
  <div>
- <label htmlFor="occupation_id" className="block text-sm font-medium text-gray-700 mb-2">
+ <label htmlFor="occupation_id" className="block text-sm font-medium text-white/80 mb-2">
  Jabatan (Opsional)
  </label>
  <div className="relative">
  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <Briefcase className="h-5 w-5 text-gray-400" />
+ <Briefcase className="h-5 w-5 text-white/50" />
  </div>
  {loadingOccupations ? (
- <div className="block w-full pl-10 pr-3 py-3 bg-gray-100 border border-gray-300 rounded-lg">
- <span className="text-gray-500">Memuat...</span>
+ <div className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg">
+ <span className="text-white/60">Memuat...</span>
  </div>
  ) : (
  <select
  {...register('occupation_id')}
- className="block w-full pl-10 pr-3 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer"
  disabled={isLoading}
  >
  <option value="">Pilih jabatan Anda</option>
@@ -316,14 +316,14 @@ export const RegisterPage = () => {
 
  {/* Password */}
  <div>
- <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+ <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-2">
  Kata Sandi
  </label>
  <div className="relative">
  <input
  {...register('password')}
  type={showPassword ? 'text' : 'password'}
- className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-4 pr-12 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  placeholder="Masukkan kata sandi Anda"
  disabled={isLoading}
  />
@@ -335,9 +335,9 @@ export const RegisterPage = () => {
  tabIndex={-1}
  >
  {showPassword ? (
- <EyeOff className="h-5 w-5 text-gray-400" />
+ <EyeOff className="h-5 w-5 text-white/50" />
  ) : (
- <Eye className="h-5 w-5 text-gray-400" />
+ <Eye className="h-5 w-5 text-white/50" />
  )}
  </button>
  </div>
@@ -348,14 +348,14 @@ export const RegisterPage = () => {
 
  {/* Confirm Password */}
  <div>
- <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+ <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/80 mb-2">
  Konfirmasi Kata Sandi
  </label>
  <div className="relative">
  <input
  {...register('confirmPassword')}
  type={showConfirmPassword ? 'text' : 'password'}
- className="block w-full pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-4 pr-12 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  placeholder="Konfirmasi kata sandi Anda"
  disabled={isLoading}
  />
@@ -367,9 +367,9 @@ export const RegisterPage = () => {
  tabIndex={-1}
  >
  {showConfirmPassword ? (
- <EyeOff className="h-5 w-5 text-gray-400" />
+ <EyeOff className="h-5 w-5 text-white/50" />
  ) : (
- <Eye className="h-5 w-5 text-gray-400" />
+ <Eye className="h-5 w-5 text-white/50" />
  )}
  </button>
  </div>
@@ -407,7 +407,7 @@ export const RegisterPage = () => {
  <div className="w-full border-t border-gray-300"></div>
  </div>
  <div className="relative flex justify-center text-sm">
- <span className="px-4 bg-white text-gray-500">
+ <span className="px-4 bg-white text-white/60">
  Sudah punya akun?
  </span>
  </div>
@@ -423,7 +423,7 @@ export const RegisterPage = () => {
  </div>
 
  {/* Footer */}
- <div className="mt-8 text-center text-sm text-gray-600">
+ <div className="mt-8 text-center text-sm text-white/70">
  <p>
  © 2025 Proservice Indonesia. Hak cipta dilindungi.
  </p>
