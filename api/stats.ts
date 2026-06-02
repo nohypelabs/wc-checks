@@ -19,6 +19,12 @@ interface DashboardStats {
   userGrowth: number;
   inspectionGrowth: number;
   dailyTrend: Array<{ date: string; count: number }>;
+  usage: {
+    plan: string;
+    limit: number;
+    used: number;
+    remaining: number;
+  };
 }
 
 /**
@@ -76,6 +82,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const trendStartDate = (() => { const d = new Date(now); d.setDate(d.getDate() - trendDays); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
 
     // Parallel queries for better performance
+    const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+
     const [
       usersCount,
       locationsCount,
@@ -87,6 +95,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       activeUsersCount,
       recentInspections,
       dailyTrendData,
+      userPlanData,
+      userMonthlyCount,
     ] = await Promise.all([
       // Total active users
       supabase
@@ -154,6 +164,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .gte('inspection_date', trendStartDate)
         .order('inspection_date', { ascending: true })
         .range(0, 9999),
+
+      // User plan info
+      supabase
+        .from('users')
+        .select('plan, inspection_limit')
+        .eq('id', auth.userId)
+        .single(),
+
+      // User's monthly inspection count
+      supabase
+        .from('inspection_records')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', auth.userId)
+        .gte('inspection_date', monthStart),
     ]);
 
     // Calculate average score
@@ -209,6 +233,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
     const dailyTrend = Array.from(trendMap.entries()).map(([date, count]) => ({ date, count }));
 
+    const plan = (userPlanData.data as any)?.plan || 'free';
+    const limit = (userPlanData.data as any)?.inspection_limit || 50;
+    const used = userMonthlyCount.count || 0;
+
     const stats: DashboardStats = {
       totalUsers: usersCount.count || 0,
       totalLocations: locationsCount.count || 0,
@@ -221,6 +249,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userGrowth: 0,
       inspectionGrowth,
       dailyTrend,
+      usage: {
+        plan,
+        limit,
+        used,
+        remaining: Math.max(0, limit - used),
+      },
     };
 
     console.log('[stats] Success - returning dashboard statistics for user:', auth.userId);

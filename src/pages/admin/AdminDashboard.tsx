@@ -140,6 +140,45 @@ export const AdminDashboard = () => {
  </Card>
  </div>
 
+ {/* Usage Indicator */}
+ {stats?.usage && stats.usage.plan !== 'pro_max' && (
+ <div className="mb-3 lg:mb-5">
+ <div className="bg-white/8 backdrop-blur-md rounded-xl border border-white/10 px-3 py-2.5 lg:px-4 lg:py-3">
+ <div className="flex items-center justify-between mb-1.5">
+ <div className="flex items-center gap-2">
+ <span className="text-[10px] lg:text-xs text-white/50 font-medium uppercase tracking-wider">Kuota</span>
+ <span className={`text-[10px] lg:text-xs font-semibold px-1.5 py-0.5 rounded-md ${
+ stats.usage.plan === 'free'
+ ? 'bg-white/10 text-white/60'
+ : stats.usage.plan === 'basic'
+ ? 'bg-blue-500/15 text-blue-300'
+ : 'bg-purple-500/15 text-purple-300'
+ }`}>
+ {stats.usage.plan === 'free' ? 'Free' : stats.usage.plan === 'basic' ? 'Basic' : 'Pro'}
+ </span>
+ </div>
+ <span className={`text-[10px] lg:text-xs font-semibold ${
+ stats.usage.remaining === 0 ? 'text-red-300' : stats.usage.remaining < 10 ? 'text-yellow-300' : 'text-white/60'
+ }`}>
+ {stats.usage.used} / {stats.usage.limit}
+ </span>
+ </div>
+ <div className="w-full bg-white/10 rounded-full h-1.5 lg:h-2">
+ <div
+ className={`h-1.5 lg:h-2 rounded-full transition-all duration-500 ${
+ stats.usage.remaining === 0
+ ? 'bg-red-500'
+ : stats.usage.remaining < 10
+ ? 'bg-yellow-500'
+ : 'bg-green-500'
+ }`}
+ style={{ width: `${Math.min(100, (stats.usage.used / stats.usage.limit) * 100)}%` }}
+ />
+ </div>
+ </div>
+ </div>
+ )}
+
  {/* Two column layout on desktop: Management | Overview */}
  <div className="lg:grid lg:grid-cols-3 lg:gap-5 lg:items-stretch">
  {/* Management Cards - Admin Only */}

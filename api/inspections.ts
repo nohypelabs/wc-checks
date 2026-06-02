@@ -77,6 +77,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const now = new Date();
+
+      // Check inspection limit
+      const { data: userProfile } = await supabase
+        .from('users')
+        .select('plan, inspection_limit')
+        .eq('id', userId)
+        .single();
+
+      if (userProfile) {
+        const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+
+        const { count: currentCount } = await supabase
+          .from('inspection_records')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId)
+          .gte('inspection_date', monthStart);
+
+        const used = currentCount || 0;
+        const limit = userProfile.inspection_limit || 50;
+
+        if (used >= limit) {
+          return res.status(403).json({
+            error: 'INSPECTION_LIMIT_REACHED',
+            message: `Batas inspeksi bulan ini tercapai (${used}/${limit}). Silakan upgrade paket Anda.`,
+            plan: userProfile.plan || 'free',
+            used,
+            limit,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      }
+
       const inspectionData = {
         user_id: userId,
         location_id,
