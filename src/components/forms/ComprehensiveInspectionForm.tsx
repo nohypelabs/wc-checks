@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Save, CheckCircle2, AlertCircle, Camera, SkipForward, AlertTriangle, XCircle } from 'lucide-react';
+import { ArrowLeft, Save, CheckCircle2, AlertCircle, Camera, SkipForward, AlertTriangle, XCircle, Droplet } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import {
  InspectionComponent,
@@ -386,7 +386,7 @@ const handleSubmit = async () => {
 
  if (locationLoading) {
  return (
- <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
  </div>
  );
@@ -394,7 +394,7 @@ const handleSubmit = async () => {
 
  if (!location) {
  return (
- <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
  <div className="text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-2" />
  <p className="text-white/70">Lokasi tidak ditemukan</p>
@@ -412,8 +412,8 @@ const handleSubmit = async () => {
  <div
  className={`min-h-screen pb-32 ${
  genZMode
- ? 'bg-blue-500/10'
- : 'bg-gray-50'
+ ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
+ : 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
  }`}
  >
  {/* Header */}
@@ -433,7 +433,7 @@ const handleSubmit = async () => {
  <button
  onClick={() => navigate(-1)}
  className={`p-2 rounded-xl ${
- genZMode ? 'bg-white/20 text-white' : 'bg-gray-100 text-white/70'
+ genZMode ? 'bg-white/20 text-white' : 'bg-white/10 text-white/70'
  }`}
  >
  <ArrowLeft className="w-5 h-5" />
@@ -444,11 +444,11 @@ const handleSubmit = async () => {
  <div className="flex items-center space-x-3 mb-3">
  <div
  className={`
- w-12 h-12 rounded-xl flex items-center justify-center text-2xl
+ w-12 h-12 rounded-xl flex items-center justify-center
  ${genZMode ? 'bg-white/20' : 'bg-blue-500/20'}
  `}
  >
- 🚽
+ <Droplet className="w-6 h-6 text-white" />
  </div>
  <div className={genZMode ? 'text-white' : 'text-white'}>
  <h1 className="font-bold text-lg">{location.name}</h1>
@@ -472,7 +472,7 @@ const handleSubmit = async () => {
  <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
  <div
  className={`h-full transition-all duration-300 ${
- genZMode ? 'bg-white' : 'bg-blue-600'
+ genZMode ? 'bg-white' : 'bg-blue-500'
  }`}
  style={{ width: `${progress}%` }}
  />
@@ -579,7 +579,7 @@ const handleSubmit = async () => {
  ${
  genZMode
  ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
- : 'bg-gray-100 text-white/70 hover:bg-gray-200'
+ : 'bg-white/10 text-white/70 hover:bg-white/20'
  }
  `}
  >
@@ -624,7 +624,7 @@ const handleSubmit = async () => {
  {/* Issues Section */}
  <div
  className={`${
- genZMode ? 'bg-white/80' : 'bg-white'
+ genZMode ? 'bg-white/10' : 'bg-white/10'
  } rounded-2xl p-4 shadow-sm border border-gray-100`}
  >
  <label className="flex items-center justify-between mb-3">
@@ -653,7 +653,7 @@ const handleSubmit = async () => {
  {/* Maintenance Required */}
  <div
  className={`${
- genZMode ? 'bg-white/80' : 'bg-white'
+ genZMode ? 'bg-white/10' : 'bg-white/10'
  } rounded-2xl p-4 shadow-sm border border-gray-100`}
  >
  <label className="flex items-center justify-between mb-3">
@@ -691,7 +691,7 @@ const handleSubmit = async () => {
  : value === 'medium'
  ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
  : 'bg-blue-100 text-blue-700 border-2 border-blue-500'
- : 'bg-gray-100 text-white/70 border-2 border-gray-200'
+ : 'bg-white/10 text-white/70 border-2 border-white/15'
  }
  `}
  >
@@ -705,7 +705,7 @@ const handleSubmit = async () => {
  {/* General Notes */}
  <div
  className={`${
- genZMode ? 'bg-white/80' : 'bg-white'
+ genZMode ? 'bg-white/10' : 'bg-white/10'
  } rounded-2xl p-4 shadow-sm border border-gray-100`}
  >
  <label className="block text-sm font-medium text-white/70 mb-2">
@@ -727,7 +727,7 @@ const handleSubmit = async () => {
 {/* Upload Progress Indicator */}
 {uploadProgress && (
  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+ <div className="bg-slate-800/90 backdrop-blur-xl rounded-2xl p-6 max-w-sm w-full shadow-2xl">
  {/* Progress Title */}
  <div className="text-center mb-4">
  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -783,7 +783,7 @@ const handleSubmit = async () => {
 )}
 
  {/* Submit Button (Sticky Bottom) */}
- <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg">
+ <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-800/90 backdrop-blur-xl border-t border-white/10 shadow-lg">
  <button
  type="button"
  onClick={handleSubmit}
