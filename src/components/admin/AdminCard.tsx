@@ -36,7 +36,7 @@ export const AdminCard = ({
     <button
       onClick={() => navigate(path)}
       className="
-        relative w-full p-3.5 lg:p-3 bg-white rounded-2xl lg:rounded-xl shadow-sm border border-gray-100
+        relative w-full p-2.5 lg:p-3 bg-white rounded-xl lg:rounded-xl shadow-sm border border-gray-100
         hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
         transition-all duration-200
         text-left group
@@ -44,38 +44,37 @@ export const AdminCard = ({
     >
       {/* Badge */}
       {badge && (
-        <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full">
+        <div className="absolute top-1.5 right-1.5 px-1 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full">
           {badge}
         </div>
       )}
 
       {/* Icon */}
       <div className={`
-        w-10 h-10 lg:w-8 lg:h-8 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue}
-        rounded-xl lg:rounded-lg flex items-center justify-center mb-2 lg:mb-1.5
+        w-8 h-8 lg:w-8 lg:h-8 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue}
+        rounded-lg flex items-center justify-center mb-1.5 lg:mb-1.5
         group-hover:scale-110 transition-transform
       `}>
-        <Icon className="w-5 h-5 lg:w-4 lg:h-4" />
+        <Icon className="w-4 h-4 lg:w-4 lg:h-4" />
       </div>
 
       {/* Content */}
-      <div className="mb-1.5 lg:mb-1">
-        <h3 className="text-sm lg:text-xs font-bold text-gray-900 leading-tight">{title}</h3>
-        <p className="text-[11px] lg:text-[10px] text-gray-500 mt-0.5 hidden lg:block">{description}</p>
+      <div className="mb-1 lg:mb-1">
+        <h3 className="text-xs lg:text-xs font-bold text-gray-900 leading-tight">{title}</h3>
+        <p className="text-[10px] lg:text-[10px] text-gray-500 mt-0.5 hidden lg:block">{description}</p>
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between">
         {count !== undefined && (
-          <div className="text-lg lg:text-base font-bold text-gray-900">{count}</div>
+          <div className="text-base lg:text-base font-bold text-gray-900">{count}</div>
         )}
         <div className={`
-          ml-auto flex items-center gap-0.5 text-[11px] font-medium
+          ml-auto flex items-center gap-0.5 text-[10px] lg:text-[11px] font-medium
           ${colorClasses[color as keyof typeof colorClasses]?.split(' ')[1] || 'text-blue-600'}
           group-hover:gap-1.5 transition-all
         `}>
-          <span className="hidden lg:inline">Manage</span>
-          <span className="lg:hidden text-xs">Manage</span>
+          <span>Manage</span>
           <ChevronRight className="w-3 h-3" />
         </div>
       </div>
