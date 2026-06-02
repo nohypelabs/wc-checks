@@ -407,12 +407,12 @@ export const ReportsPage = () => {
  <select
  value={selectedBuildingId}
  onChange={(e) => setSelectedBuildingId(e.target.value)}
- className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 appearance-none cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20"
+ className="w-full pl-9 pr-8 py-2.5 text-sm font-semibold bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 appearance-none cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20 placeholder-white/60"
  disabled={buildingsLoading}
  >
- <option value="" className="text-gray-900 bg-white">Semua Gedung</option>
+ <option value="" className="text-white bg-slate-800">Semua Gedung</option>
  {buildings?.filter(b => b.is_active).map((building) => (
- <option key={building.id} value={building.id} className="text-gray-900 bg-white">
+ <option key={building.id} value={building.id} className="text-white bg-slate-800">
  {building.name}
  </option>
  ))}
