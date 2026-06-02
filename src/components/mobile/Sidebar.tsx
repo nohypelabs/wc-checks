@@ -2,6 +2,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   X,
+  Home,
   MapPin,
   FileText,
   LogOut,
@@ -43,6 +44,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   };
 
   const menuItems = [
+    { icon: Home, label: 'Dashboard', path: '/', description: 'Beranda utama' },
     { icon: MapPin, label: 'Lokasi', path: '/locations', description: 'Daftar semua lokasi' },
     { icon: FileText, label: 'Laporan', path: '/reports', description: 'Riwayat inspeksi' },
     { icon: BarChart3, label: 'Analitik', path: '/analytics', description: 'Statistik & wawasan' },
