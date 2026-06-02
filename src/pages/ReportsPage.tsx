@@ -410,9 +410,9 @@ export const ReportsPage = () => {
  className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/8 text-white border border-white/10 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm transition-all"
  disabled={buildingsLoading}
  >
- <option value="" className="text-white/80">Semua Gedung</option>
+ <option value="" className="text-gray-900 bg-white">Semua Gedung</option>
  {buildings?.filter(b => b.is_active).map((building) => (
- <option key={building.id} value={building.id} className="text-white/80">
+ <option key={building.id} value={building.id} className="text-gray-900 bg-white">
  {building.name}
  </option>
  ))}
