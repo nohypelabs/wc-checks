@@ -141,19 +141,19 @@ export const ScanPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-20 lg:pb-6">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Simple Header - White */}
-      <div className="bg-white p-6 border-b border-gray-100">
+      <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none lg:py-3 lg:px-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+              className="p-1.5 hover:bg-white/10 lg:hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-5 h-5" />
             </button>
             <div>
               <h1 className="text-xl font-bold text-gray-900">
@@ -166,19 +166,19 @@ export const ScanPage = () => {
 
         {/* Stats Cards - Simple 3D Shadow */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white rounded-2xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 text-center">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none text-center">
             <div className="text-2xl font-bold text-gray-900">
               {stats?.total || 0}
             </div>
             <div className="text-xs text-gray-500 mt-1">Total</div>
           </div>
-          <div className="bg-white rounded-2xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 text-center">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none text-center">
             <div className="text-2xl font-bold text-blue-600">
               {stats?.today || 0}
             </div>
             <div className="text-xs text-gray-500 mt-1">Today</div>
           </div>
-          <div className="bg-white rounded-2xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 text-center">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none text-center">
             <div className="text-2xl font-bold text-green-600">
               {stats ? Math.round((stats.completed / stats.total) * 100) || 0 : 0}%
             </div>
@@ -191,7 +191,7 @@ export const ScanPage = () => {
         {/* Scan Button - Big with 3D Shadow */}
         <button
           onClick={() => setShowScanner(true)}
-          className="w-full bg-white rounded-3xl p-8 shadow-[0_12px_40px_rgb(0,0,0,0.12)] active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-gray-100"
+          className="w-full bg-white/15 backdrop-blur-md rounded-3xl p-8 shadow-lg lg:bg-white lg:shadow-xl lg:backdrop-blur-none active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-gray-100"
         >
           <div className="flex flex-col items-center space-y-4">
             <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -226,7 +226,7 @@ export const ScanPage = () => {
         </div>
 
         {/* Recent Inspections - Simple */}
-        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-5">
+        <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-gray-900">Recent</h3>
             <button

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { Sidebar } from '../components/mobile/Sidebar';
 import { BottomNav } from '../components/mobile/BottomNav';
 import { Card } from '../components/ui/Card';
 
@@ -42,6 +43,7 @@ export const ProfilePageWithAdmin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
   // ✅ FIXED: Use backend API for role check
@@ -228,6 +230,7 @@ export const ProfilePageWithAdmin = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -235,6 +238,7 @@ export const ProfilePageWithAdmin = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       {/* Header */}
       <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 pt-12 pb-24 px-6">
         <div className="flex items-center justify-between text-white mb-6">
@@ -469,7 +473,7 @@ export const ProfilePageWithAdmin = () => {
         </div>
       </div>
 
-      <BottomNav />
+      <div className="lg:hidden"><BottomNav /></div>
     </div>
   );
 };

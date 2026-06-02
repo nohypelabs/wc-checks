@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
 import { useUsers, useRoles, useAssignRole, useToggleUserStatus } from '../../hooks/useUserRoles';
+import { Sidebar } from '../../components/mobile/Sidebar';
 import { BottomNav } from '../../components/mobile/BottomNav';
 import { format } from 'date-fns';
 
@@ -28,6 +29,7 @@ export const UserManagement = () => {
     authLoading,
   });
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
 
@@ -133,6 +135,7 @@ export const UserManagement = () => {
     console.log('⏳ [UserManagement] Showing loading screen - waiting for auth/user/role check');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
@@ -151,7 +154,8 @@ export const UserManagement = () => {
   console.log('✅ [UserManagement] Rendering main content');
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-24 lg:pb-6">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       {/* Header */}
       <div className="bg-gradient-to-br from-purple-600 to-purple-800 text-white p-6">
         <button
@@ -339,7 +343,7 @@ export const UserManagement = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav />
+      <div className="lg:hidden"><div className="lg:hidden"><BottomNav /></div></div>
     </div>
   );
 };

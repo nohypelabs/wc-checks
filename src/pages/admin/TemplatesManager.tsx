@@ -1,13 +1,18 @@
 // src/pages/admin/TemplatesManager.tsx - Inspection Templates Management
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText, Plus } from 'lucide-react';
+import { Menu, FileText, Plus } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
+import { useState } from 'react';
+import { Sidebar } from '../../components/mobile/Sidebar';
+import { BottomNav } from '../../components/mobile/BottomNav';
 
 export const TemplatesManager = () => {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-20 lg:pb-6">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       {/* Header */}
       <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-red-500 p-6 rounded-b-3xl shadow-lg">
         <div className="flex items-center gap-3 text-white mb-6">
@@ -15,7 +20,7 @@ export const TemplatesManager = () => {
             onClick={() => navigate('/admin')}
             className="p-2 hover:bg-white/10 rounded-xl transition-colors"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <Menu className="w-6 h-6" />
           </button>
           <div>
             <h1 className="text-2xl font-bold">Templates Management</h1>
@@ -64,6 +69,7 @@ export const TemplatesManager = () => {
           </div>
         </Card>
       </div>
+      <div className="lg:hidden"><BottomNav /></div>
     </div>
   );
 };

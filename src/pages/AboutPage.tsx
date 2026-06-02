@@ -1,22 +1,24 @@
+import { useState } from 'react';
 // src/pages/AboutPage.tsx
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, Github, Globe, Mail, Database, Lock, Server, Smartphone, Code, BarChart3, Shield, Users, QrCode, FileText, Calendar, TrendingUp } from 'lucide-react';
+import { Menu, CheckCircle, Github, Globe, Mail, Database, Lock, Server, Smartphone, Code, BarChart3, Shield, Users, QrCode, FileText, TrendingUp } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { BottomNav } from '../components/mobile/BottomNav';
+import { Sidebar } from '../components/mobile/Sidebar';
 
 export const AboutPage = () => {
-  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-24 lg:pb-6">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 shadow-lg">
         <div className="flex items-center gap-3 mb-4">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => setSidebarOpen(true)}
             className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20"
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <Menu className="w-5 h-5 text-white" />
           </button>
           <div>
             <h1 className="text-xl font-bold text-white">Tentang Aplikasi</h1>
@@ -735,7 +737,7 @@ export const AboutPage = () => {
         </Card>
       </main>
 
-      <BottomNav />
+      <div className="lg:hidden"><BottomNav /></div>
     </div>
   );
 };

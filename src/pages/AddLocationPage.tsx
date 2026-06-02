@@ -334,17 +334,17 @@ export const AddLocationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-24 lg:pb-6">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Header */}
-      <div className="bg-white p-6 border-b border-gray-100">
+      <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none lg:py-3 lg:px-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+              className="p-1.5 hover:bg-white/10 lg:hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </button>
@@ -355,9 +355,9 @@ export const AddLocationPage = () => {
           </div>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+            className="p-1.5 hover:bg-white/10 lg:hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <Menu className="w-5 h-5 text-gray-600" />
+            <Menu className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -579,7 +579,7 @@ export const AddLocationPage = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav />
+      <div className="lg:hidden"><BottomNav /></div>
     </div>
   );
 };

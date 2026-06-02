@@ -164,19 +164,19 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-20 lg:pb-6">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Simple Header - White */}
-      <div className="bg-white p-6 border-b border-gray-100">
+      <div className="bg-white/10 backdrop-blur-lg px-3 py-2.5 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none lg:py-3 lg:px-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+              className="p-1.5 hover:bg-white/10 lg:hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2">
               <img
@@ -199,7 +199,7 @@ export const Dashboard = () => {
           </div>
           <button
             onClick={() => navigate('/profile')}
-            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+            className="p-1.5 hover:bg-white/10 lg:hover:bg-gray-100 rounded-lg transition-colors"
           >
             <User className="w-5 h-5 text-gray-600" />
           </button>
@@ -213,19 +213,19 @@ export const Dashboard = () => {
           <SkeletonStats />
         ) : (
           <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <p className="text-3xl font-bold text-gray-900">{dashboardStats.total}</p>
             <p className="text-xs text-gray-500 mt-1">Total</p>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <p className="text-3xl font-bold text-blue-600">{dashboardStats.todayCount}</p>
             <p className="text-xs text-gray-500 mt-1">Hari Ini</p>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <p className="text-3xl font-bold text-green-600">{dashboardStats.completed}</p>
             <p className="text-xs text-gray-500 mt-1">Selesai</p>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <p className="text-3xl font-bold text-purple-600">{dashboardStats.avgScore}</p>
             <p className="text-xs text-gray-500 mt-1">Rata-rata</p>
           </div>
@@ -239,7 +239,7 @@ export const Dashboard = () => {
             navigate('/scan');
           }}
           type="button"
-          className="w-full bg-white rounded-3xl p-6 shadow-[0_12px_40px_rgb(0,0,0,0.12)] active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 active:scale-98 transition-all border border-gray-100"
+          className="w-full bg-white/15 backdrop-blur-md rounded-3xl p-6 shadow-lg lg:bg-white lg:shadow-xl lg:backdrop-blur-none active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 active:scale-98 transition-all border border-gray-100"
         >
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -328,14 +328,14 @@ export const Dashboard = () => {
 
         {/* Recent Activity - Minimal */}
         {statsLoading ? (
-          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-5">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-gray-900">Terbaru</h2>
             </div>
             <SkeletonActivity />
           </div>
         ) : dashboardStats.recent && dashboardStats.recent.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-5">
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5 lg:bg-white lg:shadow-sm lg:border-gray-100 lg:backdrop-blur-none">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-gray-900">Terbaru</h2>
               <button
@@ -420,7 +420,7 @@ export const Dashboard = () => {
 
       {/* PWA removed - pure web app */}
 
-      <BottomNav />
+      <div className="lg:hidden"><BottomNav /></div>
     </div>
   );
 };

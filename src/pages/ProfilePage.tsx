@@ -223,7 +223,7 @@ export const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-24 lg:pb-6">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -232,9 +232,9 @@ export const ProfilePage = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+            className="p-1.5 hover:bg-white/10 lg:hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <Menu className="w-5 h-5 text-gray-600" />
+            <Menu className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold text-gray-900">Profil</h1>
         </div>
@@ -478,7 +478,7 @@ export const ProfilePage = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav />
+      <div className="lg:hidden"><div className="lg:hidden"><BottomNav /></div></div>
     </div>
   );
 };

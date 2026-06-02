@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardHeader } from '../../components/ui/Card';
+import { Sidebar } from '../../components/mobile/Sidebar';
+import { BottomNav } from '../../components/mobile/BottomNav';
 
 interface Occupation {
   id: string;
@@ -27,6 +29,7 @@ type OccupationForm = Omit<Occupation, 'id' | 'is_active'>;
 
 export const OccupationManagerPage = () => {
   const queryClient = useQueryClient();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<OccupationForm>({
@@ -175,14 +178,16 @@ export const OccupationManagerPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 flex items-center justify-center">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 p-6">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -411,6 +416,7 @@ export const OccupationManagerPage = () => {
           </div>
         </Card>
       </div>
+      <div className="lg:hidden"><BottomNav /></div>
     </div>
   );
 };
