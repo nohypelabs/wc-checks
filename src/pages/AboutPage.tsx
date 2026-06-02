@@ -250,35 +250,35 @@ export const AboutPage = () => {
  Frontend Technologies
  </h4>
  <div className="grid grid-cols-2 gap-2">
- <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+ <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
  <p className="font-semibold text-white text-xs">React 18.2</p>
  <p className="text-xs text-white/60">UI Library</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+ <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
  <p className="font-semibold text-white text-xs">TypeScript 5.9</p>
  <p className="text-xs text-white/60">Type Safety</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-lg border border-cyan-200">
+ <div className="p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
  <p className="font-semibold text-white text-xs">Vite 5.4</p>
  <p className="text-xs text-white/60">Build Tool</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-lg border border-cyan-200">
+ <div className="p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
  <p className="font-semibold text-white text-xs">Tailwind CSS 3.4</p>
  <p className="text-xs text-white/60">Styling</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg border border-indigo-200">
+ <div className="p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
  <p className="font-semibold text-white text-xs">React Router 6</p>
  <p className="text-xs text-white/60">Navigation</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg border border-indigo-200">
+ <div className="p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
  <p className="font-semibold text-white text-xs">Zustand 5.0</p>
  <p className="text-xs text-white/60">State Management</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+ <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
  <p className="font-semibold text-white text-xs">React Query 5</p>
  <p className="text-xs text-white/60">Data Fetching</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+ <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
  <p className="font-semibold text-white text-xs">React Hook Form</p>
  <p className="text-xs text-white/60">Form Handling</p>
  </div>
@@ -292,19 +292,19 @@ export const AboutPage = () => {
  Backend & Database
  </h4>
  <div className="grid grid-cols-2 gap-2">
- <div className="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+ <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
  <p className="font-semibold text-white text-xs">Supabase</p>
  <p className="text-xs text-white/60">Backend Platform</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+ <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
  <p className="font-semibold text-white text-xs">PostgreSQL</p>
  <p className="text-xs text-white/60">Database</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg border border-emerald-200">
+ <div className="p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
  <p className="font-semibold text-white text-xs">Vercel Functions</p>
  <p className="text-xs text-white/60">Serverless API</p>
  </div>
- <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg border border-emerald-200">
+ <div className="p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
  <p className="font-semibold text-white text-xs">Cloudinary</p>
  <p className="text-xs text-white/60">Image CDN</p>
  </div>
