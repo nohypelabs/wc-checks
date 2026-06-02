@@ -7,6 +7,7 @@ import { CustomToaster } from './lib/toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
+import { UpdateNotification } from './components/common/UpdateNotification';
 import { useAuth } from './hooks/useAuth';
 import { useIsAdmin } from './hooks/useIsAdmin';
 import { logger } from './lib/logger';
@@ -151,6 +152,7 @@ function AppContent() {
  const location = useLocation();
 
  return (
+ <>
  <AnimatePresence mode="wait">
  <Suspense fallback={<PageLoader />}>
  <Routes location={location} key={location.pathname}>
@@ -277,6 +279,8 @@ function AppContent() {
  </Routes>
  </Suspense>
  </AnimatePresence>
+  {user && <UpdateNotification />}
+ </>
  );
 }
 
@@ -284,7 +288,7 @@ export default function App() {
  // Log app initialization
  logger.info('App initialized', {
  env: import.meta.env.MODE,
- version: '1.0.0',
+ version: '4.0.1',
  });
 
  return (

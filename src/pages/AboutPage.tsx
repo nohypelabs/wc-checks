@@ -52,7 +52,7 @@ export const AboutPage = () => {
  <h2 className="text-2xl font-bold text-white mb-2">Proservice Indonesia</h2>
  <p className="text-white/60 mb-4">Sistem Inspeksi & Monitoring Toilet Terintegrasi</p>
  <div className="inline-block px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full shadow-md">
- <span className="text-sm font-bold text-white">Versi 3.0.0</span>
+ <span className="text-sm font-bold text-white">Versi 4.0.1</span>
  </div>
  </div>
  </Card>
@@ -727,7 +727,7 @@ export const AboutPage = () => {
  <Card>
  <div className="text-center text-xs text-white/50 space-y-2">
  <p className="font-medium">© 2025 Proservice Indonesia. All rights reserved.</p>
- <p className="text-xs">Sistem Inspeksi & Monitoring Toilet Terintegrasi - Version 3.0.0</p>
+ <p className="text-xs">Sistem Inspeksi & Monitoring Toilet Terintegrasi - Version 4.0.1</p>
  <div className="flex justify-center gap-4 pt-2">
  <a href="#" className="hover:text-blue-300 transition-colors">Privacy Policy</a>
  <span>•</span>
