@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, CheckCircle, ArrowRight, Zap, Shield, Palette } from 'lucide-react';
 
-const UPDATE_KEY = 'wc-checks-update-v4.0.1-seen';
+const UPDATE_KEY = 'wc-checks-update-v4.0.1-dismissed';
+const SHOW_DURATION_DAYS = 7;
 
 const features = [
   {
@@ -33,17 +34,19 @@ export const UpdateNotification = () => {
  const [isOpen, setIsOpen] = useState(false);
 
  useEffect(() => {
-  const hasSeenUpdate = localStorage.getItem(UPDATE_KEY);
-  if (!hasSeenUpdate) {
-   // Show modal after a short delay for better UX
-   const timer = setTimeout(() => setIsOpen(true), 1500);
-   return () => clearTimeout(timer);
+  const dismissedAt = localStorage.getItem(UPDATE_KEY);
+  if (dismissedAt) {
+   const daysSinceDismiss = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+   if (daysSinceDismiss < SHOW_DURATION_DAYS) return;
   }
+  // Show modal after a short delay for better UX
+  const timer = setTimeout(() => setIsOpen(true), 1500);
+  return () => clearTimeout(timer);
  }, []);
 
  const handleClose = () => {
   setIsOpen(false);
-  localStorage.setItem(UPDATE_KEY, 'true');
+  localStorage.setItem(UPDATE_KEY, Date.now().toString());
  };
 
  if (!isOpen) return null;
