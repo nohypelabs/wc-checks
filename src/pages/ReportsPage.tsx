@@ -1,5 +1,6 @@
-// src/pages/ReportsPage.tsx - WITH SIDEBAR
+// src/pages/ReportsPage.tsx - Polished UI
 import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { useMonthlyInspections, useDateInspections, InspectionReport } from '../hooks/useReports';
@@ -8,7 +9,7 @@ import { InspectionDrawer } from '../components/reports/InspectionDrawer';
 import { InspectionDetailModal } from '../components/reports/InspectionDetailModal';
 import { Sidebar } from '../components/mobile/Sidebar';
 import { BottomNav } from '../components/mobile/BottomNav';
-import { TrendingUp, FileText, Menu, Download, Users, FileDown, Building2, ChevronDown } from 'lucide-react';
+import { TrendingUp, FileText, Menu, Download, Users, FileDown, Building2, ChevronDown, BarChart3, Info } from 'lucide-react';
 import { exportToCSV, type ExportInspectionData } from '../lib/exportUtils';
 import { generateMonthlyReport } from '../lib/pdfGenerator';
 import { supabase } from '../lib/supabase';
@@ -20,7 +21,6 @@ export const ReportsPage = () => {
   const { user } = useAuth();
   const { isAdmin, isSuperAdmin, loading: adminLoading } = useIsAdmin();
 
-  // 🔍 DEBUG: Log role status
   console.log('📊 [ReportsPage] Role check:', {
     userId: user?.id,
     isAdmin,
@@ -46,16 +46,12 @@ export const ReportsPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter states
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
 
-  // Fetch buildings
   const { data: buildings, isLoading: buildingsLoading } = useBuildings({
     enabled: true,
   });
 
-  // Fetch monthly data
-  // Admin sees ALL inspections (undefined), regular users see only their own (user.id)
   const filterUserId = isAdmin ? undefined : user?.id;
 
   console.log('📊 [ReportsPage] Fetching monthly data with filter:', {
@@ -63,16 +59,13 @@ export const ReportsPage = () => {
     filterUserId: filterUserId || 'ALL USERS',
   });
 
-  // ✅ FIX: Only fetch after admin check completes to ensure correct filter
   const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
     filterUserId,
     currentDate,
-    !adminLoading,  // Wait for admin check to complete
+    !adminLoading,
     selectedBuildingId || undefined
   );
 
-  // Fetch specific date data when date is selected
-  // Admin sees ALL inspections (undefined), regular users see only their own (user.id)
   const dateFilterUserId = isAdmin ? undefined : user?.id;
 
   console.log('📊 [ReportsPage] Fetching date inspections with filter:', {
@@ -83,11 +76,10 @@ export const ReportsPage = () => {
     buildingId: selectedBuildingId || 'ALL',
   });
 
-  // ✅ FIX: Only fetch after admin check completes
   const { data: dateInspections } = useDateInspections(
     dateFilterUserId,
     selectedDate || '',
-    !adminLoading,  // Wait for admin check to complete
+    !adminLoading,
     selectedBuildingId || undefined
   );
 
@@ -107,7 +99,6 @@ export const ReportsPage = () => {
     setSelectedInspection(null);
   };
 
-  // Calculate stats
   const totalInspections = monthlyData?.reduce((sum, d) => sum + d.count, 0) || 0;
   const averageScore = monthlyData && monthlyData.length > 0
     ? Math.round(
@@ -115,7 +106,9 @@ export const ReportsPage = () => {
       )
     : 0;
 
-  // ✅ Export current month's inspections via backend API
+  // Active days count
+  const activeDays = monthlyData?.filter(d => d.count > 0).length || 0;
+
   const handleExportMonth = async () => {
     if (!user?.id) return;
 
@@ -124,7 +117,6 @@ export const ReportsPage = () => {
     try {
       const month = format(currentDate, 'yyyy-MM');
 
-      // ✅ Use backend API instead of direct query
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
@@ -132,7 +124,6 @@ export const ReportsPage = () => {
         throw new Error('No authentication token');
       }
 
-      // Fetch through backend API - will only return current user's data
       const response = await fetch(`/api/reports?month=${month}&userId=${user.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -145,9 +136,8 @@ export const ReportsPage = () => {
       }
 
       const result = await response.json();
-      const monthData: any[] = result.data; // DateInspections[]
+      const monthData: any[] = result.data;
 
-      // Flatten inspections from all dates
       const allInspections = monthData.flatMap(d => d.inspections || []);
 
       if (allInspections.length === 0) {
@@ -156,24 +146,23 @@ export const ReportsPage = () => {
         return;
       }
 
-      // Format data for export
       const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
         inspection_id: inspection.id,
         inspection_date: inspection.inspection_date || '',
         inspection_time: inspection.inspection_time || '',
-        submitted_at: '', // Not returned by API, keep empty
+        submitted_at: '',
         overall_status: inspection.overall_status || '',
         notes: inspection.notes || '',
         user_full_name: inspection.user?.full_name || '',
         user_email: inspection.user?.email || '',
-        user_phone: '', // Not returned by API
+        user_phone: '',
         user_occupation: inspection.occupation?.display_name || 'N/A',
         location_name: inspection.location?.name || '',
         building_name: inspection.location?.building || '',
-        organization_name: '', // Not in current API response
+        organization_name: '',
         floor: inspection.location?.floor || '',
-        area: '', // Not in current API response
-        section: '', // Not in current API response
+        area: '',
+        section: '',
         photo_urls: (inspection.photo_urls || []).join('; '),
         responses: JSON.stringify(inspection.responses || {}),
       }));
@@ -188,29 +177,25 @@ export const ReportsPage = () => {
     }
   };
 
-  // ✅ Export PDF Report
   const handleExportPDF = async () => {
     if (!user?.id) return;
 
     const loadingToast = toast.loading('Membuat laporan PDF...');
 
     try {
-      // Use monthlyData that's already loaded
       if (!monthlyData || monthlyData.length === 0) {
         toast.dismiss(loadingToast);
         toast.error('Tidak ada data untuk diekspor');
         return;
       }
 
-      // Get building name for PDF
       const selectedBuilding = buildings?.find(b => b.id === selectedBuildingId);
       const siteName = selectedBuilding?.name || 'Semua Lokasi';
 
-      // Generate PDF with current data
       await generateMonthlyReport(
         monthlyData,
         currentDate,
-        'PT Prenacons Internusa', // Default organization name
+        'PT Prenacons Internusa',
         siteName
       );
 
@@ -223,7 +208,6 @@ export const ReportsPage = () => {
     }
   };
 
-  // ✅ ADMIN ONLY (level 80+): Export ALL users' inspections for current month
   const handleExportAllUsers = async () => {
     if (!user?.id || !isAdmin) {
       toast.error('Akses administrator diperlukan');
@@ -235,7 +219,6 @@ export const ReportsPage = () => {
     try {
       const month = format(currentDate, 'yyyy-MM');
 
-      // ✅ Use backend API - admin can fetch ALL users' data by not passing userId
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
@@ -243,7 +226,6 @@ export const ReportsPage = () => {
         throw new Error('No authentication token');
       }
 
-      // Fetch ALL users' data through backend API (no userId param = ALL)
       const response = await fetch(`/api/reports?month=${month}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -256,9 +238,8 @@ export const ReportsPage = () => {
       }
 
       const result = await response.json();
-      const monthData: any[] = result.data; // DateInspections[]
+      const monthData: any[] = result.data;
 
-      // Flatten inspections from all dates
       const allInspections = monthData.flatMap(d => d.inspections || []);
 
       if (allInspections.length === 0) {
@@ -267,24 +248,23 @@ export const ReportsPage = () => {
         return;
       }
 
-      // Format data for export
       const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
         inspection_id: inspection.id,
         inspection_date: inspection.inspection_date || '',
         inspection_time: inspection.inspection_time || '',
-        submitted_at: '', // Not returned by API, keep empty
+        submitted_at: '',
         overall_status: inspection.overall_status || '',
         notes: inspection.notes || '',
         user_full_name: inspection.user?.full_name || '',
         user_email: inspection.user?.email || '',
-        user_phone: '', // Not returned by API
+        user_phone: '',
         user_occupation: inspection.occupation?.display_name || 'N/A',
         location_name: inspection.location?.name || '',
         building_name: inspection.location?.building || '',
-        organization_name: '', // Not in current API response
+        organization_name: '',
         floor: inspection.location?.floor || '',
-        area: '', // Not in current API response
-        section: '', // Not in current API response
+        area: '',
+        section: '',
         photo_urls: (inspection.photo_urls || []).join('; '),
         responses: JSON.stringify(inspection.responses || {}),
       }));
@@ -299,13 +279,12 @@ export const ReportsPage = () => {
     }
   };
 
-  // ✅ FIX: Show loading while admin check OR monthly data is loading
   if (adminLoading || monthlyLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-sm">
+          <div className="w-12 h-12 border-3 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/80 lg:text-gray-500 text-sm font-medium">
             {adminLoading ? 'Memeriksa hak akses...' : 'Memuat laporan...'}
           </p>
         </div>
@@ -314,159 +293,248 @@ export const ReportsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-24 lg:pb-6">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Header - White Theme - Compact on Desktop */}
-      <div className="bg-white p-3 md:p-4 border-b border-gray-100">
-        <div className="flex items-center justify-between mb-3 md:mb-4">
-          <div className="flex items-center gap-2 md:gap-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="w-9 h-9 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
-            >
-              <Menu className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
-            </button>
-            <div>
-              <h1 className="text-lg md:text-xl font-bold text-gray-900">Laporan</h1>
-              <p className="text-xs md:text-sm text-gray-500">Riwayat & analitik inspeksi</p>
-            </div>
-          </div>
-          {/* Export dropdown */}
-          <div className="relative" ref={exportMenuRef}>
-            <button
-              onClick={() => setExportMenuOpen(prev => !prev)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md text-xs font-medium whitespace-nowrap"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
+      {/* Header */}
+      <header className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none lg:py-3">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between text-white lg:text-gray-900">
+            {/* Left: Menu + Title */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
 
-            {exportMenuOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                <button
-                  onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
-                  disabled={totalInspections === 0}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <FileDown className="w-4 h-4 text-red-500 flex-shrink-0" />
-                  <span className="font-medium">Export PDF</span>
-                </button>
-                <div className="h-px bg-gray-100" />
-                <button
-                  onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
-                  disabled={totalInspections === 0}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <Download className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="font-medium">Data Saya (CSV)</span>
-                </button>
-                {isAdmin && (
-                  <>
-                    <div className="h-px bg-gray-100" />
-                    <button
-                      onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                    >
-                      <Users className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                      <span className="font-medium">Semua Pengguna</span>
-                    </button>
-                  </>
-                )}
+              {/* Mobile title */}
+              <div className="lg:hidden">
+                <h1 className="text-lg font-bold">Laporan</h1>
+                <p className="text-xs text-blue-100">Riwayat & analitik inspeksi</p>
               </div>
-            )}
+
+              {/* Desktop: Logo + Title */}
+              <div className="hidden lg:flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center p-1">
+                  <BarChart3 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-sm font-bold leading-tight text-gray-900">Laporan</h1>
+                  <p className="text-[11px] text-gray-500">Riwayat & analitik inspeksi</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Export dropdown */}
+            <div className="relative" ref={exportMenuRef}>
+              <motion.button
+                onClick={() => setExportMenuOpen(prev => !prev)}
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 lg:hover:bg-blue-700 transition-colors backdrop-blur-sm lg:backdrop-blur-none shadow-lg lg:shadow-md text-xs font-semibold whitespace-nowrap"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Export</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
+              </motion.button>
+
+              <AnimatePresence>
+                {exportMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                    transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+                  >
+                    <div className="p-1.5">
+                      <button
+                        onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
+                        disabled={totalInspections === 0}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FileDown className="w-3.5 h-3.5 text-red-600" />
+                        </div>
+                        <div className="text-left">
+                          <span className="font-semibold block">Export PDF</span>
+                          <span className="text-[10px] text-gray-400 font-normal">Laporan bulanan</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
+                        disabled={totalInspections === 0}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <div className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Download className="w-3.5 h-3.5 text-green-600" />
+                        </div>
+                        <div className="text-left">
+                          <span className="font-semibold block">Data Saya (CSV)</span>
+                          <span className="text-[10px] text-gray-400 font-normal">Inspeksi bulan ini</span>
+                        </div>
+                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors"
+                        >
+                          <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Users className="w-3.5 h-3.5 text-blue-600" />
+                          </div>
+                          <div className="text-left">
+                            <span className="font-semibold block">Semua Pengguna</span>
+                            <span className="text-[10px] text-gray-400 font-normal">Admin only</span>
+                          </div>
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Filter + Stats Section */}
+          <div className="mt-3 lg:mt-4">
+            {/* Building Filter */}
+            <div className="mb-3 lg:mb-4">
+              <div className="relative max-w-xs">
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 lg:text-gray-500 pointer-events-none" />
+                <select
+                  value={selectedBuildingId}
+                  onChange={(e) => setSelectedBuildingId(e.target.value)}
+                  className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/15 lg:bg-white text-white lg:text-gray-700 border border-white/20 lg:border-gray-200 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm lg:backdrop-blur-none transition-all"
+                  disabled={buildingsLoading}
+                >
+                  <option value="" className="text-gray-700">Semua Gedung</option>
+                  {buildings?.filter(b => b.is_active).map((building) => (
+                    <option key={building.id} value={building.id} className="text-gray-700">
+                      {building.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60 lg:text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-2 lg:gap-3">
+              {/* Total Inspections */}
+              <motion.div
+                className="bg-white/15 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-2xl border border-white/20 lg:border-gray-100 p-3 lg:shadow-sm"
+                whileHover={{ scale: 1.02, y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-white/20 lg:bg-blue-100 rounded-xl flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-white lg:text-blue-600" />
+                  </div>
+                </div>
+                <div className="text-2xl lg:text-xl font-extrabold text-white lg:text-gray-900">
+                  {totalInspections}
+                </div>
+                <div className="text-[10px] text-white/70 lg:text-gray-500 font-medium mt-0.5">Inspeksi</div>
+              </motion.div>
+
+              {/* Average Score */}
+              <motion.div
+                className="bg-white/15 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-2xl border border-white/20 lg:border-gray-100 p-3 lg:shadow-sm"
+                whileHover={{ scale: 1.02, y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-white/20 lg:bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-white lg:text-emerald-600" />
+                  </div>
+                </div>
+                <div className="text-2xl lg:text-xl font-extrabold text-white lg:text-gray-900">
+                  {averageScore}
+                </div>
+                <div className="text-[10px] text-white/70 lg:text-gray-500 font-medium mt-0.5">Rata-rata</div>
+              </motion.div>
+
+              {/* Active Days */}
+              <motion.div
+                className="bg-white/15 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-2xl border border-white/20 lg:border-gray-100 p-3 lg:shadow-sm"
+                whileHover={{ scale: 1.02, y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-white/20 lg:bg-amber-100 rounded-xl flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4 text-white lg:text-amber-600" />
+                  </div>
+                </div>
+                <div className="text-2xl lg:text-xl font-extrabold text-white lg:text-gray-900">
+                  {activeDays}
+                </div>
+                <div className="text-[10px] text-white/70 lg:text-gray-500 font-medium mt-0.5">Hari Aktif</div>
+              </motion.div>
+            </div>
           </div>
         </div>
+      </header>
 
-        {/* Filter Section - Compact on Desktop */}
-        <div className="mb-2 md:mb-3">
-          {/* Building Filter */}
-          <div>
-            <label className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
-              <Building2 className="w-3 h-3" />
-              <span>Filter Gedung</span>
-            </label>
-            <select
-              value={selectedBuildingId}
-              onChange={(e) => setSelectedBuildingId(e.target.value)}
-              className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={buildingsLoading}
-            >
-              <option value="">Semua Gedung</option>
-              {buildings?.filter(b => b.is_active).map((building) => (
-                <option key={building.id} value={building.id}>
-                  {building.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Stats Cards - Compact on Desktop */}
-        <div className="grid grid-cols-2 gap-2 md:gap-3">
-          <div className="bg-white rounded-xl md:rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.06)] md:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-2.5 md:p-3">
-            <div className="flex items-center space-x-1.5 md:space-x-2 mb-0.5 md:mb-1">
-              <FileText className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" />
-              <span className="text-[10px] md:text-xs text-gray-500">Bulan Ini</span>
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-3 lg:px-6 pt-4 lg:pt-5 space-y-3 lg:space-y-4">
+        {/* Instructions Tip */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="bg-white/10 lg:bg-blue-50 backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-blue-200 rounded-2xl p-3 lg:p-3.5"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-white/20 lg:bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Info className="w-4 h-4 text-white lg:text-blue-600" />
             </div>
-            <div className="text-xl md:text-2xl font-bold text-gray-900">
-              {totalInspections}
-            </div>
-            <div className="text-[10px] md:text-xs text-gray-500 mt-0.5 md:mt-1">Inspeksi</div>
-          </div>
-
-          <div className="bg-white rounded-xl md:rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.06)] md:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-2.5 md:p-3">
-            <div className="flex items-center space-x-1.5 md:space-x-2 mb-0.5 md:mb-1">
-              <TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
-              <span className="text-[10px] md:text-xs text-gray-500">Rata-rata</span>
-            </div>
-            <div className="text-xl md:text-2xl font-bold text-gray-900">
-              {averageScore}
-            </div>
-            <div className="text-[10px] md:text-xs text-gray-500 mt-0.5 md:mt-1">Skor</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content - Compact padding on Desktop */}
-      <div className="p-3 md:p-4 space-y-2 md:space-y-3">
-        {/* Instructions Card - More compact on Desktop */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg md:rounded-xl p-2.5 md:p-3">
-          <div className="flex items-start space-x-2 md:space-x-3">
-            <div className="text-lg md:text-xl">💡</div>
-            <div className="flex-1">
-              <p className="text-xs md:text-sm font-medium text-blue-900 mb-0.5 md:mb-1">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-white lg:text-blue-900 mb-0.5">
                 Ketuk tanggal untuk lihat inspeksi
               </p>
-              <p className="text-[10px] md:text-xs text-blue-700">
-                Titik berwarna menunjukkan skor rata-rata:
-                <span className="font-semibold"> Hijau</span> (sangat baik),
-                <span className="font-semibold"> Kuning</span> (baik),
-                <span className="font-semibold"> Merah</span> (perlu perbaikan)
+              <p className="text-[11px] text-white/70 lg:text-blue-600 leading-relaxed">
+                Titik berwarna menunjukkan skor rata-rata:{' '}
+                <span className="font-bold text-green-300 lg:text-green-700">Hijau</span> (sangat baik),{' '}
+                <span className="font-bold text-yellow-300 lg:text-yellow-700">Kuning</span> (baik),{' '}
+                <span className="font-bold text-red-300 lg:text-red-700">Merah</span> (perlu perbaikan)
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Calendar */}
-        <CalendarView
-          currentDate={currentDate}
-          onDateChange={setCurrentDate}
-          dateInspections={monthlyData || []}
-          onDateClick={handleDateClick}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
+          <CalendarView
+            currentDate={currentDate}
+            onDateChange={setCurrentDate}
+            dateInspections={monthlyData || []}
+            onDateClick={handleDateClick}
+          />
+        </motion.div>
 
         {/* Empty State */}
         {(!monthlyData || monthlyData.length === 0) && (
-          <div className="bg-white rounded-xl p-8 text-center">
-            <div className="text-6xl mb-4">📅</div>
-            <h3 className="font-bold text-gray-900 mb-2">Belum ada inspeksi</h3>
-            <p className="text-gray-600 text-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="bg-white/10 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-gray-100 rounded-2xl p-8 text-center lg:shadow-sm"
+          >
+            <div className="w-16 h-16 bg-white/15 lg:bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">📅</span>
+            </div>
+            <h3 className="font-bold text-white lg:text-gray-900 mb-1.5">Belum ada inspeksi</h3>
+            <p className="text-white/60 lg:text-gray-500 text-sm">
               Mulai inspeksi lokasi untuk melihatnya di sini
             </p>
-          </div>
+          </motion.div>
         )}
       </div>
 
@@ -486,8 +554,10 @@ export const ReportsPage = () => {
         inspection={selectedInspection}
       />
 
-      {/* Bottom Navigation */}
-      <BottomNav />
+      {/* Bottom Navigation - mobile only */}
+      <div className="lg:hidden">
+        <BottomNav />
+      </div>
     </div>
   );
 };

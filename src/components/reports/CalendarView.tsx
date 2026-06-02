@@ -1,4 +1,4 @@
-// src/components/reports/CalendarView.tsx - FIXED: Remove unused imports
+// src/components/reports/CalendarView.tsx - Polished UI
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
@@ -30,25 +30,28 @@ const getScoreColor = (score: number) => {
 const getScoreStyle = (score: number) => {
   if (score >= 85) {
     return {
-      bg: 'bg-gradient-to-br from-green-100 to-emerald-100',
-      text: 'text-green-700',
-      border: 'border-green-400',
-      ring: 'ring-green-200'
+      bg: 'bg-gradient-to-br from-green-400/20 to-emerald-400/20 lg:from-green-100 lg:to-emerald-100',
+      text: 'text-green-100 lg:text-green-700',
+      border: 'border-green-400/40 lg:border-green-300',
+      ring: 'ring-green-400/30 lg:ring-green-200',
+      glow: 'shadow-green-500/20 lg:shadow-green-200/50',
     };
   }
   if (score >= 70) {
     return {
-      bg: 'bg-gradient-to-br from-yellow-100 to-amber-100',
-      text: 'text-yellow-700',
-      border: 'border-yellow-400',
-      ring: 'ring-yellow-200'
+      bg: 'bg-gradient-to-br from-yellow-400/20 to-amber-400/20 lg:from-yellow-100 lg:to-amber-100',
+      text: 'text-yellow-100 lg:text-yellow-700',
+      border: 'border-yellow-400/40 lg:border-yellow-300',
+      ring: 'ring-yellow-400/30 lg:ring-yellow-200',
+      glow: 'shadow-yellow-500/20 lg:shadow-yellow-200/50',
     };
   }
   return {
-    bg: 'bg-gradient-to-br from-red-100 to-rose-100',
-    text: 'text-red-700',
-    border: 'border-red-400',
-    ring: 'ring-red-200'
+    bg: 'bg-gradient-to-br from-red-400/20 to-rose-400/20 lg:from-red-100 lg:to-rose-100',
+    text: 'text-red-100 lg:text-red-700',
+    border: 'border-red-400/40 lg:border-red-300',
+    ring: 'ring-red-400/30 lg:ring-red-200',
+    glow: 'shadow-red-500/20 lg:shadow-red-200/50',
   };
 };
 
@@ -63,10 +66,7 @@ export const CalendarView = ({
   const monthEnd = endOfMonth(currentDate);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  // Get first day of week (0 = Sunday, 1 = Monday, etc)
   const firstDayOfMonth = monthStart.getDay();
-
-  // Fill empty cells at the start
   const emptyDays = Array(firstDayOfMonth).fill(null);
 
   const handlePrevMonth = () => {
@@ -85,61 +85,59 @@ export const CalendarView = ({
   };
 
   return (
-    <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100">
-      {/* Header - Compact on Desktop */}
-      <div className="p-2.5 md:p-3 border-b border-gray-100">
+    <div className="bg-white/10 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-2xl border border-white/15 lg:border-gray-100 lg:shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="p-3 lg:p-4 border-b border-white/10 lg:border-gray-100">
         <div className="flex items-center justify-between">
           <motion.button
             onClick={handlePrevMonth}
-            className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors duration-200"
             whileHover={{ scale: 1.05, x: -2 }}
             whileTap={{ scale: 0.95 }}
             transition={TAP_TRANSITION}
           >
-            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-white/80 lg:text-gray-600" />
           </motion.button>
 
           <motion.h2
             key={format(currentDate, 'yyyy-MM')}
-            initial={{ opacity: 0, y: -5 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="text-base md:text-lg font-bold text-gray-900"
+            className="text-base lg:text-lg font-bold text-white lg:text-gray-900"
           >
             {format(currentDate, 'MMMM yyyy')}
           </motion.h2>
 
           <motion.button
             onClick={handleNextMonth}
-            className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors duration-200"
             whileHover={{ scale: 1.05, x: 2 }}
             whileTap={{ scale: 0.95 }}
             transition={TAP_TRANSITION}
           >
-            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
+            <ChevronRight className="w-5 h-5 text-white/80 lg:text-gray-600" />
           </motion.button>
         </div>
 
-        {/* Weekday headers - Compact on Desktop */}
-        <div className="grid grid-cols-7 gap-0.5 md:gap-1 mt-2 md:mt-3">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="text-center text-[10px] md:text-xs font-medium text-gray-500 py-1 md:py-1.5">
+        {/* Weekday headers */}
+        <div className="grid grid-cols-7 gap-1 mt-3">
+          {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map((day) => (
+            <div key={day} className="text-center text-[10px] lg:text-xs font-semibold text-white/50 lg:text-gray-400 py-1">
               {day}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Calendar Grid - Compact on Desktop */}
-      <div className="p-1.5 md:p-2">
-        <div className="grid grid-cols-7 gap-0.5 md:gap-1">
-          {/* Empty cells for days before month starts */}
+      {/* Calendar Grid */}
+      <div className="p-2 lg:p-3">
+        <div className="grid grid-cols-7 gap-1 lg:gap-1.5">
           {emptyDays.map((_, index) => (
             <div key={`empty-${index}`} className="aspect-square" />
           ))}
 
-          {/* Actual days */}
-          {daysInMonth.map((day) => {
+          {daysInMonth.map((day, idx) => {
             const dateData = getDateData(day);
             const hasInspections = dateData && dateData.count > 0;
             const dayIsToday = isToday(day);
@@ -149,6 +147,9 @@ export const CalendarView = ({
             return (
               <motion.button
                 key={day.toISOString()}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.01, duration: 0.2 }}
                 onClick={() => {
                   if (hasInspections) {
                     haptic.medium();
@@ -157,31 +158,31 @@ export const CalendarView = ({
                 }}
                 disabled={!hasInspections}
                 className={`
-                  aspect-square p-1 rounded-xl transition-all duration-200 relative flex items-center justify-center
+                  aspect-square p-1 rounded-xl transition-all duration-200 relative flex items-center justify-center group
                   ${dayIsToday && hasInspections ? `ring-2 ${scoreStyle?.ring}` : ''}
-                  ${dayIsToday && !hasInspections ? 'ring-2 ring-blue-500' : ''}
+                  ${dayIsToday && !hasInspections ? 'ring-2 ring-blue-400/50 lg:ring-blue-500' : ''}
                   ${hasInspections
-                    ? `${scoreStyle?.bg} border-2 ${scoreStyle?.border} hover:shadow-lg cursor-pointer`
-                    : 'cursor-default opacity-40'
+                    ? `${scoreStyle?.bg} border ${scoreStyle?.border} hover:shadow-lg cursor-pointer shadow-md ${scoreStyle?.glow}`
+                    : 'cursor-default'
                   }
+                  ${!hasInspections && !dayIsToday ? 'opacity-40' : ''}
+                  ${!hasInspections && dayIsToday ? 'opacity-80' : ''}
                 `}
-                whileHover={hasInspections ? { scale: 1.05 } : {}}
-                whileTap={hasInspections ? { scale: 0.97 } : {}}
+                whileHover={hasInspections ? { scale: 1.1 } : {}}
+                whileTap={hasInspections ? { scale: 0.95 } : {}}
                 transition={hasInspections ? TAP_TRANSITION : undefined}
               >
-                {/* Date number - BOLD & COLORED for inspections */}
                 <div className="flex flex-col items-center justify-center h-full">
                   <div className={`
-                    ${hasInspections ? 'text-lg font-extrabold' : 'text-sm font-medium'}
-                    ${hasInspections ? scoreStyle?.text : dayIsToday ? 'text-blue-600 font-bold' : 'text-gray-700'}
+                    ${hasInspections ? 'text-lg lg:text-base font-extrabold' : 'text-sm lg:text-xs font-medium'}
+                    ${hasInspections ? scoreStyle?.text : dayIsToday ? 'text-blue-300 lg:text-blue-600 font-bold' : 'text-white/80 lg:text-gray-700'}
                   `}>
                     {format(day, 'd')}
                   </div>
 
-                  {/* Count badge for multiple inspections */}
                   {hasInspections && dateData.count > 1 && (
                     <div className={`
-                      text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5
+                      text-[8px] lg:text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5
                       ${scoreStyle?.text} ${scoreStyle?.bg}
                       border ${scoreStyle?.border}
                     `}>
@@ -189,25 +190,30 @@ export const CalendarView = ({
                     </div>
                   )}
                 </div>
+
+                {/* Today dot indicator */}
+                {dayIsToday && !hasInspections && (
+                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400 lg:bg-blue-500" />
+                )}
               </motion.button>
             );
           })}
         </div>
       </div>
 
-      {/* Legend - Compact on Desktop */}
-      <div className="p-2 md:p-3 border-t border-gray-100 flex items-center justify-center space-x-3 md:space-x-4 text-[10px] md:text-xs text-gray-600">
-        <div className="flex items-center space-x-1">
-          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500" />
-          <span>Good (85+)</span>
+      {/* Legend */}
+      <div className="p-2.5 lg:p-3 border-t border-white/10 lg:border-gray-100 flex items-center justify-center gap-4 text-[10px] lg:text-xs">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-green-400 lg:bg-green-500 shadow-sm shadow-green-500/30" />
+          <span className="text-white/60 lg:text-gray-500 font-medium">Baik (85+)</span>
         </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500" />
-          <span>Fair (70-84)</span>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-yellow-400 lg:bg-yellow-500 shadow-sm shadow-yellow-500/30" />
+          <span className="text-white/60 lg:text-gray-500 font-medium">Cukup (70-84)</span>
         </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500" />
-          <span>Poor (&lt;70)</span>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-red-400 lg:bg-red-500 shadow-sm shadow-red-500/30" />
+          <span className="text-white/60 lg:text-gray-500 font-medium">Perbaikan (&lt;70)</span>
         </div>
       </div>
     </div>
