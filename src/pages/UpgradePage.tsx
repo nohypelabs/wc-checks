@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Crown, Zap, Shield, Star } from 'lucide-react';
+import { ArrowLeft, Check, Crown, Zap, Shield, Star, Wifi, Users } from 'lucide-react';
 
 export const UpgradePage = () => {
   const navigate = useNavigate();
@@ -10,6 +10,19 @@ export const UpgradePage = () => {
     'Foto & laporan unlimited',
     'Priority support',
     'Export PDF & analytics lengkap',
+  ];
+
+  const iotFeatures = [
+    {
+      icon: Wifi,
+      title: 'Integrasi Sensor Aroma',
+      description: 'Deteksi kualitas udara toilet secara real-time — notifikasi otomatis saat level bau melewati ambang batas',
+    },
+    {
+      icon: Users,
+      title: 'Smart Visitor Counter',
+      description: 'Pantau lalu lintas pengunjung dan jadwalkan pembersihan otomatis berdasarkan jumlah kunjungan',
+    },
   ];
 
   return (
@@ -71,6 +84,33 @@ export const UpgradePage = () => {
                   <Check className="w-4 h-4 text-green-400" />
                 </div>
                 <span className="text-white/90 text-sm">{benefit}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* IoT Features */}
+        <div className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+              <Zap className="w-4 h-4 text-emerald-400" />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-sm">IoT Integration</h3>
+              <p className="text-emerald-400 text-xs">Coming Soon — Eksklusif Paket Max</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {iotFeatures.map((feature, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <feature.icon className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-white">{feature.title}</h4>
+                  <p className="text-xs text-white/50 leading-relaxed">{feature.description}</p>
+                </div>
               </div>
             ))}
           </div>

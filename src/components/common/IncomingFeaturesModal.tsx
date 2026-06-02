@@ -1,6 +1,7 @@
 // src/components/common/IncomingFeaturesModal.tsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { X, ArrowRight, Wifi, Users, Cpu, Zap, Lock } from 'lucide-react';
 
 const STORAGE_KEY = 'wc-checks-incoming-features-minimized';
@@ -23,6 +24,7 @@ const features = [
 ];
 
 export const IncomingFeaturesModal = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -128,11 +130,12 @@ export const IncomingFeaturesModal = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleClose}
+                  onClick={() => { handleClose(); navigate('/payment-method'); }}
                   className="w-full py-3 bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2"
                 >
                   <Lock className="w-4 h-4" />
-                  <span>Coming Soon — Stay Tuned</span>
+                  <span>Upgrade ke Paket Max</span>
+                  <ArrowRight className="w-4 h-4" />
                 </motion.button>
                 <p className="text-center text-[11px] text-white/40 mt-2">
                   Fitur eksklusif untuk pengguna Paket Max 🔒
