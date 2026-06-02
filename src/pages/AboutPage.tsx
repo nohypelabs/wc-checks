@@ -60,7 +60,7 @@ export const AboutPage = () => {
  {/* Description */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <FileText className="w-5 h-5 text-blue-300" />
  </div>
  <div>
@@ -83,7 +83,7 @@ export const AboutPage = () => {
  {/* Core Features */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <CheckCircle className="w-5 h-5 text-green-300" />
  </div>
  <div>
@@ -233,7 +233,7 @@ export const AboutPage = () => {
  {/* Tech Stack */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <Code className="w-5 h-5 text-purple-300" />
  </div>
  <div>
@@ -388,7 +388,7 @@ export const AboutPage = () => {
  {/* Data Flow */}
  <div>
  <h4 className="font-semibold text-white text-sm mb-2">Data Flow</h4>
- <div className="bg-purple-50 border-l-4 border-purple-500 p-3 rounded text-xs text-white/80 leading-relaxed">
+ <div className="bg-purple-500/10 border-l-4 border-purple-500 p-3 rounded text-xs text-white/80 leading-relaxed">
  <p className="mb-2"><strong>Inspection Flow:</strong></p>
  <p className="font-mono text-xs">
  User → Scan QR → Extract Location ID → Load Inspection Form → Fill Form + Upload Photos → POST /api/inspections → Save to PostgreSQL → Update Analytics → Redirect to Dashboard
@@ -401,7 +401,7 @@ export const AboutPage = () => {
  {/* Database Schema */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <Database className="w-5 h-5 text-red-300" />
  </div>
  <div>
@@ -484,7 +484,7 @@ export const AboutPage = () => {
  </div>
  </div>
 
- <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+ <div className="mt-4 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
  <p className="text-xs text-blue-800">
  <strong>Row Level Security (RLS):</strong> Setiap tabel dilindungi dengan RLS policy untuk memastikan user hanya bisa akses data sesuai role dan organisasi mereka.
  </p>
@@ -509,7 +509,7 @@ export const AboutPage = () => {
  <Lock className="w-4 h-4 text-blue-300" />
  Autentikasi
  </h4>
- <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+ <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
  <ul className="text-xs text-white/80 space-y-1">
  <li><strong>Provider:</strong> Supabase Authentication (Email/Password)</li>
  <li><strong>Session Management:</strong> JWT-based sessions dengan refresh token</li>
@@ -526,11 +526,11 @@ export const AboutPage = () => {
  Otorisasi (Role-Based Access Control)
  </h4>
  <div className="space-y-2">
- <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+ <div className="bg-red-500/10 border-l-4 border-red-500 p-3 rounded">
  <p className="font-semibold text-xs text-white mb-1">Super Admin</p>
  <p className="text-xs text-white/60">Full system access, user management, semua organisasi</p>
  </div>
- <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+ <div className="bg-yellow-500/10 border-l-4 border-yellow-500 p-3 rounded">
  <p className="font-semibold text-xs text-white mb-1">Admin</p>
  <p className="text-xs text-white/60">Manage organisasi sendiri, view semua inspeksi, kelola lokasi & user dalam org</p>
  </div>
@@ -616,7 +616,7 @@ export const AboutPage = () => {
  </div>
  </div>
 
- <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
+ <div className="mt-3 bg-green-500/10 border border-green-500/20 rounded-lg p-3">
  <p className="text-xs text-green-800">
  <strong>Production URL:</strong> <a href="https://wc-checks.vercel.app" target="_blank" rel="noopener noreferrer" className="underline">wc-checks.vercel.app</a>
  </p>
@@ -626,7 +626,7 @@ export const AboutPage = () => {
  {/* Performance & Optimization */}
  <Card>
  <div className="flex items-start gap-3 mb-4">
- <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
  <TrendingUp className="w-5 h-5 text-yellow-600" />
  </div>
  <div>
@@ -684,7 +684,7 @@ export const AboutPage = () => {
  rel="noopener noreferrer"
  className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/8 transition-colors border border-white/15"
  >
- <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+ <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
  <Globe className="w-5 h-5 text-blue-300" />
  </div>
  <div>
@@ -697,7 +697,7 @@ export const AboutPage = () => {
  href="mailto:abdulgofur100persen@gmail.com"
  className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/8 transition-colors border border-white/15"
  >
- <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+ <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
  <Mail className="w-5 h-5 text-red-300" />
  </div>
  <div>
