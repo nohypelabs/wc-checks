@@ -407,7 +407,7 @@ export const RegisterPage = () => {
  <div className="w-full border-t border-gray-300"></div>
  </div>
  <div className="relative flex justify-center text-sm">
- <span className="px-4 bg-white text-white/60">
+ <span className="px-4 bg-slate-800 text-white/60">
  Sudah punya akun?
  </span>
  </div>
@@ -416,7 +416,7 @@ export const RegisterPage = () => {
  {/* Login Button */}
  <Link
  to="/login"
- className="w-full bg-white hover:bg-gray-50 text-blue-600 font-semibold py-3 px-4 rounded-lg border-2 border-blue-600 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-150 flex items-center justify-center gap-2"
+ className="w-full bg-slate-800/80 hover:bg-slate-700/80 text-white font-semibold py-3 px-4 rounded-lg border-2 border-white/15 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-150 flex items-center justify-center gap-2"
  >
  <span>Masuk ke Akun</span>
  </Link>

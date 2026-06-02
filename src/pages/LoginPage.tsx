@@ -250,7 +250,7 @@ export function LoginPage() {
  <div className="w-full border-t border-white/10"></div>
  </div>
  <div className="relative flex justify-center text-sm">
- <span className="px-4 bg-white text-white/60">
+ <span className="px-4 bg-slate-800 text-white/60">
  Belum punya akun?
  </span>
  </div>
