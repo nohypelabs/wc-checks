@@ -203,7 +203,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
       },
       genZ: {
         good: 'Bersih',
-        normal: '😐 Setengah',
+        normal: 'Setengah',
         bad: 'Penuh',
         other: 'Lainnya',
       },
@@ -374,17 +374,17 @@ export const calculateWeightedScore = (ratings: ComponentRating[]): number => {
 
 export const getScoreStatus = (
   score: number
-): { label: string; color: string; emoji: string } => {
+): { label: string; color: string; icon: string } => {
   if (score >= 85) {
-    return { label: 'Excellent', color: 'green', emoji: '🌟' };
+    return { label: 'Excellent', color: 'green', icon: 'Star' };
   } else if (score >= 70) {
-    return { label: 'Good', color: 'blue', emoji: '😊' };
+    return { label: 'Good', color: 'blue', icon: 'ThumbsUp' };
   } else if (score >= 50) {
-    return { label: 'Fair', color: 'yellow', emoji: '😐' };
+    return { label: 'Fair', color: 'yellow', icon: 'Minus' };
   } else if (score >= 30) {
-    return { label: 'Poor', color: 'orange', emoji: '😟' };
+    return { label: 'Poor', color: 'orange', icon: 'ThumbsDown' };
   } else {
-    return { label: 'Critical', color: 'red', emoji: '😨' };
+    return { label: 'Critical', color: 'red', icon: 'AlertCircle' };
   }
 };
 

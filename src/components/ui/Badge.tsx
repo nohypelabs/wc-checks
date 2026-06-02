@@ -1,6 +1,7 @@
 // src/components/ui/Badge.tsx
 import { clsx } from 'clsx';
 import { ReactNode } from 'react';
+import * as Icons from 'lucide-react';
 
 interface BadgeProps {
  children: ReactNode;
@@ -64,44 +65,44 @@ export const StatusBadge = ({ status, showIcon = true }: StatusBadgeProps) => {
  excellent: { 
  label: 'Excellent', 
  variant: 'success' as const, 
- icon: '🌟',
- emoji: '😊'
+ icon: 'Star',
+ 
  },
  good: { 
  label: 'Good', 
  variant: 'success' as const, 
- icon: '✅',
- emoji: '🙂'
+ icon: 'CheckCircle2',
+ 
  },
  fair: { 
  label: 'Fair', 
  variant: 'warning' as const, 
- icon: '⚠️',
- emoji: '😐'
+ icon: 'AlertTriangle',
+ 
  },
  poor: { 
  label: 'Poor', 
  variant: 'danger' as const, 
- icon: '❌',
- emoji: '😕'
+ icon: 'XCircle',
+ 
  },
  pending: { 
  label: 'Pending', 
  variant: 'warning' as const, 
- icon: '⏰',
- emoji: '⏳'
+ icon: 'Clock',
+ 
  },
  completed: { 
  label: 'Completed', 
  variant: 'success' as const, 
- icon: '✓',
- emoji: '✅'
+ icon: 'Check',
+ 
  },
  verified: { 
  label: 'Verified', 
  variant: 'info' as const, 
- icon: '✓✓',
- emoji: '✅'
+ icon: 'ShieldCheck',
+ 
  },
  };
 
@@ -109,7 +110,10 @@ export const StatusBadge = ({ status, showIcon = true }: StatusBadgeProps) => {
 
  return (
  <Badge variant={config.variant}>
- {showIcon && <span>{config.emoji}</span>}
+ {showIcon && (() => {
+   const IconComponent = config.icon ? (Icons as any)[config.icon] : null;
+   return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
+  })()}
  {config.label}
  </Badge>
  );

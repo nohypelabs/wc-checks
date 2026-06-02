@@ -1,7 +1,8 @@
 // src/components/reports/InspectionDetailModal.tsx - MODERN REDESIGN
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Clock, User, Camera, FileText, AlertCircle, Star } from 'lucide-react';
+import { X, MapPin, Clock, User, Camera, FileText, AlertCircle, Star, ThumbsUp, ThumbsDown, Minus } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
@@ -217,7 +218,12 @@ export const InspectionDetailModal = ({
  </div>
  </div>
  <div className="flex items-center gap-1 mt-1">
- <span className="text-base">{scoreStatus.emoji}</span>
+ {(() => {
+  const IconComponent = scoreStatus.icon ? (Icons as any)[scoreStatus.icon] : null;
+  return IconComponent ? (
+   <IconComponent className="w-4 h-4" />
+  ) : null;
+ })()}
  <span className="text-xs font-semibold">{scoreStatus.label}</span>
  </div>
  </div>
