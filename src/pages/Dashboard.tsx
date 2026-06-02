@@ -182,7 +182,7 @@ export const Dashboard = () => {
  <img
  src="/logo.png"
  alt="Proservice Indonesia"
- className="h-8 w-auto"
+ className="h-10 w-auto"
  onError={(e) => {
  // If logo fails to load, hide it (text will remain)
  const img = e.target as HTMLImageElement;
@@ -190,7 +190,7 @@ export const Dashboard = () => {
  }}
  />
  <div>
- <h1 className="text-xl font-bold text-white">Proservice Indonesia</h1>
+ <h1 className="text-2xl font-bold text-white">Proservice Indonesia</h1>
  <p className="text-sm text-white/50">
  Hai, {profile?.full_name || user?.email?.split('@')[0] || 'Pengguna'}
  </p>

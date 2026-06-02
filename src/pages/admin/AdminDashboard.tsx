@@ -59,22 +59,22 @@ export const AdminDashboard = () => {
 
  {/* Desktop: Logo left */}
  <div className="hidden lg:flex items-center gap-2.5">
- <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center p-1">
+ <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center p-1">
  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
  </div>
  <div>
- <h1 className="text-sm font-bold leading-tight text-white">Proservice Indonesia</h1>
- <p className="text-[11px] text-white/50">Aplikasi Toilet Ceklis Real Time</p>
+ <h1 className="text-lg font-bold leading-tight text-white">Proservice Indonesia</h1>
+ <p className="text-xs text-white/50">Aplikasi Toilet Ceklis Real Time</p>
  </div>
  </div>
 
  {/* Mobile: Centered Logo (compact) */}
  <div className="lg:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5">
- <div className="w-7 h-7 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center justify-center p-1">
+ <div className="w-9 h-9 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center justify-center p-1">
  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
  </div>
  <div className="flex flex-col">
- <h1 className="text-sm font-bold whitespace-nowrap leading-tight">Proservice Indonesia</h1>
+ <h1 className="text-base font-bold whitespace-nowrap leading-tight">Proservice Indonesia</h1>
  <p className="text-[10px] text-blue-100 whitespace-nowrap">Toilet Ceklis Real Time</p>
  </div>
  </div>
