@@ -808,16 +808,18 @@ const handleSubmit = async () => {
  </button>
 
  {(completedCount < totalRequired || generalPhotos.length === 0) && (
- <div className="text-center text-sm text-red-600 mt-2 space-y-1">
+ <div className="flex flex-col items-center text-sm text-red-400 mt-2 space-y-1">
  {completedCount < totalRequired && (
- <p>
- <div className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Masih kurang {totalRequired - completedCount} komponen wajib</div>
- </p>
+ <div className="flex items-center gap-2">
+ <XCircle className="w-4 h-4" />
+ <span>Masih kurang {totalRequired - completedCount} komponen wajib</span>
+ </div>
  )}
  {generalPhotos.length === 0 && (
- <p>
- Wajib upload minimal 1 foto dokumentasi
- </p>
+ <div className="flex items-center gap-2">
+ <Camera className="w-4 h-4" />
+ <span>Wajib upload minimal 1 foto dokumentasi</span>
+ </div>
  )}
  </div>
  )}
