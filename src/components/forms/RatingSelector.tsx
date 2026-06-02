@@ -144,25 +144,6 @@ export const RatingSelector = ({
  })}
  </div>
 
- {/* Other Button (Full Width) */}
- <button
- type="button"
- onClick={() => handleChoiceChange('other')}
- className={`
- w-full py-2 rounded-lg text-center transition-all
- border font-medium text-xs flex items-center justify-center space-x-2
- ${
- value === 'other'
- ? genZMode
- ? 'bg-purple-500/10 border-purple-500 text-purple-400'
- : 'bg-blue-500/10 border-blue-500 text-blue-400'
- : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
- }
- `}
- >
- <MessageSquare className="w-4 h-4" />
- <span>{choices.other}</span>
- </button>
  </>
  ) : (
  <div className="text-center py-6 text-white/50">

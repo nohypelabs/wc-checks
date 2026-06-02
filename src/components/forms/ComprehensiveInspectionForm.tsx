@@ -558,18 +558,6 @@ const handleSubmit = async () => {
  </button>
  )}
 
- {/* Per-Component Photo Upload (optional) */}
- {isExpanded && component.allowPhoto && (
- <div className="mt-3">
- <EnhancedPhotoUpload
- componentId={component.id}
- photos={componentPhotos}
- onPhotosChange={(photos) => handlePhotosChange(component.id, photos)}
- genZMode={genZMode}
- />
- </div>
- )}
-
  {isExpanded && (
  <button
  type="button"
@@ -583,7 +571,7 @@ const handleSubmit = async () => {
  }
  `}
  >
- ↑ Minimize
+ Minimize
  </button>
  )}
  </div>
