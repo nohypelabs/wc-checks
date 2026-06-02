@@ -19,101 +19,101 @@ import { RegisterPage } from './pages/RegisterPage';
 // LAZY LOAD: Heavy pages loaded on-demand
 // FIX: Handle named exports by mapping to default
 const ScanPage = lazy(() => 
-  import('./pages/ScanPage').then(module => ({ default: module.ScanPage }))
+ import('./pages/ScanPage').then(module => ({ default: module.ScanPage }))
 );
 const InspectionPage = lazy(() => 
-  import('./pages/InspectionPage').then(module => ({ default: module.InspectionPage }))
+ import('./pages/InspectionPage').then(module => ({ default: module.InspectionPage }))
 );
 const ReportsPage = lazy(() => 
-  import('./pages/ReportsPage').then(module => ({ default: module.ReportsPage }))
+ import('./pages/ReportsPage').then(module => ({ default: module.ReportsPage }))
 );
 const AnalyticsPage = lazy(() => 
-  import('./pages/AnalyticsPage').then(module => ({ default: module.AnalyticsPage }))
+ import('./pages/AnalyticsPage').then(module => ({ default: module.AnalyticsPage }))
 );
 const ProfilePage = lazy(() => 
-  import('./pages/ProfilePage').then(module => ({ default: module.ProfilePage }))
+ import('./pages/ProfilePage').then(module => ({ default: module.ProfilePage }))
 );
 const LocationsListPage = lazy(() =>
-  import('./pages/LocationsListPage').then(module => ({ default: module.LocationsListPage }))
+ import('./pages/LocationsListPage').then(module => ({ default: module.LocationsListPage }))
 );
 const AddLocationPage = lazy(() =>
-  import('./pages/AddLocationPage').then(module => ({ default: module.AddLocationPage }))
+ import('./pages/AddLocationPage').then(module => ({ default: module.AddLocationPage }))
 );
 const LocationsManager = lazy(() =>
-  import('./pages/admin/LocationsManager').then(module => ({ default: module.LocationsManager }))
+ import('./pages/admin/LocationsManager').then(module => ({ default: module.LocationsManager }))
 );
 const OrganizationsManager = lazy(() =>
-  import('./pages/admin/OrganizationsManager').then(module => ({ default: module.OrganizationsManager }))
+ import('./pages/admin/OrganizationsManager').then(module => ({ default: module.OrganizationsManager }))
 );
 const BuildingsManager = lazy(() =>
-  import('./pages/admin/BuildingsManager').then(module => ({ default: module.BuildingsManager }))
+ import('./pages/admin/BuildingsManager').then(module => ({ default: module.BuildingsManager }))
 );
 const AdminDashboard = lazy(() =>
-  import('./pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard }))
+ import('./pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard }))
 );
 const QRCodeGenerator = lazy(() =>
-  import('./pages/admin/QRCodeGenerator').then(module => ({ default: module.QRCodeGenerator }))
+ import('./pages/admin/QRCodeGenerator').then(module => ({ default: module.QRCodeGenerator }))
 );
 const UserManagement = lazy(() =>
-  import('./pages/superadmin/UserManagement').then(module => ({ default: module.UserManagement }))
+ import('./pages/superadmin/UserManagement').then(module => ({ default: module.UserManagement }))
 );
 const OccupationManagerPage = lazy(() =>
-  import('./pages/admin/OccupationManagerPage').then(module => ({ default: module.OccupationManagerPage }))
+ import('./pages/admin/OccupationManagerPage').then(module => ({ default: module.OccupationManagerPage }))
 );
 const TemplatesManager = lazy(() =>
-  import('./pages/admin/TemplatesManager').then(module => ({ default: module.TemplatesManager }))
+ import('./pages/admin/TemplatesManager').then(module => ({ default: module.TemplatesManager }))
 );
 const SettingsPage = lazy(() =>
-  import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage }))
+ import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage }))
 );
 const HelpPage = lazy(() =>
-  import('./pages/HelpPage').then(module => ({ default: module.HelpPage }))
+ import('./pages/HelpPage').then(module => ({ default: module.HelpPage }))
 );
 const AboutPage = lazy(() =>
-  import('./pages/AboutPage').then(module => ({ default: module.AboutPage }))
+ import('./pages/AboutPage').then(module => ({ default: module.AboutPage }))
 );
 
 // ⚡ React Query - OPTIMIZED for performance + freshness balance
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: true, // ✅ Refetch when user comes back
-      refetchOnMount: true, // ✅ Fresh data on component mount
-      refetchOnReconnect: true, // ✅ Refetch when internet reconnects
-      retry: 1, // ⚡ Retry once (not infinite, not zero)
-      staleTime: 2 * 60 * 1000, // ⚡ Cache 2 minutes - balance performance & freshness
-      gcTime: 5 * 60 * 1000, // ⚡ Keep in memory 5 minutes - reduce re-fetching
-      onError: (error: any) => {
-        logger.error('React Query error', error);
-      },
-    },
-    mutations: {
-      retry: 0, // ❌ No retry for mutations
-      onError: (error: any) => {
-        logger.error('React Query mutation error', error);
-      },
-    },
-  },
+ defaultOptions: {
+ queries: {
+ refetchOnWindowFocus: true, // ✅ Refetch when user comes back
+ refetchOnMount: true, // ✅ Fresh data on component mount
+ refetchOnReconnect: true, // ✅ Refetch when internet reconnects
+ retry: 1, // ⚡ Retry once (not infinite, not zero)
+ staleTime: 2 * 60 * 1000, // ⚡ Cache 2 minutes - balance performance & freshness
+ gcTime: 5 * 60 * 1000, // ⚡ Keep in memory 5 minutes - reduce re-fetching
+ onError: (error: any) => {
+ logger.error('React Query error', error);
+ },
+ },
+ mutations: {
+ retry: 0, // ❌ No retry for mutations
+ onError: (error: any) => {
+ logger.error('React Query mutation error', error);
+ },
+ },
+ },
 });
 
 // Loading component
 const PageLoader = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <p className="text-gray-600">Loading...</p>
-    </div>
-  </div>
+ <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+ <div className="text-center">
+ <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+ <p className="text-gray-600">Loading...</p>
+ </div>
+ </div>
 );
 
 // Auth loading component
 const AuthLoader = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <p className="text-gray-600">Checking authentication...</p>
-    </div>
-  </div>
+ <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+ <div className="text-center">
+ <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+ <p className="text-gray-600">Checking authentication...</p>
+ </div>
+ </div>
 );
 
 // Main Dashboard - Accessible to all users (shows AdminDashboard which has role-based content)
@@ -121,182 +121,182 @@ const AuthLoader = () => (
 
 // 404 Page
 const NotFoundPage = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-    <div className="text-center">
-      <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
-      <p className="text-gray-600 mb-4">Page not found</p>
-      <a
-        href="/"
-        className="text-blue-600 hover:underline font-medium"
-      >
-        Back to Dashboard
-      </a>
-    </div>
-  </div>
+ <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+ <div className="text-center">
+ <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
+ <p className="text-gray-600 mb-4">Page not found</p>
+ <a
+ href="/"
+ className="text-blue-600 hover:underline font-medium"
+ >
+ Back to Dashboard
+ </a>
+ </div>
+ </div>
 );
 
 function AppContent() {
-  const { user, loading } = useAuth();
+ const { user, loading } = useAuth();
 
-  // DEBUG: Log auth state
-  console.log('[AppContent] render:', JSON.stringify({ loading, hasUser: !!user, userId: user?.id }));
+ // DEBUG: Log auth state
+ console.log('[AppContent] render:', JSON.stringify({ loading, hasUser: !!user, userId: user?.id }));
 
-  // WAIT for auth to load before routing
-  if (loading) {
-    console.log('[AppContent] Showing AuthLoader - waiting for auth...');
-    return <AuthLoader />;
-  }
+ // WAIT for auth to load before routing
+ if (loading) {
+ console.log('[AppContent] Showing AuthLoader - waiting for auth...');
+ return <AuthLoader />;
+ }
 
-  console.log('[AppContent] Auth loaded, rendering routes');
-  const location = useLocation();
+ console.log('[AppContent] Auth loaded, rendering routes');
+ const location = useLocation();
 
-  return (
-    <AnimatePresence mode="wait">
-      <Suspense fallback={<PageLoader />}>
-        <Routes location={location} key={location.pathname}>
-        {/* Public Routes */}
-        <Route 
-          path="/login" 
-          element={!user ? <LoginPage /> : <Navigate to="/" replace />} 
-        />
-        <Route 
-          path="/register" 
-          element={!user ? <RegisterPage /> : <Navigate to="/" replace />} 
-        />
+ return (
+ <AnimatePresence mode="wait">
+ <Suspense fallback={<PageLoader />}>
+ <Routes location={location} key={location.pathname}>
+ {/* Public Routes */}
+ <Route 
+ path="/login" 
+ element={!user ? <LoginPage /> : <Navigate to="/" replace />} 
+ />
+ <Route 
+ path="/register" 
+ element={!user ? <RegisterPage /> : <Navigate to="/" replace />} 
+ />
 
-        {/* Protected Routes - Main */}
-        <Route
-          path="/"
-          element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/dashboard"
-          element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/dashboard/user"
-          element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />}
-        />
-        <Route 
-          path="/scan" 
-          element={user ? <ScanPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/inspect/:locationId" 
-          element={user ? <InspectionPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/reports" 
-          element={user ? <ReportsPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/history" 
-          element={user ? <ReportsPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/analytics" 
-          element={user ? <AnalyticsPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route
-          path="/locations"
-          element={user ? <LocationsListPage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/locations/add"
-          element={user ? (
-            <ErrorBoundary>
-              <AddLocationPage />
-            </ErrorBoundary>
-          ) : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/locations"
-          element={user ? (
-            <ErrorBoundary>
-              <LocationsManager />
-            </ErrorBoundary>
-          ) : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/organizations"
-          element={user ? <OrganizationsManager /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/buildings"
-          element={user ? <BuildingsManager /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/superadmin/user-management"
-          element={user ? <UserManagement /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/profile"
-          element={user ? <ProfilePage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/settings"
-          element={user ? <SettingsPage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/help"
-          element={user ? <HelpPage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/about"
-          element={user ? <AboutPage /> : <Navigate to="/login" replace />}
-        />
+ {/* Protected Routes - Main */}
+ <Route
+ path="/"
+ element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/dashboard"
+ element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/dashboard/user"
+ element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />}
+ />
+ <Route 
+ path="/scan" 
+ element={user ? <ScanPage /> : <Navigate to="/login" replace />} 
+ />
+ <Route 
+ path="/inspect/:locationId" 
+ element={user ? <InspectionPage /> : <Navigate to="/login" replace />} 
+ />
+ <Route 
+ path="/reports" 
+ element={user ? <ReportsPage /> : <Navigate to="/login" replace />} 
+ />
+ <Route 
+ path="/history" 
+ element={user ? <ReportsPage /> : <Navigate to="/login" replace />} 
+ />
+ <Route 
+ path="/analytics" 
+ element={user ? <AnalyticsPage /> : <Navigate to="/login" replace />} 
+ />
+ <Route
+ path="/locations"
+ element={user ? <LocationsListPage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/locations/add"
+ element={user ? (
+ <ErrorBoundary>
+ <AddLocationPage />
+ </ErrorBoundary>
+ ) : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/locations"
+ element={user ? (
+ <ErrorBoundary>
+ <LocationsManager />
+ </ErrorBoundary>
+ ) : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/organizations"
+ element={user ? <OrganizationsManager /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/buildings"
+ element={user ? <BuildingsManager /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/superadmin/user-management"
+ element={user ? <UserManagement /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/profile"
+ element={user ? <ProfilePage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/settings"
+ element={user ? <SettingsPage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/help"
+ element={user ? <HelpPage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/about"
+ element={user ? <AboutPage /> : <Navigate to="/login" replace />}
+ />
 
-        {/* Admin Routes - Same as main dashboard (accessible to all users) */}
-        <Route
-          path="/admin"
-          element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/users"
-          element={user ? <UserManagement /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/occupations"
-          element={user ? <OccupationManagerPage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/reports"
-          element={user ? <ReportsPage /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/templates"
-          element={user ? <TemplatesManager /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/QRCodeGenerator"
-          element={user ? <QRCodeGenerator /> : <Navigate to="/login" replace />}
-        />
+ {/* Admin Routes - Same as main dashboard (accessible to all users) */}
+ <Route
+ path="/admin"
+ element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/users"
+ element={user ? <UserManagement /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/occupations"
+ element={user ? <OccupationManagerPage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/reports"
+ element={user ? <ReportsPage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/templates"
+ element={user ? <TemplatesManager /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/admin/QRCodeGenerator"
+ element={user ? <QRCodeGenerator /> : <Navigate to="/login" replace />}
+ />
 
-        {/* 404 */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Suspense>
-    </AnimatePresence>
-  );
+ {/* 404 */}
+ <Route path="*" element={<NotFoundPage />} />
+ </Routes>
+ </Suspense>
+ </AnimatePresence>
+ );
 }
 
 export default function App() {
-  // Log app initialization
-  logger.info('App initialized', {
-    env: import.meta.env.MODE,
-    version: '1.0.0',
-  });
+ // Log app initialization
+ logger.info('App initialized', {
+ env: import.meta.env.MODE,
+ version: '1.0.0',
+ });
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <ErrorBoundary>
-          <AppContent />
-          <PWAInstallPrompt />
-          <DebugPanel />
-          <CustomToaster />
-        </ErrorBoundary>
-      </Router>
-    </QueryClientProvider>
-  );
+ return (
+ <QueryClientProvider client={queryClient}>
+ <Router>
+ <ErrorBoundary>
+ <AppContent />
+ <PWAInstallPrompt />
+ <DebugPanel />
+ <CustomToaster />
+ </ErrorBoundary>
+ </Router>
+ </QueryClientProvider>
+ );
 }

@@ -18,546 +18,546 @@ import toast from 'react-hot-toast';
 import { useBuildings } from '../hooks/useBuildings';
 
 export const ReportsPage = () => {
-  const { user } = useAuth();
-  const { isAdmin, isSuperAdmin, loading: adminLoading } = useIsAdmin();
-
-  console.log('📊 [ReportsPage] Role check:', {
-    userId: user?.id,
-    isAdmin,
-    isSuperAdmin,
-    adminLoading,
-    willFetchAllUsers: isAdmin,
-  });
-
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedInspection, setSelectedInspection] = useState<InspectionReport | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [exportMenuOpen, setExportMenuOpen] = useState(false);
-  const exportMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
-        setExportMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
-
-  const { data: buildings, isLoading: buildingsLoading } = useBuildings({
-    enabled: true,
-  });
-
-  const filterUserId = isAdmin ? undefined : user?.id;
-
-  console.log('📊 [ReportsPage] Fetching monthly data with filter:', {
-    isAdmin,
-    filterUserId: filterUserId || 'ALL USERS',
-  });
-
-  const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
-    filterUserId,
-    currentDate,
-    !adminLoading,
-    selectedBuildingId || undefined
-  );
-
-  const dateFilterUserId = isAdmin ? undefined : user?.id;
-
-  console.log('📊 [ReportsPage] Fetching date inspections with filter:', {
-    isAdmin,
-    adminLoading,
-    dateFilterUserId: dateFilterUserId || 'ALL USERS',
-    selectedDate,
-    buildingId: selectedBuildingId || 'ALL',
-  });
-
-  const { data: dateInspections } = useDateInspections(
-    dateFilterUserId,
-    selectedDate || '',
-    !adminLoading,
-    selectedBuildingId || undefined
-  );
-
-  const handleDateClick = (date: string) => {
-    setSelectedDate(date);
-  };
-
-  const handleCloseDrawer = () => {
-    setSelectedDate(null);
-  };
-
-  const handleInspectionClick = (inspection: InspectionReport) => {
-    setSelectedInspection(inspection);
-  };
-
-  const handleCloseDetail = () => {
-    setSelectedInspection(null);
-  };
-
-  const totalInspections = monthlyData?.reduce((sum, d) => sum + d.count, 0) || 0;
-  const averageScore = monthlyData && monthlyData.length > 0
-    ? Math.round(
-        monthlyData.reduce((sum, d) => sum + (d.averageScore * d.count), 0) / totalInspections
-      )
-    : 0;
-
-  // Active days count
-  const activeDays = monthlyData?.filter(d => d.count > 0).length || 0;
-
-  const handleExportMonth = async () => {
-    if (!user?.id) return;
-
-    toast.loading('Preparing export...');
-
-    try {
-      const month = format(currentDate, 'yyyy-MM');
-
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      if (!token) {
-        throw new Error('No authentication token');
-      }
-
-      const response = await fetch(`/api/reports?month=${month}&userId=${user.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch' }));
-        throw new Error(errorData.error || 'Failed to fetch inspections');
-      }
-
-      const result = await response.json();
-      const monthData: any[] = result.data;
-
-      const allInspections = monthData.flatMap(d => d.inspections || []);
-
-      if (allInspections.length === 0) {
-        toast.dismiss();
-        toast.error('No inspections to export for this month');
-        return;
-      }
-
-      const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
-        inspection_id: inspection.id,
-        inspection_date: inspection.inspection_date || '',
-        inspection_time: inspection.inspection_time || '',
-        submitted_at: '',
-        overall_status: inspection.overall_status || '',
-        notes: inspection.notes || '',
-        user_full_name: inspection.user?.full_name || '',
-        user_email: inspection.user?.email || '',
-        user_phone: '',
-        user_occupation: inspection.occupation?.display_name || 'N/A',
-        location_name: inspection.location?.name || '',
-        building_name: inspection.location?.building || '',
-        organization_name: '',
-        floor: inspection.location?.floor || '',
-        area: '',
-        section: '',
-        photo_urls: (inspection.photo_urls || []).join('; '),
-        responses: JSON.stringify(inspection.responses || {}),
-      }));
-
-      toast.dismiss();
-      exportToCSV(exportData, `inspections_${month}.csv`);
-      toast.success(`✅ Berhasil mengekspor ${exportData.length} inspeksi`);
-    } catch (error: any) {
-      toast.dismiss();
-      console.error('Export error:', error);
-      toast.error('Gagal mengekspor: ' + error.message);
-    }
-  };
-
-  const handleExportPDF = async () => {
-    if (!user?.id) return;
-
-    const loadingToast = toast.loading('Membuat laporan PDF...');
-
-    try {
-      if (!monthlyData || monthlyData.length === 0) {
-        toast.dismiss(loadingToast);
-        toast.error('Tidak ada data untuk diekspor');
-        return;
-      }
-
-      const selectedBuilding = buildings?.find(b => b.id === selectedBuildingId);
-      const siteName = selectedBuilding?.name || 'Semua Lokasi';
-
-      await generateMonthlyReport(
-        monthlyData,
-        currentDate,
-        'PT Prenacons Internusa',
-        siteName
-      );
-
-      toast.dismiss(loadingToast);
-      toast.success('✅ Laporan PDF berhasil dibuat!');
-    } catch (error: any) {
-      toast.dismiss(loadingToast);
-      console.error('PDF Export error:', error);
-      toast.error('Gagal membuat PDF: ' + error.message);
-    }
-  };
-
-  const handleExportAllUsers = async () => {
-    if (!user?.id || !isAdmin) {
-      toast.error('Akses administrator diperlukan');
-      return;
-    }
-
-    toast.loading('Menyiapkan ekspor untuk semua pengguna...');
-
-    try {
-      const month = format(currentDate, 'yyyy-MM');
-
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      if (!token) {
-        throw new Error('No authentication token');
-      }
-
-      const response = await fetch(`/api/reports?month=${month}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch' }));
-        throw new Error(errorData.error || 'Failed to fetch inspections');
-      }
-
-      const result = await response.json();
-      const monthData: any[] = result.data;
-
-      const allInspections = monthData.flatMap(d => d.inspections || []);
-
-      if (allInspections.length === 0) {
-        toast.dismiss();
-        toast.error('No inspections to export for this month');
-        return;
-      }
-
-      const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
-        inspection_id: inspection.id,
-        inspection_date: inspection.inspection_date || '',
-        inspection_time: inspection.inspection_time || '',
-        submitted_at: '',
-        overall_status: inspection.overall_status || '',
-        notes: inspection.notes || '',
-        user_full_name: inspection.user?.full_name || '',
-        user_email: inspection.user?.email || '',
-        user_phone: '',
-        user_occupation: inspection.occupation?.display_name || 'N/A',
-        location_name: inspection.location?.name || '',
-        building_name: inspection.location?.building || '',
-        organization_name: '',
-        floor: inspection.location?.floor || '',
-        area: '',
-        section: '',
-        photo_urls: (inspection.photo_urls || []).join('; '),
-        responses: JSON.stringify(inspection.responses || {}),
-      }));
-
-      toast.dismiss();
-      exportToCSV(exportData, `SEMUA_INSPEKSI_${month}.csv`);
-      toast.success(`✅ Berhasil mengekspor ${exportData.length} inspeksi dari semua pengguna`);
-    } catch (error: any) {
-      toast.dismiss();
-      console.error('Export error:', error);
-      toast.error('Gagal mengekspor: ' + error.message);
-    }
-  };
-
-  if (adminLoading || monthlyLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-3 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white/80 lg:text-gray-500 text-sm font-medium">
-            {adminLoading ? 'Memeriksa hak akses...' : 'Memuat laporan...'}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 lg:bg-gradient-to-r lg:from-slate-50 lg:to-slate-100 pb-24 lg:pb-6">
-      {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      {/* Header */}
-      <header className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none lg:py-3">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between text-white lg:text-gray-900">
-            {/* Left: Menu + Title */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-
-              {/* Mobile title */}
-              <div className="lg:hidden">
-                <h1 className="text-lg font-bold">Laporan</h1>
-                <p className="text-xs text-blue-100">Riwayat & analitik inspeksi</p>
-              </div>
-
-              {/* Desktop: Logo + Title */}
-              <div className="hidden lg:flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center p-1">
-                  <BarChart3 className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-bold leading-tight text-gray-900">Laporan</h1>
-                  <p className="text-[11px] text-gray-500">Riwayat & analitik inspeksi</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Export dropdown */}
-            <div className="relative" ref={exportMenuRef}>
-              <motion.button
-                onClick={() => setExportMenuOpen(prev => !prev)}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 lg:hover:bg-blue-700 transition-colors backdrop-blur-sm lg:backdrop-blur-none shadow-lg lg:shadow-md text-xs font-semibold whitespace-nowrap"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
-              </motion.button>
-
-              <AnimatePresence>
-                {exportMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                    transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
-                  >
-                    <div className="p-1.5">
-                      <button
-                        onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
-                        disabled={totalInspections === 0}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <FileDown className="w-3.5 h-3.5 text-red-600" />
-                        </div>
-                        <div className="text-left">
-                          <span className="font-semibold block">Export PDF</span>
-                          <span className="text-[10px] text-gray-400 font-normal">Laporan bulanan</span>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
-                        disabled={totalInspections === 0}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <div className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Download className="w-3.5 h-3.5 text-green-600" />
-                        </div>
-                        <div className="text-left">
-                          <span className="font-semibold block">Data Saya (CSV)</span>
-                          <span className="text-[10px] text-gray-400 font-normal">Inspeksi bulan ini</span>
-                        </div>
-                      </button>
-                      {isAdmin && (
-                        <button
-                          onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors"
-                        >
-                          <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Users className="w-3.5 h-3.5 text-blue-600" />
-                          </div>
-                          <div className="text-left">
-                            <span className="font-semibold block">Semua Pengguna</span>
-                            <span className="text-[10px] text-gray-400 font-normal">Admin only</span>
-                          </div>
-                        </button>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Filter + Stats Section */}
-          <div className="mt-3 lg:mt-4">
-            {/* Building Filter */}
-            <div className="mb-3 lg:mb-4">
-              <div className="relative max-w-xs">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 lg:text-gray-500 pointer-events-none" />
-                <select
-                  value={selectedBuildingId}
-                  onChange={(e) => setSelectedBuildingId(e.target.value)}
-                  className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/15 lg:bg-white text-white lg:text-gray-700 border border-white/20 lg:border-gray-200 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm lg:backdrop-blur-none transition-all"
-                  disabled={buildingsLoading}
-                >
-                  <option value="" className="text-gray-700">Semua Gedung</option>
-                  {buildings?.filter(b => b.is_active).map((building) => (
-                    <option key={building.id} value={building.id} className="text-gray-700">
-                      {building.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60 lg:text-gray-400 pointer-events-none" />
-              </div>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-2 lg:gap-3">
-              {/* Total Inspections */}
-              <motion.div
-                className="bg-white/15 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-2xl border border-white/20 lg:border-gray-100 p-3 lg:shadow-sm"
-                whileHover={{ scale: 1.02, y: -2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 bg-white/20 lg:bg-blue-100 rounded-xl flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-white lg:text-blue-600" />
-                  </div>
-                </div>
-                <div className="text-2xl lg:text-xl font-extrabold text-white lg:text-gray-900">
-                  {totalInspections}
-                </div>
-                <div className="text-[10px] text-white/70 lg:text-gray-500 font-medium mt-0.5">Inspeksi</div>
-              </motion.div>
-
-              {/* Average Score */}
-              <motion.div
-                className="bg-white/15 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-2xl border border-white/20 lg:border-gray-100 p-3 lg:shadow-sm"
-                whileHover={{ scale: 1.02, y: -2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 bg-white/20 lg:bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4 text-white lg:text-emerald-600" />
-                  </div>
-                </div>
-                <div className="text-2xl lg:text-xl font-extrabold text-white lg:text-gray-900">
-                  {averageScore}
-                </div>
-                <div className="text-[10px] text-white/70 lg:text-gray-500 font-medium mt-0.5">Rata-rata</div>
-              </motion.div>
-
-              {/* Active Days */}
-              <motion.div
-                className="bg-white/15 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-2xl border border-white/20 lg:border-gray-100 p-3 lg:shadow-sm"
-                whileHover={{ scale: 1.02, y: -2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 bg-white/20 lg:bg-amber-100 rounded-xl flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4 text-white lg:text-amber-600" />
-                  </div>
-                </div>
-                <div className="text-2xl lg:text-xl font-extrabold text-white lg:text-gray-900">
-                  {activeDays}
-                </div>
-                <div className="text-[10px] text-white/70 lg:text-gray-500 font-medium mt-0.5">Hari Aktif</div>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-3 lg:px-6 pt-4 lg:pt-5 space-y-3 lg:space-y-4">
-        {/* Instructions Tip */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.4 }}
-          className="bg-white/10 lg:bg-blue-50 backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-blue-200 rounded-2xl p-3 lg:p-3.5"
-        >
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-white/20 lg:bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Info className="w-4 h-4 text-white lg:text-blue-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white lg:text-blue-900 mb-0.5">
-                Ketuk tanggal untuk lihat inspeksi
-              </p>
-              <p className="text-[11px] text-white/70 lg:text-blue-600 leading-relaxed">
-                Titik berwarna menunjukkan skor rata-rata:{' '}
-                <span className="font-bold text-green-300 lg:text-green-700">Hijau</span> (sangat baik),{' '}
-                <span className="font-bold text-yellow-300 lg:text-yellow-700">Kuning</span> (baik),{' '}
-                <span className="font-bold text-red-300 lg:text-red-700">Merah</span> (perlu perbaikan)
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Calendar */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-        >
-          <CalendarView
-            currentDate={currentDate}
-            onDateChange={setCurrentDate}
-            dateInspections={monthlyData || []}
-            onDateClick={handleDateClick}
-          />
-        </motion.div>
-
-        {/* Empty State */}
-        {(!monthlyData || monthlyData.length === 0) && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="bg-white/10 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-gray-100 rounded-2xl p-8 text-center lg:shadow-sm"
-          >
-            <div className="w-16 h-16 bg-white/15 lg:bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📅</span>
-            </div>
-            <h3 className="font-bold text-white lg:text-gray-900 mb-1.5">Belum ada inspeksi</h3>
-            <p className="text-white/60 lg:text-gray-500 text-sm">
-              Mulai inspeksi lokasi untuk melihatnya di sini
-            </p>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Bottom Drawer */}
-      <InspectionDrawer
-        isOpen={!!selectedDate}
-        onClose={handleCloseDrawer}
-        inspections={dateInspections || []}
-        selectedDate={selectedDate || ''}
-        onInspectionClick={handleInspectionClick}
-      />
-
-      {/* Detail Modal */}
-      <InspectionDetailModal
-        isOpen={!!selectedInspection}
-        onClose={handleCloseDetail}
-        inspection={selectedInspection}
-      />
-
-      {/* Bottom Navigation - mobile only */}
-      <div className="lg:hidden">
-        <BottomNav />
-      </div>
-    </div>
-  );
+ const { user } = useAuth();
+ const { isAdmin, isSuperAdmin, loading: adminLoading } = useIsAdmin();
+
+ console.log('📊 [ReportsPage] Role check:', {
+ userId: user?.id,
+ isAdmin,
+ isSuperAdmin,
+ adminLoading,
+ willFetchAllUsers: isAdmin,
+ });
+
+ const [currentDate, setCurrentDate] = useState(new Date());
+ const [selectedDate, setSelectedDate] = useState<string | null>(null);
+ const [selectedInspection, setSelectedInspection] = useState<InspectionReport | null>(null);
+ const [sidebarOpen, setSidebarOpen] = useState(false);
+ const [exportMenuOpen, setExportMenuOpen] = useState(false);
+ const exportMenuRef = useRef<HTMLDivElement>(null);
+
+ useEffect(() => {
+ const handleClickOutside = (e: MouseEvent) => {
+ if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+ setExportMenuOpen(false);
+ }
+ };
+ document.addEventListener('mousedown', handleClickOutside);
+ return () => document.removeEventListener('mousedown', handleClickOutside);
+ }, []);
+
+ const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
+
+ const { data: buildings, isLoading: buildingsLoading } = useBuildings({
+ enabled: true,
+ });
+
+ const filterUserId = isAdmin ? undefined : user?.id;
+
+ console.log('📊 [ReportsPage] Fetching monthly data with filter:', {
+ isAdmin,
+ filterUserId: filterUserId || 'ALL USERS',
+ });
+
+ const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
+ filterUserId,
+ currentDate,
+ !adminLoading,
+ selectedBuildingId || undefined
+ );
+
+ const dateFilterUserId = isAdmin ? undefined : user?.id;
+
+ console.log('📊 [ReportsPage] Fetching date inspections with filter:', {
+ isAdmin,
+ adminLoading,
+ dateFilterUserId: dateFilterUserId || 'ALL USERS',
+ selectedDate,
+ buildingId: selectedBuildingId || 'ALL',
+ });
+
+ const { data: dateInspections } = useDateInspections(
+ dateFilterUserId,
+ selectedDate || '',
+ !adminLoading,
+ selectedBuildingId || undefined
+ );
+
+ const handleDateClick = (date: string) => {
+ setSelectedDate(date);
+ };
+
+ const handleCloseDrawer = () => {
+ setSelectedDate(null);
+ };
+
+ const handleInspectionClick = (inspection: InspectionReport) => {
+ setSelectedInspection(inspection);
+ };
+
+ const handleCloseDetail = () => {
+ setSelectedInspection(null);
+ };
+
+ const totalInspections = monthlyData?.reduce((sum, d) => sum + d.count, 0) || 0;
+ const averageScore = monthlyData && monthlyData.length > 0
+ ? Math.round(
+ monthlyData.reduce((sum, d) => sum + (d.averageScore * d.count), 0) / totalInspections
+ )
+ : 0;
+
+ // Active days count
+ const activeDays = monthlyData?.filter(d => d.count > 0).length || 0;
+
+ const handleExportMonth = async () => {
+ if (!user?.id) return;
+
+ toast.loading('Preparing export...');
+
+ try {
+ const month = format(currentDate, 'yyyy-MM');
+
+ const { data: { session } } = await supabase.auth.getSession();
+ const token = session?.access_token;
+
+ if (!token) {
+ throw new Error('No authentication token');
+ }
+
+ const response = await fetch(`/api/reports?month=${month}&userId=${user.id}`, {
+ headers: {
+ 'Authorization': `Bearer ${token}`,
+ },
+ });
+
+ if (!response.ok) {
+ const errorData = await response.json().catch(() => ({ error: 'Failed to fetch' }));
+ throw new Error(errorData.error || 'Failed to fetch inspections');
+ }
+
+ const result = await response.json();
+ const monthData: any[] = result.data;
+
+ const allInspections = monthData.flatMap(d => d.inspections || []);
+
+ if (allInspections.length === 0) {
+ toast.dismiss();
+ toast.error('No inspections to export for this month');
+ return;
+ }
+
+ const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
+ inspection_id: inspection.id,
+ inspection_date: inspection.inspection_date || '',
+ inspection_time: inspection.inspection_time || '',
+ submitted_at: '',
+ overall_status: inspection.overall_status || '',
+ notes: inspection.notes || '',
+ user_full_name: inspection.user?.full_name || '',
+ user_email: inspection.user?.email || '',
+ user_phone: '',
+ user_occupation: inspection.occupation?.display_name || 'N/A',
+ location_name: inspection.location?.name || '',
+ building_name: inspection.location?.building || '',
+ organization_name: '',
+ floor: inspection.location?.floor || '',
+ area: '',
+ section: '',
+ photo_urls: (inspection.photo_urls || []).join('; '),
+ responses: JSON.stringify(inspection.responses || {}),
+ }));
+
+ toast.dismiss();
+ exportToCSV(exportData, `inspections_${month}.csv`);
+ toast.success(`✅ Berhasil mengekspor ${exportData.length} inspeksi`);
+ } catch (error: any) {
+ toast.dismiss();
+ console.error('Export error:', error);
+ toast.error('Gagal mengekspor: ' + error.message);
+ }
+ };
+
+ const handleExportPDF = async () => {
+ if (!user?.id) return;
+
+ const loadingToast = toast.loading('Membuat laporan PDF...');
+
+ try {
+ if (!monthlyData || monthlyData.length === 0) {
+ toast.dismiss(loadingToast);
+ toast.error('Tidak ada data untuk diekspor');
+ return;
+ }
+
+ const selectedBuilding = buildings?.find(b => b.id === selectedBuildingId);
+ const siteName = selectedBuilding?.name || 'Semua Lokasi';
+
+ await generateMonthlyReport(
+ monthlyData,
+ currentDate,
+ 'PT Prenacons Internusa',
+ siteName
+ );
+
+ toast.dismiss(loadingToast);
+ toast.success('✅ Laporan PDF berhasil dibuat!');
+ } catch (error: any) {
+ toast.dismiss(loadingToast);
+ console.error('PDF Export error:', error);
+ toast.error('Gagal membuat PDF: ' + error.message);
+ }
+ };
+
+ const handleExportAllUsers = async () => {
+ if (!user?.id || !isAdmin) {
+ toast.error('Akses administrator diperlukan');
+ return;
+ }
+
+ toast.loading('Menyiapkan ekspor untuk semua pengguna...');
+
+ try {
+ const month = format(currentDate, 'yyyy-MM');
+
+ const { data: { session } } = await supabase.auth.getSession();
+ const token = session?.access_token;
+
+ if (!token) {
+ throw new Error('No authentication token');
+ }
+
+ const response = await fetch(`/api/reports?month=${month}`, {
+ headers: {
+ 'Authorization': `Bearer ${token}`,
+ },
+ });
+
+ if (!response.ok) {
+ const errorData = await response.json().catch(() => ({ error: 'Failed to fetch' }));
+ throw new Error(errorData.error || 'Failed to fetch inspections');
+ }
+
+ const result = await response.json();
+ const monthData: any[] = result.data;
+
+ const allInspections = monthData.flatMap(d => d.inspections || []);
+
+ if (allInspections.length === 0) {
+ toast.dismiss();
+ toast.error('No inspections to export for this month');
+ return;
+ }
+
+ const exportData: ExportInspectionData[] = allInspections.map((inspection: any) => ({
+ inspection_id: inspection.id,
+ inspection_date: inspection.inspection_date || '',
+ inspection_time: inspection.inspection_time || '',
+ submitted_at: '',
+ overall_status: inspection.overall_status || '',
+ notes: inspection.notes || '',
+ user_full_name: inspection.user?.full_name || '',
+ user_email: inspection.user?.email || '',
+ user_phone: '',
+ user_occupation: inspection.occupation?.display_name || 'N/A',
+ location_name: inspection.location?.name || '',
+ building_name: inspection.location?.building || '',
+ organization_name: '',
+ floor: inspection.location?.floor || '',
+ area: '',
+ section: '',
+ photo_urls: (inspection.photo_urls || []).join('; '),
+ responses: JSON.stringify(inspection.responses || {}),
+ }));
+
+ toast.dismiss();
+ exportToCSV(exportData, `SEMUA_INSPEKSI_${month}.csv`);
+ toast.success(`✅ Berhasil mengekspor ${exportData.length} inspeksi dari semua pengguna`);
+ } catch (error: any) {
+ toast.dismiss();
+ console.error('Export error:', error);
+ toast.error('Gagal mengekspor: ' + error.message);
+ }
+ };
+
+ if (adminLoading || monthlyLoading) {
+ return (
+ <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
+ <div className="text-center">
+ <div className="w-12 h-12 border-3 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
+ <p className="text-white/80 text-sm font-medium">
+ {adminLoading ? 'Memeriksa hak akses...' : 'Memuat laporan...'}
+ </p>
+ </div>
+ </div>
+ );
+ }
+
+ return (
+ <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 pb-24 lg:pb-6">
+ {/* Sidebar */}
+ <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+ {/* Header */}
+ <header className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20 lg:py-3">
+ <div className="max-w-7xl mx-auto">
+ <div className="flex items-center justify-between text-white">
+ {/* Left: Menu + Title */}
+ <div className="flex items-center gap-3">
+ <button
+ onClick={() => setSidebarOpen(true)}
+ className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+ >
+ <Menu className="w-5 h-5" />
+ </button>
+
+ {/* Mobile title */}
+ <div className="lg:hidden">
+ <h1 className="text-lg font-bold">Laporan</h1>
+ <p className="text-xs text-blue-100">Riwayat & analitik inspeksi</p>
+ </div>
+
+ {/* Desktop: Logo + Title */}
+ <div className="hidden lg:flex items-center gap-2.5">
+ <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center p-1">
+ <BarChart3 className="w-5 h-5 text-white" />
+ </div>
+ <div>
+ <h1 className="text-sm font-bold leading-tight text-gray-900">Laporan</h1>
+ <p className="text-[11px] text-gray-500">Riwayat & analitik inspeksi</p>
+ </div>
+ </div>
+ </div>
+
+ {/* Right: Export dropdown */}
+ <div className="relative" ref={exportMenuRef}>
+ <motion.button
+ onClick={() => setExportMenuOpen(prev => !prev)}
+ className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm shadow-lg text-xs font-semibold whitespace-nowrap"
+ whileHover={{ scale: 1.02 }}
+ whileTap={{ scale: 0.98 }}
+ >
+ <Download className="w-3.5 h-3.5" />
+ <span>Export</span>
+ <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
+ </motion.button>
+
+ <AnimatePresence>
+ {exportMenuOpen && (
+ <motion.div
+ initial={{ opacity: 0, y: -8, scale: 0.95 }}
+ animate={{ opacity: 1, y: 0, scale: 1 }}
+ exit={{ opacity: 0, y: -8, scale: 0.95 }}
+ transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+ className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+ >
+ <div className="p-1.5">
+ <button
+ onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
+ disabled={totalInspections === 0}
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ >
+ <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <FileDown className="w-3.5 h-3.5 text-red-600" />
+ </div>
+ <div className="text-left">
+ <span className="font-semibold block">Export PDF</span>
+ <span className="text-[10px] text-gray-400 font-normal">Laporan bulanan</span>
+ </div>
+ </button>
+ <button
+ onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
+ disabled={totalInspections === 0}
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ >
+ <div className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <Download className="w-3.5 h-3.5 text-green-600" />
+ </div>
+ <div className="text-left">
+ <span className="font-semibold block">Data Saya (CSV)</span>
+ <span className="text-[10px] text-gray-400 font-normal">Inspeksi bulan ini</span>
+ </div>
+ </button>
+ {isAdmin && (
+ <button
+ onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors"
+ >
+ <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <Users className="w-3.5 h-3.5 text-blue-600" />
+ </div>
+ <div className="text-left">
+ <span className="font-semibold block">Semua Pengguna</span>
+ <span className="text-[10px] text-gray-400 font-normal">Admin only</span>
+ </div>
+ </button>
+ )}
+ </div>
+ </motion.div>
+ )}
+ </AnimatePresence>
+ </div>
+ </div>
+
+ {/* Filter + Stats Section */}
+ <div className="mt-3 lg:mt-4">
+ {/* Building Filter */}
+ <div className="mb-3 lg:mb-4">
+ <div className="relative max-w-xs">
+ <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+ <select
+ value={selectedBuildingId}
+ onChange={(e) => setSelectedBuildingId(e.target.value)}
+ className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/15 text-white border border-white/20 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm transition-all"
+ disabled={buildingsLoading}
+ >
+ <option value="" className="text-gray-700">Semua Gedung</option>
+ {buildings?.filter(b => b.is_active).map((building) => (
+ <option key={building.id} value={building.id} className="text-gray-700">
+ {building.name}
+ </option>
+ ))}
+ </select>
+ <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60 pointer-events-none" />
+ </div>
+ </div>
+
+ {/* Stats Cards */}
+ <div className="grid grid-cols-3 gap-2 lg:gap-3">
+ {/* Total Inspections */}
+ <motion.div
+ className="bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 p-3"
+ whileHover={{ scale: 1.02, y: -2 }}
+ transition={{ duration: 0.2 }}
+ >
+ <div className="flex items-center gap-2 mb-2">
+ <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+ <FileText className="w-4 h-4 text-white" />
+ </div>
+ </div>
+ <div className="text-2xl lg:text-xl font-extrabold text-white">
+ {totalInspections}
+ </div>
+ <div className="text-[10px] text-white/70 font-medium mt-0.5">Inspeksi</div>
+ </motion.div>
+
+ {/* Average Score */}
+ <motion.div
+ className="bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 p-3"
+ whileHover={{ scale: 1.02, y: -2 }}
+ transition={{ duration: 0.2 }}
+ >
+ <div className="flex items-center gap-2 mb-2">
+ <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+ <TrendingUp className="w-4 h-4 text-white" />
+ </div>
+ </div>
+ <div className="text-2xl lg:text-xl font-extrabold text-white">
+ {averageScore}
+ </div>
+ <div className="text-[10px] text-white/70 font-medium mt-0.5">Rata-rata</div>
+ </motion.div>
+
+ {/* Active Days */}
+ <motion.div
+ className="bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 p-3"
+ whileHover={{ scale: 1.02, y: -2 }}
+ transition={{ duration: 0.2 }}
+ >
+ <div className="flex items-center gap-2 mb-2">
+ <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+ <BarChart3 className="w-4 h-4 text-white" />
+ </div>
+ </div>
+ <div className="text-2xl lg:text-xl font-extrabold text-white">
+ {activeDays}
+ </div>
+ <div className="text-[10px] text-white/70 font-medium mt-0.5">Hari Aktif</div>
+ </motion.div>
+ </div>
+ </div>
+ </div>
+ </header>
+
+ {/* Content */}
+ <div className="max-w-7xl mx-auto px-3 lg:px-6 pt-4 lg:pt-5 space-y-3 lg:space-y-4">
+ {/* Instructions Tip */}
+ <motion.div
+ initial={{ opacity: 0, y: 10 }}
+ animate={{ opacity: 1, y: 0 }}
+ transition={{ delay: 0.1, duration: 0.4 }}
+ className="bg-white/10 backdrop-blur-sm border border-white/15 lg:border-blue-200 rounded-2xl p-3 lg:p-3.5"
+ >
+ <div className="flex items-start gap-3">
+ <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+ <Info className="w-4 h-4 text-white" />
+ </div>
+ <div className="flex-1 min-w-0">
+ <p className="text-xs font-semibold text-white lg:text-blue-900 mb-0.5">
+ Ketuk tanggal untuk lihat inspeksi
+ </p>
+ <p className="text-[11px] text-white/70 leading-relaxed">
+ Titik berwarna menunjukkan skor rata-rata:{' '}
+ <span className="font-bold text-green-300 lg:text-green-700">Hijau</span> (sangat baik),{' '}
+ <span className="font-bold text-yellow-300 lg:text-yellow-700">Kuning</span> (baik),{' '}
+ <span className="font-bold text-red-300 lg:text-red-700">Merah</span> (perlu perbaikan)
+ </p>
+ </div>
+ </div>
+ </motion.div>
+
+ {/* Calendar */}
+ <motion.div
+ initial={{ opacity: 0, y: 15 }}
+ animate={{ opacity: 1, y: 0 }}
+ transition={{ delay: 0.2, duration: 0.4 }}
+ >
+ <CalendarView
+ currentDate={currentDate}
+ onDateChange={setCurrentDate}
+ dateInspections={monthlyData || []}
+ onDateClick={handleDateClick}
+ />
+ </motion.div>
+
+ {/* Empty State */}
+ {(!monthlyData || monthlyData.length === 0) && (
+ <motion.div
+ initial={{ opacity: 0, scale: 0.95 }}
+ animate={{ opacity: 1, scale: 1 }}
+ transition={{ delay: 0.3, duration: 0.4 }}
+ className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-8 text-center"
+ >
+ <div className="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
+ <span className="text-3xl">📅</span>
+ </div>
+ <h3 className="font-bold text-white mb-1.5">Belum ada inspeksi</h3>
+ <p className="text-white/60 text-sm">
+ Mulai inspeksi lokasi untuk melihatnya di sini
+ </p>
+ </motion.div>
+ )}
+ </div>
+
+ {/* Bottom Drawer */}
+ <InspectionDrawer
+ isOpen={!!selectedDate}
+ onClose={handleCloseDrawer}
+ inspections={dateInspections || []}
+ selectedDate={selectedDate || ''}
+ onInspectionClick={handleInspectionClick}
+ />
+
+ {/* Detail Modal */}
+ <InspectionDetailModal
+ isOpen={!!selectedInspection}
+ onClose={handleCloseDetail}
+ inspection={selectedInspection}
+ />
+
+ {/* Bottom Navigation - mobile only */}
+ <div className="lg:hidden">
+ <BottomNav />
+ </div>
+ </div>
+ );
 };
