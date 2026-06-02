@@ -73,7 +73,7 @@ export const AboutPage = () => {
  <p className="text-sm text-white/60 leading-relaxed mb-4">
  Sistem ini memungkinkan petugas kebersihan melakukan inspeksi dengan mudah melalui smartphone, supervisor dapat memantau kinerja tim secara real-time, dan manajemen fasilitas mendapatkan laporan komprehensif untuk pengambilan keputusan yang lebih baik.
  </p>
- <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+ <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
  <p className="text-sm text-blue-800 font-medium">
  <strong>Value Proposition:</strong> Sistem ini meningkatkan efisiensi inspeksi hingga 70%, mengurangi paperwork, dan memberikan data real-time untuk decision making yang lebih cepat dan akurat.
  </p>
@@ -360,7 +360,7 @@ export const AboutPage = () => {
  {/* Frontend Architecture */}
  <div>
  <h4 className="font-semibold text-white text-sm mb-2">Frontend Architecture</h4>
- <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+ <div className="bg-blue-500/10 border-l-4 border-blue-500 p-3 rounded">
  <ul className="text-xs text-white/80 space-y-1">
  <li><strong>Component-Based:</strong> 34+ reusable React components</li>
  <li><strong>Custom Hooks:</strong> 15 custom hooks untuk logic separation</li>
@@ -374,7 +374,7 @@ export const AboutPage = () => {
  {/* Backend Architecture */}
  <div>
  <h4 className="font-semibold text-white text-sm mb-2">Backend Architecture</h4>
- <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
+ <div className="bg-green-500/10 border-l-4 border-green-500 p-3 rounded">
  <ul className="text-xs text-white/80 space-y-1">
  <li><strong>Serverless API:</strong> Vercel Functions (Node.js runtime)</li>
  <li><strong>RESTful Endpoints:</strong> /api/inspections, /api/locations, /api/reports, /api/admin/*</li>
@@ -534,7 +534,7 @@ export const AboutPage = () => {
  <p className="font-semibold text-xs text-white mb-1">Admin</p>
  <p className="text-xs text-white/60">Manage organisasi sendiri, view semua inspeksi, kelola lokasi & user dalam org</p>
  </div>
- <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
+ <div className="bg-green-500/10 border-l-4 border-green-500 p-3 rounded">
  <p className="font-semibold text-xs text-white mb-1">User (Inspector)</p>
  <p className="text-xs text-white/60">Lakukan inspeksi, view history sendiri, update profile</p>
  </div>
