@@ -61,14 +61,16 @@ export const BottomNav = () => {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
-        <div className="flex items-center justify-around relative px-2 pt-2 pb-2">
+      {/* Telegram-style Floating Bottom Nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom pointer-events-none">
+        <div className="flex items-center justify-center relative px-6 pb-2">
+          <div className="flex items-center justify-around max-w-md w-[85%] bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-black/10 border border-gray-200/30 px-3 py-0.5 pointer-events-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path ||
                             (item.path !== '/' && location.pathname.startsWith(item.path));
 
-            // Center Floating Action Button (FAB) - Direct to Scanner
+            // Center Floating Action Button (FAB) - Telegram Style
             if (item.isCenter) {
               return (
                 <div key={item.id} className="flex-1 flex justify-center">
@@ -79,19 +81,19 @@ export const BottomNav = () => {
                     }}
                     className="
                       w-14 h-14
-                      bg-gradient-to-br from-blue-600 to-blue-400
-                      rounded-full
+                      bg-gradient-to-br from-blue-500 to-blue-600
+                      rounded-2xl
                       flex items-center justify-center
                       text-white
-                      shadow-lg shadow-blue-600/30
-                      -mt-6
+                      shadow-lg shadow-blue-500/30
                       transition-all duration-200
-                      active:scale-90
-                      hover:shadow-xl hover:shadow-blue-600/40
+                      active:scale-95
+                      hover:shadow-xl hover:shadow-blue-500/40
+                      hover:from-blue-600 hover:to-blue-700
                     "
                     aria-label={item.label}
                   >
-                    <Icon className="w-7 h-7" strokeWidth={2.5} />
+                    <Icon className="w-6 h-6" strokeWidth={2.5} />
                   </button>
                 </div>
               );
@@ -106,7 +108,7 @@ export const BottomNav = () => {
                 navigate(item.path);
               }}
               className={clsx(
-                'flex-1 flex flex-col items-center justify-center gap-1 py-2 px-2 rounded-xl transition-all duration-200',
+                'flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-xl transition-all duration-200',
                 isActive
                   ? 'text-blue-600'
                   : 'text-gray-500 hover:text-gray-700 active:scale-95'
@@ -134,8 +136,9 @@ export const BottomNav = () => {
             </button>
           );
         })}
-      </div>
-    </nav>
+          </div>
+        </div>
+      </nav>
 
       {/* Scanner Modal */}
       <ScanModal

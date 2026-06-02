@@ -36,7 +36,7 @@ export const AdminCard = ({
     <button
       onClick={() => navigate(path)}
       className="
-        relative w-full p-4 lg:p-3 bg-white rounded-2xl lg:rounded-xl shadow-sm border border-gray-100
+        relative w-full p-3.5 lg:p-3 bg-white rounded-2xl lg:rounded-xl shadow-sm border border-gray-100
         hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
         transition-all duration-200
         text-left group
@@ -44,38 +44,39 @@ export const AdminCard = ({
     >
       {/* Badge */}
       {badge && (
-        <div className="absolute top-3 right-3 px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">
+        <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full">
           {badge}
         </div>
       )}
 
       {/* Icon */}
       <div className={`
-        w-12 h-12 lg:w-9 lg:h-9 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue}
-        rounded-xl lg:rounded-lg flex items-center justify-center mb-3 lg:mb-2
+        w-10 h-10 lg:w-8 lg:h-8 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue}
+        rounded-xl lg:rounded-lg flex items-center justify-center mb-2 lg:mb-1.5
         group-hover:scale-110 transition-transform
       `}>
-        <Icon className="w-6 h-6 lg:w-4 lg:h-4" />
+        <Icon className="w-5 h-5 lg:w-4 lg:h-4" />
       </div>
 
       {/* Content */}
-      <div className="mb-2 lg:mb-1.5">
-        <h3 className="text-base lg:text-sm font-bold text-gray-900 leading-tight">{title}</h3>
-        <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+      <div className="mb-1.5 lg:mb-1">
+        <h3 className="text-sm lg:text-xs font-bold text-gray-900 leading-tight">{title}</h3>
+        <p className="text-[11px] lg:text-[10px] text-gray-500 mt-0.5 hidden lg:block">{description}</p>
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between">
         {count !== undefined && (
-          <div className="text-xl lg:text-lg font-bold text-gray-900">{count}</div>
+          <div className="text-lg lg:text-base font-bold text-gray-900">{count}</div>
         )}
         <div className={`
-          ml-auto flex items-center gap-1 text-xs font-medium
+          ml-auto flex items-center gap-0.5 text-[11px] font-medium
           ${colorClasses[color as keyof typeof colorClasses]?.split(' ')[1] || 'text-blue-600'}
-          group-hover:gap-2 transition-all
+          group-hover:gap-1.5 transition-all
         `}>
-          <span>Manage</span>
-          <ChevronRight className="w-3.5 h-3.5" />
+          <span className="hidden lg:inline">Manage</span>
+          <span className="lg:hidden text-xs">Manage</span>
+          <ChevronRight className="w-3 h-3" />
         </div>
       </div>
     </button>

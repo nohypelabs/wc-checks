@@ -12,6 +12,8 @@ interface DashboardStats {
   totalLocations: number;
   totalInspections: number;
   todayInspections: number;
+  inspections7d: number;
+  inspections30d: number;
   activeUsers: number;
   avgScore: number;
   userGrowth: number;
@@ -59,10 +61,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   try {
-    // Calculate dates
-    const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    // Calculate dates (UTC to match Supabase date storage)
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const yesterday = (() => { const d = new Date(now); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
+    const weekAgo = (() => { const d = new Date(now); d.setDate(d.getDate() - 7); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
+    const monthAgo = (() => { const d = new Date(now); d.setDate(d.getDate() - 30); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
+
+    console.log('[stats] Date filters:', { today, yesterday, weekAgo, monthAgo });
 
     // Parallel queries for better performance
     const [
@@ -71,6 +77,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       inspectionsCount,
       todayInspectionsCount,
       yesterdayInspectionsCount,
+      inspections7dCount,
+      inspections30dCount,
       activeUsersCount,
       recentInspections,
     ] = await Promise.all([
@@ -90,21 +98,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       supabase
         .from('inspection_records')
         .select('*', { count: 'exact', head: true })
-        .range(0, 999999), // Allow counting up to 1M records
+        .range(0, 999999),
 
       // Today's inspections
       supabase
         .from('inspection_records')
         .select('*', { count: 'exact', head: true })
         .eq('inspection_date', today)
-        .range(0, 999999), // Allow counting all records
+        .range(0, 999999),
 
       // Yesterday's inspections
       supabase
         .from('inspection_records')
         .select('*', { count: 'exact', head: true })
         .eq('inspection_date', yesterday)
-        .range(0, 999999), // Allow counting all records
+        .range(0, 999999),
+
+      // 7-day inspections
+      supabase
+        .from('inspection_records')
+        .select('*', { count: 'exact', head: true })
+        .gte('inspection_date', weekAgo)
+        .range(0, 999999),
+
+      // 30-day inspections
+      supabase
+        .from('inspection_records')
+        .select('*', { count: 'exact', head: true })
+        .gte('inspection_date', monthAgo)
+        .range(0, 999999),
 
       // Active users (logged in last 7 days)
       supabase
@@ -142,6 +164,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Calculate growth metrics
     const todayCount = todayInspectionsCount.count || 0;
     const yesterdayCount = yesterdayInspectionsCount.count || 0;
+
+    console.log('[stats] Query results:', {
+      totalInspections: inspectionsCount.count,
+      today: todayCount,
+      yesterday: yesterdayCount,
+      '7d': inspections7dCount.count,
+      '30d': inspections30dCount.count,
+      '7d_error': inspections7dCount.error?.message,
+      '30d_error': inspections30dCount.error?.message,
+    });
     const inspectionGrowth =
       yesterdayCount > 0
         ? Math.round(((todayCount - yesterdayCount) / yesterdayCount) * 100)
@@ -152,9 +184,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       totalLocations: locationsCount.count || 0,
       totalInspections: inspectionsCount.count || 0,
       todayInspections: todayCount,
+      inspections7d: inspections7dCount.count || 0,
+      inspections30d: inspections30dCount.count || 0,
       activeUsers: activeUsersCount.count || 0,
       avgScore,
-      userGrowth: 0, // Can be calculated with historical data
+      userGrowth: 0,
       inspectionGrowth,
     };
 

@@ -17,10 +17,9 @@ import {
   BarChart3,
   Calendar,
   Menu,
-  Shield
 } from 'lucide-react';
 import { AdminCard } from '../../components/admin/AdminCard';
-import { Card, CardHeader } from '../../components/ui/Card';
+import { Card } from '../../components/ui/Card';
 import { usePerformance } from '../../hooks/usePerformance';
 import { Sidebar } from '../../components/mobile/Sidebar';
 import { BottomNav } from '../../components/mobile/BottomNav';
@@ -48,7 +47,7 @@ export const AdminDashboard = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none">
+      <header className="bg-white/10 backdrop-blur-lg p-4 shadow-xl border-b border-white/20 lg:bg-white lg:shadow-sm lg:border-gray-200 lg:backdrop-blur-none lg:py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-white lg:text-gray-900">
           {/* Left Menu Button */}
           <button
@@ -59,13 +58,13 @@ export const AdminDashboard = () => {
           </button>
 
           {/* Desktop: Logo left */}
-          <div className="hidden lg:flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center p-1.5">
+          <div className="hidden lg:flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center p-1">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-base font-bold leading-tight text-gray-900">Proservice Indonesia</h1>
-              <p className="text-xs text-gray-500">Aplikasi Toilet Ceklis Real Time</p>
+              <h1 className="text-sm font-bold leading-tight text-gray-900">Proservice Indonesia</h1>
+              <p className="text-[11px] text-gray-500">Aplikasi Toilet Ceklis Real Time</p>
             </div>
           </div>
 
@@ -81,15 +80,15 @@ export const AdminDashboard = () => {
           </div>
 
           {/* Right: Welcome + Settings */}
-          <div className="flex items-center gap-3">
-            <span className="hidden lg:inline text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <span className="hidden lg:inline text-xs text-gray-600">
               Selamat datang, {isAdmin ? 'Admin' : 'User'} <span className="font-semibold text-gray-900">{profile?.full_name?.split(' ')[0] || ''}</span>
             </span>
             <button
               onClick={() => navigate('/profile')}
-              className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors"
+              className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -103,16 +102,16 @@ export const AdminDashboard = () => {
       </header>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 pt-4 lg:pt-6">
-        {/* Quick Stats - 4 columns on desktop */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-4 lg:mb-6">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-4 lg:pt-4">
+        {/* Quick Stats - Inspection counts by period */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-3 mb-4 lg:mb-4">
           <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-blue-100 rounded-lg lg:rounded-lg flex items-center justify-center">
-                <Activity className="w-4 h-4 lg:w-4 lg:h-4 text-blue-600" />
+            <div className="flex items-center justify-between mb-1">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Activity className="w-4 h-4 text-blue-600" />
               </div>
               {stats && stats.inspectionGrowth !== 0 && (
-                <div className={`flex items-center gap-1 text-xs font-medium ${
+                <div className={`flex items-center gap-0.5 text-xs font-medium ${
                   stats.inspectionGrowth > 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
                   {stats.inspectionGrowth > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -120,48 +119,48 @@ export const AdminDashboard = () => {
                 </div>
               )}
             </div>
-            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.todayInspections || 0}</div>
-            <div className="text-xs text-gray-500">Today's Inspections</div>
+            <div className="text-2xl lg:text-lg font-bold text-gray-900">{stats?.todayInspections || 0}</div>
+            <div className="text-xs text-gray-500">Inspeksi Hari Ini</div>
           </Card>
 
           <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 text-green-600" />
+            <div className="flex items-center justify-between mb-1">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-green-600" />
               </div>
             </div>
-            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.avgScore || 0}</div>
-            <div className="text-xs text-gray-500">Average Score</div>
+            <div className="text-2xl lg:text-lg font-bold text-gray-900">{stats?.inspections7d || 0}</div>
+            <div className="text-xs text-gray-500">Inspeksi 7 Hari</div>
           </Card>
 
           <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Users className="w-4 h-4 text-purple-600" />
+            <div className="flex items-center justify-between mb-1">
+              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-purple-600" />
               </div>
             </div>
-            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.totalUsers || 0}</div>
-            <div className="text-xs text-gray-500">Total Users</div>
+            <div className="text-2xl lg:text-lg font-bold text-gray-900">{stats?.inspections30d || 0}</div>
+            <div className="text-xs text-gray-500">Inspeksi 30 Hari</div>
           </Card>
 
           <Card className="p-4 lg:p-3 bg-white shadow-xl border-0 lg:shadow-sm">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-9 h-9 lg:w-8 lg:h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Activity className="w-4 h-4 text-orange-600" />
+            <div className="flex items-center justify-between mb-1">
+              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-orange-600" />
               </div>
             </div>
-            <div className="text-2xl lg:text-xl font-bold text-gray-900">{stats?.activeUsers || 0}</div>
-            <div className="text-xs text-gray-500">Active Users (7d)</div>
+            <div className="text-2xl lg:text-lg font-bold text-gray-900">{stats?.totalInspections || 0}</div>
+            <div className="text-xs text-gray-500">Total Inspeksi</div>
           </Card>
         </div>
 
         {/* Two column layout on desktop: Management | Overview */}
-        <div className={`lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start ${isAdmin ? '' : ''}`}>
+        <div className="lg:grid lg:grid-cols-3 lg:gap-4 lg:items-end">
           {/* Management Cards - Admin Only */}
           {isAdmin && (
             <div className="mb-4 lg:mb-0 lg:col-span-2">
-              <h2 className="text-lg font-bold text-white lg:text-gray-800 mb-3">Management</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-3">
+              <h2 className="text-lg font-bold text-white lg:text-gray-800 lg:mb-2 mb-3">Management</h2>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-2">
                 <AdminCard
                   icon={Users}
                   title="User Management"
@@ -213,25 +212,25 @@ export const AdminDashboard = () => {
 
           {/* System Overview */}
           <div className={isAdmin ? 'lg:col-span-1' : 'lg:col-span-3 lg:max-w-md lg:mx-auto'}>
-            <Card className="bg-white shadow-xl border-0 lg:shadow-sm" padding="none">
-              <div className="p-4 lg:p-3 border-b border-gray-100">
+            <Card className="bg-white shadow-xl border-0 lg:shadow-sm lg:h-full" padding="none">
+              <div className="px-4 py-3 lg:px-3 lg:py-2.5 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-blue-600" />
                   <h3 className="font-semibold text-gray-900 text-sm">System Overview</h3>
                 </div>
               </div>
-              <div className="divide-y divide-gray-50 lg:divide-y-0 lg:divide-x lg:divide-gray-100 lg:flex">
-                <div className="flex items-center justify-between p-3 lg:flex-1 lg:flex-col lg:gap-1 lg:py-3">
+              <div className="divide-y divide-gray-50 lg:divide-y-0 lg:divide-x lg:divide-gray-100 lg:flex lg:flex-col">
+                <div className="flex items-center justify-between px-4 py-3 lg:px-3 lg:py-2.5">
                   <span className="text-xs text-gray-500">Total Inspections</span>
-                  <span className="text-lg font-bold text-gray-900">{stats?.totalInspections || 0}</span>
+                  <span className="text-sm font-bold text-gray-900">{stats?.totalInspections || 0}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 lg:flex-1 lg:flex-col lg:gap-1 lg:py-3">
+                <div className="flex items-center justify-between px-4 py-3 lg:px-3 lg:py-2.5">
                   <span className="text-xs text-gray-500">Active Locations</span>
-                  <span className="text-lg font-bold text-gray-900">{stats?.totalLocations || 0}</span>
+                  <span className="text-sm font-bold text-gray-900">{stats?.totalLocations || 0}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 lg:flex-1 lg:flex-col lg:gap-1 lg:py-3">
+                <div className="flex items-center justify-between px-4 py-3 lg:px-3 lg:py-2.5">
                   <span className="text-xs text-gray-500">Today's Activity</span>
-                  <span className="text-lg font-bold text-gray-900">{stats?.todayInspections || 0}</span>
+                  <span className="text-sm font-bold text-gray-900">{stats?.todayInspections || 0}</span>
                 </div>
               </div>
             </Card>

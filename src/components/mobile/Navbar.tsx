@@ -24,15 +24,17 @@ export const Navbar = ({ onScanClick, showScanButton = true }: NavbarProps) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 safe-area-top">
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-            <span className="text-white text-xl font-bold">🚽</span>
+      <div className="flex items-center justify-between p-4 relative">
+        {/* Logo & Title - Centered */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center space-x-2">
+          <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
+            <span className="text-white text-lg font-bold">🚽</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">ToiletCheck</h1>
+          <h1 className="text-lg font-bold text-gray-900">ProService</h1>
         </div>
-        
-        <div className="flex items-center space-x-3">
+
+        {/* Right Actions */}
+        <div className="flex items-center space-x-3 ml-auto">
           {showScanButton && onScanClick && (
             <button 
               onClick={onScanClick}
