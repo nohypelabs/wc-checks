@@ -93,16 +93,21 @@ export function LoginPage() {
  };
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+ {/* Background Decorations */}
+ <div className="absolute top-0 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+ <div className="absolute bottom-0 right-0 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+ <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
  {/* Login Container */}
- <div className="w-full max-w-md">
+ <div className="w-full max-w-md relative z-10">
  {/* Logo/Header */}
  <div className="text-center mb-8">
  <div className="inline-flex items-center justify-center mb-4">
+ <div className="p-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/15 shadow-lg shadow-blue-500/10">
  <img
  src="/logo.png"
  alt="Proservice Indonesia Logo"
- className="h-20 w-auto"
+ className="h-28 w-auto"
  onError={(e) => {
  // If logo fails, hide and show text fallback
  const img = e.target as HTMLImageElement;
@@ -113,6 +118,7 @@ export function LoginPage() {
  />
  <div className="hidden w-16 h-16 bg-blue-600 rounded-2xl shadow-lg flex items-center justify-center">
  <span className="text-3xl">🚽</span>
+ </div>
  </div>
  </div>
  <h1 className="text-3xl font-bold text-white mb-2">
@@ -225,9 +231,9 @@ export function LoginPage() {
  <button
  type="submit"
  disabled={isLoading}
- className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+ className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
  style={{
- boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
+ boxShadow: '0 4px 14px 0 rgba(14, 165, 233, 0.39)',
  }}
  >
  {isLoading ? (
