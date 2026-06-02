@@ -45,8 +45,23 @@ export const ReportsPage = () => {
  document.addEventListener('mousedown', handleClickOutside);
  return () => document.removeEventListener('mousedown', handleClickOutside);
  }, []);
+ useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+   if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+    setExportMenuOpen(false);
+   }
+   if (buildingDropdownRef.current && !buildingDropdownRef.current.contains(e.target as Node)) {
+    setBuildingDropdownOpen(false);
+   }
+  };
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+ }, []);
+
 
  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
+const [buildingDropdownOpen, setBuildingDropdownOpen] = useState(false);
+const buildingDropdownRef = useRef<HTMLDivElement>(null);
 
  const { data: buildings, isLoading: buildingsLoading } = useBuildings({
  enabled: true,
@@ -402,25 +417,55 @@ export const ReportsPage = () => {
  <div className="mt-3 lg:mt-4">
  {/* Building Filter */}
  <div className="mb-3 lg:mb-4">
- <div className="relative max-w-xs">
- <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
- <select
- value={selectedBuildingId}
- onChange={(e) => setSelectedBuildingId(e.target.value)}
- className="w-full pl-9 pr-8 py-2.5 text-sm font-semibold bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 appearance-none cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20 placeholder-white/60"
+ <div className="relative max-w-xs" ref={buildingDropdownRef}>
+ <button
+ onClick={() => setBuildingDropdownOpen(prev => !prev)}
  disabled={buildingsLoading}
+ className="w-full flex items-center gap-2 pl-9 pr-8 py-2.5 text-sm font-semibold bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20"
  >
- <option value="" className="text-white bg-slate-800">Semua Gedung</option>
+ <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
+ <span className="flex-1 text-left truncate">
+ {buildings?.find(b => b.id === selectedBuildingId)?.name || 'Semua Gedung'}
+ </span>
+ <ChevronDown className={`w-3.5 h-3.5 text-blue-400 transition-transform duration-200 ${buildingDropdownOpen ? 'rotate-180' : ''}`} />
+ </button>
+ <AnimatePresence>
+ {buildingDropdownOpen && (
+ <motion.div
+ initial={{ opacity: 0, y: -8, scale: 0.95 }}
+ animate={{ opacity: 1, y: 0, scale: 1 }}
+ exit={{ opacity: 0, y: -8, scale: 0.95 }}
+ transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+ className="absolute left-0 right-0 top-full mt-2 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50 max-h-60 overflow-y-auto"
+ >
+ <div className="p-1.5">
+ <button
+ onClick={() => { setSelectedBuildingId(''); setBuildingDropdownOpen(false); }}
+ className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
+ selectedBuildingId === '' ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
+ }`}
+ >
+ <Building2 className="w-4 h-4 flex-shrink-0" />
+ <span className="font-medium">Semua Gedung</span>
+ </button>
  {buildings?.filter(b => b.is_active).map((building) => (
- <option key={building.id} value={building.id} className="text-white bg-slate-800">
- {building.name}
- </option>
+ <button
+ key={building.id}
+ onClick={() => { setSelectedBuildingId(building.id); setBuildingDropdownOpen(false); }}
+ className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
+ selectedBuildingId === building.id ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
+ }`}
+ >
+ <Building2 className="w-4 h-4 flex-shrink-0" />
+ <span className="font-medium truncate">{building.name}</span>
+ </button>
  ))}
- </select>
- <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
+ </div>
+ </motion.div>
+ )}
+ </AnimatePresence>
  </div>
  </div>
-
  {/* Stats Cards */}
  <div className="grid grid-cols-3 gap-2 lg:gap-3">
  {/* Total Inspections */}
