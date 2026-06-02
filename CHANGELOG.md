@@ -2,6 +2,28 @@
 
 All notable changes to WC-Checks will be documented in this file.
 
+## [4.0.3] - 2026-06-03
+
+### 📊 Dashboard - Inspection Trend Chart
+
+#### New Feature
+- **Crypto-style area chart**: 30-day inspection trend displayed at the top of the dashboard, above stat cards
+- **Smooth area chart** via `recharts` with gradient fill — looks like a crypto portfolio chart
+- **Smart color coding**: Green (growth ↑), Red (decline ↓), Blue (neutral)
+- **Glass morphism card**: `bg-white/8 backdrop-blur-xl` wrapper matching dashboard theme
+- **Custom tooltip**: Shows inspection count + full Indonesian date on hover
+- **Trend badge**: Percentage change indicator with matching color
+
+#### Backend
+- **`/api/stats`**: Added `dailyTrend` field — array of `{ date, count }` for last 30 days
+- **New Supabase query**: Groups inspection records by date, fills gaps with zero counts
+- **`useAdminStats` hook**: Updated types to include `dailyTrend`
+
+#### Dependencies
+- Added `recharts` v3.8.1
+
+---
+
 ## [4.0.2] - 2026-06-03
 
 ### ✨ InspectionDetailModal - Glassmorphism & Icon Cleanup
