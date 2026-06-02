@@ -225,17 +225,21 @@ export const AdminDashboard = () => {
 
  {/* Footer */}
  <footer className="mt-6 lg:mt-8 mb-2 border-t border-white/8 pt-4 pb-2">
- <div className="flex items-center justify-between">
- <p className="text-[11px] text-white/30">
- © {new Date().getFullYear()} Proservice Indonesia
+ <div className="flex flex-col items-center gap-1.5">
+ <div className="flex items-center gap-2">
+ <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+ <p className="text-[11px] text-white/40 font-medium tracking-wide">
+ Toilet Inspection System
  </p>
- <p className="text-[11px] text-white/30">
- Developed by{' '}
+ <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+ </div>
+ <p className="text-[10px] text-white/25">
+ © {new Date().getFullYear()} Proservice Indonesia · Crafted by{' '}
  <a
  href="https://nohypelabs.vercel.app"
  target="_blank"
  rel="noopener noreferrer"
- className="text-white/50 hover:text-blue-300 transition-colors font-medium"
+ className="text-emerald-500/60 hover:text-emerald-400 transition-colors font-semibold"
  >
  NoHypeLabs
  </a>
