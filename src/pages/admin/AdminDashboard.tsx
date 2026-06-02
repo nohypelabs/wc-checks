@@ -47,7 +47,7 @@ export const AdminDashboard = () => {
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Header - Compact */}
- <header className="bg-white/8 backdrop-blur-xl px-3 py-2.5 shadow-xl border-b border-white/10 lg:py-3 lg:px-4">
+ <header className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
  <div className="max-w-7xl mx-auto flex items-center justify-between text-white">
  {/* Left Menu Button */}
  <button
