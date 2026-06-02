@@ -64,7 +64,7 @@ export const BottomNav = () => {
  {/* Telegram-style Floating Bottom Nav */}
  <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom pointer-events-none">
  <div className="flex items-center justify-center relative px-6 pb-2">
- <div className="flex items-center justify-around max-w-md w-[85%] bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-black/10 border border-white/15/30 px-3 py-0.5 pointer-events-auto">
+ <div className="flex items-center justify-around max-w-md w-[85%] bg-slate-800/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-black/10 border border-white/15/30 px-3 py-0.5 pointer-events-auto">
  {navItems.map((item) => {
  const Icon = item.icon;
  const isActive = location.pathname === item.path ||
@@ -165,7 +165,7 @@ export const BottomNavMinimal = () => {
  ];
 
  return (
- <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-white/15 z-50 safe-area-bottom">
+ <nav className="fixed bottom-0 left-0 right-0 bg-slate-800/90 backdrop-blur-xl border-t border-white/10 z-50 safe-area-bottom">
  <div className="flex items-center justify-around py-1">
  {minimalItems.map((item, index) => {
  const Icon = item.icon;
@@ -211,7 +211,7 @@ export const BottomNavLivin = () => {
  ];
 
  return (
- <nav className="fixed bottom-0 left-0 right-0 bg-white z-50 safe-area-bottom">
+ <nav className="fixed bottom-0 left-0 right-0 bg-slate-800/90 backdrop-blur-xl z-50 safe-area-bottom">
  <div className="flex items-center justify-around relative h-16 px-2">
  {livinItems.map((item, index) => {
  const Icon = item.icon;

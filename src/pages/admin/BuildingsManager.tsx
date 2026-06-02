@@ -292,7 +292,7 @@ export const BuildingsManager = () => {
  {filteredBuildings?.length === 0 ? (
  <Card>
  <div className="text-center py-8 text-white/50">
- <Building2 className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+ <Building2 className="w-12 h-12 mx-auto mb-2 text-white/30" />
  <p>Tidak ada gedung ditemukan</p>
  </div>
  </Card>

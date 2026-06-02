@@ -260,7 +260,7 @@ export const OrganizationsManager = () => {
  {filteredOrgs?.length === 0 ? (
  <Card>
  <div className="text-center py-8 text-white/50">
- <Building2 className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+ <Building2 className="w-12 h-12 mx-auto mb-2 text-white/30" />
  <p>Tidak ada organisasi ditemukan</p>
  </div>
  </Card>
@@ -318,7 +318,7 @@ export const OrganizationsManager = () => {
  className="fixed inset-0 z-10"
  onClick={() => setOpenMenuId(null)}
  />
- <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-2xl border border-white/15 py-2 min-w-[160px]">
+ <div className="absolute right-0 top-12 z-20 bg-slate-800/90 backdrop-blur-xl rounded-xl shadow-2xl border border-white/15 py-2 min-w-[160px]">
  <button
  onClick={() => handleEdit(org)}
  className="w-full px-4 py-2 text-left hover:bg-white/8 flex items-center gap-2 text-white/70"

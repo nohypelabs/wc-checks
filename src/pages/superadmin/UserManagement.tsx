@@ -239,7 +239,7 @@ export const UserManagement = () => {
  filteredUsers.map((user) => (
  <div
  key={user.id}
- className="bg-white rounded-2xl shadow-sm border border-white/10 p-4"
+ className="bg-white/8 rounded-2xl shadow-sm border border-white/10 backdrop-blur-sm p-4"
  >
  {/* User Info */}
  <div className="flex items-start justify-between mb-3">
@@ -314,7 +314,7 @@ export const UserManagement = () => {
  ))
  ) : (
  <div className="text-center py-12">
- <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+ <Users className="w-12 h-12 text-white/30 mx-auto mb-3" />
  <p className="text-white/60 font-medium">No users found</p>
  <p className="text-white/50 text-sm mt-1">
  Try adjusting your search or filters

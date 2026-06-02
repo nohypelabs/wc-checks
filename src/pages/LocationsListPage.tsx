@@ -187,7 +187,7 @@ export const LocationsListPage = () => {
  placeholder="Cari lokasi..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-9 pr-4 py-2 text-xs bg-white/8 text-white placeholder-white/50 lg:placeholder-gray-400 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent backdrop-blur-sm transition-all"
+ className="w-full pl-9 pr-4 py-2 text-xs bg-white/8 text-white placeholder-white/50 lg:placeholder-white/40 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent backdrop-blur-sm transition-all"
  />
  </div>
 
@@ -195,7 +195,7 @@ export const LocationsListPage = () => {
  {!isLoading && filteredLocations.length > 0 && (
  <div className="flex items-center gap-3 text-[10px] lg:text-xs text-white/60 font-medium">
  <span>{filteredLocations.length} lokasi</span>
- <span className="w-1 h-1 rounded-full bg-white/30 lg:bg-gray-300" />
+ <span className="w-1 h-1 rounded-full bg-white/30 lg:bg-white/30" />
  <span>{buildingCount} gedung</span>
  </div>
  )}
@@ -296,13 +296,13 @@ export const LocationsListPage = () => {
  )}
  {location.code && (
  <>
- {location.floor && <span className="text-white/20 lg:text-gray-300 text-[10px]">•</span>}
+ {location.floor && <span className="text-white/20 lg:text-white/30 text-[10px]">•</span>}
  <span className="text-[10px] text-white/40 font-mono">{location.code}</span>
  </>
  )}
  </div>
  </div>
- <ChevronRight className="w-3.5 h-3.5 text-white/30 lg:text-gray-300 flex-shrink-0 group-hover:text-white/60 lg:group-hover:text-white/50 transition-colors" />
+ <ChevronRight className="w-3.5 h-3.5 text-white/30 lg:text-white/30 flex-shrink-0 group-hover:text-white/60 lg:group-hover:text-white/50 transition-colors" />
  </motion.button>
  ))}
  </div>
