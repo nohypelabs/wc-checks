@@ -348,46 +348,46 @@ export const ReportsPage = () => {
  animate={{ opacity: 1, y: 0, scale: 1 }}
  exit={{ opacity: 0, y: -8, scale: 0.95 }}
  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
- className="absolute right-0 top-full mt-2 w-52 bg-white/8 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-50"
+ className="absolute right-0 top-full mt-2 w-52 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50"
  >
  <div className="p-1.5">
  <button
  onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
  disabled={totalInspections === 0}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/80 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
  >
- <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
- <FileDown className="w-3.5 h-3.5 text-red-300" />
+ <div className="w-7 h-7 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <FileDown className="w-3.5 h-3.5 text-red-400" />
  </div>
  <div className="text-left">
  <span className="font-semibold block">Export PDF</span>
- <span className="text-[10px] text-white/40 font-normal">Laporan bulanan</span>
+ <span className="text-[10px] text-white/60 font-normal">Laporan bulanan</span>
  </div>
  </button>
  <button
  onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
  disabled={totalInspections === 0}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/80 hover:bg-green-50 hover:text-green-300 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
  >
- <div className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
- <Download className="w-3.5 h-3.5 text-green-300" />
+ <div className="w-7 h-7 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <Download className="w-3.5 h-3.5 text-green-400" />
  </div>
  <div className="text-left">
  <span className="font-semibold block">Data Saya (CSV)</span>
- <span className="text-[10px] text-white/40 font-normal">Inspeksi bulan ini</span>
+ <span className="text-[10px] text-white/60 font-normal">Inspeksi bulan ini</span>
  </div>
  </button>
  {isAdmin && (
  <button
  onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/80 hover:bg-blue-50 hover:text-blue-300 rounded-xl transition-colors"
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors"
  >
- <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
- <Users className="w-3.5 h-3.5 text-blue-300" />
+ <div className="w-7 h-7 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <Users className="w-3.5 h-3.5 text-blue-400" />
  </div>
  <div className="text-left">
  <span className="font-semibold block">Semua Pengguna</span>
- <span className="text-[10px] text-white/40 font-normal">Admin only</span>
+ <span className="text-[10px] text-white/60 font-normal">Admin only</span>
  </div>
  </button>
  )}
