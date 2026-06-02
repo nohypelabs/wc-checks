@@ -627,15 +627,16 @@ const handleSubmit = async () => {
  genZMode ? 'bg-white/10' : 'bg-white/10'
  } rounded-2xl p-4 shadow-sm border border-white/10`}
  >
- <label className="flex items-center justify-between mb-3">
- <span className="font-semibold text-white">
- <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-yellow-500" /> Ada masalah yang ditemukan?</div>
+ <label className="flex items-center justify-between">
+ <span className="font-semibold text-white flex items-center gap-2">
+ <AlertTriangle className="w-4 h-4 text-yellow-500" />
+ Ada masalah yang ditemukan?
  </span>
  <input
  type="checkbox"
  checked={issuesFound}
  onChange={(e) => setIssuesFound(e.target.checked)}
- className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+ className="w-5 h-5 accent-blue-500 bg-white/10 border-white/20 rounded focus:ring-blue-500 cursor-pointer"
  />
  </label>
 
@@ -656,7 +657,7 @@ const handleSubmit = async () => {
  genZMode ? 'bg-white/10' : 'bg-white/10'
  } rounded-2xl p-4 shadow-sm border border-white/10`}
  >
- <label className="flex items-center justify-between mb-3">
+ <label className="flex items-center justify-between">
  <span className="font-semibold text-white">
  Perlu maintenance?
  </span>
@@ -664,7 +665,7 @@ const handleSubmit = async () => {
  type="checkbox"
  checked={requiresMaintenance}
  onChange={(e) => setRequiresMaintenance(e.target.checked)}
- className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+ className="w-5 h-5 accent-blue-500 bg-white/10 border-white/20 rounded focus:ring-blue-500 cursor-pointer"
  />
  </label>
 
