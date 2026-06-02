@@ -205,7 +205,7 @@ export const AdminDashboard = () => {
 
  {/* System Overview */}
  <div className={isAdmin ? 'lg:col-span-1' : 'lg:col-span-3 lg:max-w-md lg:mx-auto'}>
- <Card className="bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5 lg:h-full" padding="none">
+ <Card className="bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5 lg:h-[90%] lg:self-end" padding="none">
  <div className="px-3 py-2 lg:px-4 lg:py-3 border-b border-white/10">
  <div className="flex items-center gap-1.5 lg:gap-2">
  <Activity className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-white" />
