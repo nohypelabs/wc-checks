@@ -564,6 +564,7 @@ export type Database = {
           is_active: boolean | null
           last_login_at: string | null
           occupation_id: string | null
+          organization_id: string | null
           password_hash: string | null
           phone: string | null
           profile_photo_url: string | null
@@ -577,6 +578,7 @@ export type Database = {
           is_active?: boolean | null
           last_login_at?: string | null
           occupation_id?: string | null
+          organization_id?: string | null
           password_hash?: string | null
           phone?: string | null
           profile_photo_url?: string | null
@@ -590,6 +592,7 @@ export type Database = {
           is_active?: boolean | null
           last_login_at?: string | null
           occupation_id?: string | null
+          organization_id?: string | null
           password_hash?: string | null
           phone?: string | null
           profile_photo_url?: string | null
@@ -601,6 +604,13 @@ export type Database = {
             columns: ["occupation_id"]
             isOneToOne: false
             referencedRelation: "user_occupations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "users_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]

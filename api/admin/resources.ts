@@ -36,6 +36,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const isSuperAdmin = auth.userRole.level >= 100;
+    const orgId = auth.organizationId;
+
     // GET - List all or get specific
     if (req.method === 'GET') {
       if (resourceId) {
@@ -64,18 +67,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         query = (supabase as any).from(resourceType).select('*, buildings(name, organization_id)').order('created_at', { ascending: false });
       }
 
-      // Apply filters
-      if (resourceType === 'buildings' && req.query.organization_id) {
-        const orgId = Array.isArray(req.query.organization_id) ? req.query.organization_id[0] : req.query.organization_id;
-        query = query.eq('organization_id', orgId);
+      // Org scoping: non-superadmin only sees their own org's resources
+      if (!isSuperAdmin && orgId) {
+        if (resourceType === 'organizations') {
+          query = query.eq('id', orgId);
+        } else {
+          query = query.eq('organization_id', orgId);
+        }
+      }
+
+      // Apply additional filters (only if not already org-scoped)
+      if (resourceType === 'buildings' && req.query.organization_id && isSuperAdmin) {
+        const filterOrgId = Array.isArray(req.query.organization_id) ? req.query.organization_id[0] : req.query.organization_id;
+        query = query.eq('organization_id', filterOrgId);
       } else if (resourceType === 'locations') {
         if (req.query.building_id) {
           const buildingId = Array.isArray(req.query.building_id) ? req.query.building_id[0] : req.query.building_id;
           query = query.eq('building_id', buildingId);
         }
-        if (req.query.organization_id) {
-          const orgId = Array.isArray(req.query.organization_id) ? req.query.organization_id[0] : req.query.organization_id;
-          query = query.eq('organization_id', orgId);
+        if (req.query.organization_id && isSuperAdmin) {
+          const filterOrgId = Array.isArray(req.query.organization_id) ? req.query.organization_id[0] : req.query.organization_id;
+          query = query.eq('organization_id', filterOrgId);
         }
       }
 

@@ -53,7 +53,7 @@ export function useAuth(): UseAuthReturn {
 
       const { data, error: profileError } = await supabase
         .from('users')
-        .select('id, email, full_name, is_active, occupation_id')
+        .select('id, email, full_name, is_active, occupation_id, organization_id, created_at, updated_at, phone, last_login_at, profile_photo_url')
         .eq('id', userId)
         .eq('is_active', true)
         .maybeSingle();

@@ -65,11 +65,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[admin/users] ✅ Auth validated:', { userId: auth.userId, level: auth.userRole.level });
 
     try {
-      // Fetch all users
-      const { data: users, error: usersError } = await supabase
+      // Org scoping: non-superadmin only sees their org's users
+      const isSuperAdmin = auth.userRole.level >= 100;
+      let usersQuery = supabase
         .from('users')
-        .select('id, email, full_name, phone, is_active, created_at, last_login_at')
+        .select('id, email, full_name, phone, is_active, organization_id, created_at, last_login_at')
         .order('created_at', { ascending: false });
+
+      if (!isSuperAdmin && auth.organizationId) {
+        usersQuery = usersQuery.eq('organization_id', auth.organizationId);
+      }
+
+      // Fetch all users
+      const { data: users, error: usersError } = await usersQuery;
 
       if (usersError) throw usersError;
 

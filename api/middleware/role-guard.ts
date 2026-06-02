@@ -33,6 +33,7 @@ export const supabase = supabaseClient;
 
 export interface AuthContext {
   userId: string;
+  organizationId: string | null;
   userRole: {
     id: string;
     name: string;
@@ -97,6 +98,7 @@ export async function validateAuth(
         id,
         email,
         is_active,
+        organization_id,
         user_roles!user_roles_user_id_fkey (
           role_id,
           roles!user_roles_role_id_fkey (
@@ -143,6 +145,7 @@ export async function validateAuth(
 
     return {
       userId: userData.id,
+      organizationId: userData.organization_id || null,
       userRole: {
         id: roleId,
         name: roleName,

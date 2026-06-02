@@ -75,6 +75,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const trendDays = Math.min(Math.max(Number(req.query.days) || 30, 1), 365);
     const trendStartDate = (() => { const d = new Date(now); d.setDate(d.getDate() - trendDays); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
 
+    // Determine org scope (super admins see all, others see their org only)
+    const isSuperAdmin = auth.userRole.level >= 100;
+    const orgId = auth.organizationId;
+
+    // For non-superadmin: get location IDs for the org to filter inspections
+    let orgLocationIds: string[] = [];
+    if (!isSuperAdmin && orgId) {
+      const { data: orgLocations } = await supabase
+        .from('locations')
+        .select('id')
+        .eq('organization_id', orgId)
+        .eq('is_active', true);
+      orgLocationIds = (orgLocations || []).map((l: any) => l.id);
+    }
+
+    // Helper: add org filter to inspection queries
+    const scopeInspectionQuery = (query: any) => {
+      if (!isSuperAdmin && orgLocationIds.length > 0) {
+        return query.in('location_id', orgLocationIds);
+      }
+      return query;
+    };
+
+    // Helper: add org filter to user queries
+    const scopeUserQuery = (query: any) => {
+      if (!isSuperAdmin && orgId) {
+        return query.eq('organization_id', orgId);
+      }
+      return query;
+    };
+
+    // Helper: add org filter to location queries
+    const scopeLocationQuery = (query: any) => {
+      if (!isSuperAdmin && orgId) {
+        return query.eq('organization_id', orgId);
+      }
+      return query;
+    };
+
     // Parallel queries for better performance
     const [
       usersCount,
@@ -88,72 +127,92 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       recentInspections,
       dailyTrendData,
     ] = await Promise.all([
-      // Total active users
-      supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true),
+      // Total active users (org-scoped)
+      scopeUserQuery(
+        supabase
+          .from('users')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true)
+      ),
 
-      // Total active locations
-      supabase
-        .from('locations')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true),
+      // Total active locations (org-scoped)
+      scopeLocationQuery(
+        supabase
+          .from('locations')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true)
+      ),
 
-      // Total inspections (bypass 1000 row limit with range)
-      supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .range(0, 999999),
+      // Total inspections (org-scoped)
+      scopeInspectionQuery(
+        supabase
+          .from('inspection_records')
+          .select('*', { count: 'exact', head: true })
+          .range(0, 999999)
+      ),
 
-      // Today's inspections
-      supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('inspection_date', today)
-        .range(0, 999999),
+      // Today's inspections (org-scoped)
+      scopeInspectionQuery(
+        supabase
+          .from('inspection_records')
+          .select('*', { count: 'exact', head: true })
+          .eq('inspection_date', today)
+          .range(0, 999999)
+      ),
 
-      // Yesterday's inspections
-      supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('inspection_date', yesterday)
-        .range(0, 999999),
+      // Yesterday's inspections (org-scoped)
+      scopeInspectionQuery(
+        supabase
+          .from('inspection_records')
+          .select('*', { count: 'exact', head: true })
+          .eq('inspection_date', yesterday)
+          .range(0, 999999)
+      ),
 
-      // 7-day inspections
-      supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .gte('inspection_date', weekAgo)
-        .range(0, 999999),
+      // 7-day inspections (org-scoped)
+      scopeInspectionQuery(
+        supabase
+          .from('inspection_records')
+          .select('*', { count: 'exact', head: true })
+          .gte('inspection_date', weekAgo)
+          .range(0, 999999)
+      ),
 
-      // 30-day inspections
-      supabase
-        .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .gte('inspection_date', monthAgo)
-        .range(0, 999999),
+      // 30-day inspections (org-scoped)
+      scopeInspectionQuery(
+        supabase
+          .from('inspection_records')
+          .select('*', { count: 'exact', head: true })
+          .gte('inspection_date', monthAgo)
+          .range(0, 999999)
+      ),
 
-      // Active users (logged in last 7 days)
-      supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .gte('last_login_at', weekAgo)
-        .eq('is_active', true),
+      // Active users (org-scoped, logged in last 7 days)
+      scopeUserQuery(
+        supabase
+          .from('users')
+          .select('*', { count: 'exact', head: true })
+          .gte('last_login_at', weekAgo)
+          .eq('is_active', true)
+      ),
 
-      // Recent inspections for score calculation
-      supabase
-        .from('inspection_records')
-        .select('responses')
-        .limit(100),
+      // Recent inspections for score calculation (org-scoped)
+      scopeInspectionQuery(
+        supabase
+          .from('inspection_records')
+          .select('responses')
+          .limit(100)
+      ),
 
-      // Daily trend — configurable period
-      supabase
-        .from('inspection_records')
-        .select('inspection_date')
-        .gte('inspection_date', trendStartDate)
-        .order('inspection_date', { ascending: true })
-        .range(0, 9999),
+      // Daily trend — configurable period (org-scoped)
+      scopeInspectionQuery(
+        supabase
+          .from('inspection_records')
+          .select('inspection_date')
+          .gte('inspection_date', trendStartDate)
+          .order('inspection_date', { ascending: true })
+          .range(0, 9999)
+      ),
     ]);
 
     // Calculate average score

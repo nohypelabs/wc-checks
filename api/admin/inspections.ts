@@ -37,14 +37,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return errorResponse(res, 405, 'Method not allowed - use /api/inspections for modifications');
     }
 
+    // Org scoping: non-superadmin can only see their org's inspections
+    const isSuperAdmin = auth.userRole.level >= 100;
+    let orgLocationIds: string[] = [];
+    if (!isSuperAdmin && auth.organizationId) {
+      const { data: orgLocations } = await supabase
+        .from('locations')
+        .select('id')
+        .eq('organization_id', auth.organizationId);
+      orgLocationIds = (orgLocations || []).map((l: any) => l.id);
+    }
+
     // Get specific inspection
     if (inspectionId) {
-      const { data: inspection, error } = await supabase
+      let query = supabase
         .from('inspection_records')
-        .select('*, locations!inner(id, name, floor, buildings(name)), users!inspection_records_user_id_fkey(full_name, email)')
-        .eq('id', inspectionId)
-        .single();
+        .select('*, locations!inner(id, name, floor, organization_id, buildings(name)), users!inspection_records_user_id_fkey(full_name, email)')
+        .eq('id', inspectionId);
 
+      // Org scope: verify inspection belongs to user's org
+      if (!isSuperAdmin && orgLocationIds.length > 0) {
+        query = query.in('location_id', orgLocationIds);
+      }
+
+      const { data: inspection, error } = await query.single();
       if (error) throw error;
       return successResponse(res, inspection, 'Inspection retrieved');
     }
@@ -52,9 +68,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // List inspections with filters
     let query = supabase
       .from('inspection_records')
-      .select('*, locations!inner(id, name, floor, buildings(name)), users!inspection_records_user_id_fkey(full_name, email)')
+      .select('*, locations!inner(id, name, floor, organization_id, buildings(name)), users!inspection_records_user_id_fkey(full_name, email)')
       .order('inspection_date', { ascending: false })
       .range(0, parseInt(resultLimit, 10) - 1);
+
+    // Org scope
+    if (!isSuperAdmin && orgLocationIds.length > 0) {
+      query = query.in('location_id', orgLocationIds);
+    }
 
     if (userId) {
       query = query.eq('user_id', userId);
