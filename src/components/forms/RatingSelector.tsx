@@ -107,7 +107,7 @@ export const RatingSelector = ({
  ${
  isAvailable
  ? genZMode
- ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-400 text-green-900'
+ ? 'bg-green-500/10 border-green-500 text-green-400'
  : 'bg-green-500/10 border-green-500 text-green-400'
  : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
  }
@@ -180,7 +180,7 @@ export const RatingSelector = ({
  ${
  value === 'other'
  ? genZMode
- ? 'bg-purple-50 border-purple-400 text-purple-700'
+ ? 'bg-purple-500/10 border-purple-500 text-purple-400'
  : 'bg-blue-500/10 border-blue-500 text-blue-400'
  : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
  }
@@ -244,7 +244,7 @@ export const RatingSelector = ({
  w-full mt-3 py-2 text-sm font-medium rounded-xl
  ${
  genZMode
- ? 'text-purple-600 hover:bg-purple-50'
+ ? 'text-purple-400 hover:bg-purple-500/10'
  : 'text-blue-400 hover:bg-blue-500/10'
  }
  `}
@@ -272,11 +272,11 @@ const getChoiceStyle = (
  if (genZMode) {
  switch (choice) {
  case 'good':
- return 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-400 text-green-900';
+ return 'bg-green-500/10 border-green-500 text-green-400';
  case 'normal':
- return 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-400 text-yellow-900';
+ return 'bg-yellow-500/10 border-yellow-500 text-yellow-400';
  case 'bad':
- return 'bg-gradient-to-br from-red-50 to-pink-50 border-red-400 text-red-900';
+ return 'bg-red-500/10 border-red-500 text-red-400';
  default:
  return 'bg-white border-gray-200 text-gray-700';
  }
@@ -285,9 +285,9 @@ const getChoiceStyle = (
  case 'good':
  return 'bg-green-500/10 border-green-500 text-green-400';
  case 'normal':
- return 'bg-yellow-50 border-yellow-500 text-yellow-900';
+ return 'bg-yellow-500/10 border-yellow-500 text-yellow-400';
  case 'bad':
- return 'bg-red-50 border-red-500 text-red-900';
+ return 'bg-red-500/10 border-red-500 text-red-400';
  default:
  return 'bg-white border-gray-200 text-gray-700';
  }

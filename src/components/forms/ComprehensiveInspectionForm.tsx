@@ -412,7 +412,7 @@ const handleSubmit = async () => {
  <div
  className={`min-h-screen pb-32 ${
  genZMode
- ? 'bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50'
+ ? 'bg-blue-500/10'
  : 'bg-gray-50'
  }`}
  >
@@ -522,7 +522,7 @@ const handleSubmit = async () => {
  ? 'bg-white/5 border-white/15'
  : rating
  ? genZMode
- ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-400'
+ ? 'bg-green-500/10 border-green-500'
  : 'bg-green-500/10 border-green-500'
  : genZMode
  ? 'bg-white/10 border-blue-500/30 hover:border-blue-500/50'
