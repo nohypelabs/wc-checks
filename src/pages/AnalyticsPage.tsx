@@ -172,7 +172,7 @@ export const AnalyticsPage = () => {
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Header */}
- <div className="bg-white/8 backdrop-blur-xl px-3 py-3.5 shadow-xl border-b border-white/10 lg:py-4 lg:px-4">
+ <div className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-3">
  <button
