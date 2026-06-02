@@ -1,10 +1,11 @@
 // src/pages/ChangelogPage.tsx
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, ArrowLeft, Tag, Calendar, Palette, Layout, Eye, Zap, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { Menu, ArrowLeft, Tag, Calendar, Palette, Layout, Eye, Zap, Search, ChevronDown, ChevronUp, PlayCircle, Sparkles } from 'lucide-react';
 import { Sidebar } from '../components/mobile/Sidebar';
 import { BottomNav } from '../components/mobile/BottomNav';
 import { useNavigate } from 'react-router-dom';
+import { startTour, isTourCompleted } from '../components/tour/FeatureTour';
 
 interface ChangelogEntry {
   version: string;
@@ -181,6 +182,32 @@ export const ChangelogPage = () => {
             )}
           </motion.div>
         ))}
+        {/* Tour CTA */}
+        {!isTourCompleted() && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-br from-sky-500/10 to-cyan-500/10 border border-sky-500/30 rounded-2xl p-6 text-center"
+          >
+            <div className="w-14 h-14 bg-sky-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-7 h-7 text-sky-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Baru di sini?</h3>
+            <p className="text-sm text-white/60 mb-4 leading-relaxed">
+              Yuk ikuti tour singkat untuk kenalan sama fitur-fitur baru yang udah kita bikin!
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={startTour}
+              className="px-6 py-3 bg-gradient-to-r from-sky-500 to-cyan-600 hover:from-sky-600 hover:to-cyan-700 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/30 transition-all inline-flex items-center gap-2"
+            >
+              <PlayCircle className="w-5 h-5" />
+              Mulai Tour
+            </motion.button>
+          </motion.div>
+        )}
       </main>
 
       {/* Bottom Nav */}

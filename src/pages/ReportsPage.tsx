@@ -308,7 +308,7 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  }
 
  return (
- <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6" data-tour="reports-page">
  {/* Sidebar */}
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

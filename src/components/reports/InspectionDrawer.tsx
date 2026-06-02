@@ -196,6 +196,7 @@ export const InspectionDrawer = ({
  return (
  <motion.button
  key={inspection.id}
+ data-tour={idx === 0 ? 'inspection-card' : undefined}
  onClick={() => {
  haptic.medium();
  onInspectionClick(inspection);

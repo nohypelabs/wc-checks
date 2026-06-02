@@ -9,6 +9,7 @@ import { DebugPanel } from './components/DebugPanel';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { UpdateNotification } from './components/common/UpdateNotification';
 import { IncomingFeaturesModal } from './components/common/IncomingFeaturesModal';
+import { FeatureTour } from './components/tour/FeatureTour';
 import { useAuth } from './hooks/useAuth';
 import { useIsAdmin } from './hooks/useIsAdmin';
 import { logger } from './lib/logger';
@@ -305,6 +306,7 @@ function AppContent() {
  </AnimatePresence>
   {user && <UpdateNotification />}
   {user && <IncomingFeaturesModal />}
+  {user && <FeatureTour />}
  </>
  );
 }

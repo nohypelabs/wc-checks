@@ -1,6 +1,7 @@
 // src/components/common/UpdateNotification.tsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { X, Sparkles, ArrowRight, Palette, Eye, Layout, Zap, Smartphone } from 'lucide-react';
 
 const UPDATE_KEY = 'wc-checks-update-v4.0.1-minimized';
@@ -44,6 +45,7 @@ const features = [
 ];
 
 export const UpdateNotification = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -141,7 +143,7 @@ export const UpdateNotification = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleClose}
+                  onClick={() => { handleClose(); navigate('/changelog'); }}
                   className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2"
                 >
                   <span>Mulai Explorasi</span>

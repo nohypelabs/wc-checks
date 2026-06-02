@@ -156,7 +156,7 @@ export const InspectionDetailModal = ({
  className="fixed left-3 right-3 top-3 bottom-3 max-w-2xl mx-auto my-auto z-[60] max-h-[94vh]"
  onClick={(e) => e.stopPropagation()}
  >
- <div className="bg-white/8 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col border border-white/10">
+ <div className="bg-white/8 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col border border-white/10" data-tour="inspection-detail">
  {/* Header - Score-based glassmorphism */}
  <div className={`p-4 text-white relative rounded-t-3xl flex-shrink-0 overflow-hidden ${getScoreGlassBg(score)}`}>
  {/* Decorative glass circles */}
