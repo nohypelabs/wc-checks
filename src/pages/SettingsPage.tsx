@@ -118,8 +118,8 @@ export const SettingsPage = () => {
  </Card>
 
  {/* Coming Soon Notice */}
- <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
- <p className="text-sm text-blue-300">
+ <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-center">
+ <p className="text-sm text-blue-400">
  💡 Fitur pengaturan lanjutan akan segera hadir
  </p>
  </div>
