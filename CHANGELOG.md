@@ -2,6 +2,39 @@
 
 All notable changes to WC-Checks will be documented in this file.
 
+## [4.0.4] - 2026-06-03
+
+### 🔧 UI Polish & Dark Glass Consistency
+
+#### Dashboard Header & Footer
+- **Header**: Hamburger icon replaced with Prenacons logo (tap to open sidebar)
+- **Header**: Removed logo images, center text only ("Proservice Indonesia")
+- **Footer**: Minimal bar style — left: copyright + year, right: "Developed by NoHypeLabs · v4.0.3"
+- **Footer**: Single `border-t` separator, no card/glass wrapper
+
+#### Sidebar
+- **Logout button**: Moved to top-right of sidebar header, replaces X close button
+- **Logout styling**: Hover turns red (`hover:bg-red-500/20`), icon transitions to `text-red-300`
+- **Bottom logout section**: Removed entirely
+- **Close behavior**: Overlay click or swipe to close (no X button)
+
+#### Profile Page
+- **Logout button**: Removed from profile page (now only in sidebar)
+- **Info fields**: Added glassmorphism (`backdrop-blur-md border-white/10`) to Email, Phone, Jabatan, Bergabung Sejak, Login Terakhir
+- **Role badges**: Converted to dark glass — Administrator (`bg-purple-500/15 border-purple-400/25`), Pengguna (`bg-blue-500/15`), Aktif (`bg-green-500/15`), Tidak Aktif (`bg-red-500/15`)
+
+#### InspectionDetailModal
+- **Close button**: Repositioned to `top-2 right-2` with `z-30` — no longer overlaps score badge
+- **Button style**: Glass background (`bg-white/10 backdrop-blur-sm border-white/10`)
+
+#### Success & Failed Modals
+- **Icon circles**: `bg-white` solid → `bg-white/15 backdrop-blur-sm border-white/20`
+- **SuccessModal**: CheckCircle `text-green-500` → `text-green-300`
+- **FailedModal**: Error text `text-red-800` → `text-red-200`, tips `text-blue-900` → `text-blue-200`
+- **FailedModal**: Box borders updated to `border-{color}-400/25`
+
+---
+
 ## [4.0.3] - 2026-06-03
 
 ### 📊 Dashboard - Inspection Trend Chart
@@ -13,11 +46,13 @@ All notable changes to WC-Checks will be documented in this file.
 - **Glass morphism card**: `bg-white/8 backdrop-blur-xl` wrapper matching dashboard theme
 - **Custom tooltip**: Shows inspection count + full Indonesian date on hover
 - **Trend badge**: Percentage change indicator with matching color
+- **Period selector**: Toggle between 7D, 30D, 90D with glass pill buttons
 
 #### Backend
-- **`/api/stats`**: Added `dailyTrend` field — array of `{ date, count }` for last 30 days
+- **`/api/stats`**: Added `dailyTrend` field — array of `{ date, count }` for configurable period
+- **`/api/stats?days=N`**: Supports `?days=7`, `?days=30`, `?days=90` query param
 - **New Supabase query**: Groups inspection records by date, fills gaps with zero counts
-- **`useAdminStats` hook**: Updated types to include `dailyTrend`
+- **`useInspectionTrend` hook**: New hook for independent trend data fetching
 
 #### Dependencies
 - Added `recharts` v3.8.1
