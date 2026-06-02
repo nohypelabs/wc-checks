@@ -8,6 +8,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { UpdateNotification } from './components/common/UpdateNotification';
+import { IncomingFeaturesModal } from './components/common/IncomingFeaturesModal';
 import { useAuth } from './hooks/useAuth';
 import { useIsAdmin } from './hooks/useIsAdmin';
 import { logger } from './lib/logger';
@@ -303,6 +304,7 @@ function AppContent() {
  </Suspense>
  </AnimatePresence>
   {user && <UpdateNotification />}
+  {user && <IncomingFeaturesModal />}
  </>
  );
 }
