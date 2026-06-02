@@ -422,8 +422,8 @@ const handleSubmit = async () => {
  sticky top-0 z-20
  ${
  genZMode
- ? 'bg-gradient-to-r from-blue-600 to-cyan-600'
- : 'bg-white/8 border-b border-white/10'
+ ? 'bg-white/8 border-b border-white/10 backdrop-blur-xl'
+ : 'bg-white/8 border-b border-white/10 backdrop-blur-xl'
  }
  shadow-sm
  `}
@@ -792,9 +792,9 @@ const handleSubmit = async () => {
  w-full py-4 rounded-xl font-bold text-white transition-all
  ${
  isSubmitting || completedCount < totalRequired || generalPhotos.length === 0
- ? 'bg-gray-300 cursor-not-allowed'
+ ? 'bg-white/20 cursor-not-allowed'
  : genZMode
- ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700'
+ ? 'bg-blue-600 hover:bg-blue-700'
  : 'bg-blue-600 hover:bg-blue-700'
  }
  `}
