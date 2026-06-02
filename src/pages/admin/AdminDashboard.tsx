@@ -52,7 +52,7 @@ export const AdminDashboard = () => {
           {/* Left Menu Button */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors lg:hidden"
+            className="p-2 hover:bg-white/10 lg:hover:bg-gray-100 rounded-xl transition-colors"
           >
             <Menu className="w-6 h-6" />
           </button>
