@@ -20,9 +20,9 @@ export const Card = ({
  const baseStyles = 'rounded-2xl transition-all';
  
  const variants = {
- default: 'bg-white shadow-sm border border-gray-100',
- flat: 'border border-gray-200',
- bordered: 'border-2 border-gray-200',
+ default: 'shadow-sm border border-white/10',
+ flat: 'border border-white/15',
+ bordered: 'border-2 border-white/20',
  glass: 'glass',
  };
 
