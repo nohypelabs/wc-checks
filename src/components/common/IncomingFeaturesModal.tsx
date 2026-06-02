@@ -1,46 +1,24 @@
 // src/components/common/IncomingFeaturesModal.tsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, ArrowRight, Wifi, Users, TrendingUp, Bell, Cpu, Zap } from 'lucide-react';
+import { X, ArrowRight, Wifi, Users, Cpu, Zap, Lock } from 'lucide-react';
 
 const STORAGE_KEY = 'wc-checks-incoming-features-minimized';
 
 const features = [
   {
     icon: Wifi,
-    title: 'Alat Pendeteksi Bau',
-    description: 'Sensor IoT yang mendeteksi bau toilet secara real-time dan otomatis trigger alert ke petugas kebersihan',
-    color: 'text-green-400',
-    bg: 'bg-green-500/20',
-    status: 'Dalam Pengembangan',
-    statusColor: 'bg-green-500/20 text-green-400',
+    title: 'Integrasi Sensor Aroma',
+    description: 'Deteksi kualitas udara toilet secara real-time. Sistem otomatis memicu notifikasi inspeksi ketika level bau melewati ambang batas — tanpa perlu laporan manual.',
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/20',
   },
   {
     icon: Users,
-    title: 'Counter Pengunjung',
-    description: 'Alat hitung pengunjung otomatis dengan sensor infrared — data langsung masuk ke dashboard analytics',
+    title: 'Smart Visitor Counter',
+    description: 'Pantau lalu lintas pengunjung dan jadwalkan pembersihan otomatis berdasarkan jumlah kunjungan. Makin ramai, makin cepat sistem merespons.',
     color: 'text-cyan-400',
     bg: 'bg-cyan-500/20',
-    status: 'Dalam Pengembangan',
-    statusColor: 'bg-cyan-500/20 text-cyan-400',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Dashboard Real-Time',
-    description: 'Monitor tingkat bau dan jumlah pengunjung secara live dari dashboard — notifikasi otomatis jika melebihi threshold',
-    color: 'text-purple-400',
-    bg: 'bg-purple-500/20',
-    status: 'Coming Soon',
-    statusColor: 'bg-purple-500/20 text-purple-400',
-  },
-  {
-    icon: Bell,
-    title: 'Smart Alerts',
-    description: 'Sistem notifikasi pintar — WhatsApp & push notification ketika kondisi toilet perlu perhatian segera',
-    color: 'text-yellow-400',
-    bg: 'bg-yellow-500/20',
-    status: 'Coming Soon',
-    statusColor: 'bg-yellow-500/20 text-yellow-400',
   },
 ];
 
@@ -110,13 +88,13 @@ export const IncomingFeaturesModal = () => {
                     <Cpu className="w-6 h-6 text-white" />
                   </motion.div>
                   <div>
-                    <p className="text-xs text-emerald-400 font-medium uppercase tracking-wider">Incoming Update</p>
-                    <h2 className="text-xl font-bold text-white">IoT Integration</h2>
+                    <p className="text-xs text-emerald-400 font-medium uppercase tracking-wider">New Update Incoming</p>
+                    <h2 className="text-lg font-bold text-white">🔧 IoT Integration</h2>
                   </div>
                 </div>
 
                 <p className="relative text-sm text-white/70 leading-relaxed">
-                  Sistem monitoring toilet akan terintegrasi dengan perangkat hardware! 🚀
+                  Kami sedang mengembangkan fitur terbaru yang akan membawa sistem inspeksi ke level berikutnya.
                 </p>
               </div>
 
@@ -134,32 +112,30 @@ export const IncomingFeaturesModal = () => {
                       <feature.icon className={`w-5 h-5 ${feature.color}`} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="text-sm font-semibold text-white">{feature.title}</h3>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${feature.statusColor}`}>
-                          {feature.status}
-                        </span>
-                      </div>
+                      <h3 className="text-sm font-semibold text-white mb-1">{feature.title}</h3>
                       <p className="text-xs text-white/50 leading-relaxed">{feature.description}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              {/* Upgrade CTA */}
+              {/* Closing & CTA */}
               <div className="px-6 pb-6">
+                <p className="text-sm text-white/60 leading-relaxed mb-4 text-center">
+                  Dengan update ini, platform kami berevolusi dari aplikasi inspeksi manual menjadi sistem manajemen fasilitas berbasis IoT — lebih cerdas, lebih otomatis, lebih akurat.
+                </p>
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleClose}
                   className="w-full py-3 bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2"
                 >
-                  <Zap className="w-4 h-4" />
-                  <span>Fitur ini untuk Paket Max</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <Lock className="w-4 h-4" />
+                  <span>Coming Soon — Stay Tuned</span>
                 </motion.button>
                 <p className="text-center text-[11px] text-white/40 mt-2">
-                  Upgrade untuk akses fitur IoT pertama di Indonesia
+                  Fitur eksklusif untuk pengguna Paket Max 🔒
                 </p>
               </div>
             </motion.div>
