@@ -186,17 +186,17 @@ export const AnalyticsPage = () => {
  <p className="text-sm text-white/50">Wawasan kinerja inspeksi</p>
  </div>
  </div>
- <BarChart3 className="w-6 h-6 text-blue-300" />
+ <BarChart3 className="w-6 h-6 text-blue-400" />
  </div>
 
  {/* Month Selector - Simple approach with visible input */}
- <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm">
+ <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl p-4 border-2 border-blue-500/20 shadow-sm">
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
  <Calendar className="w-5 h-5 text-white" />
  </div>
  <div className="flex-1">
- <label htmlFor="analytics-month" className="block text-xs text-blue-300 font-medium mb-1">
+ <label htmlFor="analytics-month" className="block text-xs text-blue-400 font-medium mb-1">
  Pilih Periode
  </label>
  <input
@@ -269,7 +269,7 @@ export const AnalyticsPage = () => {
  <div>
  <div className="flex items-center justify-between mb-1">
  <span className="text-sm font-medium text-white">Baik</span>
- <span className="text-sm font-bold text-blue-300">
+ <span className="text-sm font-bold text-blue-400">
  {analytics?.statusBreakdown.good.count || 0} ({analytics?.statusBreakdown.good.percentage || 0}%)
  </span>
  </div>

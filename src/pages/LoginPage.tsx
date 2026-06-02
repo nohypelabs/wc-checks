@@ -153,7 +153,7 @@ export function LoginPage() {
  <form onSubmit={handleLogin} className="space-y-5">
  {/* Email Field */}
  <div>
- <label className="block text-sm font-medium text-white/80 mb-2">
+ <label className="block text-sm font-medium text-gray-700 mb-2">
  Alamat Email
  </label>
  <div className="relative">
@@ -175,7 +175,7 @@ export function LoginPage() {
 
  {/* Password Field */}
  <div>
- <label className="block text-sm font-medium text-white/80 mb-2">
+ <label className="block text-sm font-medium text-gray-700 mb-2">
  Kata Sandi
  </label>
  <div className="relative">

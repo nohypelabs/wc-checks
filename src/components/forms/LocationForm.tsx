@@ -111,7 +111,7 @@ export function LocationForm({
 
  {/* Organization Dropdown */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Organization <span className="text-red-500">*</span>
  </label>
  <select
@@ -120,7 +120,7 @@ export function LocationForm({
  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
  errors.organization_id 
  ? 'border-red-300 bg-red-50' 
- : 'border-gray-300 bg-white'
+ : 'border-white/15 bg-slate-800/80'
  }`}
  required
  disabled={isLoadingOrgs || isSubmitting}
@@ -141,7 +141,7 @@ export function LocationForm({
 
  {/* Building Dropdown */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Building <span className="text-red-500">*</span>
  </label>
  <select
@@ -150,7 +150,7 @@ export function LocationForm({
  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
  errors.building_id 
  ? 'border-red-300 bg-red-50' 
- : 'border-gray-300 bg-white'
+ : 'border-white/15 bg-slate-800/80'
  }`}
  required
  disabled={!formData.organization_id || isLoadingBuildings || isSubmitting}
@@ -170,7 +170,7 @@ export function LocationForm({
  ))}
  </select>
  {!formData.organization_id && (
- <p className="mt-1 text-sm text-gray-500">
+ <p className="mt-1 text-sm text-white/60">
  Please select an organization first
  </p>
  )}
@@ -181,7 +181,7 @@ export function LocationForm({
 
  {/* Location Name */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Location Name <span className="text-red-500">*</span>
  </label>
  <input
@@ -191,7 +191,7 @@ export function LocationForm({
  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
  errors.name 
  ? 'border-red-300 bg-red-50' 
- : 'border-gray-300 bg-white'
+ : 'border-white/15 bg-slate-800/80'
  }`}
  placeholder="e.g., Lobby Toilet - Men's Room"
  required
@@ -207,36 +207,36 @@ export function LocationForm({
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  {/* Floor */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Floor
  </label>
  <input
  type="text"
  value={formData.floor}
  onChange={(e) => handleInputChange('floor', e.target.value)}
- className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2.5 border border-white/15 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  placeholder="e.g., 3F, Ground, Basement 1"
  disabled={isSubmitting}
  />
- <p className="mt-1 text-xs text-gray-500">
+ <p className="mt-1 text-xs text-white/60">
  Optional: Specify which floor
  </p>
  </div>
 
  {/* Section */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Section
  </label>
  <input
  type="text"
  value={formData.section}
  onChange={(e) => handleInputChange('section', e.target.value)}
- className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2.5 border border-white/15 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  placeholder="e.g., North Wing, Hall A"
  disabled={isSubmitting}
  />
- <p className="mt-1 text-xs text-gray-500">
+ <p className="mt-1 text-xs text-white/60">
  Optional: Specify section or wing
  </p>
  </div>
@@ -246,13 +246,13 @@ export function LocationForm({
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  {/* Area */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Area Type
  </label>
  <select
  value={formData.area}
  onChange={(e) => handleInputChange('area', e.target.value)}
- className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2.5 border border-white/15 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={isSubmitting}
  >
  <option value="">Select Area Type</option>
@@ -262,14 +262,14 @@ export function LocationForm({
  <option value="Service Area">Service Area</option>
  <option value="Emergency Area">Emergency Area</option>
  </select>
- <p className="mt-1 text-xs text-gray-500">
+ <p className="mt-1 text-xs text-white/60">
  Optional: Type of area
  </p>
  </div>
 
  {/* Location Code */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Location Code
  </label>
  <input
@@ -279,13 +279,13 @@ export function LocationForm({
  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
  errors.code 
  ? 'border-red-300 bg-red-50' 
- : 'border-gray-300 bg-white'
+ : 'border-white/15 bg-slate-800/80'
  }`}
  placeholder="e.g., T01, WC-M1, LBY-T1"
  disabled={isSubmitting}
  maxLength={20}
  />
- <p className="mt-1 text-xs text-gray-500">
+ <p className="mt-1 text-xs text-white/60">
  Optional: Short code for easy reference
  </p>
  {errors.code && (
@@ -296,7 +296,7 @@ export function LocationForm({
 
  {/* Description */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Description
  </label>
  <textarea
@@ -305,7 +305,7 @@ export function LocationForm({
  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
  errors.description 
  ? 'border-red-300 bg-red-50' 
- : 'border-gray-300 bg-white'
+ : 'border-white/15 bg-slate-800/80'
  }`}
  rows={3}
  placeholder="Additional details about this location..."
@@ -313,10 +313,10 @@ export function LocationForm({
  maxLength={500}
  />
  <div className="flex justify-between mt-1">
- <p className="text-xs text-gray-500">
+ <p className="text-xs text-white/60">
  Optional: Any additional information
  </p>
- <p className="text-xs text-gray-500">
+ <p className="text-xs text-white/60">
  {formData.description?.length || 0} / 500
  </p>
  </div>
@@ -354,7 +354,7 @@ export function LocationForm({
  <button
  type="button"
  onClick={onCancel}
- className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+ className="px-6 py-2.5 border border-white/15 rounded-lg text-white/80 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
  disabled={isSubmitting}
  >
  Cancel

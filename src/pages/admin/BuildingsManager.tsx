@@ -357,7 +357,7 @@ export const BuildingsManager = () => {
  className="fixed inset-0 z-10"
  onClick={() => setOpenMenuId(null)}
  />
- <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-2xl border border-white/15 py-2 min-w-[160px]">
+ <div className="absolute right-0 top-12 z-20 bg-slate-800/90 backdrop-blur-xl rounded-xl shadow-2xl border border-white/15 py-2 min-w-[160px]">
  <button
  onClick={() => handleEdit(building)}
  className="w-full px-4 py-2 text-left hover:bg-white/8 flex items-center gap-2 text-white/70"

@@ -84,7 +84,7 @@ export const InspectionFailedModal = ({
  {/* Error Details */}
  <div className="p-6 space-y-4">
  {/* Main Error Message */}
- <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+ <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
  <p className="text-sm text-red-800 leading-relaxed">
  {getErrorDescription()}
  </p>

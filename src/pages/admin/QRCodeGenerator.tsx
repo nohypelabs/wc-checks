@@ -114,16 +114,16 @@ export const QRCodeGenerator = ({ locations, onClose }: QRCodeGeneratorProps) =>
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
  <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
  {/* Header */}
- <div className="sticky top-0 bg-white pb-4 border-b border-gray-200 flex items-center justify-between">
+ <div className="sticky top-0 bg-slate-800/90 backdrop-blur-xl pb-4 border-b border-white/10 flex items-center justify-between">
  <div>
- <h2 className="text-xl font-bold text-gray-900">QR Code Generator</h2>
- <p className="text-sm text-gray-600 mt-1">
+ <h2 className="text-xl font-bold text-white">QR Code Generator</h2>
+ <p className="text-sm text-white/60 mt-1">
  {locations.length} location{locations.length > 1 ? 's' : ''} • Production URL
  </p>
  </div>
  <button
  onClick={onClose}
- className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-white/10 rounded-lg transition-colors"
  >
  <X className="w-5 h-5" />
  </button>
@@ -146,7 +146,7 @@ export const QRCodeGenerator = ({ locations, onClose }: QRCodeGeneratorProps) =>
  const locationURL = getLocationURL(location.id);
  
  return (
- <Card key={location.id} className="bg-gray-50">
+ <Card key={location.id} className="bg-white/5">
  <div className="flex items-center space-x-4">
  {/* QR Code */}
  <div id={`qr-${location.id}`} className="flex-shrink-0 bg-white p-2 rounded-lg">
@@ -160,23 +160,23 @@ export const QRCodeGenerator = ({ locations, onClose }: QRCodeGeneratorProps) =>
 
  {/* Location Info */}
  <div className="flex-1 min-w-0">
- <h3 className="font-semibold text-gray-900 truncate">
+ <h3 className="font-semibold text-white truncate">
  {location.name}
  </h3>
  {location.code && (
- <p className="text-sm text-blue-600 font-medium">
+ <p className="text-sm text-blue-400 font-medium">
  Code: {location.code}
  </p>
  )}
- <div className="text-sm text-gray-600 mt-1 space-y-0.5">
+ <div className="text-sm text-white/60 mt-1 space-y-0.5">
  {location.building && <p>🏢 {location.building}</p>}
  {location.floor && <p>📍 {location.floor}</p>}
  {location.area && <p>📌 {location.area}</p>}
  </div>
  
  {/* URL Display */}
- <div className="mt-2 p-2 bg-white rounded border border-gray-200">
- <p className="text-xs text-gray-500 mb-1">QR URL:</p>
+ <div className="mt-2 p-2 bg-white/5 rounded border border-white/10">
+ <p className="text-xs text-white/50 mb-1">QR URL:</p>
  <p className="text-xs font-mono text-white/80 break-all">
  {locationURL}
  </p>

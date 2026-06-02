@@ -374,7 +374,7 @@ export const AddLocationPage = () => {
  <select
  value={formData.organization_id}
  onChange={(e) => handleChange('organization_id', e.target.value)}
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  disabled={createLocationMutation.isPending}
  >
@@ -401,7 +401,7 @@ export const AddLocationPage = () => {
  <select
  value={formData.building_id}
  onChange={(e) => handleChange('building_id', e.target.value)}
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
  required
  disabled={
  !formData.organization_id ||
@@ -440,7 +440,7 @@ export const AddLocationPage = () => {
  value={formData.name}
  onChange={(e) => handleChange('name', e.target.value)}
  placeholder="e.g., Men's Toilet, Women's Restroom"
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  disabled={createLocationMutation.isPending}
  />
@@ -457,7 +457,7 @@ export const AddLocationPage = () => {
  value={formData.code}
  onChange={(e) => handleChange('code', e.target.value.toUpperCase())}
  placeholder="e.g., WC-01, TL-A1"
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  />
  <p className="text-xs text-white/50 mt-1">
@@ -477,7 +477,7 @@ export const AddLocationPage = () => {
  value={formData.floor}
  onChange={(e) => handleChange('floor', e.target.value)}
  placeholder="e.g., 1F, Ground"
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  />
  </div>
@@ -492,7 +492,7 @@ export const AddLocationPage = () => {
  value={formData.section}
  onChange={(e) => handleChange('section', e.target.value)}
  placeholder="e.g., Men, Women"
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  />
  </div>
@@ -507,7 +507,7 @@ export const AddLocationPage = () => {
  <select
  value={formData.area}
  onChange={(e) => handleChange('area', e.target.value)}
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  >
  <option value="">Select Area Type (Optional)</option>
@@ -529,7 +529,7 @@ export const AddLocationPage = () => {
  value={formData.description}
  onChange={(e) => handleChange('description', e.target.value)}
  placeholder="Additional notes or special instructions..."
- className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+ className="w-full px-4 py-3 bg-slate-800/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
  rows={3}
  disabled={createLocationMutation.isPending}
  />
@@ -559,7 +559,7 @@ export const AddLocationPage = () => {
  type="button"
  onClick={() => navigate(-1)}
  disabled={createLocationMutation.isPending}
- className="w-full bg-white border-2 border-white/15 text-white/70 py-4 rounded-2xl font-medium hover:bg-white/8 active:scale-[0.98] transition-all disabled:opacity-50"
+ className="w-full bg-slate-800/80 border-2 border-white/15 text-white/70 py-4 rounded-2xl font-medium hover:bg-white/8 active:scale-[0.98] transition-all disabled:opacity-50"
  >
  Cancel
  </button>

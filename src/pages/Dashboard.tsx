@@ -255,7 +255,7 @@ export const Dashboard = () => {
 
  {/* Quick Insights - Weekly Performance */}
  {dashboardStats.weeklyBreakdown.total > 0 && (
- <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-5 border border-blue-100">
+ <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl p-5 border border-blue-500/20">
  <div className="flex items-center justify-between mb-3">
  <h3 className="font-bold text-white">Performa Minggu Ini</h3>
  <span className="text-sm text-white/60">{dashboardStats.weeklyBreakdown.total} inspeksi</span>

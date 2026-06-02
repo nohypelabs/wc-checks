@@ -22,7 +22,7 @@ export const Badge = ({
  warning: 'badge-warning',
  danger: 'badge-danger',
  info: 'badge-info',
- default: 'bg-gray-100 text-gray-700',
+ default: 'bg-white/10 text-white/80',
  };
 
  const sizeStyles = {

@@ -32,7 +32,7 @@ export const AboutPage = () => {
  {/* App Logo & Version */}
  <Card>
  <div className="text-center py-6">
- <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg border-2 border-white/10">
+ <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg border-2 border-white/15">
  <img
  src="/logo.png"
  alt="Proservice Indonesia Logo"

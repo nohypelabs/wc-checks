@@ -337,7 +337,7 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  <BarChart3 className="w-5 h-5 text-white" />
  </div>
  <div>
- <h1 className="text-sm font-bold leading-tight text-gray-900">Laporan</h1>
+ <h1 className="text-sm font-bold leading-tight text-white">Laporan</h1>
  <p className="text-[11px] text-white/50">Riwayat & analitik inspeksi</p>
  </div>
  </div>

@@ -220,7 +220,7 @@ export const RegisterPage = () => {
  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
  {/* Full Name */}
  <div>
- <label htmlFor="full_name" className="block text-sm font-medium text-white/80 mb-2">
+ <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
  Nama Lengkap
  </label>
  <div className="relative">
@@ -242,7 +242,7 @@ export const RegisterPage = () => {
 
  {/* Email */}
  <div>
- <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
+ <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
  Alamat Email
  </label>
  <div className="relative">
@@ -264,7 +264,7 @@ export const RegisterPage = () => {
 
  {/* Phone Number */}
  <div>
- <label htmlFor="phone" className="block text-sm font-medium text-white/80 mb-2">
+ <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
  Nomor Telepon (Opsional)
  </label>
  <div className="relative">
@@ -286,7 +286,7 @@ export const RegisterPage = () => {
 
  {/* Occupation */}
  <div>
- <label htmlFor="occupation_id" className="block text-sm font-medium text-white/80 mb-2">
+ <label htmlFor="occupation_id" className="block text-sm font-medium text-gray-700 mb-2">
  Jabatan (Opsional)
  </label>
  <div className="relative">
@@ -316,7 +316,7 @@ export const RegisterPage = () => {
 
  {/* Password */}
  <div>
- <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-2">
+ <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
  Kata Sandi
  </label>
  <div className="relative">
@@ -348,7 +348,7 @@ export const RegisterPage = () => {
 
  {/* Confirm Password */}
  <div>
- <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/80 mb-2">
+ <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
  Konfirmasi Kata Sandi
  </label>
  <div className="relative">

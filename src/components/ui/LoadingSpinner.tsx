@@ -22,9 +22,9 @@ export const LoadingSpinner = ({
  };
 
  const colorClasses = {
- primary: 'border-gray-200 border-t-blue-600',
+ primary: 'border-white/20 border-t-blue-500',
  white: 'border-white/30 border-t-white',
- gray: 'border-gray-300 border-t-gray-600',
+ gray: 'border-white/20 border-t-white/60',
  };
 
  const spinner = (
@@ -39,7 +39,7 @@ export const LoadingSpinner = ({
  {text && (
  <p className={clsx(
  'text-sm font-medium',
- color === 'white' ? 'text-white' : 'text-gray-600'
+ color === 'white' ? 'text-white' : 'text-white/60'
  )}>
  {text}
  </p>
@@ -49,7 +49,7 @@ export const LoadingSpinner = ({
 
  if (fullScreen) {
  return (
- <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+ <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50">
  {spinner}
  </div>
  );
@@ -87,7 +87,7 @@ export const Skeleton = ({
 // Card Skeleton
 export const CardSkeleton = () => {
  return (
- <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+ <div className="bg-white/8 rounded-2xl p-4 border border-white/10 shadow-sm">
  <div className="flex items-center gap-3 mb-3">
  <Skeleton width="3rem" height="3rem" rounded />
  <div className="flex-1">
@@ -105,7 +105,7 @@ export const ListSkeleton = ({ items = 3 }: { items?: number }) => {
  return (
  <div className="space-y-3">
  {Array.from({ length: items }).map((_, i) => (
- <div key={i} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100">
+ <div key={i} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
  <Skeleton width="2.5rem" height="2.5rem" rounded />
  <div className="flex-1">
  <Skeleton width="70%" height="1rem" className="mb-2" />

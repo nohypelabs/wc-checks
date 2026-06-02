@@ -49,7 +49,7 @@ export const DebugPanel = () => {
  case 'error': return <AlertCircle className="w-4 h-4 text-red-600" />;
  case 'warn': return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
  case 'info': return <Info className="w-4 h-4 text-blue-600" />;
- case 'debug': return <Bug className="w-4 h-4 text-gray-600" />;
+ case 'debug': return <Bug className="w-4 h-4 text-white/70" />;
  default: return null;
  }
  };
@@ -59,8 +59,8 @@ export const DebugPanel = () => {
  case 'error': return 'bg-red-50 border-red-200 text-red-900';
  case 'warn': return 'bg-yellow-50 border-yellow-200 text-yellow-900';
  case 'info': return 'bg-blue-50 border-blue-200 text-blue-900';
- case 'debug': return 'bg-gray-50 border-gray-200 text-gray-900';
- default: return 'bg-gray-50 border-gray-200 text-gray-900';
+ case 'debug': return 'bg-white/5 border-white/10 text-white';
+ default: return 'bg-white/5 border-white/10 text-white';
  }
  };
 
@@ -93,7 +93,7 @@ export const DebugPanel = () => {
  {/* Debug Panel */}
  {isOpen && (
  <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
- <div className="bg-white w-full h-full sm:h-[80vh] sm:max-w-4xl sm:rounded-2xl shadow-2xl flex flex-col">
+ <div className="bg-slate-800/90 w-full h-full sm:h-[80vh] sm:max-w-4xl sm:rounded-2xl shadow-2xl flex flex-col">
  {/* Header */}
  <div className="bg-gray-900 text-white p-4 flex items-center justify-between sm:rounded-t-2xl">
  <div className="flex items-center space-x-3">
@@ -113,13 +113,13 @@ export const DebugPanel = () => {
  </div>
 
  {/* Stats */}
- <div className="bg-gray-50 border-b border-gray-200 p-3 grid grid-cols-5 gap-2 text-xs">
+ <div className="bg-white/5 border-b border-white/10 p-3 grid grid-cols-5 gap-2 text-xs">
  <button
  onClick={() => setFilterLevel('all')}
  className={`px-3 py-2 rounded-lg font-medium transition-colors ${
  filterLevel === 'all' 
  ? 'bg-gray-900 text-white' 
- : 'bg-white text-gray-700 hover:bg-gray-100'
+ : 'bg-white/10 text-white/80 hover:bg-white/20'
  }`}
  >
  All ({stats.total})
@@ -129,7 +129,7 @@ export const DebugPanel = () => {
  className={`px-3 py-2 rounded-lg font-medium transition-colors ${
  filterLevel === 'error' 
  ? 'bg-red-600 text-white' 
- : 'bg-white text-red-600 hover:bg-red-50'
+ : 'bg-white/10 text-red-400 hover:bg-red-500/10'
  }`}
  >
  Errors ({stats.errors})
@@ -139,7 +139,7 @@ export const DebugPanel = () => {
  className={`px-3 py-2 rounded-lg font-medium transition-colors ${
  filterLevel === 'warn' 
  ? 'bg-yellow-600 text-white' 
- : 'bg-white text-yellow-600 hover:bg-yellow-50'
+ : 'bg-white/10 text-yellow-400 hover:bg-yellow-500/10'
  }`}
  >
  Warns ({stats.warnings})
@@ -149,7 +149,7 @@ export const DebugPanel = () => {
  className={`px-3 py-2 rounded-lg font-medium transition-colors ${
  filterLevel === 'info' 
  ? 'bg-blue-600 text-white' 
- : 'bg-white text-blue-600 hover:bg-blue-50'
+ : 'bg-white/10 text-blue-400 hover:bg-blue-500/10'
  }`}
  >
  Info ({stats.info})
@@ -159,7 +159,7 @@ export const DebugPanel = () => {
  className={`px-3 py-2 rounded-lg font-medium transition-colors ${
  filterLevel === 'debug' 
  ? 'bg-gray-600 text-white' 
- : 'bg-white text-gray-600 hover:bg-gray-100'
+ : 'bg-white text-white/70 hover:bg-gray-100'
  }`}
  >
  Debug ({stats.debug})
@@ -167,7 +167,7 @@ export const DebugPanel = () => {
  </div>
 
  {/* Actions */}
- <div className="bg-gray-50 border-b border-gray-200 p-3 flex gap-2">
+ <div className="bg-white/5 border-b border-white/10 p-3 flex gap-2">
  <button
  onClick={handleExport}
  className="flex-1 sm:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm"

@@ -333,7 +333,7 @@ export const LocationsManager = () => {
  <div className="p-4 space-y-4">
  {/* User Info for Mobile */}
  {user && (
- <Card className="sm:hidden p-3 bg-white border-white/15">
+ <Card className="sm:hidden p-3 bg-slate-800/80 border-white/15">
  <div className="flex items-center space-x-2">
  <User className="w-4 h-4 text-white/60" />
  <span className="text-white/80 text-sm font-medium">
@@ -433,17 +433,17 @@ export const LocationsManager = () => {
 
  {/* Stats Grid */}
  <div className="grid grid-cols-3 gap-3 mb-4">
- <div className="bg-blue-50 rounded-xl p-3">
- <p className="text-xs text-blue-300 mb-1">Total</p>
- <p className="text-2xl font-bold text-blue-200">{analytics.total}</p>
+ <div className="bg-blue-500/10 rounded-xl p-3">
+ <p className="text-xs text-blue-400 mb-1">Total</p>
+ <p className="text-2xl font-bold text-blue-300">{analytics.total}</p>
  </div>
- <div className="bg-green-50 rounded-xl p-3">
- <p className="text-xs text-green-300 mb-1">Active</p>
- <p className="text-2xl font-bold text-green-900">{analytics.active}</p>
+ <div className="bg-green-500/10 rounded-xl p-3">
+ <p className="text-xs text-green-400 mb-1">Active</p>
+ <p className="text-2xl font-bold text-green-400">{analytics.active}</p>
  </div>
- <div className="bg-red-50 rounded-xl p-3">
- <p className="text-xs text-red-300 mb-1">Inactive</p>
- <p className="text-2xl font-bold text-red-900">{analytics.inactive}</p>
+ <div className="bg-red-500/10 rounded-xl p-3">
+ <p className="text-xs text-red-400 mb-1">Inactive</p>
+ <p className="text-2xl font-bold text-red-400">{analytics.inactive}</p>
  </div>
  </div>
 
@@ -464,37 +464,37 @@ export const LocationsManager = () => {
 
  {/* Bulk Selection Bar */}
  {selectedIds.size > 0 && (
- <Card className="bg-blue-50 border-blue-200">
+ <Card className="bg-blue-500/10 border-blue-500/20">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <CheckSquare className="w-5 h-5 text-blue-300" />
- <span className="font-semibold text-blue-200">{selectedIds.size} selected</span>
+ <CheckSquare className="w-5 h-5 text-blue-400" />
+ <span className="font-semibold text-blue-300">{selectedIds.size} selected</span>
  </div>
  <div className="flex items-center gap-2">
  <button
  onClick={() => handleBulkActivate(true)}
- className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
  title="Activate selected"
  >
- <Power className="w-5 h-5 text-green-300" />
+ <Power className="w-5 h-5 text-green-400" />
  </button>
  <button
  onClick={() => handleBulkActivate(false)}
- className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
  title="Deactivate selected"
  >
  <PowerOff className="w-5 h-5 text-orange-300" />
  </button>
  <button
  onClick={handleBulkDelete}
- className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
  title="Delete selected"
  >
- <Trash2 className="w-5 h-5 text-red-300" />
+ <Trash2 className="w-5 h-5 text-red-400" />
  </button>
  <button
  onClick={clearSelection}
- className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
  title="Clear selection"
  >
  <X className="w-5 h-5 text-white/60" />
@@ -511,10 +511,10 @@ export const LocationsManager = () => {
  <div className="flex items-center gap-2 px-4">
  <button
  onClick={toggleSelectAll}
- className="flex items-center gap-2 text-sm font-medium text-white/80 hover:text-blue-300 transition-colors"
+ className="flex items-center gap-2 text-sm font-medium text-white/80 hover:text-blue-400 transition-colors"
  >
  {selectedIds.size === filteredLocations.length ? (
- <CheckSquare className="w-5 h-5 text-blue-300" />
+ <CheckSquare className="w-5 h-5 text-blue-400" />
  ) : (
  <Square className="w-5 h-5" />
  )}
@@ -541,7 +541,7 @@ export const LocationsManager = () => {
  className="absolute top-4 left-4 z-10 p-1 hover:bg-white/10 rounded transition-colors"
  >
  {selectedIds.has(location.id) ? (
- <CheckSquare className="w-5 h-5 text-blue-300" />
+ <CheckSquare className="w-5 h-5 text-blue-400" />
  ) : (
  <Square className="w-5 h-5 text-white/40" />
  )}
@@ -551,7 +551,7 @@ export const LocationsManager = () => {
  <div className="pl-12 pr-10">
  {/* Header */}
  <div className="flex items-start space-x-3 mb-3">
- <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
+ <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
  🚽
  </div>
  <div className="flex-1 min-w-0">
@@ -560,12 +560,12 @@ export const LocationsManager = () => {
  </h3>
  <div className="flex items-center gap-2 mt-1">
  {location.code && (
- <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-300 text-xs rounded-full">
+ <span className="inline-block px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full">
  {location.code}
  </span>
  )}
  {location.is_active ? (
- <span className="inline-block px-2 py-0.5 bg-green-100 text-green-300 text-xs rounded-full">
+ <span className="inline-block px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
  Active
  </span>
  ) : (
@@ -599,7 +599,7 @@ export const LocationsManager = () => {
 
  {/* URL Preview - Collapsible */}
  <details className="text-xs">
- <summary className="text-blue-300 cursor-pointer hover:text-blue-300 font-medium">
+ <summary className="text-blue-400 cursor-pointer hover:text-blue-400 font-medium">
  View URL
  </summary>
  <div className="mt-2 p-2 bg-white/8 rounded-lg border border-white/15">
@@ -629,12 +629,12 @@ export const LocationsManager = () => {
  />
 
  {/* Menu */}
- <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-white/15 z-[9999] overflow-hidden">
+ <div className="absolute right-0 top-full mt-2 w-48 bg-slate-800/90 backdrop-blur-xl rounded-xl shadow-xl border border-white/15 z-[9999] overflow-hidden">
  <button
  onClick={() => handleGenerateQR(location)}
  className="w-full px-4 py-3 text-left hover:bg-white/8 flex items-center space-x-3 transition-colors"
  >
- <QrCode className="w-5 h-5 text-blue-300" />
+ <QrCode className="w-5 h-5 text-blue-400" />
  <span className="text-sm font-medium text-white">Buat QR</span>
  </button>
 
@@ -656,10 +656,10 @@ export const LocationsManager = () => {
 
  <button
  onClick={() => handleDelete(location.id, location.name)}
- className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center space-x-3 transition-colors border-t border-white/10"
+ className="w-full px-4 py-3 text-left hover:bg-red-500/10 flex items-center space-x-3 transition-colors border-t border-white/10"
  >
- <Trash2 className="w-5 h-5 text-red-300" />
- <span className="text-sm font-medium text-red-300">Hapus</span>
+ <Trash2 className="w-5 h-5 text-red-400" />
+ <span className="text-sm font-medium text-red-400">Hapus</span>
  </button>
  </div>
  </>
@@ -892,7 +892,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
  <Card className="w-full max-w-lg max-h-[calc(100vh-8rem)] overflow-y-auto">
- <div className="sticky top-0 bg-white pb-4 border-b border-white/15">
+ <div className="sticky top-0 bg-slate-800/90 backdrop-blur-xl pb-4 border-b border-white/15">
  <h2 className="text-xl font-bold text-white">
  {location ? 'Edit Location' : 'Add Location'}
  </h2>

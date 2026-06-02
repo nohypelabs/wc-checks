@@ -58,7 +58,7 @@ export const PWAInstallPrompt = () => {
  }}
  className="fixed top-4 right-4 z-[60] w-full max-w-sm"
  >
- <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-5 mx-4">
+ <div className="bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 p-5 mx-4">
  {/* Header with close button */}
  <div className="flex items-start justify-between mb-3">
  <div className="flex items-center gap-3">
@@ -66,38 +66,38 @@ export const PWAInstallPrompt = () => {
  <Smartphone className="w-6 h-6 text-white" />
  </div>
  <div>
- <h3 className="font-bold text-gray-900 text-base">
+ <h3 className="font-bold text-white text-base">
  Install Aplikasi
  </h3>
- <p className="text-xs text-gray-500">Proservice Indonesia</p>
+ <p className="text-xs text-white/60">Proservice Indonesia</p>
  </div>
  </div>
  <motion.button
  onClick={handleDismiss}
- className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+ className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
  whileHover={{ scale: 1.05, rotate: 90 }}
  whileTap={{ scale: 0.95 }}
  >
- <X className="w-4 h-4 text-gray-500" />
+ <X className="w-4 h-4 text-white/60" />
  </motion.button>
  </div>
 
  {/* Content */}
- <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+ <p className="text-sm text-white/70 mb-4 leading-relaxed">
  Install aplikasi ini ke home screen untuk akses lebih cepat dan pengalaman yang lebih baik!
  </p>
 
  {/* Features/Benefits */}
  <div className="space-y-2 mb-4">
- <div className="flex items-center gap-2 text-xs text-gray-600">
+ <div className="flex items-center gap-2 text-xs text-white/70">
  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
  <span>Akses instant dari home screen</span>
  </div>
- <div className="flex items-center gap-2 text-xs text-gray-600">
+ <div className="flex items-center gap-2 text-xs text-white/70">
  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
  <span>Bekerja seperti aplikasi native</span>
  </div>
- <div className="flex items-center gap-2 text-xs text-gray-600">
+ <div className="flex items-center gap-2 text-xs text-white/70">
  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
  <span>Tidak perlu membuka browser</span>
  </div>
@@ -135,7 +135,7 @@ export const PWAInstallPrompt = () => {
 
  <motion.button
  onClick={handleDismiss}
- className="px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors text-sm font-medium"
+ className="px-4 py-2.5 text-white/70 hover:bg-white/10 rounded-xl transition-colors text-sm font-medium"
  whileHover={{ scale: 1.02 }}
  whileTap={{ scale: 0.98 }}
  >

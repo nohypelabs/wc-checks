@@ -23,7 +23,7 @@ export const Button = ({
  const variants = {
  primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg',
  secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
- outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-blue-500 bg-white',
+ outline: 'border border-white/20 text-white hover:bg-white/10 focus:ring-blue-500 bg-transparent',
  };
 
  const sizes = {

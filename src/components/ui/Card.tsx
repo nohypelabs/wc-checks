@@ -64,13 +64,13 @@ export const CardHeader = ({ title, subtitle, action, icon }: CardHeaderProps) =
  <div className="flex items-center justify-between mb-3">
  <div className="flex items-center gap-3">
  {icon && (
- <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-xl">
+ <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-xl">
  {icon}
  </div>
  )}
  <div>
- <h3 className="font-semibold text-gray-900">{title}</h3>
- {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+ <h3 className="font-semibold text-white">{title}</h3>
+ {subtitle && <p className="text-sm text-white/60">{subtitle}</p>}
  </div>
  </div>
  {action && <div>{action}</div>}
@@ -80,13 +80,13 @@ export const CardHeader = ({ title, subtitle, action, icon }: CardHeaderProps) =
 
 // Card Content Component
 export const CardContent = ({ children, className }: { children: ReactNode; className?: string }) => {
- return <div className={clsx('text-gray-700', className)}>{children}</div>;
+ return <div className={clsx('text-white/80', className)}>{children}</div>;
 };
 
 // Card Footer Component
 export const CardFooter = ({ children, className }: { children: ReactNode; className?: string }) => {
  return (
- <div className={clsx('mt-4 pt-4 border-t border-gray-100', className)}>
+ <div className={clsx('mt-4 pt-4 border-t border-white/10', className)}>
  {children}
  </div>
  );
