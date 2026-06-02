@@ -63,54 +63,39 @@ DROP POLICY IF EXISTS "audit_logs_select" ON audit_logs;
 -- 5. New RLS policies with org scoping
 -- ============================================================
 
--- Helper: check if user has no org (legacy/backward-compatible)
-CREATE OR REPLACE FUNCTION user_has_no_org()
-RETURNS BOOLEAN AS $$
-  SELECT get_user_org_id() IS NULL;
-$$ LANGUAGE sql SECURITY DEFINER STABLE;
-
 -- ORGANIZATIONS:
--- Super admins see all. Legacy users (no org) see all. Org users see their own.
+-- Super admins see all, others see only their own org
 CREATE POLICY "org_select_scoped" ON organizations
   FOR SELECT USING (
-    is_super_admin()
-    OR user_has_no_org()  -- legacy: backward compatible
-    OR id = get_user_org_id()
+    is_super_admin() OR id = get_user_org_id()
   );
 
 -- BUILDINGS:
--- Super admins see all. Legacy users see all active. Org users see their org's buildings.
+-- Super admins see all, others see only buildings in their org
 CREATE POLICY "building_select_scoped" ON buildings
   FOR SELECT USING (
     is_active = true AND (
-      is_super_admin()
-      OR user_has_no_org()  -- legacy: backward compatible
-      OR organization_id = get_user_org_id()
+      is_super_admin() OR organization_id = get_user_org_id()
     )
   );
 
 -- LOCATIONS:
--- Super admins see all. Legacy users see all active. Org users see their org's locations.
+-- Super admins see all, others see only locations in their org
 CREATE POLICY "location_select_scoped" ON locations
   FOR SELECT USING (
     is_active = true AND (
-      is_super_admin()
-      OR user_has_no_org()  -- legacy: backward compatible
-      OR organization_id = get_user_org_id()
+      is_super_admin() OR organization_id = get_user_org_id()
     )
   );
 
 -- INSPECTION RECORDS:
--- Users see own inspections. Super admins see all. Legacy admins see all. Org admins see org inspections.
+-- Users see own inspections. Admins see org inspections. Super admins see all.
 CREATE POLICY "inspection_select_scoped" ON inspection_records
   FOR SELECT USING (
     user_id = auth.uid()  -- own inspections
     OR is_super_admin()   -- super admin sees all
     OR (
-      is_admin() AND user_has_no_org()  -- legacy admin: sees all (backward compatible)
-    )
-    OR (
-      is_admin() AND EXISTS (  -- org admin sees org inspections
+      is_admin() AND EXISTS (  -- admin sees org inspections
         SELECT 1 FROM locations l
         WHERE l.id = inspection_records.location_id
         AND l.organization_id = get_user_org_id()
@@ -119,28 +104,21 @@ CREATE POLICY "inspection_select_scoped" ON inspection_records
   );
 
 -- USERS:
--- Users see own profile. Super admins see all. Legacy admins see all. Org admins see org users.
+-- Users see own profile. Admins see org users. Super admins see all.
 CREATE POLICY "user_select_scoped" ON users
   FOR SELECT USING (
     id = auth.uid()  -- own profile
     OR is_super_admin()  -- super admin sees all
     OR (
-      is_admin() AND user_has_no_org()  -- legacy admin: sees all (backward compatible)
-    )
-    OR (
-      is_admin() AND organization_id = get_user_org_id()  -- org admin sees org users
+      is_admin() AND organization_id = get_user_org_id()  -- admin sees org users
     )
   );
 
 -- AUDIT LOGS:
--- Super admins see all. Legacy admins see all. Org admins see org logs.
+-- Super admins see all, admins see org logs
 CREATE POLICY "audit_logs_select_scoped" ON audit_logs
   FOR SELECT USING (
-    is_super_admin()
-    OR (
-      is_admin() AND user_has_no_org()  -- legacy admin: sees all (backward compatible)
-    )
-    OR (
+    is_super_admin() OR (
       is_admin() AND (
         user_id = auth.uid()  -- own logs
         OR user_id IN (  -- logs from org users
