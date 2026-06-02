@@ -17,10 +17,10 @@ export const Card = ({
  className,
  ...props 
 }: CardProps) => {
- const baseStyles = 'bg-white rounded-2xl transition-all';
+ const baseStyles = 'rounded-2xl transition-all';
  
  const variants = {
- default: 'shadow-sm border border-gray-100',
+ default: 'bg-white shadow-sm border border-gray-100',
  flat: 'border border-gray-200',
  bordered: 'border-2 border-gray-200',
  glass: 'glass',
