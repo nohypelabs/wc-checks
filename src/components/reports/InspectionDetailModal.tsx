@@ -19,7 +19,7 @@ const getScoreGradient = (score: number) => {
 
 const getScoreTextColor = (score: number) => {
  if (score >= 90) return 'text-green-600';
- if (score >= 75) return 'text-blue-600';
+ if (score >= 75) return 'text-white/80';
  if (score >= 60) return 'text-yellow-600';
  return 'text-red-600';
 };
@@ -92,15 +92,15 @@ const getChoiceEmoji = (choice: string, category: string): string => {
 const getChoiceColor = (choice: string): string => {
  switch (choice) {
  case 'good':
- return 'bg-green-50 text-green-700 border-green-200';
+ return 'bg-green-500/15 text-green-200 border-green-400/25';
  case 'normal':
- return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+ return 'bg-yellow-500/15 text-yellow-200 border-yellow-400/25';
  case 'bad':
- return 'bg-red-50 text-red-700 border-red-200';
+ return 'bg-red-500/15 text-red-200 border-red-400/25';
  case 'other':
- return 'bg-blue-50 text-blue-700 border-blue-200';
+ return 'bg-blue-500/15 text-blue-200 border-blue-400/25';
  default:
- return 'bg-gray-50 text-gray-700 border-gray-200';
+ return 'bg-white/10 text-white/70 border-white/15';
  }
 };
 
@@ -163,7 +163,7 @@ export const InspectionDetailModal = ({
  className="fixed left-3 right-3 top-3 bottom-3 max-w-2xl mx-auto my-auto z-[60] max-h-[94vh]"
  onClick={(e) => e.stopPropagation()}
  >
- <div className="bg-white rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col">
+ <div className="bg-white/15 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col border border-white/20">
  {/* Header - Dynamic gradient based on score */}
  <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-4 text-white relative overflow-hidden rounded-t-3xl flex-shrink-0`}>
  {/* Animated background pattern */}
@@ -213,7 +213,7 @@ export const InspectionDetailModal = ({
  <span className={`text-2xl font-extrabold ${getScoreTextColor(score)}`}>
  {score}
  </span>
- <span className="text-xs text-gray-500 font-medium">/100</span>
+ <span className="text-xs text-white/50 font-medium">/100</span>
  </div>
  </div>
  <div className="flex items-center gap-1 mt-1">
@@ -230,28 +230,28 @@ export const InspectionDetailModal = ({
  {/* Metadata - Compact inline cards */}
  <div className="grid grid-cols-2 gap-2">
  {/* Date & Time Card */}
- <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-2.5 border border-blue-100 shadow-sm">
+ <div className="bg-white/10 rounded-xl p-2.5 border border-white/15">
  <div className="flex items-center space-x-2">
- <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
- <Clock className="w-4 h-4 text-blue-600" />
+ <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <Clock className="w-4 h-4 text-white/80" />
  </div>
  <div className="flex-1 min-w-0">
- <p className="text-xs font-medium text-blue-600">Tanggal & Waktu</p>
- <p className="font-semibold text-gray-900 text-xs truncate">{formattedDate}</p>
- <p className="text-xs text-gray-600">{inspection.inspection_time}</p>
+ <p className="text-xs font-medium text-white/80">Tanggal & Waktu</p>
+ <p className="font-semibold text-white text-xs truncate">{formattedDate}</p>
+ <p className="text-xs text-white/70">{inspection.inspection_time}</p>
  </div>
  </div>
  </div>
 
  {/* Inspector Card */}
- <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-2.5 border border-purple-100 shadow-sm">
+ <div className="bg-white/10 rounded-xl p-2.5 border border-white/15">
  <div className="flex items-center space-x-2">
- <div className="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
- <User className="w-4 h-4 text-purple-600" />
+ <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <User className="w-4 h-4 text-white/80" />
  </div>
  <div className="flex-1 min-w-0">
- <p className="text-xs font-medium text-purple-600">Inspektur</p>
- <p className="font-semibold text-gray-900 text-xs truncate">{inspection.user?.full_name}</p>
+ <p className="text-xs font-medium text-white/80">Inspektur</p>
+ <p className="font-semibold text-white text-xs truncate">{inspection.user?.full_name}</p>
  {inspection.occupation ? (
  <div className="flex items-center gap-1 mt-0.5">
  {inspection.occupation.icon && (
@@ -265,7 +265,7 @@ export const InspectionDetailModal = ({
  </span>
  </div>
  ) : (
- <p className="text-xs text-gray-600 truncate">{inspection.user?.email}</p>
+ <p className="text-xs text-white/70 truncate">{inspection.user?.email}</p>
  )}
  </div>
  </div>
@@ -274,7 +274,7 @@ export const InspectionDetailModal = ({
 
  {/* Component Ratings */}
  <div>
- <h3 className="font-bold text-gray-900 mb-2 flex items-center space-x-1.5 text-sm">
+ <h3 className="font-bold text-white mb-2 flex items-center space-x-1.5 text-sm">
  <span>📋</span>
  <span>Penilaian Komponen</span>
  </h3>
@@ -288,7 +288,7 @@ export const InspectionDetailModal = ({
  return (
  <motion.div
  key={index}
- className="rounded-lg px-3 py-2 border bg-gray-50 border-gray-200"
+ className="rounded-lg px-3 py-2 border bg-white/10 border-white/15"
  {...slideInLeft}
  transition={{
  ...slideInLeft.transition,
@@ -300,13 +300,13 @@ export const InspectionDetailModal = ({
  <span className="text-base">
  {inspectionMode === 'genz' ? component.iconGenZ : component.icon}
  </span>
- <span className="text-sm font-medium text-gray-900">
+ <span className="text-sm font-medium text-white">
  {component.labelGenZ || component.label}
  </span>
  </div>
  <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
  <span className="text-base">⏭️</span>
- <span className="text-xs font-medium text-gray-500">Tidak Ada</span>
+ <span className="text-xs font-medium text-white/50">Tidak Ada</span>
  </div>
  </div>
  </motion.div>
@@ -331,12 +331,12 @@ export const InspectionDetailModal = ({
  <span className="text-base">
  {inspectionMode === 'genz' ? component.iconGenZ : component.icon}
  </span>
- <span className="text-sm font-medium text-gray-900">
+ <span className="text-sm font-medium text-white">
  {component.labelGenZ || component.label}
  </span>
  </div>
  {rating.notes && (
- <p className="text-xs text-gray-600 mt-1 pl-6">
+ <p className="text-xs text-white/70 mt-1 pl-6">
  💬 {rating.notes}
  </p>
  )}
@@ -360,10 +360,10 @@ export const InspectionDetailModal = ({
  {issues && (
  <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
  <div className="flex items-start space-x-2">
- <AlertCircle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+ <AlertCircle className="w-4 h-4 text-orange-300 mt-0.5 flex-shrink-0" />
  <div>
- <h4 className="font-semibold text-orange-900 text-sm">Masalah Ditemukan</h4>
- <p className="text-xs text-orange-800 mt-0.5">{issues.description}</p>
+ <h4 className="font-semibold text-white text-sm">Masalah Ditemukan</h4>
+ <p className="text-xs text-white/70 mt-0.5">{issues.description}</p>
  </div>
  </div>
  </div>
@@ -374,19 +374,19 @@ export const InspectionDetailModal = ({
  <div className={`
  border rounded-lg px-3 py-2
  ${maintenance.priority === 'urgent'
- ? 'bg-red-50 border-red-200'
+ ? 'bg-red-500/15 border-red-400/25'
  : maintenance.priority === 'high'
- ? 'bg-orange-50 border-orange-200'
+ ? 'bg-orange-500/15 border-orange-400/25'
  : maintenance.priority === 'medium'
- ? 'bg-yellow-50 border-yellow-200'
- : 'bg-blue-50 border-blue-200'
+ ? 'bg-yellow-500/15 border-yellow-400/25'
+ : 'bg-blue-500/15 border-blue-400/25'
  }
  `}>
  <div className="flex items-center space-x-2">
  <span className="text-base">🔧</span>
  <div>
- <h4 className="font-semibold text-gray-900 text-sm">Perlu Perbaikan</h4>
- <p className="text-xs text-gray-700">
+ <h4 className="font-semibold text-white text-sm">Perlu Perbaikan</h4>
+ <p className="text-xs text-white/80">
  Prioritas: <span className="font-semibold capitalize">{maintenance.priority}</span>
  </p>
  </div>
@@ -397,7 +397,7 @@ export const InspectionDetailModal = ({
  {/* Photos */}
  {inspection.photo_urls && inspection.photo_urls.length > 0 && (
  <div>
- <h3 className="font-bold text-gray-900 mb-2 flex items-center space-x-1.5 text-sm">
+ <h3 className="font-bold text-white mb-2 flex items-center space-x-1.5 text-sm">
  <Camera className="w-4 h-4" />
  <span>Foto Dokumentasi ({inspection.photo_urls.length})</span>
  </h3>
@@ -434,12 +434,12 @@ export const InspectionDetailModal = ({
 
  {/* General Notes */}
  {inspection.notes && (
- <div className="bg-gray-50 rounded-lg px-3 py-2">
+ <div className="bg-white/10 rounded-lg px-3 py-2">
  <div className="flex items-start space-x-2">
- <FileText className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+ <FileText className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
  <div>
- <h4 className="font-semibold text-gray-900 text-sm">Catatan Umum</h4>
- <p className="text-xs text-gray-700 mt-0.5">{inspection.notes}</p>
+ <h4 className="font-semibold text-white text-sm">Catatan Umum</h4>
+ <p className="text-xs text-white/80 mt-0.5">{inspection.notes}</p>
  </div>
  </div>
  </div>
