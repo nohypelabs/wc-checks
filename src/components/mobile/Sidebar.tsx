@@ -13,6 +13,7 @@ import {
   Info,
   BarChart3,
   Users,
+  Tag,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
@@ -51,6 +52,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { icon: Settings, label: 'Pengaturan', path: '/settings', description: 'Preferensi aplikasi' },
     { icon: HelpCircle, label: 'Bantuan & FAQ', path: '/help', description: 'Panduan penggunaan' },
     { icon: Info, label: 'Tentang Aplikasi', path: '/about', description: 'Versi & informasi' },
+  { icon: Tag, label: 'Changelog', path: '/changelog', description: 'Riwayat pembaruan' },
   ];
 
   const adminMenuItems = [
