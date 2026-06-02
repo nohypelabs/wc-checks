@@ -179,7 +179,7 @@ export const AnalyticsPage = () => {
  onClick={() => setSidebarOpen(true)}
  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
  >
- <Menu className="w-5 h-5" />
+ <Menu className="w-5 h-5 text-white" />
  </button>
  <div>
  <h1 className="text-xl font-bold text-white">Analitik</h1>
