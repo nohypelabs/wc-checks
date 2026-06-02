@@ -164,7 +164,7 @@ export function LoginPage() {
  type="email"
  value={email}
  onChange={(e) => setEmail(e.target.value)}
- className="block w-full pl-10 pr-3 py-3 border border-white/15 rounded-lg bg-slate-800/80 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-3 py-3 text-white border border-white/15 rounded-lg bg-slate-800/80 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40"
  placeholder="your.email@example.com"
  disabled={isLoading}
  autoComplete="email"
@@ -186,7 +186,7 @@ export function LoginPage() {
  type={showPassword ? 'text' : 'password'}
  value={password}
  onChange={(e) => setPassword(e.target.value)}
- className="block w-full pl-10 pr-12 py-3 border border-white/15 rounded-lg bg-slate-800/80 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-12 py-3 text-white border border-white/15 rounded-lg bg-slate-800/80 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40"
  placeholder="Masukkan kata sandi Anda"
  disabled={isLoading}
  autoComplete="current-password"

@@ -230,7 +230,7 @@ export const RegisterPage = () => {
  <input
  {...register('full_name')}
  type="text"
- className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40"
  placeholder="Masukkan nama lengkap Anda"
  disabled={isLoading}
  />
@@ -252,7 +252,7 @@ export const RegisterPage = () => {
  <input
  {...register('email')}
  type="email"
- className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40"
  placeholder="email.anda@example.com"
  disabled={isLoading}
  />
@@ -274,7 +274,7 @@ export const RegisterPage = () => {
  <input
  {...register('phone')}
  type="tel"
- className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40"
  placeholder="081234567890"
  disabled={isLoading}
  />
@@ -300,7 +300,7 @@ export const RegisterPage = () => {
  ) : (
  <select
  {...register('occupation_id')}
- className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+ className="block w-full pl-10 pr-3 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40 appearance-none cursor-pointer"
  disabled={isLoading}
  >
  <option value="">Pilih jabatan Anda</option>
@@ -323,7 +323,7 @@ export const RegisterPage = () => {
  <input
  {...register('password')}
  type={showPassword ? 'text' : 'password'}
- className="block w-full pl-4 pr-12 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-4 pr-12 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40"
  placeholder="Masukkan kata sandi Anda"
  disabled={isLoading}
  />
@@ -355,7 +355,7 @@ export const RegisterPage = () => {
  <input
  {...register('confirmPassword')}
  type={showConfirmPassword ? 'text' : 'password'}
- className="block w-full pl-4 pr-12 py-3 bg-slate-800/80 border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="block w-full pl-4 pr-12 py-3 bg-slate-800/80 text-white border border-white/15 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-white/40"
  placeholder="Konfirmasi kata sandi Anda"
  disabled={isLoading}
  />
