@@ -55,13 +55,13 @@ export const RatingSelector = ({
  ${genZMode ? 'bg-purple-500/20' : 'bg-blue-500/20'}
  `}
  >
- {genZMode ? (
- config.iconGenZ
- ) : IconComponent ? (
- <IconComponent className="w-6 h-6 text-blue-600" />
- ) : (
- config.icon
- )}
+ {(() => {
+  const iconToUse = genZMode ? config.iconGenZ : config.icon;
+  const ResolvedIcon = iconToUse ? (Icons as any)[iconToUse] : null;
+  return ResolvedIcon ? (
+   <ResolvedIcon className={`w-6 h-6 ${genZMode ? 'text-white' : 'text-blue-400'}`} />
+  ) : null;
+ })()}
  </div>
  <div>
  <h3 className={`font-semibold ${genZMode ? 'text-white' : 'text-white'}`}>
@@ -113,7 +113,7 @@ export const RatingSelector = ({
  }
  `}
  >
- ✅ {genZMode ? 'Ada' : 'Available'}
+ {genZMode ? 'Ada' : 'Available'}
  </button>
  <button
  type="button"
@@ -129,7 +129,7 @@ export const RatingSelector = ({
  }
  `}
  >
- ❌ {genZMode ? 'Tidak Ada' : 'Not Available'}
+ {genZMode ? 'Tidak Ada' : 'Not Available'}
  </button>
  </div>
  </div>
