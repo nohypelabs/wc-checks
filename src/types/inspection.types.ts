@@ -63,8 +63,8 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     label: 'Aroma/Odor Level',
     labelGenZ: 'Aroma',
     weight: 0.15,
-    icon: 'Wind',
-    iconGenZ: 'Wind',
+    icon: 'Flower2',
+    iconGenZ: 'Flower2',
     required: true,
     allowPhoto: false,
     choices: {
@@ -319,8 +319,8 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     label: 'Air Freshener',
     labelGenZ: 'Pengharum Ruangan',
     weight: 0.04,
-    icon: 'Wind',
-    iconGenZ: 'Wind',
+    icon: 'Flower2',
+    iconGenZ: 'Flower2',
     required: true,
     allowPhoto: false,
     choices: {
