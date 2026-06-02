@@ -100,8 +100,6 @@ export const AdminDashboard = () => {
  {/* Trend Chart */}
  <div className="mb-3 lg:mb-5">
  <InspectionTrendChart
- data={stats?.dailyTrend || []}
- totalInspections={stats?.totalInspections || 0}
  inspectionGrowth={stats?.inspectionGrowth || 0}
  />
  </div>

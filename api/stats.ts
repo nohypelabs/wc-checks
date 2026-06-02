@@ -71,8 +71,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('[stats] Date filters:', { today, yesterday, weekAgo, monthAgo });
 
-    // 30 days ago for trend
-    const thirtyDaysAgo = (() => { const d = new Date(now); d.setDate(d.getDate() - 30); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
+    // Trend period (supports ?days=7, 30, 90, or default 30)
+    const trendDays = Math.min(Math.max(Number(req.query.days) || 30, 1), 365);
+    const trendStartDate = (() => { const d = new Date(now); d.setDate(d.getDate() - trendDays); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
 
     // Parallel queries for better performance
     const [
@@ -146,11 +147,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .select('responses')
         .limit(100),
 
-      // Daily trend — last 30 days
+      // Daily trend — configurable period
       supabase
         .from('inspection_records')
         .select('inspection_date')
-        .gte('inspection_date', thirtyDaysAgo)
+        .gte('inspection_date', trendStartDate)
         .order('inspection_date', { ascending: true })
         .range(0, 9999),
     ]);
@@ -194,7 +195,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Aggregate daily trend
     const trendMap = new Map<string, number>();
-    for (let i = 29; i >= 0; i--) {
+    for (let i = trendDays - 1; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
