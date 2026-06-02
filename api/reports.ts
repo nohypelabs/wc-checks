@@ -102,9 +102,7 @@ async function handleAnalytics(
   currentUserId: string,
   targetUserId: string | undefined,
   monthStr: string | undefined,
-  buildingIdStr?: string,
-  orgId?: string | null,
-  isSuperAdmin?: boolean
+  buildingIdStr?: string
 ): Promise<void> {
   if (!supabase) {
     errorResponse(res, 500, 'Database not initialized');
@@ -157,11 +155,6 @@ async function handleAnalytics(
     // Filter by user if specified
     if (targetUserId) {
       query = query.eq('user_id', targetUserId);
-    }
-
-    // Org scoping: non-superadmin only sees their org's data
-    if (!isSuperAdmin && orgId) {
-      query = query.eq('locations.organization_id', orgId);
     }
 
     // Apply building filter
@@ -361,9 +354,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const buildingIdStr = Array.isArray(buildingId) ? buildingId[0] : buildingId;
 
   const isAdmin = auth.userRole.level >= 80;
-  const isSuperAdmin = auth.userRole.level >= 100;
   const currentUserId = auth.userId;
-  const orgId = auth.organizationId;
 
   // 🔍 DEBUG: Log auth details with detailed role check
   console.log('[reports] 🔐 Auth details:', {
@@ -422,7 +413,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ===== ANALYTICS MODE =====
     if (analyticsStr === 'true') {
-      await handleAnalytics(res, isAdmin, currentUserId, targetUserId, monthStr, buildingIdStr, orgId, isSuperAdmin);
+      await handleAnalytics(res, isAdmin, currentUserId, targetUserId, monthStr, buildingIdStr);
       return; // handleAnalytics handles response
     }
 
@@ -466,11 +457,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       query = query.eq('user_id', targetUserId);
     }
     // else: no filter = ALL users (admin only)
-
-    // Org scoping: non-superadmin only sees their org's data
-    if (!isSuperAdmin && orgId) {
-      query = query.eq('location.organization_id', orgId);
-    }
 
     // Apply building filter via locations table
     if (buildingIdStr) {

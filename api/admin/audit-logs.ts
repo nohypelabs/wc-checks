@@ -78,23 +78,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .order('created_at', { ascending: false })
       .limit(parsedLimit);
 
-    // Org scoping: non-superadmin only sees their org's audit logs
-    const isSuperAdmin = auth.userRole.level >= 100;
-    if (!isSuperAdmin && auth.organizationId) {
-      // Get user IDs in the same org
-      const { data: orgUsers } = await supabase
-        .from('users')
-        .select('id')
-        .eq('organization_id', auth.organizationId);
-      const orgUserIds = (orgUsers || []).map((u: any) => u.id);
-      if (orgUserIds.length > 0) {
-        query = query.in('user_id', orgUserIds);
-      } else {
-        // No users in org = no logs
-        return successResponse(res, [], 'No audit logs found');
-      }
-    }
-
     // Apply filters
     if (userIdStr) {
       query = query.eq('user_id', userIdStr);
