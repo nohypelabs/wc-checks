@@ -183,7 +183,7 @@ export const ProfilePage = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600 text-sm">Memuat profil...</p>
+ <p className="text-white/60 text-sm">Memuat profil...</p>
  </div>
  </div>
  );
@@ -228,7 +228,7 @@ export const ProfilePage = () => {
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Simple Header - White */}
- <div className="bg-white pt-12 pb-8 px-6 border-b border-gray-100">
+ <div className="bg-white/8 backdrop-blur-md pt-12 pb-8 px-6 border-b border-white/10">
  <div className="flex items-center gap-3">
  <button
  onClick={() => setSidebarOpen(true)}
@@ -242,7 +242,7 @@ export const ProfilePage = () => {
 
  {/* Profile Card */}
  <div className="px-6 py-6">
- <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 p-6">
+ <div className="bg-white/8 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/5 p-6">
  {/* Profile Photo */}
  <div className="flex justify-center mb-6">
  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
@@ -263,12 +263,12 @@ export const ProfilePage = () => {
  {/* Role Badge */}
  <div className="flex items-center justify-center gap-2 flex-wrap">
  {isAdmin ? (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-100 to-purple-50 border border-purple-200 rounded-full text-sm text-purple-700 font-medium">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-100 to-purple-50 border border-purple-200 rounded-full text-sm text-purple-300 font-medium">
  <Shield className="w-4 h-4" />
  <span>Administrator</span>
  </div>
  ) : (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-sm text-blue-700 font-medium">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-sm text-blue-300 font-medium">
  <UserIcon className="w-4 h-4" />
  <span>Pengguna</span>
  </div>
@@ -276,7 +276,7 @@ export const ProfilePage = () => {
 
  {/* Account Status */}
  {profile.is_active ? (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 border border-green-200 rounded-full text-xs text-green-700 font-medium">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 border border-green-200 rounded-full text-xs text-green-300 font-medium">
  <CheckCircle2 className="w-3 h-3" />
  <span>Aktif</span>
  </div>
@@ -289,7 +289,7 @@ export const ProfilePage = () => {
  </div>
  </>
  ) : (
- <div className="text-sm text-gray-600">
+ <div className="text-sm text-white/60">
  Edit informasi profil Anda
  </div>
  )}
@@ -301,36 +301,36 @@ export const ProfilePage = () => {
  {/* Read-only view */}
  <div className="space-y-3 mb-6">
  {/* Email */}
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Mail className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Mail className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Email</div>
+ <div className="text-xs text-white/50">Email</div>
  <div className="font-medium text-white">{profile.email || 'N/A'}</div>
  </div>
  </div>
 
  {/* Phone */}
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Phone className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Phone className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Nomor Telepon</div>
+ <div className="text-xs text-white/50">Nomor Telepon</div>
  <div className="font-medium text-white">{profile.phone || 'Belum diisi'}</div>
  </div>
  </div>
 
  {/* Occupation/Jabatan */}
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
  <Briefcase
  className="w-5 h-5"
  style={{ color: occupation?.color || '#6b7280' }}
  />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Jabatan</div>
+ <div className="text-xs text-white/50">Jabatan</div>
  <div className="font-medium text-white">
  {occupation?.display_name || 'Belum diisi'}
  </div>
  {occupation?.description && (
- <div className="text-xs text-gray-500 mt-0.5">
+ <div className="text-xs text-white/50 mt-0.5">
  {occupation.description}
  </div>
  )}
@@ -338,10 +338,10 @@ export const ProfilePage = () => {
  </div>
 
  {/* Member Since */}
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Calendar className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Calendar className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Bergabung Sejak</div>
+ <div className="text-xs text-white/50">Bergabung Sejak</div>
  <div className="font-medium text-white">
  {formatDate(profile.created_at) !== 'N/A'
  ? formatDate(profile.created_at)
@@ -354,10 +354,10 @@ export const ProfilePage = () => {
 
  {/* Last Login */}
  {profile.last_login_at && (
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Clock className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Clock className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Login Terakhir</div>
+ <div className="text-xs text-white/50">Login Terakhir</div>
  <div className="font-medium text-white">
  {formatDateTime(profile.last_login_at)}
  </div>
@@ -388,7 +388,7 @@ export const ProfilePage = () => {
  type="text"
  value={editForm.full_name}
  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
- className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  placeholder="Masukkan nama lengkap"
  disabled={isSaving}
  required
@@ -404,7 +404,7 @@ export const ProfilePage = () => {
  type="tel"
  value={editForm.phone}
  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
- className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  placeholder="Contoh: 081234567890"
  disabled={isSaving}
  />
@@ -418,7 +418,7 @@ export const ProfilePage = () => {
  <select
  value={editForm.occupation_id}
  onChange={(e) => setEditForm({ ...editForm, occupation_id: e.target.value })}
- className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+ className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
  disabled={isSaving}
  >
  <option value="">Pilih Jabatan</option>
@@ -436,7 +436,7 @@ export const ProfilePage = () => {
  <button
  onClick={handleCancelEdit}
  disabled={isSaving}
- className="flex-1 flex items-center justify-center gap-2 p-4 bg-gray-100 text-gray-700 rounded-2xl font-medium hover:bg-gray-200 active:translate-y-1 transition-all disabled:opacity-50"
+ className="flex-1 flex items-center justify-center gap-2 p-4 bg-white/10 text-white/70 rounded-2xl font-medium hover:bg-white/15 active:translate-y-1 transition-all disabled:opacity-50"
  >
  <XIcon className="w-5 h-5" />
  <span>Batal</span>
@@ -468,7 +468,7 @@ export const ProfilePage = () => {
  <div className="mt-6">
  <button
  onClick={handleLogout}
- className="w-full flex items-center justify-center gap-2 p-4 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50 rounded-2xl font-medium text-red-600 active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all"
+ className="w-full flex items-center justify-center gap-2 p-4 bg-white/8 backdrop-blur-md shadow-lg shadow-blue-500/5 ring-1 ring-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/5 rounded-2xl font-medium text-red-300 active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all"
  >
  <LogOut className="w-5 h-5" />
  <span>Keluar</span>

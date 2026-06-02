@@ -116,11 +116,11 @@ export const UserManagement = () => {
  };
 
  const getRoleBadgeColor = (level: number | undefined) => {
- if (!level) return 'bg-gray-100 text-gray-600';
- if (level >= 100) return 'bg-purple-100 text-purple-700 border-purple-300';
- if (level >= 80) return 'bg-blue-100 text-blue-700 border-blue-300';
- if (level >= 50) return 'bg-green-100 text-green-700 border-green-300';
- return 'bg-gray-100 text-gray-600 border-gray-300';
+ if (!level) return 'bg-white/10 text-white/60';
+ if (level >= 100) return 'bg-purple-100 text-purple-300 border-purple-300';
+ if (level >= 80) return 'bg-blue-100 text-blue-300 border-blue-400/40';
+ if (level >= 50) return 'bg-green-100 text-green-300 border-green-300';
+ return 'bg-white/10 text-white/60 border-white/20';
  };
 
  console.log('🔵 [UserManagement] Render state:', {
@@ -138,7 +138,7 @@ export const UserManagement = () => {
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
- <p className="text-gray-600">
+ <p className="text-white/60">
  {authLoading ? 'Loading authentication...' : !user ? 'Loading user...' : 'Verifying superadmin access...'}
  </p>
  </div>
@@ -202,13 +202,13 @@ export const UserManagement = () => {
  <div className="p-4 space-y-3">
  {/* Search */}
  <div className="relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
  <input
  type="text"
  placeholder="Search by name or email..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+ className="w-full pl-10 pr-4 py-3 border border-white/15 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
  />
  </div>
 
@@ -216,7 +216,7 @@ export const UserManagement = () => {
  <select
  value={roleFilter}
  onChange={(e) => setRoleFilter(e.target.value)}
- className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+ className="w-full px-4 py-3 border border-white/15 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
  >
  <option value="all">All Roles</option>
  <option value="none">No Role Assigned</option>
@@ -233,13 +233,13 @@ export const UserManagement = () => {
  {usersLoading ? (
  <div className="text-center py-8">
  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
- <p className="text-gray-600 text-sm">Loading users...</p>
+ <p className="text-white/60 text-sm">Loading users...</p>
  </div>
  ) : filteredUsers && filteredUsers.length > 0 ? (
  filteredUsers.map((user) => (
  <div
  key={user.id}
- className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4"
+ className="bg-white rounded-2xl shadow-sm border border-white/10 p-4"
  >
  {/* User Info */}
  <div className="flex items-start justify-between mb-3">
@@ -254,11 +254,11 @@ export const UserManagement = () => {
  <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
  )}
  </div>
- <p className="text-sm text-gray-600 truncate">{user.email}</p>
+ <p className="text-sm text-white/60 truncate">{user.email}</p>
  {user.phone && (
- <p className="text-xs text-gray-500 mt-0.5">{user.phone}</p>
+ <p className="text-xs text-white/50 mt-0.5">{user.phone}</p>
  )}
- <p className="text-xs text-gray-400 mt-1">
+ <p className="text-xs text-white/40 mt-1">
  Joined {user.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : 'N/A'}
  </p>
  </div>
@@ -283,7 +283,7 @@ export const UserManagement = () => {
  <select
  value={user.role?.id || ''}
  onChange={(e) => handleRoleChange(user.id, e.target.value)}
- className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+ className="w-full px-3 py-2 border border-white/15 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
  disabled={assignRoleMutation.isPending}
  >
  <option value="">No Role</option>
@@ -296,7 +296,7 @@ export const UserManagement = () => {
  </div>
 
  {/* Status Toggle */}
- <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+ <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
  <span className="text-sm text-white/80">User Status</span>
  <button
  onClick={() => handleToggleStatus(user.id, user.is_active ?? true)}
@@ -304,7 +304,7 @@ export const UserManagement = () => {
  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
  user.is_active
  ? 'bg-red-50 text-red-700 hover:bg-red-100'
- : 'bg-green-50 text-green-700 hover:bg-green-100'
+ : 'bg-green-50 text-green-300 hover:bg-green-100'
  }`}
  >
  {user.is_active ? 'Deactivate' : 'Activate'}
@@ -315,8 +315,8 @@ export const UserManagement = () => {
  ) : (
  <div className="text-center py-12">
  <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
- <p className="text-gray-600 font-medium">No users found</p>
- <p className="text-gray-500 text-sm mt-1">
+ <p className="text-white/60 font-medium">No users found</p>
+ <p className="text-white/50 text-sm mt-1">
  Try adjusting your search or filters
  </p>
  </div>
@@ -326,9 +326,9 @@ export const UserManagement = () => {
  {/* Info Banner */}
  <div className="px-4 mt-6">
  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
- <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+ <AlertCircle className="w-5 h-5 text-blue-300 flex-shrink-0 mt-0.5" />
  <div className="flex-1">
- <h4 className="font-semibold text-blue-900 text-sm mb-1">
+ <h4 className="font-semibold text-blue-200 text-sm mb-1">
  Role Level Guide
  </h4>
  <ul className="text-xs text-blue-800 space-y-1">

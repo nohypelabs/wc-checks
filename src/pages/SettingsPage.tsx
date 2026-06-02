@@ -20,11 +20,11 @@ export const SettingsPage = () => {
  onClick={() => setSidebarOpen(true)}
  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
  >
- <Menu className="w-5 h-5 text-gray-600" />
+ <Menu className="w-5 h-5 text-white/60" />
  </button>
  <div>
  <h1 className="text-xl font-bold text-white">Pengaturan</h1>
- <p className="text-sm text-gray-500">Preferensi aplikasi</p>
+ <p className="text-sm text-white/50">Preferensi aplikasi</p>
  </div>
  </div>
  </div>
@@ -35,26 +35,26 @@ export const SettingsPage = () => {
  <Card>
  <h2 className="font-bold text-white mb-3">Tampilan</h2>
  <div className="space-y-3">
- <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+ <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/8 transition-colors">
  <div className="flex items-center gap-3">
- <Moon className="w-5 h-5 text-gray-600" />
+ <Moon className="w-5 h-5 text-white/60" />
  <div className="text-left">
  <p className="font-medium text-white">Mode Gelap</p>
- <p className="text-xs text-gray-500">Segera hadir</p>
+ <p className="text-xs text-white/50">Segera hadir</p>
  </div>
  </div>
- <div className="text-sm text-gray-400">Tidak Aktif</div>
+ <div className="text-sm text-white/40">Tidak Aktif</div>
  </button>
 
- <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+ <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/8 transition-colors">
  <div className="flex items-center gap-3">
- <Globe className="w-5 h-5 text-gray-600" />
+ <Globe className="w-5 h-5 text-white/60" />
  <div className="text-left">
  <p className="font-medium text-white">Bahasa</p>
- <p className="text-xs text-gray-500">Pilih bahasa aplikasi</p>
+ <p className="text-xs text-white/50">Pilih bahasa aplikasi</p>
  </div>
  </div>
- <div className="text-sm text-blue-600">Bahasa Indonesia</div>
+ <div className="text-sm text-blue-300">Bahasa Indonesia</div>
  </button>
  </div>
  </Card>
@@ -63,15 +63,15 @@ export const SettingsPage = () => {
  <Card>
  <h2 className="font-bold text-white mb-3">Notifikasi</h2>
  <div className="space-y-3">
- <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+ <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/8 transition-colors">
  <div className="flex items-center gap-3">
- <Bell className="w-5 h-5 text-gray-600" />
+ <Bell className="w-5 h-5 text-white/60" />
  <div className="text-left">
  <p className="font-medium text-white">Notifikasi Push</p>
- <p className="text-xs text-gray-500">Pengingat inspeksi</p>
+ <p className="text-xs text-white/50">Pengingat inspeksi</p>
  </div>
  </div>
- <div className="text-sm text-gray-400">Tidak Aktif</div>
+ <div className="text-sm text-white/40">Tidak Aktif</div>
  </button>
  </div>
  </Card>
@@ -80,22 +80,22 @@ export const SettingsPage = () => {
  <Card>
  <h2 className="font-bold text-white mb-3">Data & Penyimpanan</h2>
  <div className="space-y-3">
- <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+ <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/8 transition-colors">
  <div className="flex items-center gap-3">
- <Download className="w-5 h-5 text-gray-600" />
+ <Download className="w-5 h-5 text-white/60" />
  <div className="text-left">
  <p className="font-medium text-white">Ekspor Data</p>
- <p className="text-xs text-gray-500">Unduh semua data Anda</p>
+ <p className="text-xs text-white/50">Unduh semua data Anda</p>
  </div>
  </div>
  </button>
 
- <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+ <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/8 transition-colors">
  <div className="flex items-center gap-3">
- <Trash2 className="w-5 h-5 text-red-600" />
+ <Trash2 className="w-5 h-5 text-red-300" />
  <div className="text-left">
- <p className="font-medium text-red-600">Hapus Cache</p>
- <p className="text-xs text-gray-500">Bersihkan data temporary</p>
+ <p className="font-medium text-red-300">Hapus Cache</p>
+ <p className="text-xs text-white/50">Bersihkan data temporary</p>
  </div>
  </div>
  </button>
@@ -107,11 +107,11 @@ export const SettingsPage = () => {
  <h2 className="font-bold text-white mb-3">Informasi Aplikasi</h2>
  <div className="space-y-2 text-sm">
  <div className="flex justify-between">
- <span className="text-gray-600">Versi</span>
+ <span className="text-white/60">Versi</span>
  <span className="font-medium text-white">3.0.0</span>
  </div>
  <div className="flex justify-between">
- <span className="text-gray-600">Email</span>
+ <span className="text-white/60">Email</span>
  <span className="font-medium text-white truncate ml-4">{user?.email}</span>
  </div>
  </div>
@@ -119,7 +119,7 @@ export const SettingsPage = () => {
 
  {/* Coming Soon Notice */}
  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
- <p className="text-sm text-blue-700">
+ <p className="text-sm text-blue-300">
  💡 Fitur pengaturan lanjutan akan segera hadir
  </p>
  </div>

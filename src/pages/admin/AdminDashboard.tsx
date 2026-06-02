@@ -64,7 +64,7 @@ export const AdminDashboard = () => {
  </div>
  <div>
  <h1 className="text-sm font-bold leading-tight text-white">Proservice Indonesia</h1>
- <p className="text-[11px] text-gray-500">Aplikasi Toilet Ceklis Real Time</p>
+ <p className="text-[11px] text-white/50">Aplikasi Toilet Ceklis Real Time</p>
  </div>
  </div>
 
@@ -81,7 +81,7 @@ export const AdminDashboard = () => {
 
  {/* Right: Welcome + Settings */}
  <div className="flex items-center gap-1.5">
- <span className="hidden lg:inline text-xs text-gray-600">
+ <span className="hidden lg:inline text-xs text-white/60">
  Selamat datang, {isAdmin ? 'Admin' : 'User'} <span className="font-semibold text-white">{profile?.full_name?.split(' ')[0] || ''}</span>
  </span>
  <button

@@ -16,7 +16,7 @@ interface InspectionDrawerProps {
 }
 
 const getScoreColor = (score: number) => {
- if (score >= 85) return 'bg-green-500/20 text-green-200 border-green-400/30 lg:text-green-700 lg:border-green-200';
+ if (score >= 85) return 'bg-green-500/20 text-green-200 border-green-400/30 lg:text-green-300 lg:border-green-200';
  if (score >= 70) return 'bg-yellow-500/20 text-yellow-200 border-yellow-400/30 lg:bg-yellow-100 lg:text-yellow-700 lg:border-yellow-200';
  return 'bg-red-500/20 text-red-200 border-red-400/30 lg:text-red-700 lg:border-red-200';
 };
@@ -161,7 +161,7 @@ export const InspectionDrawer = ({
  {formattedDate}
  </p>
  <div className="flex items-center space-x-2 mt-2">
- <span className="px-2 py-1 bg-white/10 text-white border border-white/30 text-xs font-medium rounded-full lg:text-blue-700 lg:border-blue-200">
+ <span className="px-2 py-1 bg-white/10 text-white border border-white/30 text-xs font-medium rounded-full lg:text-blue-300 lg:border-blue-200">
  {inspections.length} inspeksi
  </span>
  </div>

@@ -191,7 +191,7 @@ export const Dashboard = () => {
  />
  <div>
  <h1 className="text-xl font-bold text-white">Proservice Indonesia</h1>
- <p className="text-sm text-gray-500">
+ <p className="text-sm text-white/50">
  Hai, {profile?.full_name || user?.email?.split('@')[0] || 'Pengguna'}
  </p>
  </div>
@@ -201,7 +201,7 @@ export const Dashboard = () => {
  onClick={() => navigate('/profile')}
  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
  >
- <User className="w-5 h-5 text-gray-600" />
+ <User className="w-5 h-5 text-white/60" />
  </button>
  </div>
  </div>
@@ -215,19 +215,19 @@ export const Dashboard = () => {
  <div className="grid grid-cols-2 gap-3">
  <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
  <p className="text-3xl font-bold text-white">{dashboardStats.total}</p>
- <p className="text-xs text-gray-500 mt-1">Total</p>
+ <p className="text-xs text-white/50 mt-1">Total</p>
  </div>
  <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
- <p className="text-3xl font-bold text-blue-600">{dashboardStats.todayCount}</p>
- <p className="text-xs text-gray-500 mt-1">Hari Ini</p>
+ <p className="text-3xl font-bold text-blue-300">{dashboardStats.todayCount}</p>
+ <p className="text-xs text-white/50 mt-1">Hari Ini</p>
  </div>
  <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
- <p className="text-3xl font-bold text-green-600">{dashboardStats.completed}</p>
- <p className="text-xs text-gray-500 mt-1">Selesai</p>
+ <p className="text-3xl font-bold text-green-300">{dashboardStats.completed}</p>
+ <p className="text-xs text-white/50 mt-1">Selesai</p>
  </div>
  <div className="bg-white/8 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/10">
- <p className="text-3xl font-bold text-purple-600">{dashboardStats.avgScore}</p>
- <p className="text-xs text-gray-500 mt-1">Rata-rata</p>
+ <p className="text-3xl font-bold text-purple-300">{dashboardStats.avgScore}</p>
+ <p className="text-xs text-white/50 mt-1">Rata-rata</p>
  </div>
  </div>
  )}
@@ -239,7 +239,7 @@ export const Dashboard = () => {
  navigate('/scan');
  }}
  type="button"
- className="w-full bg-white/8 backdrop-blur-md rounded-3xl p-6 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 active:scale-98 transition-all border border-gray-100"
+ className="w-full bg-white/8 backdrop-blur-md rounded-3xl p-6 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 active:scale-98 transition-all border border-white/10"
  >
  <div className="flex items-center gap-4">
  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -247,9 +247,9 @@ export const Dashboard = () => {
  </div>
  <div className="flex-1 text-left">
  <p className="font-bold text-lg text-white">Pindai Kode QR</p>
- <p className="text-gray-500 text-sm">Mulai inspeksi baru</p>
+ <p className="text-white/50 text-sm">Mulai inspeksi baru</p>
  </div>
- <ChevronRight className="w-6 h-6 text-gray-400" />
+ <ChevronRight className="w-6 h-6 text-white/40" />
  </div>
  </button>
 
@@ -258,15 +258,15 @@ export const Dashboard = () => {
  <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-5 border border-blue-100">
  <div className="flex items-center justify-between mb-3">
  <h3 className="font-bold text-white">Performa Minggu Ini</h3>
- <span className="text-sm text-gray-600">{dashboardStats.weeklyBreakdown.total} inspeksi</span>
+ <span className="text-sm text-white/60">{dashboardStats.weeklyBreakdown.total} inspeksi</span>
  </div>
  <div className="grid grid-cols-2 gap-2">
  {dashboardStats.weeklyBreakdown.excellent > 0 && (
  <div className="bg-white/70 rounded-xl p-3 flex items-center gap-2">
  <div className="text-xl">✅</div>
  <div>
- <div className="text-lg font-bold text-green-600">{dashboardStats.weeklyBreakdown.excellent}</div>
- <div className="text-xs text-gray-600">Sangat Baik</div>
+ <div className="text-lg font-bold text-green-300">{dashboardStats.weeklyBreakdown.excellent}</div>
+ <div className="text-xs text-white/60">Sangat Baik</div>
  </div>
  </div>
  )}
@@ -274,8 +274,8 @@ export const Dashboard = () => {
  <div className="bg-white/70 rounded-xl p-3 flex items-center gap-2">
  <div className="text-xl">👍</div>
  <div>
- <div className="text-lg font-bold text-blue-600">{dashboardStats.weeklyBreakdown.good}</div>
- <div className="text-xs text-gray-600">Baik</div>
+ <div className="text-lg font-bold text-blue-300">{dashboardStats.weeklyBreakdown.good}</div>
+ <div className="text-xs text-white/60">Baik</div>
  </div>
  </div>
  )}
@@ -284,7 +284,7 @@ export const Dashboard = () => {
  <div className="text-xl">🟡</div>
  <div>
  <div className="text-lg font-bold text-yellow-600">{dashboardStats.weeklyBreakdown.fair}</div>
- <div className="text-xs text-gray-600">Cukup</div>
+ <div className="text-xs text-white/60">Cukup</div>
  </div>
  </div>
  )}
@@ -292,8 +292,8 @@ export const Dashboard = () => {
  <div className="bg-white/70 rounded-xl p-3 flex items-center gap-2">
  <div className="text-xl">⚠️</div>
  <div>
- <div className="text-lg font-bold text-red-600">{dashboardStats.weeklyBreakdown.poor}</div>
- <div className="text-xs text-gray-600">Perlu Perbaikan</div>
+ <div className="text-lg font-bold text-red-300">{dashboardStats.weeklyBreakdown.poor}</div>
+ <div className="text-xs text-white/60">Perlu Perbaikan</div>
  </div>
  </div>
  )}
@@ -308,9 +308,9 @@ export const Dashboard = () => {
  haptic.light();
  navigate('/locations');
  }}
- className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-gray-50"
+ className="bg-white/8 backdrop-blur-md rounded-2xl border border-white/10 ring-1 ring-white/5 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-white/5"
  >
- <MapPin className="w-7 h-7 text-blue-600 mb-3" />
+ <MapPin className="w-7 h-7 text-blue-300 mb-3" />
  <p className="font-semibold text-white text-sm">Lokasi</p>
  </button>
 
@@ -319,9 +319,9 @@ export const Dashboard = () => {
  haptic.light();
  navigate('/reports');
  }}
- className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-gray-50"
+ className="bg-white/8 backdrop-blur-md rounded-2xl border border-white/10 ring-1 ring-white/5 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-white/5"
  >
- <Calendar className="w-7 h-7 text-blue-600 mb-3" />
+ <Calendar className="w-7 h-7 text-blue-300 mb-3" />
  <p className="font-semibold text-white text-sm">Laporan</p>
  </button>
  </div>
@@ -340,7 +340,7 @@ export const Dashboard = () => {
  <h2 className="font-bold text-white">Terbaru</h2>
  <button
  onClick={() => navigate('/reports')}
- className="text-blue-600 text-sm font-medium"
+ className="text-blue-300 text-sm font-medium"
  >
  Lihat Semua
  </button>
@@ -363,7 +363,7 @@ export const Dashboard = () => {
  return (
  <div
  key={inspection.id}
- className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+ className="flex items-center justify-between p-3 bg-white/8 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
  onClick={() => navigate(`/reports?inspection=${inspection.id}`)}
  >
  <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -371,16 +371,16 @@ export const Dashboard = () => {
  inspection.overall_status === 'excellent' ||
  inspection.overall_status === 'good' ? (
  <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
- <CheckCircle2 className="w-5 h-5 text-green-600" />
+ <CheckCircle2 className="w-5 h-5 text-green-300" />
  </div>
  ) : (
- <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
- <Clock className="w-5 h-5 text-gray-400" />
+ <div className="w-10 h-10 bg-white/8 rounded-xl flex items-center justify-center flex-shrink-0">
+ <Clock className="w-5 h-5 text-white/40" />
  </div>
  )}
  <div className="flex-1 min-w-0">
  <p className="text-sm font-medium text-white truncate">{locationName}</p>
- <div className="flex items-center gap-1 text-xs text-gray-500">
+ <div className="flex items-center gap-1 text-xs text-white/50">
  <span>{isToday ? 'Hari ini' : inspection.inspection_date}</span>
  {inspection.inspection_time && (
  <>
@@ -390,11 +390,11 @@ export const Dashboard = () => {
  )}
  </div>
  {locationDetail && (
- <p className="text-xs text-gray-400 truncate">{locationDetail}</p>
+ <p className="text-xs text-white/40 truncate">{locationDetail}</p>
  )}
  </div>
  </div>
- <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+ <ChevronRight className="w-4 h-4 text-white/40 flex-shrink-0" />
  </div>
  );
  })}
@@ -404,14 +404,14 @@ export const Dashboard = () => {
 
  {/* Empty State - Simple */}
  {!statsLoading && dashboardStats.total === 0 && (
- <div className="text-center py-12 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-50">
- <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+ <div className="text-center py-12 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/5">
+ <div className="w-20 h-20 bg-white/8 rounded-full flex items-center justify-center mx-auto mb-4">
  <QrCode className="w-10 h-10 text-gray-300" />
  </div>
  <h3 className="text-lg font-bold text-white mb-2">
  Belum Ada Inspeksi
  </h3>
- <p className="text-gray-500 text-sm">
+ <p className="text-white/50 text-sm">
  Pindai kode QR untuk memulai
  </p>
  </div>

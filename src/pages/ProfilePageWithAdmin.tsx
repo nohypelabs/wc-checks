@@ -312,12 +312,12 @@ export const ProfilePageWithAdmin = () => {
  )}
 
  <div className="flex items-center justify-center gap-2">
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-white/10 rounded-full text-sm text-white/60">
  <UserIcon className="w-4 h-4" />
  <span>{userRole?.name || 'Member'}</span>
  </div>
  {(isAdmin || isSuperAdmin) && (
- <div className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 rounded-full text-sm text-purple-600">
+ <div className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 rounded-full text-sm text-purple-300">
  <Shield className="w-4 h-4" />
  <span>{isSuperAdmin ? 'Super Admin' : 'Admin'}</span>
  </div>
@@ -327,28 +327,28 @@ export const ProfilePageWithAdmin = () => {
 
  {/* Contact Info */}
  <div className="space-y-3 mb-6">
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Mail className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Mail className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Email</div>
+ <div className="text-xs text-white/50">Email</div>
  <div className="font-medium text-white">{profile.email}</div>
  </div>
  </div>
 
  {profile.phone && (
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Phone className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Phone className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Phone</div>
+ <div className="text-xs text-white/50">Phone</div>
  <div className="font-medium text-white">{profile.phone}</div>
  </div>
  </div>
  )}
 
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Calendar className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Calendar className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Member Since</div>
+ <div className="text-xs text-white/50">Member Since</div>
  <div className="font-medium text-white">
  {profile.created_at
  ? format(new Date(profile.created_at), 'dd MMM yyyy')
@@ -360,10 +360,10 @@ export const ProfilePageWithAdmin = () => {
  </div>
 
  {profile.last_login_at && (
- <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
- <Clock className="w-5 h-5 text-gray-500" />
+ <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <Clock className="w-5 h-5 text-white/50" />
  <div className="flex-1">
- <div className="text-xs text-gray-500">Last Login</div>
+ <div className="text-xs text-white/50">Last Login</div>
  <div className="font-medium text-white">
  {format(new Date(profile.last_login_at), 'dd MMM yyyy, HH:mm')}
  </div>
@@ -380,7 +380,7 @@ export const ProfilePageWithAdmin = () => {
  {statsLoading ? (
  <div className="grid grid-cols-2 gap-3">
  {[...Array(4)].map((_, i) => (
- <div key={i} className="h-24 bg-gray-100 rounded-xl animate-pulse" />
+ <div key={i} className="h-24 bg-white/10 rounded-xl animate-pulse" />
  ))}
  </div>
  ) : (
@@ -388,11 +388,11 @@ export const ProfilePageWithAdmin = () => {
  <Card className="p-4">
  <div className="flex items-center gap-3">
  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
- <CheckCircle2 className="w-6 h-6 text-blue-600" />
+ <CheckCircle2 className="w-6 h-6 text-blue-300" />
  </div>
  <div>
  <div className="text-2xl font-bold text-white">{stats?.totalInspections || 0}</div>
- <div className="text-xs text-gray-500">Inspections</div>
+ <div className="text-xs text-white/50">Inspections</div>
  </div>
  </div>
  </Card>
@@ -400,11 +400,11 @@ export const ProfilePageWithAdmin = () => {
  <Card className="p-4">
  <div className="flex items-center gap-3">
  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
- <TrendingUp className="w-6 h-6 text-green-600" />
+ <TrendingUp className="w-6 h-6 text-green-300" />
  </div>
  <div>
  <div className="text-2xl font-bold text-white">{stats?.avgScore || 0}</div>
- <div className="text-xs text-gray-500">Avg Score</div>
+ <div className="text-xs text-white/50">Avg Score</div>
  </div>
  </div>
  </Card>
@@ -416,7 +416,7 @@ export const ProfilePageWithAdmin = () => {
  </div>
  <div>
  <div className="text-2xl font-bold text-white">{stats?.currentStreak || 0}</div>
- <div className="text-xs text-gray-500">Day Streak</div>
+ <div className="text-xs text-white/50">Day Streak</div>
  </div>
  </div>
  </Card>
@@ -424,16 +424,16 @@ export const ProfilePageWithAdmin = () => {
  <Card className="p-4">
  <div className="flex items-center gap-3">
  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
- <Award className="w-6 h-6 text-purple-600" />
+ <Award className="w-6 h-6 text-purple-300" />
  </div>
  <div className="flex-1 min-w-0">
  {stats?.bestLocation ? (
  <>
  <div className="text-lg font-bold text-white">{stats.bestLocation.score}</div>
- <div className="text-xs text-gray-500 truncate">{stats.bestLocation.name}</div>
+ <div className="text-xs text-white/50 truncate">{stats.bestLocation.name}</div>
  </>
  ) : (
- <div className="text-xs text-gray-500">No data yet</div>
+ <div className="text-xs text-white/50">No data yet</div>
  )}
  </div>
  </div>
@@ -457,7 +457,7 @@ export const ProfilePageWithAdmin = () => {
 
  <button
  onClick={() => navigate('/edit-profile')}
- className="w-full flex items-center justify-center gap-2 p-4 bg-white border-2 border-gray-200 rounded-2xl font-medium text-white hover:bg-gray-50 transition-colors active:scale-95"
+ className="w-full flex items-center justify-center gap-2 p-4 bg-white border-2 border-white/15 rounded-2xl font-medium text-white hover:bg-white/8 transition-colors active:scale-95"
  >
  <Edit2 className="w-5 h-5" />
  <span>Edit Profile</span>
@@ -465,7 +465,7 @@ export const ProfilePageWithAdmin = () => {
 
  <button
  onClick={handleLogout}
- className="w-full flex items-center justify-center gap-2 p-4 bg-red-50 border-2 border-red-200 rounded-2xl font-medium text-red-600 hover:bg-red-100 transition-colors active:scale-95"
+ className="w-full flex items-center justify-center gap-2 p-4 bg-red-50 border-2 border-red-200 rounded-2xl font-medium text-red-300 hover:bg-red-100 transition-colors active:scale-95"
  >
  <LogOut className="w-5 h-5" />
  <span>Logout</span>

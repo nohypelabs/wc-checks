@@ -94,7 +94,7 @@ export const LocationInspectionPage = () => {
  <Card className="p-6 text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
  <h2 className="text-xl font-bold text-white mb-2">Lokasi Tidak Ditemukan</h2>
- <p className="text-gray-600 mb-4">Lokasi yang diminta tidak ada atau Anda tidak memiliki akses.</p>
+ <p className="text-white/60 mb-4">Lokasi yang diminta tidak ada atau Anda tidak memiliki akses.</p>
  <Button onClick={() => navigate('/scan')}>
  Kembali ke Pemindai
  </Button>
@@ -106,7 +106,7 @@ export const LocationInspectionPage = () => {
  return (
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
  {/* Header */}
- <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+ <div className="bg-white border-b border-white/15 sticky top-0 z-10">
  <div className="max-w-4xl mx-auto px-4 py-4">
  <div className="flex items-center justify-between">
  <div className="flex items-center space-x-4">
@@ -120,15 +120,15 @@ export const LocationInspectionPage = () => {
  </Button>
  <div>
  <h1 className="text-2xl font-bold text-white">Inspeksi Toilet</h1>
- <p className="text-gray-600">Lengkapi inspeksi untuk lokasi ini</p>
+ <p className="text-white/60">Lengkapi inspeksi untuk lokasi ini</p>
  </div>
  </div>
  
  {/* User Info Badge */}
  {user && (
- <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600">
+ <div className="hidden md:flex items-center space-x-2 text-sm text-white/60">
  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
- <span className="text-blue-600 font-semibold">
+ <span className="text-blue-300 font-semibold">
  {user.email?.charAt(0).toUpperCase()}
  </span>
  </div>
@@ -151,7 +151,7 @@ export const LocationInspectionPage = () => {
  {location.name}
  </h2>
  
- <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-white/60">
  <div className="space-y-2">
  <div className="flex items-center space-x-2">
  <Building className="w-4 h-4" />
@@ -187,14 +187,14 @@ export const LocationInspectionPage = () => {
  </div>
 
  {location.description && (
- <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+ <div className="mt-4 p-3 bg-white/8 rounded-lg">
  <p className="text-sm text-white/80">{location.description}</p>
  </div>
  )}
 
  {location.code && (
  <div className="mt-3">
- <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+ <span className="inline-block px-2 py-1 bg-blue-100 text-blue-300 text-xs rounded-full">
  Kode: {location.code}
  </span>
  </div>
@@ -214,7 +214,7 @@ export const LocationInspectionPage = () => {
  <h3 className="text-lg font-semibold text-white mb-2">
  Siap Melakukan Inspeksi?
  </h3>
- <p className="text-gray-600 mb-6">
+ <p className="text-white/60 mb-6">
  Mulai proses inspeksi untuk <strong>{location.name}</strong>.
  Anda akan menilai berbagai komponen dan dapat menambahkan foto jika diperlukan.
  </p>
@@ -285,24 +285,24 @@ const RecentInspections = ({ locationId }: { locationId: string }) => {
  </h3>
 
  {inspections.length === 0 ? (
- <p className="text-gray-500 text-center py-4">
+ <p className="text-white/50 text-center py-4">
  Belum ada inspeksi. Jadilah yang pertama memeriksa lokasi ini!
  </p>
  ) : (
  <div className="space-y-3">
  {inspections.map((inspection) => (
- <div key={inspection.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+ <div key={inspection.id} className="flex items-center justify-between p-3 bg-white/8 rounded-lg">
  <div>
  <p className="font-medium text-white">
  {new Date(inspection.inspection_date).toLocaleDateString('id-ID')}
  </p>
- <p className="text-sm text-gray-600">
+ <p className="text-sm text-white/60">
  {inspection.inspection_time} •
  Status: <span className={`font-medium ${
- inspection.overall_status === 'excellent' ? 'text-green-600' :
- inspection.overall_status === 'good' ? 'text-blue-600' :
+ inspection.overall_status === 'excellent' ? 'text-green-300' :
+ inspection.overall_status === 'good' ? 'text-blue-300' :
  inspection.overall_status === 'fair' ? 'text-yellow-600' :
- 'text-red-600'
+ 'text-red-300'
  }`}>
  {inspection.overall_status}
  </span>

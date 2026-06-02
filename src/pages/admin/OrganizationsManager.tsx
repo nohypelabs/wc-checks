@@ -158,7 +158,7 @@ export const OrganizationsManager = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600 text-sm">Checking permissions...</p>
+ <p className="text-white/60 text-sm">Checking permissions...</p>
  </div>
  </div>
  );
@@ -199,7 +199,7 @@ export const OrganizationsManager = () => {
  <div className="flex items-center gap-3">
  <button
  onClick={() => setSidebarOpen(true)}
- className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200"
+ className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/15"
  >
  <Menu className="w-5 h-5" />
  </button>
@@ -210,13 +210,13 @@ export const OrganizationsManager = () => {
  >
  Organisasi
  </h1>
- <p className="text-gray-600 text-sm">Kelola organisasi & buat kode QR</p>
+ <p className="text-white/60 text-sm">Kelola organisasi & buat kode QR</p>
  </div>
  </div>
 
  {user && (
- <div className="hidden sm:flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
- <User className="w-4 h-4 text-gray-600" />
+ <div className="hidden sm:flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-lg">
+ <User className="w-4 h-4 text-white/60" />
  <span className="text-white/80 text-sm font-medium">
  {user.user_metadata?.name || user.email}
  </span>
@@ -231,13 +231,13 @@ export const OrganizationsManager = () => {
  <div className="space-y-3">
  {/* Search */}
  <div className="relative">
- <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+ <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
  <input
  type="text"
  placeholder="Cari organisasi..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full pl-10 pr-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>
 
@@ -259,7 +259,7 @@ export const OrganizationsManager = () => {
  <div className="space-y-3">
  {filteredOrgs?.length === 0 ? (
  <Card>
- <div className="text-center py-8 text-gray-500">
+ <div className="text-center py-8 text-white/50">
  <Building2 className="w-12 h-12 mx-auto mb-2 text-gray-300" />
  <p>Tidak ada organisasi ditemukan</p>
  </div>
@@ -275,14 +275,14 @@ export const OrganizationsManager = () => {
  </div>
  <div className="flex-1 min-w-0">
  <h3 className="font-semibold text-white truncate">{org.name}</h3>
- <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+ <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-300 text-xs rounded-full">
  {org.short_code}
  </span>
  </div>
  </div>
 
  {/* Details */}
- <div className="text-sm text-gray-600 space-y-1 mb-2">
+ <div className="text-sm text-white/60 space-y-1 mb-2">
  {org.email && <p className="truncate">📧 {org.email}</p>}
  {org.phone && <p>📱 {org.phone}</p>}
  {org.address && <p className="truncate">📍 {org.address}</p>}
@@ -293,8 +293,8 @@ export const OrganizationsManager = () => {
  <span
  className={`inline-block px-2 py-1 text-xs rounded-full ${
  org.is_active
- ? 'bg-green-100 text-green-700'
- : 'bg-gray-100 text-gray-600'
+ ? 'bg-green-100 text-green-300'
+ : 'bg-white/10 text-white/60'
  }`}
  >
  {org.is_active ? '✓ Aktif' : '✗ Tidak Aktif'}
@@ -306,9 +306,9 @@ export const OrganizationsManager = () => {
  <div className="absolute top-4 right-4">
  <button
  onClick={() => setOpenMenuId(openMenuId === org.id ? null : org.id)}
- className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-white/10 rounded-lg transition-colors"
  >
- <MoreVertical className="w-5 h-5 text-gray-600" />
+ <MoreVertical className="w-5 h-5 text-white/60" />
  </button>
 
  {/* Dropdown Menu */}
@@ -318,17 +318,17 @@ export const OrganizationsManager = () => {
  className="fixed inset-0 z-10"
  onClick={() => setOpenMenuId(null)}
  />
- <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 min-w-[160px]">
+ <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-2xl border border-white/15 py-2 min-w-[160px]">
  <button
  onClick={() => handleEdit(org)}
- className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-gray-700"
+ className="w-full px-4 py-2 text-left hover:bg-white/8 flex items-center gap-2 text-white/70"
  >
  <Edit2 className="w-4 h-4" />
  Ubah
  </button>
  <button
  onClick={() => handleDelete(org.id, org.name)}
- className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-red-600"
+ className="w-full px-4 py-2 text-left hover:bg-white/8 flex items-center gap-2 text-red-300"
  >
  <Trash2 className="w-4 h-4" />
  Hapus
@@ -360,7 +360,7 @@ export const OrganizationsManager = () => {
  type="text"
  value={formData.name}
  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  required
  />
  </div>
@@ -373,7 +373,7 @@ export const OrganizationsManager = () => {
  type="text"
  value={formData.short_code}
  onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  placeholder="e.g., ORG01"
  required
  />
@@ -387,7 +387,7 @@ export const OrganizationsManager = () => {
  type="email"
  value={formData.email}
  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  />
  </div>
 
@@ -399,7 +399,7 @@ export const OrganizationsManager = () => {
  type="tel"
  value={formData.phone}
  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  />
  </div>
 
@@ -410,7 +410,7 @@ export const OrganizationsManager = () => {
  <textarea
  value={formData.address}
  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  rows={3}
  />
  </div>

@@ -150,7 +150,7 @@ export const LocationsListPage = () => {
  </div>
  <div>
  <h1 className="text-sm font-bold leading-tight text-white">Lokasi</h1>
- <p className="text-[11px] text-gray-500">Pilih lokasi untuk inspeksi</p>
+ <p className="text-[11px] text-white/50">Pilih lokasi untuk inspeksi</p>
  </div>
  </div>
  </div>
@@ -168,7 +168,7 @@ export const LocationsListPage = () => {
  </motion.button>
  <motion.button
  onClick={() => navigate('/admin/locations')}
- className="p-2 bg-white/10 lg:bg-gray-200 text-white rounded-xl hover:bg-white/30 transition-colors"
+ className="p-2 bg-white/10 lg:bg-white/15 text-white rounded-xl hover:bg-white/30 transition-colors"
  whileHover={{ scale: 1.05 }}
  whileTap={{ scale: 0.95 }}
  >
@@ -302,7 +302,7 @@ export const LocationsListPage = () => {
  )}
  </div>
  </div>
- <ChevronRight className="w-3.5 h-3.5 text-white/30 lg:text-gray-300 flex-shrink-0 group-hover:text-white/60 lg:group-hover:text-gray-500 transition-colors" />
+ <ChevronRight className="w-3.5 h-3.5 text-white/30 lg:text-gray-300 flex-shrink-0 group-hover:text-white/60 lg:group-hover:text-white/50 transition-colors" />
  </motion.button>
  ))}
  </div>

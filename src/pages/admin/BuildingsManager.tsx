@@ -190,7 +190,7 @@ export const BuildingsManager = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600 text-sm">Checking permissions...</p>
+ <p className="text-white/60 text-sm">Checking permissions...</p>
  </div>
  </div>
  );
@@ -231,7 +231,7 @@ export const BuildingsManager = () => {
  <div className="flex items-center gap-3">
  <button
  onClick={() => setSidebarOpen(true)}
- className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200"
+ className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/15"
  >
  <Menu className="w-5 h-5" />
  </button>
@@ -242,13 +242,13 @@ export const BuildingsManager = () => {
  >
  Gedung
  </h1>
- <p className="text-gray-600 text-sm">Kelola gedung & buat kode QR</p>
+ <p className="text-white/60 text-sm">Kelola gedung & buat kode QR</p>
  </div>
  </div>
 
  {user && (
- <div className="hidden sm:flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
- <User className="w-4 h-4 text-gray-600" />
+ <div className="hidden sm:flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-lg">
+ <User className="w-4 h-4 text-white/60" />
  <span className="text-white/80 text-sm font-medium">
  {user.user_metadata?.name || user.email}
  </span>
@@ -263,13 +263,13 @@ export const BuildingsManager = () => {
  <div className="space-y-3">
  {/* Search */}
  <div className="relative">
- <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+ <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
  <input
  type="text"
  placeholder="Cari gedung..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full pl-10 pr-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>
 
@@ -291,7 +291,7 @@ export const BuildingsManager = () => {
  <div className="space-y-3">
  {filteredBuildings?.length === 0 ? (
  <Card>
- <div className="text-center py-8 text-gray-500">
+ <div className="text-center py-8 text-white/50">
  <Building2 className="w-12 h-12 mx-auto mb-2 text-gray-300" />
  <p>Tidak ada gedung ditemukan</p>
  </div>
@@ -307,7 +307,7 @@ export const BuildingsManager = () => {
  </div>
  <div className="flex-1 min-w-0">
  <h3 className="font-semibold text-white truncate">{building.name}</h3>
- <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+ <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-300 text-xs rounded-full">
  {building.short_code}
  </span>
  </div>
@@ -315,13 +315,13 @@ export const BuildingsManager = () => {
 
  {/* Organization */}
  <div className="mb-2">
- <span className="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-lg">
+ <span className="inline-block px-2 py-1 bg-purple-100 text-purple-300 text-xs rounded-lg">
  🏢 {getOrganizationName(building.organization_id)}
  </span>
  </div>
 
  {/* Details */}
- <div className="text-sm text-gray-600 space-y-1 mb-2">
+ <div className="text-sm text-white/60 space-y-1 mb-2">
  {building.type && <p>🏗️ {building.type}</p>}
  {building.total_floors && <p>📊 {building.total_floors} lantai</p>}
  {building.address && <p className="truncate">📍 {building.address}</p>}
@@ -332,8 +332,8 @@ export const BuildingsManager = () => {
  <span
  className={`inline-block px-2 py-1 text-xs rounded-full ${
  building.is_active
- ? 'bg-green-100 text-green-700'
- : 'bg-gray-100 text-gray-600'
+ ? 'bg-green-100 text-green-300'
+ : 'bg-white/10 text-white/60'
  }`}
  >
  {building.is_active ? '✓ Aktif' : '✗ Tidak Aktif'}
@@ -345,9 +345,9 @@ export const BuildingsManager = () => {
  <div className="absolute top-4 right-4">
  <button
  onClick={() => setOpenMenuId(openMenuId === building.id ? null : building.id)}
- className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-white/10 rounded-lg transition-colors"
  >
- <MoreVertical className="w-5 h-5 text-gray-600" />
+ <MoreVertical className="w-5 h-5 text-white/60" />
  </button>
 
  {/* Dropdown Menu */}
@@ -357,17 +357,17 @@ export const BuildingsManager = () => {
  className="fixed inset-0 z-10"
  onClick={() => setOpenMenuId(null)}
  />
- <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 min-w-[160px]">
+ <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-2xl border border-white/15 py-2 min-w-[160px]">
  <button
  onClick={() => handleEdit(building)}
- className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-gray-700"
+ className="w-full px-4 py-2 text-left hover:bg-white/8 flex items-center gap-2 text-white/70"
  >
  <Edit2 className="w-4 h-4" />
  Ubah
  </button>
  <button
  onClick={() => handleDelete(building.id, building.name)}
- className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-red-600"
+ className="w-full px-4 py-2 text-left hover:bg-white/8 flex items-center gap-2 text-red-300"
  >
  <Trash2 className="w-4 h-4" />
  Hapus
@@ -398,7 +398,7 @@ export const BuildingsManager = () => {
  <select
  value={formData.organization_id}
  onChange={(e) => setFormData({ ...formData, organization_id: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  required
  >
  <option value="">Select organization</option>
@@ -418,20 +418,20 @@ export const BuildingsManager = () => {
  type="text"
  value={formData.name}
  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  required
  />
  </div>
 
  <div>
  <label className="block text-sm font-medium text-white/80 mb-1">
- Short Code * <span className="text-xs text-gray-500">(Max 10 karakter)</span>
+ Short Code * <span className="text-xs text-white/50">(Max 10 karakter)</span>
  </label>
  <input
  type="text"
  value={formData.short_code}
  onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  placeholder="e.g., BLD01, TOWERA, GED_1"
  maxLength={10}
  pattern="[A-Z0-9_]+"
@@ -441,11 +441,11 @@ export const BuildingsManager = () => {
  <p className="text-xs text-red-500 mt-1 font-semibold">
  ⚠️ TIDAK BOLEH pakai strip/hyphen (-) !
  </p>
- <p className="text-xs text-gray-500">
+ <p className="text-xs text-white/50">
  ✓ Hanya HURUF BESAR, angka, dan underscore (_)
  </p>
- <p className="text-xs text-gray-500">
- ✓ Contoh: <span className="font-mono bg-gray-100 px-1 rounded">BLD01</span>, <span className="font-mono bg-gray-100 px-1 rounded">TOWERA</span>, <span className="font-mono bg-gray-100 px-1 rounded">GED_1</span>
+ <p className="text-xs text-white/50">
+ ✓ Contoh: <span className="font-mono bg-white/10 px-1 rounded">BLD01</span>, <span className="font-mono bg-white/10 px-1 rounded">TOWERA</span>, <span className="font-mono bg-white/10 px-1 rounded">GED_1</span>
  </p>
  <p className="text-xs text-red-500">
  ✗ SALAH: <span className="font-mono bg-red-50 px-1 rounded line-through">GD-01</span>, <span className="font-mono bg-red-50 px-1 rounded line-through">TOWER-A</span>
@@ -459,7 +459,7 @@ export const BuildingsManager = () => {
  <select
  value={formData.type || ''}
  onChange={(e) => setFormData({ ...formData, type: e.target.value || null })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  >
  <option value="">Select type</option>
  <option value="apartment">Apartment</option>
@@ -478,7 +478,7 @@ export const BuildingsManager = () => {
  type="number"
  value={formData.total_floors ?? ''}
  onChange={(e) => setFormData({ ...formData, total_floors: e.target.value ? parseInt(e.target.value) : null })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  min="1"
  />
  </div>
@@ -490,7 +490,7 @@ export const BuildingsManager = () => {
  <textarea
  value={formData.address || ''}
  onChange={(e) => setFormData({ ...formData, address: e.target.value || null })}
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+ className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  rows={3}
  />
  </div>

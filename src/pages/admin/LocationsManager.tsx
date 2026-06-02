@@ -248,7 +248,7 @@ export const LocationsManager = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600 text-sm">Checking permissions...</p>
+ <p className="text-white/60 text-sm">Checking permissions...</p>
  </div>
  </div>
  );
@@ -265,11 +265,11 @@ export const LocationsManager = () => {
  <h2 className="text-2xl font-bold text-white mb-3">
  Admin Access Required
  </h2>
- <p className="text-gray-600 mb-6 leading-relaxed">
+ <p className="text-white/60 mb-6 leading-relaxed">
  This page is only accessible to administrators.
  </p>
- <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left">
- <p className="text-xs text-gray-600 mb-1">Debug Info:</p>
+ <div className="mb-6 p-4 bg-white/10 rounded-lg text-left">
+ <p className="text-xs text-white/60 mb-1">Debug Info:</p>
  <p className="text-xs text-white">User: {user?.email || 'Not logged in'}</p>
  <p className="text-xs text-white">Admin Status: {isAdmin ? 'Yes' : 'No'}</p>
  </div>
@@ -303,7 +303,7 @@ export const LocationsManager = () => {
  <div className="flex items-center gap-3">
  <button
  onClick={() => setSidebarOpen(true)}
- className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+ className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/15 transition-colors"
  >
  <Menu className="w-5 h-5" />
  </button>
@@ -314,14 +314,14 @@ export const LocationsManager = () => {
  >
  Kelola Lokasi
  </h1>
- <p className="text-gray-600 text-sm">Kelola lokasi toilet & kode QR</p>
+ <p className="text-white/60 text-sm">Kelola lokasi toilet & kode QR</p>
  </div>
  </div>
 
  {/* Right: User Info */}
  {user && (
- <div className="hidden sm:flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
- <User className="w-4 h-4 text-gray-600" />
+ <div className="hidden sm:flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-lg">
+ <User className="w-4 h-4 text-white/60" />
  <span className="text-white/80 text-sm font-medium">
  {user.user_metadata?.name || user.email}
  </span>
@@ -333,9 +333,9 @@ export const LocationsManager = () => {
  <div className="p-4 space-y-4">
  {/* User Info for Mobile */}
  {user && (
- <Card className="sm:hidden p-3 bg-white border-gray-200">
+ <Card className="sm:hidden p-3 bg-white border-white/15">
  <div className="flex items-center space-x-2">
- <User className="w-4 h-4 text-gray-600" />
+ <User className="w-4 h-4 text-white/60" />
  <span className="text-white/80 text-sm font-medium">
  {user.user_metadata?.name || user.email}
  </span>
@@ -348,23 +348,23 @@ export const LocationsManager = () => {
  <div className="space-y-3">
  {/* Search */}
  <div className="relative">
- <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+ <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
  <input
  type="text"
  placeholder="Cari lokasi..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full pl-10 pr-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>
 
  {/* Building Filter */}
  <div className="relative">
- <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+ <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
  <select
  value={selectedBuildingId}
  onChange={(e) => setSelectedBuildingId(e.target.value)}
- className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+ className="w-full pl-10 pr-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/10 backdrop-blur-sm"
  >
  <option value="">Semua Gedung</option>
  {buildings?.map((building) => (
@@ -425,24 +425,24 @@ export const LocationsManager = () => {
  <h3 className="font-bold text-white">Analytics</h3>
  <button
  onClick={() => setShowAnalytics(false)}
- className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+ className="p-1 hover:bg-white/10 rounded-lg transition-colors"
  >
- <X className="w-5 h-5 text-gray-500" />
+ <X className="w-5 h-5 text-white/50" />
  </button>
  </div>
 
  {/* Stats Grid */}
  <div className="grid grid-cols-3 gap-3 mb-4">
  <div className="bg-blue-50 rounded-xl p-3">
- <p className="text-xs text-blue-600 mb-1">Total</p>
- <p className="text-2xl font-bold text-blue-900">{analytics.total}</p>
+ <p className="text-xs text-blue-300 mb-1">Total</p>
+ <p className="text-2xl font-bold text-blue-200">{analytics.total}</p>
  </div>
  <div className="bg-green-50 rounded-xl p-3">
- <p className="text-xs text-green-600 mb-1">Active</p>
+ <p className="text-xs text-green-300 mb-1">Active</p>
  <p className="text-2xl font-bold text-green-900">{analytics.active}</p>
  </div>
  <div className="bg-red-50 rounded-xl p-3">
- <p className="text-xs text-red-600 mb-1">Inactive</p>
+ <p className="text-xs text-red-300 mb-1">Inactive</p>
  <p className="text-2xl font-bold text-red-900">{analytics.inactive}</p>
  </div>
  </div>
@@ -452,7 +452,7 @@ export const LocationsManager = () => {
  <p className="text-sm font-semibold text-white/80 mb-2">By Building</p>
  <div className="space-y-2">
  {Object.entries(analytics.byBuilding).map(([building, count]) => (
- <div key={building} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+ <div key={building} className="flex items-center justify-between bg-white/8 rounded-lg p-2">
  <span className="text-sm text-white/80">{building}</span>
  <span className="font-semibold text-white">{count}</span>
  </div>
@@ -467,8 +467,8 @@ export const LocationsManager = () => {
  <Card className="bg-blue-50 border-blue-200">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <CheckSquare className="w-5 h-5 text-blue-600" />
- <span className="font-semibold text-blue-900">{selectedIds.size} selected</span>
+ <CheckSquare className="w-5 h-5 text-blue-300" />
+ <span className="font-semibold text-blue-200">{selectedIds.size} selected</span>
  </div>
  <div className="flex items-center gap-2">
  <button
@@ -476,28 +476,28 @@ export const LocationsManager = () => {
  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
  title="Activate selected"
  >
- <Power className="w-5 h-5 text-green-600" />
+ <Power className="w-5 h-5 text-green-300" />
  </button>
  <button
  onClick={() => handleBulkActivate(false)}
  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
  title="Deactivate selected"
  >
- <PowerOff className="w-5 h-5 text-orange-600" />
+ <PowerOff className="w-5 h-5 text-orange-300" />
  </button>
  <button
  onClick={handleBulkDelete}
  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
  title="Delete selected"
  >
- <Trash2 className="w-5 h-5 text-red-600" />
+ <Trash2 className="w-5 h-5 text-red-300" />
  </button>
  <button
  onClick={clearSelection}
  className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
  title="Clear selection"
  >
- <X className="w-5 h-5 text-gray-600" />
+ <X className="w-5 h-5 text-white/60" />
  </button>
  </div>
  </div>
@@ -511,10 +511,10 @@ export const LocationsManager = () => {
  <div className="flex items-center gap-2 px-4">
  <button
  onClick={toggleSelectAll}
- className="flex items-center gap-2 text-sm font-medium text-white/80 hover:text-blue-600 transition-colors"
+ className="flex items-center gap-2 text-sm font-medium text-white/80 hover:text-blue-300 transition-colors"
  >
  {selectedIds.size === filteredLocations.length ? (
- <CheckSquare className="w-5 h-5 text-blue-600" />
+ <CheckSquare className="w-5 h-5 text-blue-300" />
  ) : (
  <Square className="w-5 h-5" />
  )}
@@ -527,7 +527,7 @@ export const LocationsManager = () => {
 
  {filteredLocations?.length === 0 ? (
  <Card>
- <div className="text-center py-8 text-gray-500">
+ <div className="text-center py-8 text-white/50">
  <MapPin className="w-12 h-12 mx-auto mb-2 text-gray-300" />
  <p>No locations found</p>
  </div>
@@ -538,12 +538,12 @@ export const LocationsManager = () => {
  {/* Checkbox */}
  <button
  onClick={() => toggleSelection(location.id)}
- className="absolute top-4 left-4 z-10 p-1 hover:bg-gray-100 rounded transition-colors"
+ className="absolute top-4 left-4 z-10 p-1 hover:bg-white/10 rounded transition-colors"
  >
  {selectedIds.has(location.id) ? (
- <CheckSquare className="w-5 h-5 text-blue-600" />
+ <CheckSquare className="w-5 h-5 text-blue-300" />
  ) : (
- <Square className="w-5 h-5 text-gray-400" />
+ <Square className="w-5 h-5 text-white/40" />
  )}
  </button>
 
@@ -560,16 +560,16 @@ export const LocationsManager = () => {
  </h3>
  <div className="flex items-center gap-2 mt-1">
  {location.code && (
- <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+ <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-300 text-xs rounded-full">
  {location.code}
  </span>
  )}
  {location.is_active ? (
- <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+ <span className="inline-block px-2 py-0.5 bg-green-100 text-green-300 text-xs rounded-full">
  Active
  </span>
  ) : (
- <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+ <span className="inline-block px-2 py-0.5 bg-white/10 text-white/60 text-xs rounded-full">
  Inactive
  </span>
  )}
@@ -578,7 +578,7 @@ export const LocationsManager = () => {
  </div>
 
  {/* Location Details */}
- <div className="text-sm text-gray-600 space-y-1 mb-3">
+ <div className="text-sm text-white/60 space-y-1 mb-3">
  {location.building && (
  <p className="truncate">🏢 {location.building}</p>
  )}
@@ -592,18 +592,18 @@ export const LocationsManager = () => {
 
  {/* Created By Info */}
  {location.created_by && (
- <div className="text-xs text-gray-500 mb-2">
+ <div className="text-xs text-white/50 mb-2">
  Created by: {location.created_by === user?.id ? 'You' : location.created_by}
  </div>
  )}
 
  {/* URL Preview - Collapsible */}
  <details className="text-xs">
- <summary className="text-blue-600 cursor-pointer hover:text-blue-700 font-medium">
+ <summary className="text-blue-300 cursor-pointer hover:text-blue-300 font-medium">
  View URL
  </summary>
- <div className="mt-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
- <p className="text-gray-600 break-all font-mono">
+ <div className="mt-2 p-2 bg-white/8 rounded-lg border border-white/15">
+ <p className="text-white/60 break-all font-mono">
  {getLocationURL(location.id)}
  </p>
  </div>
@@ -614,9 +614,9 @@ export const LocationsManager = () => {
  <div className="absolute top-4 right-4">
  <button
  onClick={() => setOpenMenuId(openMenuId === location.id ? null : location.id)}
- className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+ className="p-2 hover:bg-white/10 rounded-lg transition-colors"
  >
- <MoreVertical className="w-5 h-5 text-gray-600" />
+ <MoreVertical className="w-5 h-5 text-white/60" />
  </button>
 
  {/* Dropdown Menu - FIX: z-index super tinggi biar ga ketutup container lain */}
@@ -629,37 +629,37 @@ export const LocationsManager = () => {
  />
 
  {/* Menu */}
- <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-[9999] overflow-hidden">
+ <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-white/15 z-[9999] overflow-hidden">
  <button
  onClick={() => handleGenerateQR(location)}
- className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors"
+ className="w-full px-4 py-3 text-left hover:bg-white/8 flex items-center space-x-3 transition-colors"
  >
- <QrCode className="w-5 h-5 text-blue-600" />
+ <QrCode className="w-5 h-5 text-blue-300" />
  <span className="text-sm font-medium text-white">Buat QR</span>
  </button>
 
  <button
  onClick={() => copyLocationURL(location)}
- className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors border-t border-gray-100"
+ className="w-full px-4 py-3 text-left hover:bg-white/8 flex items-center space-x-3 transition-colors border-t border-white/10"
  >
- <Copy className="w-5 h-5 text-gray-600" />
+ <Copy className="w-5 h-5 text-white/60" />
  <span className="text-sm font-medium text-white">Copy URL</span>
  </button>
 
  <button
  onClick={() => handleEdit(location)}
- className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors border-t border-gray-100"
+ className="w-full px-4 py-3 text-left hover:bg-white/8 flex items-center space-x-3 transition-colors border-t border-white/10"
  >
- <Edit2 className="w-5 h-5 text-gray-600" />
+ <Edit2 className="w-5 h-5 text-white/60" />
  <span className="text-sm font-medium text-white">Ubah</span>
  </button>
 
  <button
  onClick={() => handleDelete(location.id, location.name)}
- className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center space-x-3 transition-colors border-t border-gray-100"
+ className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center space-x-3 transition-colors border-t border-white/10"
  >
- <Trash2 className="w-5 h-5 text-red-600" />
- <span className="text-sm font-medium text-red-600">Hapus</span>
+ <Trash2 className="w-5 h-5 text-red-300" />
+ <span className="text-sm font-medium text-red-300">Hapus</span>
  </button>
  </div>
  </>
@@ -892,12 +892,12 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
  <Card className="w-full max-w-lg max-h-[calc(100vh-8rem)] overflow-y-auto">
- <div className="sticky top-0 bg-white pb-4 border-b border-gray-200">
+ <div className="sticky top-0 bg-white pb-4 border-b border-white/15">
  <h2 className="text-xl font-bold text-white">
  {location ? 'Edit Location' : 'Add Location'}
  </h2>
  {user && (
- <p className="text-sm text-gray-600 mt-1">
+ <p className="text-sm text-white/60 mt-1">
  Created by: {user.user_metadata?.name || user.email}
  </p>
  )}
@@ -912,7 +912,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  <select
  value={formData.organization_id || ''}
  onChange={(e) => setFormData({ ...formData, organization_id: e.target.value, building_id: '' })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  disabled={saveMutation.isPending}
  >
@@ -933,7 +933,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  <select
  value={formData.building_id || ''}
  onChange={(e) => setFormData({ ...formData, building_id: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  disabled={!formData.organization_id || loading || saveMutation.isPending}
  >
@@ -959,7 +959,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  type="text"
  value={formData.name || ''}
  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  placeholder="e.g. Toilet Lantai 3"
  required
  disabled={saveMutation.isPending}
@@ -975,7 +975,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  type="text"
  value={formData.code || ''}
  onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  placeholder="e.g. WC-03, T-MEN-1"
  disabled={saveMutation.isPending}
  />
@@ -991,7 +991,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  type="text"
  value={formData.floor || ''}
  onChange={(e) => setFormData({ ...formData, floor: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  placeholder="Lantai 3"
  disabled={saveMutation.isPending}
  />
@@ -1005,7 +1005,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  type="text"
  value={formData.section || ''}
  onChange={(e) => setFormData({ ...formData, section: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  placeholder="Pria/Wanita"
  disabled={saveMutation.isPending}
  />
@@ -1020,7 +1020,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  <select
  value={formData.area || ''}
  onChange={(e) => setFormData({ ...formData, area: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={saveMutation.isPending}
  >
  <option value="">Select Area Type</option>
@@ -1040,7 +1040,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  <textarea
  value={formData.description || ''}
  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
  rows={3}
  placeholder="Additional information..."
  disabled={saveMutation.isPending}

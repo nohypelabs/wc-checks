@@ -37,11 +37,11 @@ export const HelpPage = () => {
  onClick={() => setSidebarOpen(true)}
  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
  >
- <Menu className="w-5 h-5 text-gray-600" />
+ <Menu className="w-5 h-5 text-white/60" />
  </button>
  <div>
  <h1 className="text-xl font-bold text-white">Bantuan & FAQ</h1>
- <p className="text-sm text-gray-500">Panduan penggunaan aplikasi</p>
+ <p className="text-sm text-white/50">Panduan penggunaan aplikasi</p>
  </div>
  </div>
  </div>
@@ -51,14 +51,14 @@ export const HelpPage = () => {
  {/* FAQ Section */}
  <Card>
  <h2 className="font-bold text-white mb-3 flex items-center gap-2">
- <HelpCircle className="w-5 h-5 text-blue-600" />
+ <HelpCircle className="w-5 h-5 text-blue-300" />
  Pertanyaan Umum
  </h2>
  <div className="space-y-4">
  {faqs.map((faq, index) => (
- <div key={index} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+ <div key={index} className="border-b border-white/10 last:border-0 pb-4 last:pb-0">
  <h3 className="font-medium text-white mb-2">{faq.question}</h3>
- <p className="text-sm text-gray-600">{faq.answer}</p>
+ <p className="text-sm text-white/60">{faq.answer}</p>
  </div>
  ))}
  </div>
@@ -67,17 +67,17 @@ export const HelpPage = () => {
  {/* Quick Tips */}
  <Card>
  <h2 className="font-bold text-white mb-3">💡 Tips Cepat</h2>
- <ul className="space-y-2 text-sm text-gray-600">
+ <ul className="space-y-2 text-sm text-white/60">
  <li className="flex items-start gap-2">
- <span className="text-blue-600 mt-1">•</span>
+ <span className="text-blue-300 mt-1">•</span>
  <span>Pastikan koneksi internet stabil untuk pengalaman terbaik</span>
  </li>
  <li className="flex items-start gap-2">
- <span className="text-blue-600 mt-1">•</span>
+ <span className="text-blue-300 mt-1">•</span>
  <span>Periksa halaman Analytics untuk melihat performa inspeksi Anda</span>
  </li>
  <li className="flex items-start gap-2">
- <span className="text-blue-600 mt-1">•</span>
+ <span className="text-blue-300 mt-1">•</span>
  <span>Ekspor laporan dalam format CSV untuk analisis lebih lanjut</span>
  </li>
  </ul>
@@ -89,12 +89,12 @@ export const HelpPage = () => {
  <div className="space-y-3">
  <a
  href="mailto:abdulgofur100persen@gmail.com"
- className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+ className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/8 transition-colors"
  >
- <Mail className="w-5 h-5 text-blue-600" />
+ <Mail className="w-5 h-5 text-blue-300" />
  <div>
  <p className="font-medium text-white">Email Support</p>
- <p className="text-xs text-gray-500">abdulgofur100persen@gmail.com</p>
+ <p className="text-xs text-white/50">abdulgofur100persen@gmail.com</p>
  </div>
  </a>
 
@@ -102,12 +102,12 @@ export const HelpPage = () => {
  href="https://wa.me/6287874415491"
  target="_blank"
  rel="noopener noreferrer"
- className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+ className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/8 transition-colors"
  >
- <Phone className="w-5 h-5 text-blue-600" />
+ <Phone className="w-5 h-5 text-blue-300" />
  <div>
  <p className="font-medium text-white">WhatsApp Support</p>
- <p className="text-xs text-gray-500">+62 878-7441-5491</p>
+ <p className="text-xs text-white/50">+62 878-7441-5491</p>
  </div>
  </a>
 
@@ -115,12 +115,12 @@ export const HelpPage = () => {
  href="https://github.com/agds-alt/wc-checks"
  target="_blank"
  rel="noopener noreferrer"
- className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+ className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/8 transition-colors"
  >
- <MessageCircle className="w-5 h-5 text-blue-600" />
+ <MessageCircle className="w-5 h-5 text-blue-300" />
  <div>
  <p className="font-medium text-white">GitHub Repository</p>
- <p className="text-xs text-gray-500">Report bugs & request features</p>
+ <p className="text-xs text-white/50">Report bugs & request features</p>
  </div>
  </a>
  </div>

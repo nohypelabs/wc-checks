@@ -251,7 +251,7 @@ export const AddLocationPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600 text-sm">Checking permissions...</p>
+ <p className="text-white/60 text-sm">Checking permissions...</p>
  </div>
  </div>
  );
@@ -277,11 +277,11 @@ export const AddLocationPage = () => {
  <h2 className="text-2xl font-bold text-white mb-3">
  Admin Access Required
  </h2>
- <p className="text-gray-600 mb-6 leading-relaxed">
+ <p className="text-white/60 mb-6 leading-relaxed">
  You need administrator privileges to add new locations.
  </p>
- <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left">
- <p className="text-xs text-gray-600 mb-1">Debug Info:</p>
+ <div className="mb-6 p-4 bg-white/10 rounded-lg text-left">
+ <p className="text-xs text-white/60 mb-1">Debug Info:</p>
  <p className="text-xs text-white">User: {user.email}</p>
  <p className="text-xs text-white">Admin Status: {isAdmin ? 'Yes' : 'No'}</p>
  </div>
@@ -304,7 +304,7 @@ export const AddLocationPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600 text-sm">Memuat data formulir...</p>
+ <p className="text-white/60 text-sm">Memuat data formulir...</p>
  </div>
  </div>
  );
@@ -315,11 +315,11 @@ export const AddLocationPage = () => {
  return (
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
  <div className="text-center max-w-md">
- <Building2 className="w-20 h-20 text-gray-400 mx-auto mb-4" />
+ <Building2 className="w-20 h-20 text-white/40 mx-auto mb-4" />
  <h2 className="text-2xl font-bold text-white mb-3">
  Tidak Ada Organisasi
  </h2>
- <p className="text-gray-600 mb-6 leading-relaxed">
+ <p className="text-white/60 mb-6 leading-relaxed">
  Anda perlu membuat organisasi terlebih dahulu sebelum menambahkan lokasi.
  </p>
  <button
@@ -346,11 +346,11 @@ export const AddLocationPage = () => {
  onClick={() => navigate(-1)}
  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
  >
- <ArrowLeft className="w-5 h-5 text-gray-600" />
+ <ArrowLeft className="w-5 h-5 text-white/60" />
  </button>
  <div>
  <h1 className="text-xl font-bold text-white">Add Location</h1>
- <p className="text-sm text-gray-500">Create new inspection point</p>
+ <p className="text-sm text-white/50">Create new inspection point</p>
  </div>
  </div>
  <button
@@ -368,13 +368,13 @@ export const AddLocationPage = () => {
  {/* Organization Dropdown */}
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <HomeIcon className="w-4 h-4 text-blue-600" />
+ <HomeIcon className="w-4 h-4 text-blue-300" />
  Organization *
  </label>
  <select
  value={formData.organization_id}
  onChange={(e) => handleChange('organization_id', e.target.value)}
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  disabled={createLocationMutation.isPending}
  >
@@ -395,13 +395,13 @@ export const AddLocationPage = () => {
  {/* Building Dropdown */}
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <Building2 className="w-4 h-4 text-blue-600" />
+ <Building2 className="w-4 h-4 text-blue-300" />
  Building *
  </label>
  <select
  value={formData.building_id}
  onChange={(e) => handleChange('building_id', e.target.value)}
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
  required
  disabled={
  !formData.organization_id ||
@@ -432,7 +432,7 @@ export const AddLocationPage = () => {
  {/* Location Name */}
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <MapPin className="w-4 h-4 text-blue-600" />
+ <MapPin className="w-4 h-4 text-blue-300" />
  Location Name *
  </label>
  <input
@@ -440,7 +440,7 @@ export const AddLocationPage = () => {
  value={formData.name}
  onChange={(e) => handleChange('name', e.target.value)}
  placeholder="e.g., Men's Toilet, Women's Restroom"
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  disabled={createLocationMutation.isPending}
  />
@@ -449,7 +449,7 @@ export const AddLocationPage = () => {
  {/* Code (Optional) */}
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <Hash className="w-4 h-4 text-gray-400" />
+ <Hash className="w-4 h-4 text-white/40" />
  Location Code (Optional)
  </label>
  <input
@@ -457,10 +457,10 @@ export const AddLocationPage = () => {
  value={formData.code}
  onChange={(e) => handleChange('code', e.target.value.toUpperCase())}
  placeholder="e.g., WC-01, TL-A1"
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  />
- <p className="text-xs text-gray-500 mt-1">
+ <p className="text-xs text-white/50 mt-1">
  Will be used for QR code generation
  </p>
  </div>
@@ -469,7 +469,7 @@ export const AddLocationPage = () => {
  <div className="grid grid-cols-2 gap-3">
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <Layers className="w-4 h-4 text-gray-400" />
+ <Layers className="w-4 h-4 text-white/40" />
  Floor
  </label>
  <input
@@ -477,14 +477,14 @@ export const AddLocationPage = () => {
  value={formData.floor}
  onChange={(e) => handleChange('floor', e.target.value)}
  placeholder="e.g., 1F, Ground"
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  />
  </div>
 
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <Grid className="w-4 h-4 text-gray-400" />
+ <Grid className="w-4 h-4 text-white/40" />
  Section
  </label>
  <input
@@ -492,7 +492,7 @@ export const AddLocationPage = () => {
  value={formData.section}
  onChange={(e) => handleChange('section', e.target.value)}
  placeholder="e.g., Men, Women"
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  />
  </div>
@@ -501,13 +501,13 @@ export const AddLocationPage = () => {
  {/* Area Type */}
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <Map className="w-4 h-4 text-gray-400" />
+ <Map className="w-4 h-4 text-white/40" />
  Area Type
  </label>
  <select
  value={formData.area}
  onChange={(e) => handleChange('area', e.target.value)}
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  disabled={createLocationMutation.isPending}
  >
  <option value="">Select Area Type (Optional)</option>
@@ -522,14 +522,14 @@ export const AddLocationPage = () => {
  {/* Description */}
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
- <FileText className="w-4 h-4 text-gray-400" />
+ <FileText className="w-4 h-4 text-white/40" />
  Description (Optional)
  </label>
  <textarea
  value={formData.description}
  onChange={(e) => handleChange('description', e.target.value)}
  placeholder="Additional notes or special instructions..."
- className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+ className="w-full px-4 py-3 bg-white border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
  rows={3}
  disabled={createLocationMutation.isPending}
  />
@@ -559,7 +559,7 @@ export const AddLocationPage = () => {
  type="button"
  onClick={() => navigate(-1)}
  disabled={createLocationMutation.isPending}
- className="w-full bg-white border-2 border-gray-200 text-gray-700 py-4 rounded-2xl font-medium hover:bg-gray-50 active:scale-[0.98] transition-all disabled:opacity-50"
+ className="w-full bg-white border-2 border-white/15 text-white/70 py-4 rounded-2xl font-medium hover:bg-white/8 active:scale-[0.98] transition-all disabled:opacity-50"
  >
  Cancel
  </button>
@@ -568,7 +568,7 @@ export const AddLocationPage = () => {
 
  {/* Info Box */}
  <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-4">
- <p className="text-sm text-blue-900 font-medium mb-2">💡 Tips:</p>
+ <p className="text-sm text-blue-200 font-medium mb-2">💡 Tips:</p>
  <ul className="text-sm text-blue-800 space-y-1">
  <li>• Select organization first, then building</li>
  <li>• QR code will be auto-generated from codes</li>

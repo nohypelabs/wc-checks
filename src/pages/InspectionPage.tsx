@@ -12,7 +12,7 @@ export const InspectionPage = () => {
  <div className="text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
  <h2 className="text-xl font-bold text-white mb-2">Invalid Location</h2>
- <p className="text-gray-600">No location ID provided in URL</p>
+ <p className="text-white/60">No location ID provided in URL</p>
  </div>
  </div>
  );

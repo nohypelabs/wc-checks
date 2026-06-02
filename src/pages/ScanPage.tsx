@@ -134,7 +134,7 @@ export const ScanPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600">Loading...</p>
+ <p className="text-white/60">Loading...</p>
  </div>
  </div>
  );
@@ -159,7 +159,7 @@ export const ScanPage = () => {
  <h1 className="text-xl font-bold text-white">
  Hi, {user?.email?.split('@')[0] || 'Guest'}! 👋
  </h1>
- <p className="text-sm text-gray-500">Ready to scan?</p>
+ <p className="text-sm text-white/50">Ready to scan?</p>
  </div>
  </div>
  </div>
@@ -170,19 +170,19 @@ export const ScanPage = () => {
  <div className="text-2xl font-bold text-white">
  {stats?.total || 0}
  </div>
- <div className="text-xs text-gray-500 mt-1">Total</div>
+ <div className="text-xs text-white/50 mt-1">Total</div>
  </div>
  <div className="bg-white/8 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/10 text-center">
- <div className="text-2xl font-bold text-blue-600">
+ <div className="text-2xl font-bold text-blue-300">
  {stats?.today || 0}
  </div>
- <div className="text-xs text-gray-500 mt-1">Today</div>
+ <div className="text-xs text-white/50 mt-1">Today</div>
  </div>
  <div className="bg-white/8 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/10 text-center">
- <div className="text-2xl font-bold text-green-600">
+ <div className="text-2xl font-bold text-green-300">
  {stats ? Math.round((stats.completed / stats.total) * 100) || 0 : 0}%
  </div>
- <div className="text-xs text-gray-500 mt-1">Success</div>
+ <div className="text-xs text-white/50 mt-1">Success</div>
  </div>
  </div>
  </div>
@@ -191,7 +191,7 @@ export const ScanPage = () => {
  {/* Scan Button - Big with 3D Shadow */}
  <button
  onClick={() => setShowScanner(true)}
- className="w-full bg-white/8 backdrop-blur-md rounded-3xl p-8 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-gray-100"
+ className="w-full bg-white/8 backdrop-blur-md rounded-3xl p-8 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-white/10"
  >
  <div className="flex flex-col items-center space-y-4">
  <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -199,7 +199,7 @@ export const ScanPage = () => {
  </div>
  <div className="text-center">
  <h2 className="text-xl font-bold text-white">Scan QR Code</h2>
- <p className="text-gray-500 text-sm mt-1">
+ <p className="text-white/50 text-sm mt-1">
  Point camera at location QR
  </p>
  </div>
@@ -210,17 +210,17 @@ export const ScanPage = () => {
  <div className="grid grid-cols-2 gap-3">
  <button
  onClick={() => navigate('/locations')}
- className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-gray-50"
+ className="bg-white/8 backdrop-blur-md rounded-2xl border border-white/10 ring-1 ring-white/5 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-white/5"
  >
- <MapPin className="w-7 h-7 text-blue-600 mb-3" />
+ <MapPin className="w-7 h-7 text-blue-300 mb-3" />
  <span className="text-sm font-semibold text-white">Locations</span>
  </button>
 
  <button
  onClick={() => navigate('/')}
- className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-gray-50"
+ className="bg-white/8 backdrop-blur-md rounded-2xl border border-white/10 ring-1 ring-white/5 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-white/5"
  >
- <TrendingUp className="w-7 h-7 text-green-600 mb-3" />
+ <TrendingUp className="w-7 h-7 text-green-300 mb-3" />
  <span className="text-sm font-semibold text-white">Dashboard</span>
  </button>
  </div>
@@ -231,7 +231,7 @@ export const ScanPage = () => {
  <h3 className="font-bold text-white">Recent</h3>
  <button
  onClick={() => navigate('/')}
- className="text-sm text-blue-600 font-medium"
+ className="text-sm text-blue-300 font-medium"
  >
  View All
  </button>
@@ -245,7 +245,7 @@ export const ScanPage = () => {
  ) : recentInspections?.length === 0 ? (
  <div className="text-center py-8">
  <Clock className="w-12 h-12 mx-auto mb-2 text-gray-200" />
- <p className="text-gray-400 text-sm">No inspections yet</p>
+ <p className="text-white/40 text-sm">No inspections yet</p>
  </div>
  ) : (
  recentInspections?.slice(0, 5).map((inspection: any) => (
@@ -257,19 +257,19 @@ export const ScanPage = () => {
  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
  inspection.overall_status === 'completed'
  ? 'bg-green-50'
- : 'bg-gray-50'
+ : 'bg-white/8'
  }`}>
  {inspection.overall_status === 'completed' ? (
- <CheckCircle2 className="w-5 h-5 text-green-600" />
+ <CheckCircle2 className="w-5 h-5 text-green-300" />
  ) : (
- <Clock className="w-5 h-5 text-gray-400" />
+ <Clock className="w-5 h-5 text-white/40" />
  )}
  </div>
  <div>
  <div className="font-medium text-white text-sm">
  {inspection.locations.name}
  </div>
- <div className="text-xs text-gray-500">
+ <div className="text-xs text-white/50">
  {format(new Date(inspection.inspection_date), 'dd MMM')}
  </div>
  </div>

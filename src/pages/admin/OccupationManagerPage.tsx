@@ -192,7 +192,7 @@ export const OccupationManagerPage = () => {
  {/* Header */}
  <div className="mb-6">
  <h1 className="text-3xl font-bold text-white mb-2">Occupation Management</h1>
- <p className="text-gray-600">Manage user occupation types</p>
+ <p className="text-white/60">Manage user occupation types</p>
  </div>
 
  {/* Add Button */}
@@ -211,7 +211,7 @@ export const OccupationManagerPage = () => {
  <Card className="mb-6">
  <CardHeader 
  title={editingId ? 'Edit Occupation' : 'Add New Occupation'}
- icon={<Briefcase className="w-5 h-5 text-blue-600" />}
+ icon={<Briefcase className="w-5 h-5 text-blue-300" />}
  />
 
  <form onSubmit={handleSubmit} className="space-y-4">
@@ -225,10 +225,10 @@ export const OccupationManagerPage = () => {
  value={formData.name}
  onChange={(e) => setFormData({ ...formData, name: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
  placeholder="e.g., cleaning_staff"
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  />
- <p className="text-xs text-gray-500 mt-1">Lowercase, use underscore for spaces</p>
+ <p className="text-xs text-white/50 mt-1">Lowercase, use underscore for spaces</p>
  </div>
 
  {/* Display Name */}
@@ -241,7 +241,7 @@ export const OccupationManagerPage = () => {
  value={formData.display_name}
  onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
  placeholder="e.g., Cleaning Staff"
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  required
  />
  </div>
@@ -257,9 +257,9 @@ export const OccupationManagerPage = () => {
  value={formData.icon}
  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
  placeholder="💼"
- className="w-20 px-4 py-2 border border-gray-300 rounded-xl text-center text-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-20 px-4 py-2 border border-white/20 rounded-xl text-center text-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
- <span className="text-gray-500">or choose:</span>
+ <span className="text-white/50">or choose:</span>
  </div>
  <div className="flex flex-wrap gap-2">
  {emojiOptions.map((emoji) => (
@@ -268,8 +268,8 @@ export const OccupationManagerPage = () => {
  type="button"
  onClick={() => setFormData({ ...formData, icon: emoji })}
  className={`
- w-12 h-12 rounded-xl text-2xl hover:bg-gray-100 transition-colors
- ${formData.icon === emoji ? 'bg-blue-100 ring-2 ring-blue-500' : 'bg-white border border-gray-200'}
+ w-12 h-12 rounded-xl text-2xl hover:bg-white/10 transition-colors
+ ${formData.icon === emoji ? 'bg-blue-100 ring-2 ring-blue-500' : 'bg-white border border-white/15'}
  `}
  >
  {emoji}
@@ -295,7 +295,7 @@ export const OccupationManagerPage = () => {
  value={formData.color}
  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
  placeholder="#6B7280"
- className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="flex-1 px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>
  <div className="flex flex-wrap gap-2">
@@ -324,7 +324,7 @@ export const OccupationManagerPage = () => {
  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
  placeholder="Brief description of this occupation..."
  rows={3}
- className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+ className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
  />
  </div>
 
@@ -341,7 +341,7 @@ export const OccupationManagerPage = () => {
  <button
  type="button"
  onClick={resetForm}
- className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+ className="px-4 py-3 bg-white/10 text-white/70 rounded-xl font-medium hover:bg-white/15 transition-colors"
  >
  <X className="w-5 h-5" />
  </button>
@@ -355,7 +355,7 @@ export const OccupationManagerPage = () => {
  <CardHeader 
  title="All Occupations"
  subtitle={`${occupations?.filter(o => o.is_active).length || 0} active occupations`}
- icon={<Briefcase className="w-5 h-5 text-blue-600" />}
+ icon={<Briefcase className="w-5 h-5 text-blue-300" />}
  />
 
  <div className="space-y-2">
@@ -364,7 +364,7 @@ export const OccupationManagerPage = () => {
  key={occupation.id}
  className={`
  flex items-center gap-4 p-4 rounded-xl transition-all
- ${occupation.is_active ? 'bg-gray-50 hover:bg-gray-100' : 'bg-red-50 opacity-60'}
+ ${occupation.is_active ? 'bg-white/8 hover:bg-white/10' : 'bg-red-50 opacity-60'}
  `}
  >
  {/* Icon & Color Preview */}
@@ -378,12 +378,12 @@ export const OccupationManagerPage = () => {
  {/* Info */}
  <div className="flex-1 min-w-0">
  <div className="font-medium text-white">{occupation.display_name}</div>
- <div className="text-sm text-gray-500">{occupation.name}</div>
+ <div className="text-sm text-white/50">{occupation.name}</div>
  {occupation.description && (
- <div className="text-xs text-gray-400 mt-1 truncate">{occupation.description}</div>
+ <div className="text-xs text-white/40 mt-1 truncate">{occupation.description}</div>
  )}
  {!occupation.is_active && (
- <span className="text-xs text-red-600 font-medium">Deleted</span>
+ <span className="text-xs text-red-300 font-medium">Deleted</span>
  )}
  </div>
 
@@ -392,13 +392,13 @@ export const OccupationManagerPage = () => {
  <div className="flex gap-2">
  <button
  onClick={() => handleEdit(occupation)}
- className="p-2 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
+ className="p-2 hover:bg-blue-100 text-blue-300 rounded-lg transition-colors"
  >
  <Edit2 className="w-5 h-5" />
  </button>
  <button
  onClick={() => handleDelete(occupation.id)}
- className="p-2 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
+ className="p-2 hover:bg-red-100 text-red-300 rounded-lg transition-colors"
  >
  <Trash2 className="w-5 h-5" />
  </button>
@@ -408,7 +408,7 @@ export const OccupationManagerPage = () => {
  ))}
 
  {!occupations?.length && (
- <div className="text-center py-12 text-gray-500">
+ <div className="text-center py-12 text-white/50">
  <Briefcase className="w-12 h-12 mx-auto mb-4 text-gray-300" />
  <p>No occupations yet. Add your first one!</p>
  </div>

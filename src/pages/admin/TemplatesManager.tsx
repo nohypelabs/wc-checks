@@ -33,36 +33,36 @@ export const TemplatesManager = () => {
  {/* Coming Soon Card */}
  <Card className="p-8 text-center">
  <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
- <FileText className="w-8 h-8 text-orange-600" />
+ <FileText className="w-8 h-8 text-orange-300" />
  </div>
  <h2 className="text-xl font-bold text-white mb-2">
  Templates Management
  </h2>
- <p className="text-gray-600 mb-6">
+ <p className="text-white/60 mb-6">
  This feature is coming soon. You'll be able to create and manage custom inspection templates here.
  </p>
  <div className="flex flex-col gap-3">
- <div className="p-4 bg-gray-50 rounded-xl text-left">
+ <div className="p-4 bg-white/8 rounded-xl text-left">
  <h3 className="font-medium text-white mb-1">
  📋 Create Custom Templates
  </h3>
- <p className="text-sm text-gray-600">
+ <p className="text-sm text-white/60">
  Design inspection forms with custom questions and categories
  </p>
  </div>
- <div className="p-4 bg-gray-50 rounded-xl text-left">
+ <div className="p-4 bg-white/8 rounded-xl text-left">
  <h3 className="font-medium text-white mb-1">
  🔄 Template Versions
  </h3>
- <p className="text-sm text-gray-600">
+ <p className="text-sm text-white/60">
  Manage template versions and track changes over time
  </p>
  </div>
- <div className="p-4 bg-gray-50 rounded-xl text-left">
+ <div className="p-4 bg-white/8 rounded-xl text-left">
  <h3 className="font-medium text-white mb-1">
  📊 Default Templates
  </h3>
- <p className="text-sm text-gray-600">
+ <p className="text-sm text-white/60">
  Set default templates for different location types
  </p>
  </div>

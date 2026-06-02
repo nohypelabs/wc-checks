@@ -31,7 +31,7 @@ const getScoreStyle = (score: number) => {
  if (score >= 85) {
  return {
  bg: 'bg-gradient-to-br from-green-400/20 to-emerald-400/20 lg:from-green-100 lg:to-emerald-100',
- text: 'text-green-100 lg:text-green-700',
+ text: 'text-green-100 lg:text-green-300',
  border: 'border-green-400/40 lg:border-green-300',
  ring: 'ring-green-400/30 lg:ring-green-200',
  glow: 'shadow-green-500/20 lg:shadow-green-200/50',

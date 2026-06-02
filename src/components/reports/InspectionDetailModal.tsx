@@ -18,10 +18,10 @@ const getScoreGradient = (score: number) => {
 };
 
 const getScoreTextColor = (score: number) => {
- if (score >= 90) return 'text-green-600';
+ if (score >= 90) return 'text-green-300';
  if (score >= 75) return 'text-white/80';
  if (score >= 60) return 'text-yellow-600';
- return 'text-red-600';
+ return 'text-red-300';
 };
 
 interface InspectionDetailModalProps {

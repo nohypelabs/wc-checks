@@ -64,7 +64,7 @@ export const BottomNav = () => {
  {/* Telegram-style Floating Bottom Nav */}
  <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom pointer-events-none">
  <div className="flex items-center justify-center relative px-6 pb-2">
- <div className="flex items-center justify-around max-w-md w-[85%] bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-black/10 border border-gray-200/30 px-3 py-0.5 pointer-events-auto">
+ <div className="flex items-center justify-around max-w-md w-[85%] bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-black/10 border border-white/15/30 px-3 py-0.5 pointer-events-auto">
  {navItems.map((item) => {
  const Icon = item.icon;
  const isActive = location.pathname === item.path ||
@@ -110,8 +110,8 @@ export const BottomNav = () => {
  className={clsx(
  'flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-xl transition-all duration-200',
  isActive
- ? 'text-blue-600'
- : 'text-gray-500 hover:text-gray-700 active:scale-95'
+ ? 'text-blue-300'
+ : 'text-white/50 hover:text-white/70 active:scale-95'
  )}
  aria-label={item.label}
  >
@@ -129,7 +129,7 @@ export const BottomNav = () => {
  
  <span className={clsx(
  'text-[11px] font-medium',
- isActive ? 'text-blue-600' : 'text-gray-600'
+ isActive ? 'text-blue-300' : 'text-white/60'
  )}>
  {item.label}
  </span>
@@ -165,7 +165,7 @@ export const BottomNavMinimal = () => {
  ];
 
  return (
- <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
+ <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-white/15 z-50 safe-area-bottom">
  <div className="flex items-center justify-around py-1">
  {minimalItems.map((item, index) => {
  const Icon = item.icon;
@@ -182,8 +182,8 @@ export const BottomNavMinimal = () => {
  className={clsx(
  'flex flex-col items-center gap-0.5 p-2 rounded-xl transition-all min-w-[60px]',
  isActive
- ? 'text-blue-600 bg-blue-50'
- : 'text-gray-500'
+ ? 'text-blue-300 bg-blue-50'
+ : 'text-white/50'
  )}
  >
  <Icon className="w-6 h-6" strokeWidth={isActive ? 2.5 : 2} />
@@ -241,7 +241,7 @@ export const BottomNavLivin = () => {
  >
  <Icon className="w-8 h-8" strokeWidth={2.5} />
  </button>
- <span className="absolute bottom-1 text-[10px] font-medium text-gray-600">
+ <span className="absolute bottom-1 text-[10px] font-medium text-white/60">
  {item.label}
  </span>
  </div>
@@ -264,13 +264,13 @@ export const BottomNavLivin = () => {
  <Icon 
  className={clsx(
  'w-6 h-6 transition-colors',
- isActive ? 'text-blue-600' : 'text-gray-400'
+ isActive ? 'text-blue-300' : 'text-white/40'
  )} 
  strokeWidth={isActive ? 2.5 : 2} 
  />
  <span className={clsx(
  'text-[10px] font-medium transition-colors',
- isActive ? 'text-blue-600' : 'text-gray-500'
+ isActive ? 'text-blue-300' : 'text-white/50'
  )}>
  {item.label}
  </span>
