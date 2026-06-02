@@ -224,15 +224,53 @@ export const AdminDashboard = () => {
  </div>
 
  {/* Footer */}
- <footer className="mt-6 lg:mt-8 border-t border-white/5 py-4 text-center">
+ <footer className="mt-6 lg:mt-8 mb-2">
+ <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/8 px-5 py-4">
+ {/* Top row — Brand + Version */}
+ <div className="flex items-center justify-between mb-3">
+ <div className="flex items-center gap-2.5">
+ <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center p-1 border border-white/15">
+ <img src="/logo.png" alt="Logo" className="w-full h-full object-contain opacity-80" />
+ </div>
+ <div>
+ <p className="text-sm font-semibold text-white/70 leading-tight">Proservice Indonesia</p>
+ <p className="text-[10px] text-white/30">Sistem Inspeksi Toilet</p>
+ </div>
+ </div>
+ <span className="text-[10px] text-white/25 font-mono bg-white/5 px-2 py-0.5 rounded-md border border-white/8">
+ v4.0.3
+ </span>
+ </div>
+
+ {/* Divider */}
+ <div className="border-t border-white/8 my-3" />
+
+ {/* Bottom row — Credit + Year */}
+ <div className="flex items-center justify-between">
+ <p className="text-[11px] text-white/30">
+ © {new Date().getFullYear()}{' '}
  <a
  href="https://nohypelabs.vercel.app"
  target="_blank"
  rel="noopener noreferrer"
- className="text-xs text-white/30 hover:text-white/50 transition-colors"
+ className="text-white/50 hover:text-blue-300 transition-colors font-medium"
  >
- © {new Date().getFullYear()} nohypelabs.vercel.app
+ nohypelabs.vercel.app
  </a>
+ </p>
+ <p className="text-[11px] text-white/20">
+ Dibangun dengan ❤️ oleh{' '}
+ <a
+ href="https://nohypelabs.vercel.app"
+ target="_blank"
+ rel="noopener noreferrer"
+ className="text-white/40 hover:text-blue-300 transition-colors font-medium"
+ >
+ NypeLabs
+ </a>
+ </p>
+ </div>
+ </div>
  </footer>
  </div>
 
