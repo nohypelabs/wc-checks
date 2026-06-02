@@ -18,7 +18,6 @@ import { EnhancedPhotoUpload } from './EnhancedPhotoUpload'; // Per-component ph
 import { GeneralPhotoUpload } from './GeneralPhotoUpload'; // General photos
 import { InspectionSuccessModal } from './InspectionSuccessModal'; // Success modal
 import { InspectionFailedModal } from './InspectionFailedModal'; // Failed modal
-import { InspectionLimitModal } from '../modals/InspectionLimitModal';
 import { useAuth } from '../../hooks/useAuth';
 import { useInspection } from '../../hooks/useInspection';
 import { batchUploadToCloudinary } from '../../lib/cloudinary';
@@ -34,7 +33,7 @@ export const ComprehensiveInspectionForm = ({
  const genZMode = true;
  const navigate = useNavigate();
  const { user, profile } = useAuth();
- const { getLocation, submitInspection, limitReached, resetLimitReached } = useInspection();
+ const { getLocation, submitInspection } = useInspection();
 
  // Refs for cleanup
  const isMountedRef = useRef(true);
@@ -364,13 +363,6 @@ const handleSubmit = async () => {
  } catch (error: any) {
  console.error('❌ Submission error:', error);
  setUploadProgress(null); // Clear progress on error
-
- // Check if it's a limit error
- if (error.message === 'INSPECTION_LIMIT_REACHED') {
- toast.error('Batas inspeksi tercapai!', { duration: 2000 });
- // The limitReached state is already set by the hook
- return;
- }
 
  // Show detailed error modal instead of simple toast
  setErrorMessage(error.message || 'Gagal submit inspection');
@@ -834,15 +826,6 @@ const handleSubmit = async () => {
  onClose={() => setShowFailedModal(false)}
  onRetry={handleRetry}
  errorMessage={errorMessage}
- />
-
- {/* Limit Reached Modal */}
- <InspectionLimitModal
- isOpen={!!limitReached}
- onClose={resetLimitReached}
- plan={limitReached?.plan || 'free'}
- used={limitReached?.used || 0}
- limit={limitReached?.limit || 50}
  />
  </div>
  );

@@ -1,16 +1,9 @@
 // src/hooks/useInspection.ts - OPTIMIZED: No double upload
-import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { TablesInsert } from '../../src/types/database.types';
 import type { InspectionComponent } from '../types/inspection.types';
-
-interface LimitReachedInfo {
-  plan: string;
-  used: number;
-  limit: number;
-}
 
 interface SubmitInspectionData {
   location_id: string;
@@ -36,7 +29,6 @@ interface LocationWithDetails {
 
 export const useInspection = (inspectionId?: string) => {
   const queryClient = useQueryClient();
-  const [limitReached, setLimitReached] = useState<LimitReachedInfo | null>(null);
 
   const getInspection = useQuery({
     queryKey: ['inspection', inspectionId],
@@ -340,10 +332,6 @@ export const useInspection = (inspectionId?: string) => {
 
         if (!response.ok) {
           const err = await response.json().catch(() => ({}));
-          if (err.error === 'INSPECTION_LIMIT_REACHED') {
-            setLimitReached({ plan: err.plan, used: err.used, limit: err.limit });
-            throw new Error('INSPECTION_LIMIT_REACHED');
-          }
           throw new Error(err.error || `HTTP ${response.status}`);
         }
 
@@ -413,7 +401,5 @@ export const useInspection = (inspectionId?: string) => {
     getLocation,
     submitInspection,
     getLocationInspections,
-    limitReached,
-    resetLimitReached: () => setLimitReached(null),
   };
 };

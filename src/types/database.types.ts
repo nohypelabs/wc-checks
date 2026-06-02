@@ -561,13 +561,11 @@ export type Database = {
           email: string
           full_name: string
           id: string
-          inspection_limit: number
           is_active: boolean | null
           last_login_at: string | null
           occupation_id: string | null
           password_hash: string | null
           phone: string | null
-          plan: string
           profile_photo_url: string | null
           updated_at: string | null
         }
@@ -576,13 +574,11 @@ export type Database = {
           email: string
           full_name: string
           id?: string
-          inspection_limit?: number
           is_active?: boolean | null
           last_login_at?: string | null
           occupation_id?: string | null
           password_hash?: string | null
           phone?: string | null
-          plan?: string
           profile_photo_url?: string | null
           updated_at?: string | null
         }
@@ -591,13 +587,11 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
-          inspection_limit?: number
           is_active?: boolean | null
           last_login_at?: string | null
           occupation_id?: string | null
           password_hash?: string | null
           phone?: string | null
-          plan?: string
           profile_photo_url?: string | null
           updated_at?: string | null
         }

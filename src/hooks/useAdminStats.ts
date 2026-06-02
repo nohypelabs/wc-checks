@@ -14,12 +14,6 @@ export interface AdminStats {
   userGrowth: number;
   inspectionGrowth: number;
   dailyTrend: Array<{ date: string; count: number }>;
-  usage: {
-    plan: string;
-    limit: number;
-    used: number;
-    remaining: number;
-  };
 }
 
 function dateStr(d: Date) {
