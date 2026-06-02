@@ -326,7 +326,7 @@ export const AnalyticsPage = () => {
  {analytics?.topLocations && analytics.topLocations.length > 0 ? (
  <div className="space-y-3">
  {analytics.topLocations.map((location, index) => (
- <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-xl border border-green-100">
+ <div key={index} className="flex items-center gap-3 p-3 bg-green-500/10 rounded-xl border border-green-500/20">
  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
  #{index + 1}
  </div>
@@ -364,7 +364,7 @@ export const AnalyticsPage = () => {
  {analytics?.worstLocations && analytics.worstLocations.length > 0 ? (
  <div className="space-y-3">
  {analytics.worstLocations.map((location, index) => (
- <div key={index} className="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
+ <div key={index} className="flex items-center gap-3 p-3 bg-red-500/10 rounded-xl border border-red-500/20">
  <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
  !
  </div>
