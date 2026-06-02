@@ -403,11 +403,11 @@ export const ReportsPage = () => {
  {/* Building Filter */}
  <div className="mb-3 lg:mb-4">
  <div className="relative max-w-xs">
- <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+ <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
  <select
  value={selectedBuildingId}
  onChange={(e) => setSelectedBuildingId(e.target.value)}
- className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/8 text-white border border-white/10 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm transition-all"
+ className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 appearance-none cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20"
  disabled={buildingsLoading}
  >
  <option value="" className="text-gray-900 bg-white">Semua Gedung</option>
@@ -417,7 +417,7 @@ export const ReportsPage = () => {
  </option>
  ))}
  </select>
- <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60 pointer-events-none" />
+ <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
  </div>
  </div>
 
