@@ -107,7 +107,7 @@ export const InspectionFailedModal = ({
  {/* Tips */}
  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
  <p className="text-sm font-semibold text-blue-900 mb-2">
- 💡 Apa yang harus dilakukan:
+ Apa yang harus dilakukan:
  </p>
  <ul className="text-sm text-blue-800 space-y-1.5">
  {isNetworkError && (

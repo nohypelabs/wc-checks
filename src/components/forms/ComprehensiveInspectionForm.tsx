@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Save, CheckCircle2, AlertCircle, Camera } from 'lucide-react';
+import { ArrowLeft, Save, CheckCircle2, AlertCircle, Camera, SkipForward, AlertTriangle, XCircle } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import {
  InspectionComponent,
@@ -531,20 +531,14 @@ const handleSubmit = async () => {
  `}
  >
  <div className="flex items-center space-x-3">
- {genZMode ? (
- <span className="text-2xl">{component.iconGenZ}</span>
- ) : (
- (() => {
+ {(() => {
  const IconComponent = component.icon ? (Icons as any)[component.icon] : null;
  return IconComponent ? (
- <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
- <IconComponent className="w-5 h-5 text-blue-600" />
+ <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${genZMode ? 'bg-white/20' : 'bg-blue-500/20'}`}>
+ <IconComponent className={`w-5 h-5 ${genZMode ? 'text-white' : 'text-blue-400'}`} />
  </div>
- ) : (
- <span className="text-2xl">{component.iconGenZ}</span>
- );
- })()
- )}
+ ) : null;
+ })()}
  <div className="flex flex-col items-start">
  <span className="font-medium text-gray-900">
  {component.labelGenZ}
@@ -555,7 +549,7 @@ const handleSubmit = async () => {
  </div>
  </div>
  {rating?.isAvailable === false ? (
- <span className="text-sm text-gray-500">⏭️ Skip</span>
+ <span className="text-sm text-gray-500 flex items-center gap-1"><SkipForward className="w-4 h-4" /> Skip</span>
  ) : rating ? (
  <CheckCircle2 className="w-5 h-5 text-green-600" />
  ) : component.required ? (
@@ -614,7 +608,7 @@ const handleSubmit = async () => {
  </div>
 
  <p className={`text-sm mb-4 ${genZMode ? 'text-blue-900' : 'text-blue-900'}`}>
- ⚠️ WAJIB minimal 1 foto! Auto watermark: Tanggal, Jam, GPS, Nama Toilet.
+ <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-yellow-500" /> WAJIB minimal 1 foto! Auto watermark: Tanggal, Jam, GPS, Nama Toilet.</div>
  </p>
 
  <GeneralPhotoUpload
@@ -635,7 +629,7 @@ const handleSubmit = async () => {
  >
  <label className="flex items-center justify-between mb-3">
  <span className="font-semibold text-gray-900">
- ⚠️ Ada masalah yang ditemukan?
+ <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-yellow-500" /> Ada masalah yang ditemukan?</div>
  </span>
  <input
  type="checkbox"
@@ -816,7 +810,7 @@ const handleSubmit = async () => {
  <div className="text-center text-sm text-red-600 mt-2 space-y-1">
  {completedCount < totalRequired && (
  <p>
- ❌ Masih kurang {totalRequired - completedCount} komponen wajib
+ <div className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Masih kurang {totalRequired - completedCount} komponen wajib</div>
  </p>
  )}
  {generalPhotos.length === 0 && (

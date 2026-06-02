@@ -61,10 +61,10 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     id: 'aroma',
     category: 'aroma',
     label: 'Aroma/Odor Level',
-    labelGenZ: 'Bau-bauan',
+    labelGenZ: 'Aroma',
     weight: 0.15,
     icon: 'Nose',
-    iconGenZ: '👃',
+    iconGenZ: 'Nose',
     required: true,
     allowPhoto: false,
     choices: {
@@ -91,7 +91,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Kebersihan Lantai',
     weight: 0.12,
     icon: 'Droplets',
-    iconGenZ: '✨',
+    iconGenZ: 'Sparkles',
     required: true,
     allowPhoto: true,
     choices: {
@@ -116,7 +116,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Kondisi Dinding',
     weight: 0.08,
     icon: 'Square',
-    iconGenZ: '🎨',
+    iconGenZ: 'Palette',
     required: true,
     allowPhoto: true,
     choices: {
@@ -141,7 +141,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Kebersihan Cermin',
     weight: 0.06,
     icon: 'Mirror',
-    iconGenZ: '🪞',
+    iconGenZ: 'Mirror',
     required: true,
     allowPhoto: false,
     choices: {
@@ -166,7 +166,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Kondisi Kloset',
     weight: 0.15,
     icon: 'Droplet', // Using Droplet as placeholder for toilet
-    iconGenZ: '🚽',
+    iconGenZ: 'Droplet',
     required: true,
     allowPhoto: true,
     choices: {
@@ -191,7 +191,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Kondisi Tempat Sampah',
     weight: 0.06,
     icon: 'Trash2',
-    iconGenZ: '🗑️',
+    iconGenZ: 'Trash2',
     required: true,
     allowPhoto: false,
     choices: {
@@ -218,7 +218,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Kondisi Wastafel',
     weight: 0.10,
     icon: 'Droplet',
-    iconGenZ: '💧',
+    iconGenZ: 'Droplet',
     required: true,
     allowPhoto: true,
     choices: {
@@ -243,7 +243,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Kondisi Urinoir',
     weight: 0.08,
     icon: 'Droplets',
-    iconGenZ: '🚿',
+    iconGenZ: 'Droplets',
     required: false, // Not all toilets have urinals
     allowPhoto: true,
     choices: {
@@ -270,7 +270,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Ketersediaan Sabun',
     weight: 0.08,
     icon: 'Droplets',
-    iconGenZ: '🧴',
+    iconGenZ: 'Droplets',
     required: true,
     allowPhoto: false,
     choices: {
@@ -295,7 +295,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Ketersediaan Tissue',
     weight: 0.08,
     icon: 'FileText',
-    iconGenZ: '🧻',
+    iconGenZ: 'FileText',
     required: true,
     allowPhoto: false,
     choices: {
@@ -320,7 +320,7 @@ export const INSPECTION_COMPONENTS: InspectionComponentConfig[] = [
     labelGenZ: 'Pengharum Ruangan',
     weight: 0.04,
     icon: 'Wind',
-    iconGenZ: '🌬️',
+    iconGenZ: 'Wind',
     required: true,
     allowPhoto: false,
     choices: {

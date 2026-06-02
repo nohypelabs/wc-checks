@@ -156,7 +156,13 @@ export const RatingSelector = ({
  `}
  >
  <div className="flex flex-col items-center space-y-1">
- <span className="text-xl">{getChoiceEmoji(choice, config.category)}</span>
+ {(() => {
+  const iconName = getChoiceIcon(choice, config.category);
+  const IconComponent = iconName ? (Icons as any)[iconName] : null;
+  return IconComponent ? (
+   <IconComponent className="w-6 h-6" />
+  ) : null;
+ })()}
  <span className="leading-tight">{choices[choice]}</span>
  </div>
  </button>
@@ -288,7 +294,7 @@ const getChoiceStyle = (
  }
 };
 
-const getChoiceEmoji = (
+const getChoiceIcon = (
  choice: RatingChoice,
  category: 'aroma' | 'visual' | 'availability' | 'functional'
 ): string => {
@@ -296,11 +302,11 @@ const getChoiceEmoji = (
  if (category === 'aroma') {
  switch (choice) {
  case 'good':
- return '🌸';
+ return 'Flower2';
  case 'normal':
- return '😐';
+ return 'Minus';
  case 'bad':
- return '🤢';
+ return 'Skull';
  }
  }
 
@@ -308,11 +314,11 @@ const getChoiceEmoji = (
  if (category === 'visual') {
  switch (choice) {
  case 'good':
- return '✨';
+ return 'Sparkles';
  case 'normal':
- return '😐';
+ return 'Minus';
  case 'bad':
- return '💩';
+ return 'Trash2';
  }
  }
 
@@ -320,11 +326,11 @@ const getChoiceEmoji = (
  if (category === 'availability') {
  switch (choice) {
  case 'good':
- return '✅';
+ return 'CheckCircle2';
  case 'normal':
- return '⚠️';
+ return 'AlertTriangle';
  case 'bad':
- return '❌';
+ return 'XCircle';
  }
  }
 
@@ -332,13 +338,13 @@ const getChoiceEmoji = (
  if (category === 'functional') {
  switch (choice) {
  case 'good':
- return '✅';
+ return 'CheckCircle2';
  case 'normal':
- return '⚠️';
+ return 'AlertTriangle';
  case 'bad':
- return '❌';
+ return 'XCircle';
  }
  }
 
- return '💬';
+ return 'MessageCircle';
 };

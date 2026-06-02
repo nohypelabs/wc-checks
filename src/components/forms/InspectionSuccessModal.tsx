@@ -105,7 +105,7 @@ export const InspectionSuccessModal = ({
 
  {/* Hint Text */}
  <p className="text-xs text-gray-500 text-center pt-2">
- 💡 Tip: Dashboard nampilin hasil dan statistik terbaru lo
+ Tip: Dashboard nampilin hasil dan statistik terbaru lo
  </p>
  </div>
  </div>
