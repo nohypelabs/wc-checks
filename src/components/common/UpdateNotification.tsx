@@ -1,7 +1,7 @@
 // src/components/common/UpdateNotification.tsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, CheckCircle, ArrowRight, Zap, Shield, Palette } from 'lucide-react';
+import { X, Sparkles, CheckCircle, ArrowRight, Zap, Shield, Palette, Eye, Layout, Stethoscope } from 'lucide-react';
 
 const UPDATE_KEY = 'wc-checks-update-v4.0.1-dismissed';
 const SHOW_DURATION_DAYS = 7;
@@ -15,18 +15,25 @@ const features = [
     bg: 'bg-blue-500/20',
   },
   {
-    icon: Zap,
-    title: 'Performance Boost',
-    description: 'Loading lebih cepat dan UI lebih responsif',
-    color: 'text-yellow-400',
-    bg: 'bg-yellow-500/20',
+    icon: Layout,
+    title: 'Compact Inspection',
+    description: 'Form inspeksi lebih ringkas dan clean tanpa tombol berlebihan',
+    color: 'text-purple-400',
+    bg: 'bg-purple-500/20',
   },
   {
-    icon: Shield,
-    title: 'Improved UX',
-    description: 'Navigasi lebih intuitif dan konsisten di semua device',
-    color: 'text-green-400',
-    bg: 'bg-green-500/20',
+    icon: Eye,
+    title: 'Lucide Icons',
+    description: 'Semua emoji diganti icon profesional dari Lucide React',
+    color: 'text-cyan-400',
+    bg: 'bg-cyan-500/20',
+  },
+  {
+    icon: Zap,
+    title: 'Header 30% Lebih Besar',
+    description: 'Logo dan teks Proservice Indonesia lebih besar dan mudah dibaca',
+    color: 'text-yellow-400',
+    bg: 'bg-yellow-500/20',
   },
 ];
 

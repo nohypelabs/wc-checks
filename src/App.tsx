@@ -73,6 +73,9 @@ const HelpPage = lazy(() =>
 const AboutPage = lazy(() =>
  import('./pages/AboutPage').then(module => ({ default: module.AboutPage }))
 );
+const ChangelogPage = lazy(() =>
+ import('./pages/ChangelogPage').then(module => ({ default: module.ChangelogPage }))
+);
 
 // ⚡ React Query - OPTIMIZED for performance + freshness balance
 const queryClient = new QueryClient({
@@ -246,6 +249,10 @@ function AppContent() {
  <Route
  path="/about"
  element={user ? <AboutPage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/changelog"
+ element={user ? <ChangelogPage /> : <Navigate to="/login" replace />}
  />
 
  {/* Admin Routes - Same as main dashboard (accessible to all users) */}
