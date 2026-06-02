@@ -231,13 +231,13 @@ export const OrganizationsManager = () => {
  <div className="space-y-3">
  {/* Search */}
  <div className="relative">
- <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
+ <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5" />
  <input
  type="text"
  placeholder="Cari organisasi..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full pl-10 pr-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ className="w-full pl-10 pr-4 py-3 text-white bg-slate-800/80 border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-md placeholder-white/40"
  />
  </div>
 
