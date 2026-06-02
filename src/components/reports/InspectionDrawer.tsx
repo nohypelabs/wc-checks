@@ -16,9 +16,9 @@ interface InspectionDrawerProps {
 }
 
 const getScoreColor = (score: number) => {
-  if (score >= 85) return 'bg-green-100 text-green-700 border-green-200';
-  if (score >= 70) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-  return 'bg-red-100 text-red-700 border-red-200';
+  if (score >= 85) return 'bg-green-500/20 text-green-200 border-green-400/30 lg:bg-green-100 lg:text-green-700 lg:border-green-200';
+  if (score >= 70) return 'bg-yellow-500/20 text-yellow-200 border-yellow-400/30 lg:bg-yellow-100 lg:text-yellow-700 lg:border-yellow-200';
+  return 'bg-red-500/20 text-red-200 border-red-400/30 lg:bg-red-100 lg:text-red-700 lg:border-red-200';
 };
 
 const getScoreEmoji = (score: number) => {
@@ -133,7 +133,7 @@ export const InspectionDrawer = ({
                 onClose();
               }
             }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 bg-white/15 backdrop-blur-xl rounded-t-3xl shadow-2xl z-50 max-h-[80vh] flex flex-col border-t border-white/20 lg:bg-white lg:border-gray-200 lg:backdrop-blur-none"
             style={{
               willChange: isDragging ? 'transform' : 'auto',
               backfaceVisibility: 'hidden',
@@ -147,33 +147,33 @@ export const InspectionDrawer = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+          <div className="w-12 h-1.5 bg-white/40 lg:bg-gray-300 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="px-6 pb-4 border-b border-gray-100">
+        <div className="px-6 pb-4 border-b border-white/15 lg:border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-white lg:text-gray-900">
                 Inspeksi
               </h2>
-              <p className="text-sm text-gray-600 mt-0.5">
+              <p className="text-sm text-white/70 lg:text-gray-600 mt-0.5">
                 {formattedDate}
               </p>
               <div className="flex items-center space-x-2 mt-2">
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                <span className="px-2 py-1 bg-white/20 text-white border border-white/30 text-xs font-medium rounded-full lg:bg-blue-100 lg:text-blue-700 lg:border-blue-200">
                   {inspections.length} inspeksi
                 </span>
               </div>
             </div>
             <motion.button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              className="p-2 hover:bg-white/15 lg:hover:bg-gray-100 rounded-lg transition-colors duration-200"
               whileHover={{ scale: 1.05, rotate: 90 }}
               whileTap={{ scale: 0.95 }}
               transition={TAP_TRANSITION}
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-white/80 lg:text-gray-600" />
             </motion.button>
           </div>
         </div>
@@ -200,7 +200,7 @@ export const InspectionDrawer = ({
                   haptic.medium();
                   onInspectionClick(inspection);
                 }}
-                className="w-full bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200 text-left"
+                className="w-full bg-white/10 rounded-xl p-4 hover:bg-white/20 transition-colors duration-200 text-left border border-white/15 lg:bg-gray-50 lg:border-gray-100 lg:hover:bg-gray-100"
                 {...slideInLeft}
                 transition={{
                   ...slideInLeft.transition,
@@ -213,13 +213,13 @@ export const InspectionDrawer = ({
                   {/* Left side - Location info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-2">
-                      <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <h3 className="font-semibold text-gray-900 truncate">
+                      <MapPin className="w-4 h-4 text-blue-300 lg:text-blue-600 flex-shrink-0" />
+                      <h3 className="font-semibold text-white lg:text-gray-900 truncate">
                         {inspection.location.name}
                       </h3>
                     </div>
 
-                    <div className="text-sm text-gray-600 space-y-1">
+                    <div className="text-sm text-white/60 lg:text-gray-600 space-y-1">
                       {/* Organization */}
                       {inspection.location.organization?.name && (
                         <p className="truncate">
@@ -233,15 +233,15 @@ export const InspectionDrawer = ({
                         </p>
                       )}
                       <div className="flex items-center space-x-1.5">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm font-medium">{inspection.inspection_time}</span>
+                        <Clock className="w-4 h-4 text-white/60 lg:text-gray-500" />
+                        <span className="text-sm font-medium text-white/80 lg:text-gray-700">{inspection.inspection_time}</span>
                       </div>
                     </div>
 
                     {/* Photos indicator */}
                     {inspection.photo_urls.length > 0 && (
                       <div className="mt-2">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-white/50 lg:text-gray-500">
                           📸 {inspection.photo_urls.length} foto
                         </span>
                       </div>
@@ -258,14 +258,14 @@ export const InspectionDrawer = ({
                       <span className="text-lg">{emoji}</span>
                       <span className="text-xl">{score}</span>
                     </div>
-                    <span className="text-xs text-gray-500 mt-1">Skor</span>
+                    <span className="text-xs text-white/50 lg:text-gray-500 mt-1">Skor</span>
                   </div>
                 </div>
 
                 {/* Notes preview */}
                 {inspection.notes && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm text-gray-600 line-clamp-2">
+                  <div className="mt-3 pt-3 border-t border-white/15 lg:border-gray-200">
+                    <p className="text-sm text-white/60 lg:text-gray-600 line-clamp-2">
                       💬 {inspection.notes}
                     </p>
                   </div>
