@@ -130,7 +130,7 @@ export const IncomingFeaturesModal = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => { handleClose(); navigate('/payment-method'); }}
+                  onClick={() => { handleClose(); navigate('/upgrade'); }}
                   className="w-full py-3 bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2"
                 >
                   <Lock className="w-4 h-4" />
