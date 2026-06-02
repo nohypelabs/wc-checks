@@ -184,7 +184,7 @@ export const ComprehensiveInspectionForm = ({
 
  // VALIDATE: General photos REQUIRED (min 1)
  if (generalPhotos.length === 0) {
- toast.error('📸 Wajib upload minimal 1 foto dokumentasi!');
+ toast.error('Wajib upload minimal 1 foto dokumentasi!');
  return false;
  }
 
@@ -251,7 +251,7 @@ const handleSubmit = async () => {
 
  if (totalPhotos === 0) {
  console.error('❌ [SUBMIT] No photos found!');
- toast.error('📸 Wajib upload minimal 1 foto!');
+ toast.error('Wajib upload minimal 1 foto!');
  setIsSubmitting(false);
  return;
  }
@@ -602,7 +602,7 @@ const handleSubmit = async () => {
  <div className="flex items-center space-x-2 mb-2">
  <Camera className={`w-5 h-5 ${genZMode ? 'text-blue-700' : 'text-blue-700'}`} />
  <h3 className="font-bold text-white">
- 📸 Foto Dokumentasi
+ Foto Dokumentasi
  <span className="text-red-500 ml-1">*</span>
  </h3>
  </div>
@@ -658,7 +658,7 @@ const handleSubmit = async () => {
  >
  <label className="flex items-center justify-between mb-3">
  <span className="font-semibold text-white">
- 🔧 Perlu maintenance?
+ Perlu maintenance?
  </span>
  <input
  type="checkbox"
@@ -709,7 +709,7 @@ const handleSubmit = async () => {
  } rounded-2xl p-4 shadow-sm border border-white/10`}
  >
  <label className="block text-sm font-medium text-white/70 mb-2">
- 📝 Catatan tambahan (opsional)
+ Catatan tambahan (opsional)
  </label>
  <textarea
  value={generalNotes}
@@ -801,9 +801,9 @@ const handleSubmit = async () => {
  >
  {isSubmitting
  ? (uploadProgress?.total || 0) > 0
- ? `📸 Upload ${uploadProgress?.current || 0}/${uploadProgress?.total || 0}...`
- : '⏳ Submitting...'
- : `🚀 Submit (Score: ${currentScore})`}
+ ? `Upload ${uploadProgress?.current || 0}/${uploadProgress?.total || 0}...`
+ : 'Submitting...'
+ : `Submit (Score: ${currentScore})`}
  </button>
 
  {(completedCount < totalRequired || generalPhotos.length === 0) && (
@@ -815,7 +815,7 @@ const handleSubmit = async () => {
  )}
  {generalPhotos.length === 0 && (
  <p>
- 📸 Wajib upload minimal 1 foto dokumentasi
+ Wajib upload minimal 1 foto dokumentasi
  </p>
  )}
  </div>
