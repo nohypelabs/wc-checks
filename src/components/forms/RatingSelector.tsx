@@ -72,64 +72,38 @@ export const RatingSelector = ({
  </div>
  </div>
 
- {/* Photo Button */}
- {config.allowPhoto && isAvailable && (
- <button
- type="button"
- onClick={onPhotoAdd}
- className={`
- p-2 rounded-xl transition-all
- ${
- hasPhoto
- ? 'bg-green-100 text-green-600'
- : genZMode
- ? 'bg-purple-100 text-purple-600 hover:bg-purple-200'
- : 'bg-white/10 text-white/60 hover:bg-white/20'
- }
- `}
- >
- <Camera className="w-5 h-5" />
- </button>
- )}
  </div>
 
- {/* NEW: Availability Toggle */}
- <div className="mb-4 pb-4 border-b border-white/10">
- <p className="text-sm text-white/60 mb-2">
- {genZMode ? 'Ada nggak nih komponennya?' : 'Is this component available?'}
- </p>
- <div className="flex gap-3">
+ {/* Availability Toggle */}
+ <div className="mb-3 pb-3 border-b border-white/10">
+ <div className="flex gap-2">
  <button
  type="button"
  onClick={() => onAvailabilityChange(true)}
  className={`
- flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all border-2
+ flex-1 py-2 px-3 rounded-lg font-medium text-xs transition-all border
  ${
  isAvailable
- ? genZMode
  ? 'bg-green-500/10 border-green-500 text-green-400'
- : 'bg-green-500/10 border-green-500 text-green-400'
  : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
  }
  `}
  >
- {genZMode ? 'Ada' : 'Available'}
+ Ada
  </button>
  <button
  type="button"
  onClick={() => onAvailabilityChange(false)}
  className={`
- flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all border-2
+ flex-1 py-2 px-3 rounded-lg font-medium text-xs transition-all border
  ${
  !isAvailable
- ? genZMode
  ? 'bg-white/10 border-white/30 text-white'
- : 'bg-white/10 border-white/30 text-white'
  : 'bg-white/5 border-white/15 text-white/60 hover:border-white/30'
  }
  `}
  >
- {genZMode ? 'Tidak Ada' : 'Not Available'}
+ Tidak Ada
  </button>
  </div>
  </div>
@@ -149,18 +123,18 @@ export const RatingSelector = ({
  type="button"
  onClick={() => handleChoiceChange(choice)}
  className={`
- py-3 px-2 rounded-xl text-center transition-all
- border-2 font-medium text-sm
+ py-2 px-2 rounded-lg text-center transition-all
+ border font-medium text-xs
  ${buttonStyle}
  ${isSelected ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.01]'}
  `}
  >
- <div className="flex flex-col items-center space-y-1">
+ <div className="flex flex-col items-center space-y-0.5">
  {(() => {
   const iconName = getChoiceIcon(choice, config.category);
   const IconComponent = iconName ? (Icons as any)[iconName] : null;
   return IconComponent ? (
-   <IconComponent className="w-6 h-6" />
+   <IconComponent className="w-5 h-5" />
   ) : null;
  })()}
  <span className="leading-tight">{choices[choice]}</span>
@@ -175,8 +149,8 @@ export const RatingSelector = ({
  type="button"
  onClick={() => handleChoiceChange('other')}
  className={`
- w-full py-3 rounded-xl text-center transition-all
- border-2 font-medium text-sm flex items-center justify-center space-x-2
+ w-full py-2 rounded-lg text-center transition-all
+ border font-medium text-xs flex items-center justify-center space-x-2
  ${
  value === 'other'
  ? genZMode
@@ -193,7 +167,7 @@ export const RatingSelector = ({
  ) : (
  <div className="text-center py-6 text-white/50">
  <p className="text-sm font-medium">
- {genZMode ? '⏭️ Komponen ini tidak tersedia' : '⏭️ Component not available'}
+ {genZMode ? 'Komponen ini tidak tersedia' : 'Component not available'}
  </p>
  <p className="text-xs mt-1">
  {genZMode ? 'Tidak akan masuk penilaian' : 'Will not be included in scoring'}
