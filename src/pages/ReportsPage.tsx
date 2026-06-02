@@ -354,7 +354,7 @@ export const ReportsPage = () => {
  <button
  onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
  disabled={totalInspections === 0}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/80 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
  >
  <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
  <FileDown className="w-3.5 h-3.5 text-red-600" />
@@ -367,7 +367,7 @@ export const ReportsPage = () => {
  <button
  onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
  disabled={totalInspections === 0}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/80 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
  >
  <div className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
  <Download className="w-3.5 h-3.5 text-green-600" />
@@ -380,7 +380,7 @@ export const ReportsPage = () => {
  {isAdmin && (
  <button
  onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors"
+ className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/80 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors"
  >
  <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
  <Users className="w-3.5 h-3.5 text-blue-600" />
@@ -410,9 +410,9 @@ export const ReportsPage = () => {
  className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-white/15 text-white border border-white/20 rounded-xl focus:ring-2 focus:ring-white/40 lg:focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer backdrop-blur-sm transition-all"
  disabled={buildingsLoading}
  >
- <option value="" className="text-gray-700">Semua Gedung</option>
+ <option value="" className="text-white/80">Semua Gedung</option>
  {buildings?.filter(b => b.is_active).map((building) => (
- <option key={building.id} value={building.id} className="text-gray-700">
+ <option key={building.id} value={building.id} className="text-white/80">
  {building.name}
  </option>
  ))}

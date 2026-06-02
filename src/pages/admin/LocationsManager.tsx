@@ -262,7 +262,7 @@ export const LocationsManager = () => {
  <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-6">
  <div className="text-center max-w-md">
  <ShieldAlert className="w-20 h-20 text-red-500 mx-auto mb-4" />
- <h2 className="text-2xl font-bold text-gray-900 mb-3">
+ <h2 className="text-2xl font-bold text-white mb-3">
  Admin Access Required
  </h2>
  <p className="text-gray-600 mb-6 leading-relaxed">
@@ -270,8 +270,8 @@ export const LocationsManager = () => {
  </p>
  <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left">
  <p className="text-xs text-gray-600 mb-1">Debug Info:</p>
- <p className="text-xs text-gray-800">User: {user?.email || 'Not logged in'}</p>
- <p className="text-xs text-gray-800">Admin Status: {isAdmin ? 'Yes' : 'No'}</p>
+ <p className="text-xs text-white">User: {user?.email || 'Not logged in'}</p>
+ <p className="text-xs text-white">Admin Status: {isAdmin ? 'Yes' : 'No'}</p>
  </div>
  <button
  onClick={() => navigate('/')}
@@ -309,7 +309,7 @@ export const LocationsManager = () => {
  </button>
  <div>
  <h1
- className="text-2xl font-bold text-gray-900"
+ className="text-2xl font-bold text-white"
  style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.15)' }}
  >
  Kelola Lokasi
@@ -322,7 +322,7 @@ export const LocationsManager = () => {
  {user && (
  <div className="hidden sm:flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
  <User className="w-4 h-4 text-gray-600" />
- <span className="text-gray-700 text-sm font-medium">
+ <span className="text-white/80 text-sm font-medium">
  {user.user_metadata?.name || user.email}
  </span>
  </div>
@@ -336,7 +336,7 @@ export const LocationsManager = () => {
  <Card className="sm:hidden p-3 bg-white border-gray-200">
  <div className="flex items-center space-x-2">
  <User className="w-4 h-4 text-gray-600" />
- <span className="text-gray-700 text-sm font-medium">
+ <span className="text-white/80 text-sm font-medium">
  {user.user_metadata?.name || user.email}
  </span>
  </div>
@@ -422,7 +422,7 @@ export const LocationsManager = () => {
  {showAnalytics && (
  <Card>
  <div className="flex items-center justify-between mb-4">
- <h3 className="font-bold text-gray-900">Analytics</h3>
+ <h3 className="font-bold text-white">Analytics</h3>
  <button
  onClick={() => setShowAnalytics(false)}
  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -449,12 +449,12 @@ export const LocationsManager = () => {
 
  {/* By Building */}
  <div>
- <p className="text-sm font-semibold text-gray-700 mb-2">By Building</p>
+ <p className="text-sm font-semibold text-white/80 mb-2">By Building</p>
  <div className="space-y-2">
  {Object.entries(analytics.byBuilding).map(([building, count]) => (
  <div key={building} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
- <span className="text-sm text-gray-700">{building}</span>
- <span className="font-semibold text-gray-900">{count}</span>
+ <span className="text-sm text-white/80">{building}</span>
+ <span className="font-semibold text-white">{count}</span>
  </div>
  ))}
  </div>
@@ -511,7 +511,7 @@ export const LocationsManager = () => {
  <div className="flex items-center gap-2 px-4">
  <button
  onClick={toggleSelectAll}
- className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+ className="flex items-center gap-2 text-sm font-medium text-white/80 hover:text-blue-600 transition-colors"
  >
  {selectedIds.size === filteredLocations.length ? (
  <CheckSquare className="w-5 h-5 text-blue-600" />
@@ -555,7 +555,7 @@ export const LocationsManager = () => {
  🚽
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-semibold text-gray-900 truncate">
+ <h3 className="font-semibold text-white truncate">
  {location.name}
  </h3>
  <div className="flex items-center gap-2 mt-1">
@@ -635,7 +635,7 @@ export const LocationsManager = () => {
  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors"
  >
  <QrCode className="w-5 h-5 text-blue-600" />
- <span className="text-sm font-medium text-gray-900">Buat QR</span>
+ <span className="text-sm font-medium text-white">Buat QR</span>
  </button>
 
  <button
@@ -643,7 +643,7 @@ export const LocationsManager = () => {
  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors border-t border-gray-100"
  >
  <Copy className="w-5 h-5 text-gray-600" />
- <span className="text-sm font-medium text-gray-900">Copy URL</span>
+ <span className="text-sm font-medium text-white">Copy URL</span>
  </button>
 
  <button
@@ -651,7 +651,7 @@ export const LocationsManager = () => {
  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors border-t border-gray-100"
  >
  <Edit2 className="w-5 h-5 text-gray-600" />
- <span className="text-sm font-medium text-gray-900">Ubah</span>
+ <span className="text-sm font-medium text-white">Ubah</span>
  </button>
 
  <button
@@ -893,7 +893,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
  <Card className="w-full max-w-lg max-h-[calc(100vh-8rem)] overflow-y-auto">
  <div className="sticky top-0 bg-white pb-4 border-b border-gray-200">
- <h2 className="text-xl font-bold text-gray-900">
+ <h2 className="text-xl font-bold text-white">
  {location ? 'Edit Location' : 'Add Location'}
  </h2>
  {user && (
@@ -906,7 +906,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  <form onSubmit={handleSubmit} className="space-y-4 mt-4">
  {/* Organization Dropdown */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Organization *
  </label>
  <select
@@ -927,7 +927,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
 
  {/* Building Dropdown */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Building *
  </label>
  <select
@@ -952,7 +952,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
 
  {/* Location Name */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Location Name *
  </label>
  <input
@@ -968,7 +968,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
 
  {/* Code */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Location Code
  </label>
  <input
@@ -984,7 +984,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  {/* Floor & Section */}
  <div className="grid grid-cols-2 gap-3">
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Floor
  </label>
  <input
@@ -998,7 +998,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Section
  </label>
  <input
@@ -1014,7 +1014,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
 
  {/* Area */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Area Type
  </label>
  <select
@@ -1034,7 +1034,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
 
  {/* Description */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Description
  </label>
  <textarea

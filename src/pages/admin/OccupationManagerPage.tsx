@@ -191,7 +191,7 @@ export const OccupationManagerPage = () => {
  <div className="max-w-4xl mx-auto">
  {/* Header */}
  <div className="mb-6">
- <h1 className="text-3xl font-bold text-gray-900 mb-2">Occupation Management</h1>
+ <h1 className="text-3xl font-bold text-white mb-2">Occupation Management</h1>
  <p className="text-gray-600">Manage user occupation types</p>
  </div>
 
@@ -217,7 +217,7 @@ export const OccupationManagerPage = () => {
  <form onSubmit={handleSubmit} className="space-y-4">
  {/* Name (slug) */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Name (slug) *
  </label>
  <input
@@ -233,7 +233,7 @@ export const OccupationManagerPage = () => {
 
  {/* Display Name */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Display Name *
  </label>
  <input
@@ -248,7 +248,7 @@ export const OccupationManagerPage = () => {
 
  {/* Icon */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Icon (Emoji)
  </label>
  <div className="flex items-center gap-2 mb-2">
@@ -280,7 +280,7 @@ export const OccupationManagerPage = () => {
 
  {/* Color */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Color
  </label>
  <div className="flex items-center gap-2 mb-2">
@@ -316,7 +316,7 @@ export const OccupationManagerPage = () => {
 
  {/* Description */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Description (Optional)
  </label>
  <textarea
@@ -377,7 +377,7 @@ export const OccupationManagerPage = () => {
 
  {/* Info */}
  <div className="flex-1 min-w-0">
- <div className="font-medium text-gray-900">{occupation.display_name}</div>
+ <div className="font-medium text-white">{occupation.display_name}</div>
  <div className="text-sm text-gray-500">{occupation.name}</div>
  {occupation.description && (
  <div className="text-xs text-gray-400 mt-1 truncate">{occupation.description}</div>

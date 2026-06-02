@@ -245,7 +245,7 @@ export const UserManagement = () => {
  <div className="flex items-start justify-between mb-3">
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
- <h3 className="font-semibold text-gray-900 truncate">
+ <h3 className="font-semibold text-white truncate">
  {user.full_name}
  </h3>
  {user.is_active ? (
@@ -277,7 +277,7 @@ export const UserManagement = () => {
 
  {/* Role Selector */}
  <div className="space-y-2">
- <label className="text-xs font-medium text-gray-700">
+ <label className="text-xs font-medium text-white/80">
  Assign Role
  </label>
  <select
@@ -297,7 +297,7 @@ export const UserManagement = () => {
 
  {/* Status Toggle */}
  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
- <span className="text-sm text-gray-700">User Status</span>
+ <span className="text-sm text-white/80">User Status</span>
  <button
  onClick={() => handleToggleStatus(user.id, user.is_active ?? true)}
  disabled={toggleStatusMutation.isPending}

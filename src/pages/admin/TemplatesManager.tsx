@@ -35,7 +35,7 @@ export const TemplatesManager = () => {
  <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
  <FileText className="w-8 h-8 text-orange-600" />
  </div>
- <h2 className="text-xl font-bold text-gray-900 mb-2">
+ <h2 className="text-xl font-bold text-white mb-2">
  Templates Management
  </h2>
  <p className="text-gray-600 mb-6">
@@ -43,7 +43,7 @@ export const TemplatesManager = () => {
  </p>
  <div className="flex flex-col gap-3">
  <div className="p-4 bg-gray-50 rounded-xl text-left">
- <h3 className="font-medium text-gray-900 mb-1">
+ <h3 className="font-medium text-white mb-1">
  📋 Create Custom Templates
  </h3>
  <p className="text-sm text-gray-600">
@@ -51,7 +51,7 @@ export const TemplatesManager = () => {
  </p>
  </div>
  <div className="p-4 bg-gray-50 rounded-xl text-left">
- <h3 className="font-medium text-gray-900 mb-1">
+ <h3 className="font-medium text-white mb-1">
  🔄 Template Versions
  </h3>
  <p className="text-sm text-gray-600">
@@ -59,7 +59,7 @@ export const TemplatesManager = () => {
  </p>
  </div>
  <div className="p-4 bg-gray-50 rounded-xl text-left">
- <h3 className="font-medium text-gray-900 mb-1">
+ <h3 className="font-medium text-white mb-1">
  📊 Default Templates
  </h3>
  <p className="text-sm text-gray-600">

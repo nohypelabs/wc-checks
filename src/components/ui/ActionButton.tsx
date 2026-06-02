@@ -84,7 +84,7 @@ export const MiniActionButton: React.FC<MiniActionButtonProps> = ({
 }) => {
  const variantClasses = {
  primary: 'bg-blue-500 hover:bg-blue-600 text-white',
- secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
+ secondary: 'bg-gray-200 hover:bg-gray-300 text-white',
  outline: 'border-2 border-blue-500 text-blue-500 hover:bg-blue-50',
  };
 

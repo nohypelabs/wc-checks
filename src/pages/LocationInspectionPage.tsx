@@ -93,7 +93,7 @@ export const LocationInspectionPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center">
  <Card className="p-6 text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
- <h2 className="text-xl font-bold text-gray-900 mb-2">Lokasi Tidak Ditemukan</h2>
+ <h2 className="text-xl font-bold text-white mb-2">Lokasi Tidak Ditemukan</h2>
  <p className="text-gray-600 mb-4">Lokasi yang diminta tidak ada atau Anda tidak memiliki akses.</p>
  <Button onClick={() => navigate('/scan')}>
  Kembali ke Pemindai
@@ -119,7 +119,7 @@ export const LocationInspectionPage = () => {
  <span style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.15)' }}>Kembali</span>
  </Button>
  <div>
- <h1 className="text-2xl font-bold text-gray-900">Inspeksi Toilet</h1>
+ <h1 className="text-2xl font-bold text-white">Inspeksi Toilet</h1>
  <p className="text-gray-600">Lengkapi inspeksi untuk lokasi ini</p>
  </div>
  </div>
@@ -147,7 +147,7 @@ export const LocationInspectionPage = () => {
  ðŸš½
  </div>
  <div className="flex-1">
- <h2 className="text-xl font-bold text-gray-900 mb-2">
+ <h2 className="text-xl font-bold text-white mb-2">
  {location.name}
  </h2>
  
@@ -188,7 +188,7 @@ export const LocationInspectionPage = () => {
 
  {location.description && (
  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
- <p className="text-sm text-gray-700">{location.description}</p>
+ <p className="text-sm text-white/80">{location.description}</p>
  </div>
  )}
 
@@ -211,7 +211,7 @@ export const LocationInspectionPage = () => {
  <span className="text-2xl">ðŸ“</span>
  </div>
  
- <h3 className="text-lg font-semibold text-gray-900 mb-2">
+ <h3 className="text-lg font-semibold text-white mb-2">
  Siap Melakukan Inspeksi?
  </h3>
  <p className="text-gray-600 mb-6">
@@ -280,7 +280,7 @@ const RecentInspections = ({ locationId }: { locationId: string }) => {
 
  return (
  <Card className="p-6">
- <h3 className="text-lg font-semibold text-gray-900 mb-4">
+ <h3 className="text-lg font-semibold text-white mb-4">
  Inspeksi Terbaru
  </h3>
 
@@ -293,7 +293,7 @@ const RecentInspections = ({ locationId }: { locationId: string }) => {
  {inspections.map((inspection) => (
  <div key={inspection.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
  <div>
- <p className="font-medium text-gray-900">
+ <p className="font-medium text-white">
  {new Date(inspection.inspection_date).toLocaleDateString('id-ID')}
  </p>
  <p className="text-sm text-gray-600">

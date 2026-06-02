@@ -297,7 +297,7 @@ export const ProfilePageWithAdmin = () => {
 
  {/* User Info */}
  <div className="text-center mb-6">
- <h2 className="text-2xl font-bold text-gray-900 mb-2">
+ <h2 className="text-2xl font-bold text-white mb-2">
  {profile.full_name}
  </h2>
  
@@ -331,7 +331,7 @@ export const ProfilePageWithAdmin = () => {
  <Mail className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Email</div>
- <div className="font-medium text-gray-900">{profile.email}</div>
+ <div className="font-medium text-white">{profile.email}</div>
  </div>
  </div>
 
@@ -340,7 +340,7 @@ export const ProfilePageWithAdmin = () => {
  <Phone className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Phone</div>
- <div className="font-medium text-gray-900">{profile.phone}</div>
+ <div className="font-medium text-white">{profile.phone}</div>
  </div>
  </div>
  )}
@@ -349,7 +349,7 @@ export const ProfilePageWithAdmin = () => {
  <Calendar className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Member Since</div>
- <div className="font-medium text-gray-900">
+ <div className="font-medium text-white">
  {profile.created_at
  ? format(new Date(profile.created_at), 'dd MMM yyyy')
  : user?.created_at
@@ -364,7 +364,7 @@ export const ProfilePageWithAdmin = () => {
  <Clock className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Last Login</div>
- <div className="font-medium text-gray-900">
+ <div className="font-medium text-white">
  {format(new Date(profile.last_login_at), 'dd MMM yyyy, HH:mm')}
  </div>
  </div>
@@ -375,7 +375,7 @@ export const ProfilePageWithAdmin = () => {
 
  {/* Stats Cards */}
  <div className="mt-4">
- <h3 className="text-lg font-bold text-gray-900 mb-3">Your Statistics</h3>
+ <h3 className="text-lg font-bold text-white mb-3">Your Statistics</h3>
  
  {statsLoading ? (
  <div className="grid grid-cols-2 gap-3">
@@ -391,7 +391,7 @@ export const ProfilePageWithAdmin = () => {
  <CheckCircle2 className="w-6 h-6 text-blue-600" />
  </div>
  <div>
- <div className="text-2xl font-bold text-gray-900">{stats?.totalInspections || 0}</div>
+ <div className="text-2xl font-bold text-white">{stats?.totalInspections || 0}</div>
  <div className="text-xs text-gray-500">Inspections</div>
  </div>
  </div>
@@ -403,7 +403,7 @@ export const ProfilePageWithAdmin = () => {
  <TrendingUp className="w-6 h-6 text-green-600" />
  </div>
  <div>
- <div className="text-2xl font-bold text-gray-900">{stats?.avgScore || 0}</div>
+ <div className="text-2xl font-bold text-white">{stats?.avgScore || 0}</div>
  <div className="text-xs text-gray-500">Avg Score</div>
  </div>
  </div>
@@ -415,7 +415,7 @@ export const ProfilePageWithAdmin = () => {
  <span className="text-2xl">🔥</span>
  </div>
  <div>
- <div className="text-2xl font-bold text-gray-900">{stats?.currentStreak || 0}</div>
+ <div className="text-2xl font-bold text-white">{stats?.currentStreak || 0}</div>
  <div className="text-xs text-gray-500">Day Streak</div>
  </div>
  </div>
@@ -429,7 +429,7 @@ export const ProfilePageWithAdmin = () => {
  <div className="flex-1 min-w-0">
  {stats?.bestLocation ? (
  <>
- <div className="text-lg font-bold text-gray-900">{stats.bestLocation.score}</div>
+ <div className="text-lg font-bold text-white">{stats.bestLocation.score}</div>
  <div className="text-xs text-gray-500 truncate">{stats.bestLocation.name}</div>
  </>
  ) : (
@@ -457,7 +457,7 @@ export const ProfilePageWithAdmin = () => {
 
  <button
  onClick={() => navigate('/edit-profile')}
- className="w-full flex items-center justify-center gap-2 p-4 bg-white border-2 border-gray-200 rounded-2xl font-medium text-gray-900 hover:bg-gray-50 transition-colors active:scale-95"
+ className="w-full flex items-center justify-center gap-2 p-4 bg-white border-2 border-gray-200 rounded-2xl font-medium text-white hover:bg-gray-50 transition-colors active:scale-95"
  >
  <Edit2 className="w-5 h-5" />
  <span>Edit Profile</span>

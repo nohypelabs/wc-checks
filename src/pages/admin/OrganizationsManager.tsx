@@ -171,7 +171,7 @@ export const OrganizationsManager = () => {
  <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-6">
  <div className="text-center max-w-md">
  <ShieldAlert className="w-20 h-20 text-red-500 mx-auto mb-4" />
- <h2 className="text-2xl font-bold text-gray-900 mb-3">Admin Access Required</h2>
+ <h2 className="text-2xl font-bold text-white mb-3">Admin Access Required</h2>
  <button
  onClick={() => navigate('/')}
  className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700"
@@ -205,7 +205,7 @@ export const OrganizationsManager = () => {
  </button>
  <div>
  <h1
- className="text-2xl font-bold text-gray-900"
+ className="text-2xl font-bold text-white"
  style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.15)' }}
  >
  Organisasi
@@ -217,7 +217,7 @@ export const OrganizationsManager = () => {
  {user && (
  <div className="hidden sm:flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
  <User className="w-4 h-4 text-gray-600" />
- <span className="text-gray-700 text-sm font-medium">
+ <span className="text-white/80 text-sm font-medium">
  {user.user_metadata?.name || user.email}
  </span>
  </div>
@@ -274,7 +274,7 @@ export const OrganizationsManager = () => {
  🏢
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-semibold text-gray-900 truncate">{org.name}</h3>
+ <h3 className="font-semibold text-white truncate">{org.name}</h3>
  <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
  {org.short_code}
  </span>
@@ -347,13 +347,13 @@ export const OrganizationsManager = () => {
  {isFormOpen && (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
  <Card className="w-full max-w-lg max-h-[calc(100vh-8rem)] overflow-y-auto">
- <h2 className="text-xl font-bold text-gray-900 mb-4">
+ <h2 className="text-xl font-bold text-white mb-4">
  {selectedOrg ? 'Ubah Organisasi' : 'Tambah Organisasi'}
  </h2>
 
  <form onSubmit={handleSubmit} className="space-y-4">
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Name *
  </label>
  <input
@@ -366,7 +366,7 @@ export const OrganizationsManager = () => {
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Short Code *
  </label>
  <input
@@ -380,7 +380,7 @@ export const OrganizationsManager = () => {
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Email
  </label>
  <input
@@ -392,7 +392,7 @@ export const OrganizationsManager = () => {
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Phone
  </label>
  <input
@@ -404,7 +404,7 @@ export const OrganizationsManager = () => {
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-white/80 mb-1">
  Address
  </label>
  <textarea
@@ -423,7 +423,7 @@ export const OrganizationsManager = () => {
  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
  className="w-4 h-4"
  />
- <label htmlFor="is_active" className="text-sm text-gray-700">
+ <label htmlFor="is_active" className="text-sm text-white/80">
  Aktif
  </label>
  </div>

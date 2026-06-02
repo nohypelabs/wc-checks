@@ -177,7 +177,7 @@ export const QRCodeGenerator = ({ locations, onClose }: QRCodeGeneratorProps) =>
  {/* URL Display */}
  <div className="mt-2 p-2 bg-white rounded border border-gray-200">
  <p className="text-xs text-gray-500 mb-1">QR URL:</p>
- <p className="text-xs font-mono text-gray-700 break-all">
+ <p className="text-xs font-mono text-white/80 break-all">
  {locationURL}
  </p>
  </div>

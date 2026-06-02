@@ -156,7 +156,7 @@ export const ScanPage = () => {
  <Menu className="w-5 h-5" />
  </button>
  <div>
- <h1 className="text-xl font-bold text-gray-900">
+ <h1 className="text-xl font-bold text-white">
  Hi, {user?.email?.split('@')[0] || 'Guest'}! 👋
  </h1>
  <p className="text-sm text-gray-500">Ready to scan?</p>
@@ -167,7 +167,7 @@ export const ScanPage = () => {
  {/* Stats Cards - Simple 3D Shadow */}
  <div className="grid grid-cols-3 gap-3">
  <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 shadow-lg border border-white/20 text-center">
- <div className="text-2xl font-bold text-gray-900">
+ <div className="text-2xl font-bold text-white">
  {stats?.total || 0}
  </div>
  <div className="text-xs text-gray-500 mt-1">Total</div>
@@ -198,7 +198,7 @@ export const ScanPage = () => {
  <QrCode className="w-10 h-10 text-white" />
  </div>
  <div className="text-center">
- <h2 className="text-xl font-bold text-gray-900">Scan QR Code</h2>
+ <h2 className="text-xl font-bold text-white">Scan QR Code</h2>
  <p className="text-gray-500 text-sm mt-1">
  Point camera at location QR
  </p>
@@ -213,7 +213,7 @@ export const ScanPage = () => {
  className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-gray-50"
  >
  <MapPin className="w-7 h-7 text-blue-600 mb-3" />
- <span className="text-sm font-semibold text-gray-900">Locations</span>
+ <span className="text-sm font-semibold text-white">Locations</span>
  </button>
 
  <button
@@ -221,14 +221,14 @@ export const ScanPage = () => {
  className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all border border-gray-50"
  >
  <TrendingUp className="w-7 h-7 text-green-600 mb-3" />
- <span className="text-sm font-semibold text-gray-900">Dashboard</span>
+ <span className="text-sm font-semibold text-white">Dashboard</span>
  </button>
  </div>
 
  {/* Recent Inspections - Simple */}
  <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5">
  <div className="flex items-center justify-between mb-4">
- <h3 className="font-bold text-gray-900">Recent</h3>
+ <h3 className="font-bold text-white">Recent</h3>
  <button
  onClick={() => navigate('/')}
  className="text-sm text-blue-600 font-medium"
@@ -266,7 +266,7 @@ export const ScanPage = () => {
  )}
  </div>
  <div>
- <div className="font-medium text-gray-900 text-sm">
+ <div className="font-medium text-white text-sm">
  {inspection.locations.name}
  </div>
  <div className="text-xs text-gray-500">

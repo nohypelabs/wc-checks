@@ -274,7 +274,7 @@ export const AddLocationPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-6">
  <div className="text-center max-w-md">
  <ShieldAlert className="w-20 h-20 text-red-500 mx-auto mb-4" />
- <h2 className="text-2xl font-bold text-gray-900 mb-3">
+ <h2 className="text-2xl font-bold text-white mb-3">
  Admin Access Required
  </h2>
  <p className="text-gray-600 mb-6 leading-relaxed">
@@ -282,8 +282,8 @@ export const AddLocationPage = () => {
  </p>
  <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left">
  <p className="text-xs text-gray-600 mb-1">Debug Info:</p>
- <p className="text-xs text-gray-800">User: {user.email}</p>
- <p className="text-xs text-gray-800">Admin Status: {isAdmin ? 'Yes' : 'No'}</p>
+ <p className="text-xs text-white">User: {user.email}</p>
+ <p className="text-xs text-white">Admin Status: {isAdmin ? 'Yes' : 'No'}</p>
  </div>
  <button
  onClick={() => navigate('/')}
@@ -316,7 +316,7 @@ export const AddLocationPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-6">
  <div className="text-center max-w-md">
  <Building2 className="w-20 h-20 text-gray-400 mx-auto mb-4" />
- <h2 className="text-2xl font-bold text-gray-900 mb-3">
+ <h2 className="text-2xl font-bold text-white mb-3">
  Tidak Ada Organisasi
  </h2>
  <p className="text-gray-600 mb-6 leading-relaxed">
@@ -349,7 +349,7 @@ export const AddLocationPage = () => {
  <ArrowLeft className="w-5 h-5 text-gray-600" />
  </button>
  <div>
- <h1 className="text-xl font-bold text-gray-900">Add Location</h1>
+ <h1 className="text-xl font-bold text-white">Add Location</h1>
  <p className="text-sm text-gray-500">Create new inspection point</p>
  </div>
  </div>
@@ -367,7 +367,7 @@ export const AddLocationPage = () => {
  <form onSubmit={handleSubmit} className="space-y-5">
  {/* Organization Dropdown */}
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <HomeIcon className="w-4 h-4 text-blue-600" />
  Organization *
  </label>
@@ -394,7 +394,7 @@ export const AddLocationPage = () => {
 
  {/* Building Dropdown */}
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <Building2 className="w-4 h-4 text-blue-600" />
  Building *
  </label>
@@ -431,7 +431,7 @@ export const AddLocationPage = () => {
 
  {/* Location Name */}
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <MapPin className="w-4 h-4 text-blue-600" />
  Location Name *
  </label>
@@ -448,7 +448,7 @@ export const AddLocationPage = () => {
 
  {/* Code (Optional) */}
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <Hash className="w-4 h-4 text-gray-400" />
  Location Code (Optional)
  </label>
@@ -468,7 +468,7 @@ export const AddLocationPage = () => {
  {/* Floor & Section - Two columns */}
  <div className="grid grid-cols-2 gap-3">
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <Layers className="w-4 h-4 text-gray-400" />
  Floor
  </label>
@@ -483,7 +483,7 @@ export const AddLocationPage = () => {
  </div>
 
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <Grid className="w-4 h-4 text-gray-400" />
  Section
  </label>
@@ -500,7 +500,7 @@ export const AddLocationPage = () => {
 
  {/* Area Type */}
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <Map className="w-4 h-4 text-gray-400" />
  Area Type
  </label>
@@ -521,7 +521,7 @@ export const AddLocationPage = () => {
 
  {/* Description */}
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+ <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">
  <FileText className="w-4 h-4 text-gray-400" />
  Description (Optional)
  </label>

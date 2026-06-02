@@ -149,7 +149,7 @@ export const LocationsListPage = () => {
  <MapPin className="w-5 h-5 text-white" />
  </div>
  <div>
- <h1 className="text-sm font-bold leading-tight text-gray-900">Lokasi</h1>
+ <h1 className="text-sm font-bold leading-tight text-white">Lokasi</h1>
  <p className="text-[11px] text-gray-500">Pilih lokasi untuk inspeksi</p>
  </div>
  </div>

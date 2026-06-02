@@ -190,7 +190,7 @@ export const Dashboard = () => {
  }}
  />
  <div>
- <h1 className="text-xl font-bold text-gray-900">Proservice Indonesia</h1>
+ <h1 className="text-xl font-bold text-white">Proservice Indonesia</h1>
  <p className="text-sm text-gray-500">
  Hai, {profile?.full_name || user?.email?.split('@')[0] || 'Pengguna'}
  </p>
@@ -214,7 +214,7 @@ export const Dashboard = () => {
  ) : (
  <div className="grid grid-cols-2 gap-3">
  <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
- <p className="text-3xl font-bold text-gray-900">{dashboardStats.total}</p>
+ <p className="text-3xl font-bold text-white">{dashboardStats.total}</p>
  <p className="text-xs text-gray-500 mt-1">Total</p>
  </div>
  <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
@@ -246,7 +246,7 @@ export const Dashboard = () => {
  <QrCode className="w-8 h-8 text-white" />
  </div>
  <div className="flex-1 text-left">
- <p className="font-bold text-lg text-gray-900">Pindai Kode QR</p>
+ <p className="font-bold text-lg text-white">Pindai Kode QR</p>
  <p className="text-gray-500 text-sm">Mulai inspeksi baru</p>
  </div>
  <ChevronRight className="w-6 h-6 text-gray-400" />
@@ -257,7 +257,7 @@ export const Dashboard = () => {
  {dashboardStats.weeklyBreakdown.total > 0 && (
  <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-5 border border-blue-100">
  <div className="flex items-center justify-between mb-3">
- <h3 className="font-bold text-gray-900">Performa Minggu Ini</h3>
+ <h3 className="font-bold text-white">Performa Minggu Ini</h3>
  <span className="text-sm text-gray-600">{dashboardStats.weeklyBreakdown.total} inspeksi</span>
  </div>
  <div className="grid grid-cols-2 gap-2">
@@ -311,7 +311,7 @@ export const Dashboard = () => {
  className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-gray-50"
  >
  <MapPin className="w-7 h-7 text-blue-600 mb-3" />
- <p className="font-semibold text-gray-900 text-sm">Lokasi</p>
+ <p className="font-semibold text-white text-sm">Lokasi</p>
  </button>
 
  <button
@@ -322,7 +322,7 @@ export const Dashboard = () => {
  className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 active:scale-95 transition-all border border-gray-50"
  >
  <Calendar className="w-7 h-7 text-blue-600 mb-3" />
- <p className="font-semibold text-gray-900 text-sm">Laporan</p>
+ <p className="font-semibold text-white text-sm">Laporan</p>
  </button>
  </div>
 
@@ -330,14 +330,14 @@ export const Dashboard = () => {
  {statsLoading ? (
  <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5">
  <div className="flex items-center justify-between mb-4">
- <h2 className="font-bold text-gray-900">Terbaru</h2>
+ <h2 className="font-bold text-white">Terbaru</h2>
  </div>
  <SkeletonActivity />
  </div>
  ) : dashboardStats.recent && dashboardStats.recent.length > 0 && (
  <div className="bg-white/15 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-5">
  <div className="flex items-center justify-between mb-4">
- <h2 className="font-bold text-gray-900">Terbaru</h2>
+ <h2 className="font-bold text-white">Terbaru</h2>
  <button
  onClick={() => navigate('/reports')}
  className="text-blue-600 text-sm font-medium"
@@ -379,7 +379,7 @@ export const Dashboard = () => {
  </div>
  )}
  <div className="flex-1 min-w-0">
- <p className="text-sm font-medium text-gray-900 truncate">{locationName}</p>
+ <p className="text-sm font-medium text-white truncate">{locationName}</p>
  <div className="flex items-center gap-1 text-xs text-gray-500">
  <span>{isToday ? 'Hari ini' : inspection.inspection_date}</span>
  {inspection.inspection_time && (
@@ -408,7 +408,7 @@ export const Dashboard = () => {
  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
  <QrCode className="w-10 h-10 text-gray-300" />
  </div>
- <h3 className="text-lg font-bold text-gray-900 mb-2">
+ <h3 className="text-lg font-bold text-white mb-2">
  Belum Ada Inspeksi
  </h3>
  <p className="text-gray-500 text-sm">

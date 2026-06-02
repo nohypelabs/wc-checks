@@ -236,7 +236,7 @@ export const ProfilePage = () => {
  >
  <Menu className="w-5 h-5" />
  </button>
- <h1 className="text-xl font-bold text-gray-900">Profil</h1>
+ <h1 className="text-xl font-bold text-white">Profil</h1>
  </div>
  </div>
 
@@ -256,7 +256,7 @@ export const ProfilePage = () => {
  <div className="text-center mb-6">
  {!isEditing ? (
  <>
- <h2 className="text-2xl font-bold text-gray-900 mb-2">
+ <h2 className="text-2xl font-bold text-white mb-2">
  {profile.full_name || 'User'}
  </h2>
 
@@ -305,7 +305,7 @@ export const ProfilePage = () => {
  <Mail className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Email</div>
- <div className="font-medium text-gray-900">{profile.email || 'N/A'}</div>
+ <div className="font-medium text-white">{profile.email || 'N/A'}</div>
  </div>
  </div>
 
@@ -314,7 +314,7 @@ export const ProfilePage = () => {
  <Phone className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Nomor Telepon</div>
- <div className="font-medium text-gray-900">{profile.phone || 'Belum diisi'}</div>
+ <div className="font-medium text-white">{profile.phone || 'Belum diisi'}</div>
  </div>
  </div>
 
@@ -326,7 +326,7 @@ export const ProfilePage = () => {
  />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Jabatan</div>
- <div className="font-medium text-gray-900">
+ <div className="font-medium text-white">
  {occupation?.display_name || 'Belum diisi'}
  </div>
  {occupation?.description && (
@@ -342,7 +342,7 @@ export const ProfilePage = () => {
  <Calendar className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Bergabung Sejak</div>
- <div className="font-medium text-gray-900">
+ <div className="font-medium text-white">
  {formatDate(profile.created_at) !== 'N/A'
  ? formatDate(profile.created_at)
  : formatDate(user.created_at) !== 'N/A'
@@ -358,7 +358,7 @@ export const ProfilePage = () => {
  <Clock className="w-5 h-5 text-gray-500" />
  <div className="flex-1">
  <div className="text-xs text-gray-500">Login Terakhir</div>
- <div className="font-medium text-gray-900">
+ <div className="font-medium text-white">
  {formatDateTime(profile.last_login_at)}
  </div>
  </div>
@@ -381,7 +381,7 @@ export const ProfilePage = () => {
  <div className="space-y-4 mb-6">
  {/* Full Name */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Nama Lengkap *
  </label>
  <input
@@ -397,7 +397,7 @@ export const ProfilePage = () => {
 
  {/* Phone */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Nomor Telepon
  </label>
  <input
@@ -412,7 +412,7 @@ export const ProfilePage = () => {
 
  {/* Occupation */}
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
+ <label className="block text-sm font-medium text-white/80 mb-2">
  Jabatan
  </label>
  <select

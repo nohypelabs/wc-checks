@@ -11,7 +11,7 @@ export const InspectionPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 flex items-center justify-center p-4">
  <div className="text-center">
  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
- <h2 className="text-xl font-bold text-gray-900 mb-2">Invalid Location</h2>
+ <h2 className="text-xl font-bold text-white mb-2">Invalid Location</h2>
  <p className="text-gray-600">No location ID provided in URL</p>
  </div>
  </div>

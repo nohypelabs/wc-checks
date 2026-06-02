@@ -63,7 +63,7 @@ export const AdminDashboard = () => {
  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
  </div>
  <div>
- <h1 className="text-sm font-bold leading-tight text-gray-900">Proservice Indonesia</h1>
+ <h1 className="text-sm font-bold leading-tight text-white">Proservice Indonesia</h1>
  <p className="text-[11px] text-gray-500">Aplikasi Toilet Ceklis Real Time</p>
  </div>
  </div>
@@ -82,7 +82,7 @@ export const AdminDashboard = () => {
  {/* Right: Welcome + Settings */}
  <div className="flex items-center gap-1.5">
  <span className="hidden lg:inline text-xs text-gray-600">
- Selamat datang, {isAdmin ? 'Admin' : 'User'} <span className="font-semibold text-gray-900">{profile?.full_name?.split(' ')[0] || ''}</span>
+ Selamat datang, {isAdmin ? 'Admin' : 'User'} <span className="font-semibold text-white">{profile?.full_name?.split(' ')[0] || ''}</span>
  </span>
  <button
  onClick={() => navigate('/profile')}

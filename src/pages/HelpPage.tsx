@@ -40,7 +40,7 @@ export const HelpPage = () => {
  <Menu className="w-5 h-5 text-gray-600" />
  </button>
  <div>
- <h1 className="text-xl font-bold text-gray-900">Bantuan & FAQ</h1>
+ <h1 className="text-xl font-bold text-white">Bantuan & FAQ</h1>
  <p className="text-sm text-gray-500">Panduan penggunaan aplikasi</p>
  </div>
  </div>
@@ -50,14 +50,14 @@ export const HelpPage = () => {
  <main className="p-5 space-y-4">
  {/* FAQ Section */}
  <Card>
- <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+ <h2 className="font-bold text-white mb-3 flex items-center gap-2">
  <HelpCircle className="w-5 h-5 text-blue-600" />
  Pertanyaan Umum
  </h2>
  <div className="space-y-4">
  {faqs.map((faq, index) => (
  <div key={index} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
- <h3 className="font-medium text-gray-900 mb-2">{faq.question}</h3>
+ <h3 className="font-medium text-white mb-2">{faq.question}</h3>
  <p className="text-sm text-gray-600">{faq.answer}</p>
  </div>
  ))}
@@ -66,7 +66,7 @@ export const HelpPage = () => {
 
  {/* Quick Tips */}
  <Card>
- <h2 className="font-bold text-gray-900 mb-3">💡 Tips Cepat</h2>
+ <h2 className="font-bold text-white mb-3">💡 Tips Cepat</h2>
  <ul className="space-y-2 text-sm text-gray-600">
  <li className="flex items-start gap-2">
  <span className="text-blue-600 mt-1">•</span>
@@ -85,7 +85,7 @@ export const HelpPage = () => {
 
  {/* Contact Support */}
  <Card>
- <h2 className="font-bold text-gray-900 mb-3">Hubungi Kami</h2>
+ <h2 className="font-bold text-white mb-3">Hubungi Kami</h2>
  <div className="space-y-3">
  <a
  href="mailto:abdulgofur100persen@gmail.com"
@@ -93,7 +93,7 @@ export const HelpPage = () => {
  >
  <Mail className="w-5 h-5 text-blue-600" />
  <div>
- <p className="font-medium text-gray-900">Email Support</p>
+ <p className="font-medium text-white">Email Support</p>
  <p className="text-xs text-gray-500">abdulgofur100persen@gmail.com</p>
  </div>
  </a>
@@ -106,7 +106,7 @@ export const HelpPage = () => {
  >
  <Phone className="w-5 h-5 text-blue-600" />
  <div>
- <p className="font-medium text-gray-900">WhatsApp Support</p>
+ <p className="font-medium text-white">WhatsApp Support</p>
  <p className="text-xs text-gray-500">+62 878-7441-5491</p>
  </div>
  </a>
@@ -119,7 +119,7 @@ export const HelpPage = () => {
  >
  <MessageCircle className="w-5 h-5 text-blue-600" />
  <div>
- <p className="font-medium text-gray-900">GitHub Repository</p>
+ <p className="font-medium text-white">GitHub Repository</p>
  <p className="text-xs text-gray-500">Report bugs & request features</p>
  </div>
  </a>

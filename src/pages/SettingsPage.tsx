@@ -23,7 +23,7 @@ export const SettingsPage = () => {
  <Menu className="w-5 h-5 text-gray-600" />
  </button>
  <div>
- <h1 className="text-xl font-bold text-gray-900">Pengaturan</h1>
+ <h1 className="text-xl font-bold text-white">Pengaturan</h1>
  <p className="text-sm text-gray-500">Preferensi aplikasi</p>
  </div>
  </div>
@@ -33,13 +33,13 @@ export const SettingsPage = () => {
  <main className="p-5 space-y-4">
  {/* Appearance */}
  <Card>
- <h2 className="font-bold text-gray-900 mb-3">Tampilan</h2>
+ <h2 className="font-bold text-white mb-3">Tampilan</h2>
  <div className="space-y-3">
  <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
  <div className="flex items-center gap-3">
  <Moon className="w-5 h-5 text-gray-600" />
  <div className="text-left">
- <p className="font-medium text-gray-900">Mode Gelap</p>
+ <p className="font-medium text-white">Mode Gelap</p>
  <p className="text-xs text-gray-500">Segera hadir</p>
  </div>
  </div>
@@ -50,7 +50,7 @@ export const SettingsPage = () => {
  <div className="flex items-center gap-3">
  <Globe className="w-5 h-5 text-gray-600" />
  <div className="text-left">
- <p className="font-medium text-gray-900">Bahasa</p>
+ <p className="font-medium text-white">Bahasa</p>
  <p className="text-xs text-gray-500">Pilih bahasa aplikasi</p>
  </div>
  </div>
@@ -61,13 +61,13 @@ export const SettingsPage = () => {
 
  {/* Notifications */}
  <Card>
- <h2 className="font-bold text-gray-900 mb-3">Notifikasi</h2>
+ <h2 className="font-bold text-white mb-3">Notifikasi</h2>
  <div className="space-y-3">
  <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
  <div className="flex items-center gap-3">
  <Bell className="w-5 h-5 text-gray-600" />
  <div className="text-left">
- <p className="font-medium text-gray-900">Notifikasi Push</p>
+ <p className="font-medium text-white">Notifikasi Push</p>
  <p className="text-xs text-gray-500">Pengingat inspeksi</p>
  </div>
  </div>
@@ -78,13 +78,13 @@ export const SettingsPage = () => {
 
  {/* Data & Storage */}
  <Card>
- <h2 className="font-bold text-gray-900 mb-3">Data & Penyimpanan</h2>
+ <h2 className="font-bold text-white mb-3">Data & Penyimpanan</h2>
  <div className="space-y-3">
  <button className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
  <div className="flex items-center gap-3">
  <Download className="w-5 h-5 text-gray-600" />
  <div className="text-left">
- <p className="font-medium text-gray-900">Ekspor Data</p>
+ <p className="font-medium text-white">Ekspor Data</p>
  <p className="text-xs text-gray-500">Unduh semua data Anda</p>
  </div>
  </div>
@@ -104,15 +104,15 @@ export const SettingsPage = () => {
 
  {/* App Info */}
  <Card>
- <h2 className="font-bold text-gray-900 mb-3">Informasi Aplikasi</h2>
+ <h2 className="font-bold text-white mb-3">Informasi Aplikasi</h2>
  <div className="space-y-2 text-sm">
  <div className="flex justify-between">
  <span className="text-gray-600">Versi</span>
- <span className="font-medium text-gray-900">3.0.0</span>
+ <span className="font-medium text-white">3.0.0</span>
  </div>
  <div className="flex justify-between">
  <span className="text-gray-600">Email</span>
- <span className="font-medium text-gray-900 truncate ml-4">{user?.email}</span>
+ <span className="font-medium text-white truncate ml-4">{user?.email}</span>
  </div>
  </div>
  </Card>
