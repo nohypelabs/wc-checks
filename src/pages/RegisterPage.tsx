@@ -508,14 +508,18 @@ export const RegisterPage = () => {
  {/* Footer */}
  <div className="mt-8 text-center text-sm text-white/70">
  <p>
- © 2025 Proservice Indonesia. Hak cipta dilindungi.
+ © 2026 Proservice Indonesia. Hak cipta dilindungi.
  </p>
  <p className="mt-2">
- <a href="#" className="text-blue-600 hover:text-blue-700">
+ <a href="https://nohypelabs.vercel.app" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 transition-colors">
+ NoHypeLabs
+ </a>
+ {' · '}
+ <a href="#" className="text-sky-400 hover:text-sky-300 transition-colors">
  Kebijakan Privasi
  </a>
  {' · '}
- <a href="#" className="text-blue-600 hover:text-blue-700">
+ <a href="#" className="text-sky-400 hover:text-sky-300 transition-colors">
  Ketentuan Layanan
  </a>
  </p>
