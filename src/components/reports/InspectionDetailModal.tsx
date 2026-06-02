@@ -210,18 +210,20 @@ export const InspectionDetailModal = ({
  </div>
  </div>
 
+ </div>
+ </div>
+
+ {/* Close button — top-right of modal, above header */}
  <motion.button
  onClick={onClose}
- className="absolute top-3 right-3 p-2 hover:bg-white/10 rounded-xl transition-colors duration-200 z-20"
+ className="absolute top-2 right-2 p-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg transition-colors duration-200 z-30 border border-white/10"
  type="button"
  whileHover={{ scale: 1.05, rotate: 90 }}
  whileTap={{ scale: 0.95 }}
  transition={TAP_TRANSITION}
  >
- <X className="w-5 h-5" />
+ <X className="w-4 h-4" />
  </motion.button>
- </div>
- </div>
 
  {/* Content - Scrollable area */}
  <div className="overflow-y-auto flex-1 px-4 pt-3 pb-3 space-y-3 rounded-b-3xl">

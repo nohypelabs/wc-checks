@@ -1,7 +1,6 @@
 // src/components/mobile/Sidebar.tsx — Glassmorphism
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  X,
   Home,
   MapPin,
   FileText,
@@ -26,7 +25,7 @@ interface SidebarProps {
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, profile, signOut } = useAuth();
+  const { profile, signOut } = useAuth();
 
   const { isAdmin, isSuperAdmin } = useIsAdmin();
 
@@ -91,10 +90,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               </h2>
             </div>
             <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+              onClick={handleLogout}
+              className="p-2 hover:bg-red-500/20 rounded-xl transition-colors group"
+              title="Keluar"
             >
-              <X className="w-6 h-6 text-white" />
+              <LogOut className="w-5 h-5 text-white/60 group-hover:text-red-300 transition-colors" />
             </button>
           </div>
 
@@ -233,17 +233,6 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               })}
             </>
           )}
-        </div>
-
-        {/* Footer - Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/8 backdrop-blur-md border-t border-white/15">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 p-3.5 bg-red-500/15 border border-red-400/25 rounded-xl font-medium text-red-300 hover:bg-red-500/25 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Keluar</span>
-          </button>
         </div>
       </div>
     </>

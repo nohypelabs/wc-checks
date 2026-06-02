@@ -1,13 +1,11 @@
 // src/pages/ProfilePage.tsx - WITH COMPLETE USER INFO & EDIT FUNCTIONALITY
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 import {
- LogOut,
  Mail,
  Calendar,
  Clock,
@@ -26,9 +24,8 @@ import { BottomNav } from '../components/mobile/BottomNav';
 import { Sidebar } from '../components/mobile/Sidebar';
 
 export const ProfilePage = () => {
- const { user, profile, loading: authLoading, signOut } = useAuth();
+ const { user, profile, loading: authLoading } = useAuth();
  const { isAdmin } = useIsAdmin();
- const navigate = useNavigate();
  const queryClient = useQueryClient();
  const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -169,14 +166,6 @@ export const ProfilePage = () => {
  }
  };
 
- const handleLogout = async () => {
- const confirm = window.confirm('Apakah Anda yakin ingin keluar?');
- if (confirm) {
- await signOut();
- navigate('/login');
- }
- };
-
  // Show loading while auth or profile loads
  if (authLoading || !user || !profile) {
  return (
@@ -301,7 +290,7 @@ export const ProfilePage = () => {
  {/* Read-only view */}
  <div className="space-y-3 mb-6">
  {/* Email */}
- <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <div className="flex items-center gap-3 p-3 bg-white/8 backdrop-blur-md rounded-xl border border-white/10">
  <Mail className="w-5 h-5 text-white/50" />
  <div className="flex-1">
  <div className="text-xs text-white/50">Email</div>
@@ -310,7 +299,7 @@ export const ProfilePage = () => {
  </div>
 
  {/* Phone */}
- <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <div className="flex items-center gap-3 p-3 bg-white/8 backdrop-blur-md rounded-xl border border-white/10">
  <Phone className="w-5 h-5 text-white/50" />
  <div className="flex-1">
  <div className="text-xs text-white/50">Nomor Telepon</div>
@@ -319,7 +308,7 @@ export const ProfilePage = () => {
  </div>
 
  {/* Occupation/Jabatan */}
- <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <div className="flex items-center gap-3 p-3 bg-white/8 backdrop-blur-md rounded-xl border border-white/10">
  <Briefcase
  className="w-5 h-5"
  style={{ color: occupation?.color || '#6b7280' }}
@@ -338,7 +327,7 @@ export const ProfilePage = () => {
  </div>
 
  {/* Member Since */}
- <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <div className="flex items-center gap-3 p-3 bg-white/8 backdrop-blur-md rounded-xl border border-white/10">
  <Calendar className="w-5 h-5 text-white/50" />
  <div className="flex-1">
  <div className="text-xs text-white/50">Bergabung Sejak</div>
@@ -354,7 +343,7 @@ export const ProfilePage = () => {
 
  {/* Last Login */}
  {profile.last_login_at && (
- <div className="flex items-center gap-3 p-3 bg-white/8 rounded-xl">
+ <div className="flex items-center gap-3 p-3 bg-white/8 backdrop-blur-md rounded-xl border border-white/10">
  <Clock className="w-5 h-5 text-white/50" />
  <div className="flex-1">
  <div className="text-xs text-white/50">Login Terakhir</div>
@@ -462,19 +451,6 @@ export const ProfilePage = () => {
  </>
  )}
  </div>
-
- {/* Logout Button */}
- {!isEditing && (
- <div className="mt-6">
- <button
- onClick={handleLogout}
- className="w-full flex items-center justify-center gap-2 p-4 bg-white/8 backdrop-blur-md shadow-lg shadow-blue-500/5 ring-1 ring-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/5 rounded-2xl font-medium text-red-300 active:shadow-[0_4px_20px_rgb(0,0,0,0.06)] active:translate-y-1 transition-all"
- >
- <LogOut className="w-5 h-5" />
- <span>Keluar</span>
- </button>
- </div>
- )}
  </div>
 
  {/* Bottom Navigation */}

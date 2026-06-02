@@ -16,7 +16,6 @@ import {
  Settings,
  BarChart3,
  Calendar,
- Menu,
 } from 'lucide-react';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { Card } from '../../components/ui/Card';
@@ -50,34 +49,20 @@ export const AdminDashboard = () => {
  {/* Header - Compact */}
  <header className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
  <div className="max-w-7xl mx-auto flex items-center justify-between text-white">
- {/* Left Menu Button */}
+ {/* Left — Prenacons logo (opens sidebar) */}
  <button
  onClick={() => setSidebarOpen(true)}
- className="p-1.5 hover:bg-white/15 rounded-lg transition-colors"
+ className="p-1 hover:bg-white/15 rounded-lg transition-colors"
  >
- <Menu className="w-5 h-5" />
+ <div className="w-9 h-9 lg:w-10 lg:h-10 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center justify-center p-1.5">
+ <img src="/logo.png" alt="Prenacons" className="w-full h-full object-contain" />
+ </div>
  </button>
 
- {/* Desktop: Logo left */}
- <div className="hidden lg:flex items-center gap-2.5">
- <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center p-1">
- <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
- </div>
- <div>
- <h1 className="text-xl font-bold leading-tight text-white">Proservice Indonesia</h1>
- <p className="text-xs text-white/50">Aplikasi Toilet Ceklis Real Time</p>
- </div>
- </div>
-
- {/* Mobile: Centered Logo (compact) */}
- <div className="lg:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5">
- <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center justify-center p-1">
- <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
- </div>
- <div className="flex flex-col">
- <h1 className="text-lg font-bold whitespace-nowrap leading-tight">Proservice Indonesia</h1>
- <p className="text-[10px] text-blue-100 whitespace-nowrap">Toilet Ceklis Real Time</p>
- </div>
+ {/* Center — Text only */}
+ <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+ <h1 className="text-base lg:text-xl font-bold whitespace-nowrap leading-tight">Proservice Indonesia</h1>
+ <p className="text-[10px] lg:text-xs text-white/50 whitespace-nowrap">Aplikasi Toilet Ceklis Real Time</p>
  </div>
 
  {/* Right: Welcome + Settings */}
@@ -237,6 +222,18 @@ export const AdminDashboard = () => {
  </Card>
  </div>
  </div>
+
+ {/* Footer */}
+ <footer className="mt-6 lg:mt-8 border-t border-white/5 py-4 text-center">
+ <a
+ href="https://nohypelabs.vercel.app"
+ target="_blank"
+ rel="noopener noreferrer"
+ className="text-xs text-white/30 hover:text-white/50 transition-colors"
+ >
+ © {new Date().getFullYear()} nohypelabs.vercel.app
+ </a>
+ </footer>
  </div>
 
  {/* Bottom Nav - mobile only */}
