@@ -148,7 +148,7 @@ export const AdminDashboard = () => {
  </div>
 
  {/* Two column layout on desktop: Management | Overview */}
- <div className="lg:grid lg:grid-cols-3 lg:gap-5 lg:items-end">
+ <div className="lg:grid lg:grid-cols-3 lg:gap-5 lg:items-stretch">
  {/* Management Cards - Admin Only */}
  {isAdmin && (
  <div className="mb-3 lg:mb-0 lg:col-span-2">
