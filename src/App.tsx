@@ -76,6 +76,12 @@ const AboutPage = lazy(() =>
 const ChangelogPage = lazy(() =>
  import('./pages/ChangelogPage').then(module => ({ default: module.ChangelogPage }))
 );
+const UpgradePage = lazy(() =>
+ import('./pages/UpgradePage').then(module => ({ default: module.UpgradePage }))
+);
+const PaymentMethodPage = lazy(() =>
+ import('./pages/PaymentMethodPage').then(module => ({ default: module.PaymentMethodPage }))
+);
 
 // ⚡ React Query - OPTIMIZED for performance + freshness balance
 const queryClient = new QueryClient({
@@ -253,6 +259,16 @@ function AppContent() {
  <Route
  path="/changelog"
  element={user ? <ChangelogPage /> : <Navigate to="/login" replace />}
+ />
+
+ {/* Billing / Upgrade Routes */}
+ <Route
+ path="/upgrade"
+ element={user ? <UpgradePage /> : <Navigate to="/login" replace />}
+ />
+ <Route
+ path="/payment-method"
+ element={user ? <PaymentMethodPage /> : <Navigate to="/login" replace />}
  />
 
  {/* Admin Routes - Same as main dashboard (accessible to all users) */}

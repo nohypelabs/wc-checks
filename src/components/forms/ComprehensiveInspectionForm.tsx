@@ -207,6 +207,11 @@ export const ComprehensiveInspectionForm = ({
 // REPLACE handleSubmit FUNCTION:
 // ===============================================
 const handleSubmit = async () => {
+ // 🚫 BILLING BLOCK: Redirect to upgrade page instead of submitting
+ // TODO: Re-enable actual submit after user upgrades
+ navigate('/upgrade');
+ return;
+
  console.log('🚀 [SUBMIT] Starting submission...');
 
  if (!user) {
