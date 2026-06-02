@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Crown, Zap, Shield, Star, Wifi, Users } from 'lucide-react';
+import { ArrowLeft, Check, Crown, Zap, Shield, Star, Wifi, Users, BarChart3, Bell } from 'lucide-react';
 
 export const UpgradePage = () => {
   const navigate = useNavigate();
@@ -22,6 +22,16 @@ export const UpgradePage = () => {
       icon: Users,
       title: 'Smart Visitor Counter',
       description: 'Pantau lalu lintas pengunjung dan jadwalkan pembersihan otomatis berdasarkan jumlah kunjungan',
+    },
+    {
+      icon: BarChart3,
+      title: 'Real-Time Dashboard',
+      description: 'Monitor semua data sensor secara live dari satu dashboard — grafik, tren, dan analitik lengkap',
+    },
+    {
+      icon: Bell,
+      title: 'Real-Time Notification',
+      description: 'Push notification & WhatsApp alert otomatis ketika kondisi toilet butuh perhatian segera',
     },
   ];
 
