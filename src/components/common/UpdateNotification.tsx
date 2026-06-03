@@ -165,7 +165,7 @@ export const UpdateNotification = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleOpen}
-            className="fixed bottom-24 right-20 z-[90] w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full shadow-lg shadow-blue-500/40 flex items-center justify-center group"
+            className="fixed bottom-40 right-4 z-[90] w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full shadow-lg shadow-blue-500/40 flex items-center justify-center group"
           >
             <span className="absolute inset-0 rounded-full bg-blue-500/30 animate-ping" />
             <Sparkles className="w-5 h-5 text-white relative z-10" />
