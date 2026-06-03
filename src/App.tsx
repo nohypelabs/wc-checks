@@ -8,6 +8,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { UpdateNotification } from './components/common/UpdateNotification';
+import { PageTransition } from './components/layout/PageTransition';
 import { IncomingFeaturesModal } from './components/common/IncomingFeaturesModal';
 import { FeatureTour } from './components/tour/FeatureTour';
 import { useAuth } from './hooks/useAuth';
@@ -180,7 +181,7 @@ function AppContent() {
  {/* Protected Routes - Main */}
  <Route
  path="/"
- element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><AdminDashboard /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/dashboard"
@@ -190,113 +191,109 @@ function AppContent() {
  path="/dashboard/user"
  element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />}
  />
- <Route 
- path="/scan" 
- element={user ? <ScanPage /> : <Navigate to="/login" replace />} 
+ <Route
+ path="/scan"
+ element={user ? <PageTransition><ScanPage /></PageTransition> : <Navigate to="/login" replace />}
  />
- <Route 
- path="/inspect/:locationId" 
- element={user ? <InspectionPage /> : <Navigate to="/login" replace />} 
+ <Route
+ path="/inspect/:locationId"
+ element={user ? <PageTransition><InspectionPage /></PageTransition> : <Navigate to="/login" replace />}
  />
- <Route 
- path="/reports" 
- element={user ? <ReportsPage /> : <Navigate to="/login" replace />} 
+ <Route
+ path="/reports"
+ element={user ? <PageTransition><ReportsPage /></PageTransition> : <Navigate to="/login" replace />}
  />
- <Route 
- path="/history" 
- element={user ? <ReportsPage /> : <Navigate to="/login" replace />} 
+ <Route
+ path="/history"
+ element={user ? <PageTransition><ReportsPage /></PageTransition> : <Navigate to="/login" replace />}
  />
- <Route 
- path="/analytics" 
- element={user ? <AnalyticsPage /> : <Navigate to="/login" replace />} 
+ <Route
+ path="/analytics"
+ element={user ? <PageTransition><AnalyticsPage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/locations"
- element={user ? <LocationsListPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><LocationsListPage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/locations/add"
  element={user ? (
- <ErrorBoundary>
- <AddLocationPage />
- </ErrorBoundary>
+ <PageTransition><ErrorBoundary><AddLocationPage /></ErrorBoundary></PageTransition>
  ) : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/locations"
  element={user ? (
- <ErrorBoundary>
- <LocationsManager />
- </ErrorBoundary>
+ <PageTransition><ErrorBoundary><LocationsManager /></ErrorBoundary></PageTransition>
  ) : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/organizations"
- element={user ? <OrganizationsManager /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><OrganizationsManager /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/buildings"
- element={user ? <BuildingsManager /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><BuildingsManager /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/superadmin/user-management"
- element={user ? <UserManagement /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><UserManagement /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/profile"
- element={user ? <ProfilePage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><ProfilePage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/settings"
- element={user ? <SettingsPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><SettingsPage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/help"
- element={user ? <HelpPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><HelpPage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/about"
- element={user ? <AboutPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><AboutPage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/changelog"
- element={user ? <ChangelogPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><ChangelogPage /></PageTransition> : <Navigate to="/login" replace />}
  />
 
  {/* Billing / Upgrade Routes */}
  <Route
  path="/upgrade"
- element={user ? <UpgradePage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><UpgradePage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/payment-method"
- element={user ? <PaymentMethodPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><PaymentMethodPage /></PageTransition> : <Navigate to="/login" replace />}
  />
 
  {/* Admin Routes - Same as main dashboard (accessible to all users) */}
  <Route
  path="/admin"
- element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><AdminDashboard /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/users"
- element={user ? <UserManagement /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><UserManagement /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/occupations"
- element={user ? <OccupationManagerPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><OccupationManagerPage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/reports"
- element={user ? <ReportsPage /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><ReportsPage /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/templates"
- element={user ? <TemplatesManager /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><TemplatesManager /></PageTransition> : <Navigate to="/login" replace />}
  />
  <Route
  path="/admin/QRCodeGenerator"
- element={user ? <QRCodeGenerator /> : <Navigate to="/login" replace />}
+ element={user ? <PageTransition><QRCodeGenerator /></PageTransition> : <Navigate to="/login" replace />}
  />
 
  {/* 404 */}
