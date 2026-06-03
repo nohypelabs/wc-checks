@@ -111,20 +111,20 @@ const queryClient = new QueryClient({
 
 // Loading component
 const PageLoader = () => (
- <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
- <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600">Loading...</p>
+ <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500 mx-auto mb-4"></div>
+ <p className="text-white/60">Loading...</p>
  </div>
  </div>
 );
 
 // Auth loading component
 const AuthLoader = () => (
- <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">
- <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600">Checking authentication...</p>
+ <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500 mx-auto mb-4"></div>
+ <p className="text-white/60">Checking authentication...</p>
  </div>
  </div>
 );
@@ -134,13 +134,13 @@ const AuthLoader = () => (
 
 // 404 Page
 const NotFoundPage = () => (
- <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+ <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
  <div className="text-center">
- <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
- <p className="text-gray-600 mb-4">Page not found</p>
+ <h1 className="text-6xl font-bold text-white/20 mb-4">404</h1>
+ <p className="text-white/60 mb-4">Page not found</p>
  <a
  href="/"
- className="text-blue-600 hover:underline font-medium"
+ className="text-sky-400 hover:text-sky-300 font-medium transition-colors"
  >
  Back to Dashboard
  </a>
