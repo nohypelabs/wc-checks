@@ -255,7 +255,7 @@ export const PhotoReviewModal = ({
  </div>
  </div>
  )}
- </div>
+ </motion.div>
 
  {/* Global Styles for Animation */}
  <style>{`
