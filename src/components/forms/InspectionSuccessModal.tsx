@@ -113,7 +113,7 @@ export const InspectionSuccessModal = ({
  Tip: Dashboard nampilin hasil dan statistik terbaru lo
  </p>
  </div>
- </div>
+ </motion.div>
  </div>
 
  {/* Animations */}
