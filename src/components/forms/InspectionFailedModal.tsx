@@ -168,7 +168,6 @@ export const InspectionFailedModal = ({
  </div>
  </motion.div>
  </div>
- </>
 
  {/* Animations */}
  <style>{`
