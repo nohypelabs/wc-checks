@@ -1,5 +1,6 @@
 // src/components/mobile/Sidebar.tsx — Glassmorphism
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
   MapPin,
@@ -69,15 +70,26 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black/50 z-40 transition-opacity"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={onClose}
+          />
 
-      {/* Sidebar — Glass */}
-      <div className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-white/8 backdrop-blur-xl z-50 shadow-2xl transform transition-transform border-r border-white/10">
+          {/* Sidebar — Glass */}
+          <motion.div
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-white/8 backdrop-blur-xl z-50 shadow-2xl border-r border-white/10">
         {/* Header */}
         <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
           <div className="flex items-center justify-between mb-4">
@@ -234,7 +246,9 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             </>
           )}
         </div>
-      </div>
-    </>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };

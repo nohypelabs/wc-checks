@@ -1,5 +1,6 @@
 // src/components/reports/PhotoReviewModal.tsx
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface PhotoReviewModalProps {
@@ -102,18 +103,27 @@ export const PhotoReviewModal = ({
  setIsZoomed(!isZoomed);
  };
 
- if (!isOpen) return null;
-
  return (
+ <AnimatePresence>
+ {isOpen && (
  <>
  {/* Backdrop */}
- <div
- className="fixed inset-0 bg-black/95 backdrop-blur-md z-[100] animate-fadeIn"
+ <motion.div
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ exit={{ opacity: 0 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+ className="fixed inset-0 bg-black/95 backdrop-blur-md z-[100]"
  onClick={onClose}
  />
 
  {/* Modal Container */}
- <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+ <motion.div
+ initial={{ opacity: 0, scale: 0.9 }}
+ animate={{ opacity: 1, scale: 1 }}
+ exit={{ opacity: 0, scale: 0.9 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+ className="fixed inset-0 z-[101] flex items-center justify-center p-4">
  {/* Close Button - Top Right */}
  <button
  onClick={onClose}
@@ -263,5 +273,7 @@ export const PhotoReviewModal = ({
  }
  `}</style>
  </>
+ )}
+ </AnimatePresence>
  );
 };

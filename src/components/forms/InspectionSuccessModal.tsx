@@ -1,5 +1,6 @@
 // src/components/forms/InspectionSuccessModal.tsx
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Home, QrCode, TrendingUp } from 'lucide-react';
 
 interface InspectionSuccessModalProps {
@@ -14,8 +15,6 @@ export const InspectionSuccessModal = ({
  locationName,
 }: InspectionSuccessModalProps) => {
  const navigate = useNavigate();
-
- if (!isOpen) return null;
 
  const getScoreGradient = (score: number) => {
  if (score >= 90) return 'from-green-500 to-emerald-600';
@@ -32,13 +31,26 @@ export const InspectionSuccessModal = ({
  };
 
  return (
+ <AnimatePresence>
+ {isOpen && (
  <>
  {/* Backdrop */}
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] animate-fadeIn" />
+ <motion.div
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ exit={{ opacity: 0 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+ className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999]"
+ />
 
  {/* Modal */}
  <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
- <div className="bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn overflow-hidden">
+ <motion.div
+ initial={{ opacity: 0, scale: 0.9, y: 20 }}
+ animate={{ opacity: 1, scale: 1, y: 0 }}
+ exit={{ opacity: 0, scale: 0.9, y: 20 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+ className="bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
  {/* Success Icon & Score */}
  <div className={`bg-gradient-to-br ${getScoreGradient(score)} p-8 text-center relative overflow-hidden`}>
  {/* Decorative circles */}
@@ -135,5 +147,7 @@ export const InspectionSuccessModal = ({
  }
  `}</style>
  </>
+ )}
+ </AnimatePresence>
  );
 };

@@ -52,9 +52,8 @@ export const PWAInstallPrompt = () => {
  exit={{ x: 400, opacity: 0 }}
  transition={{
  type: 'spring',
- stiffness: 200,
+ stiffness: 300,
  damping: 25,
- duration: 0.4,
  }}
  className="fixed top-4 right-4 z-[60] w-full max-w-sm"
  >

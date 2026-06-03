@@ -143,16 +143,22 @@ export const InspectionDetailModal = ({
  <AnimatePresence>
  {isOpen && (
  <>
- {/* Backdrop with smooth fade animation */}
+ {/* Backdrop with spring fade */}
  <motion.div
- {...backdropFade}
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ exit={{ opacity: 0 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
  className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
  onClick={onClose}
  />
 
- {/* Modal with smooth scale animation */}
+ {/* Modal with spring scale */}
  <motion.div
- {...scaleIn}
+ initial={{ opacity: 0, scale: 0.9, y: 20 }}
+ animate={{ opacity: 1, scale: 1, y: 0 }}
+ exit={{ opacity: 0, scale: 0.9, y: 20 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
  className="fixed left-3 right-3 top-3 bottom-3 max-w-2xl mx-auto my-auto z-[60] max-h-[94vh]"
  onClick={(e) => e.stopPropagation()}
  >

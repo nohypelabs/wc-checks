@@ -1,4 +1,5 @@
 // src/components/forms/InspectionFailedModal.tsx
+import { motion, AnimatePresence } from 'framer-motion';
 import { XCircle, RefreshCw, ArrowLeft, AlertTriangle, WifiOff } from 'lucide-react';
 
 interface InspectionFailedModalProps {
@@ -52,13 +53,26 @@ export const InspectionFailedModal = ({
  };
 
  return (
+ <AnimatePresence>
+ {isOpen && (
  <>
  {/* Backdrop */}
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fadeIn" />
+ <motion.div
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ exit={{ opacity: 0 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+ className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+ />
 
  {/* Modal */}
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
- <div className="bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full animate-shakeIn overflow-hidden">
+ <motion.div
+ initial={{ opacity: 0, scale: 0.9, y: 20 }}
+ animate={{ opacity: 1, scale: 1, y: 0 }}
+ exit={{ opacity: 0, scale: 0.9, y: 20 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+ className="bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
  {/* Error Header */}
  <div className="bg-gradient-to-br from-red-500 to-rose-600 p-8 text-center relative overflow-hidden">
  {/* Decorative elements */}
@@ -189,5 +203,7 @@ export const InspectionFailedModal = ({
  }
  `}</style>
  </>
+ )}
+ </AnimatePresence>
  );
 };

@@ -115,16 +115,22 @@ export const InspectionDrawer = ({
  <AnimatePresence>
  {isOpen && selectedDate && (
  <>
- {/* Backdrop with smooth fade */}
+ {/* Backdrop with spring fade */}
  <motion.div
- {...backdropFade}
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ exit={{ opacity: 0 }}
+ transition={{ type: 'spring', stiffness: 300, damping: 25 }}
  className="fixed inset-0 bg-black/50 z-40"
  onClick={onClose}
  />
 
- {/* Drawer with smooth slide-up animation */}
+ {/* Drawer with spring slide-up */}
  <motion.div
- {...slideUp}
+ initial={{ y: '100%' }}
+ animate={{ y: 0 }}
+ exit={{ y: '100%' }}
+ transition={{ type: 'spring', stiffness: 300, damping: 30 }}
  drag="y"
  dragConstraints={{ top: 0, bottom: 0 }}
  dragElastic={{ top: 0, bottom: 0.5 }}

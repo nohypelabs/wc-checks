@@ -90,27 +90,22 @@ export const SPRINGS = {
 // ============================================
 
 /**
- * Modal/Dialog transitions - smooth and professional
+ * Modal/Dialog transitions - spring-based for natural feel
  */
-export const MODAL_TRANSITION: Transition = {
-  duration: DURATIONS.moderate,
-  ease: EASINGS.easeOut,
-};
+export const MODAL_TRANSITION: Transition = SPRINGS.snappy;
 
 /**
- * Backdrop fade - quick and subtle
+ * Backdrop fade - spring-based
  */
-export const BACKDROP_TRANSITION: Transition = {
-  duration: DURATIONS.fast,
-  ease: EASINGS.easeOut,
-};
+export const BACKDROP_TRANSITION: Transition = SPRINGS.snappy;
 
 /**
- * Drawer slide - smooth with slight bounce
+ * Drawer slide - spring with more damping (less bounce)
  */
 export const DRAWER_TRANSITION: Transition = {
-  ...SPRINGS.smooth,
-  duration: DURATIONS.moderate,
+  type: 'spring',
+  stiffness: 300,
+  damping: 30,
 };
 
 /**
@@ -130,12 +125,9 @@ export const TAP_TRANSITION: Transition = {
 };
 
 /**
- * Page transition - smooth and noticeable
+ * Page transition - spring-based
  */
-export const PAGE_TRANSITION: Transition = {
-  duration: DURATIONS.moderate,
-  ease: EASINGS.easeInOut,
-};
+export const PAGE_TRANSITION: Transition = SPRINGS.snappy;
 
 /**
  * Stagger delay for lists
