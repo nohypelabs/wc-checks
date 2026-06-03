@@ -166,6 +166,7 @@ export const InspectionFailedModal = ({
 
  {/* 🔥 REMOVED: Network Status Indicator - no offline detection */}
  </div>
+ </motion.div>
  </div>
  </div>
 
