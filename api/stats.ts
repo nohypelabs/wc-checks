@@ -91,53 +91,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Total active users
       supabase
         .from('users')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('is_active', true),
 
       // Total active locations
       supabase
         .from('locations')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('is_active', true),
 
-      // Total inspections (bypass 1000 row limit with range)
+      // Total inspections
       supabase
         .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .range(0, 999999),
+        .select('id', { count: 'exact', head: true }),
 
       // Today's inspections
       supabase
         .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('inspection_date', today)
-        .range(0, 999999),
+        .select('id', { count: 'exact', head: true })
+        .eq('inspection_date', today),
 
       // Yesterday's inspections
       supabase
         .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('inspection_date', yesterday)
-        .range(0, 999999),
+        .select('id', { count: 'exact', head: true })
+        .eq('inspection_date', yesterday),
 
       // 7-day inspections
       supabase
         .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .gte('inspection_date', weekAgo)
-        .range(0, 999999),
+        .select('id', { count: 'exact', head: true })
+        .gte('inspection_date', weekAgo),
 
       // 30-day inspections
       supabase
         .from('inspection_records')
-        .select('*', { count: 'exact', head: true })
-        .gte('inspection_date', monthAgo)
-        .range(0, 999999),
+        .select('id', { count: 'exact', head: true })
+        .gte('inspection_date', monthAgo),
 
       // Active users (logged in last 7 days)
       supabase
         .from('users')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .gte('last_login_at', weekAgo)
         .eq('is_active', true),
 

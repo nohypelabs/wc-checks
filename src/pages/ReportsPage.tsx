@@ -77,7 +77,7 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
  filterUserId,
  currentDate,
- !adminLoading,
+ true,
  selectedBuildingId || undefined
  );
 
@@ -94,7 +94,7 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  const { data: dateInspections } = useDateInspections(
  dateFilterUserId,
  selectedDate || '',
- !adminLoading,
+ true,
  selectedBuildingId || undefined
  );
 

@@ -91,8 +91,8 @@ const PaymentMethodPage = lazy(() =>
 const queryClient = new QueryClient({
  defaultOptions: {
  queries: {
- refetchOnWindowFocus: true, // ✅ Refetch when user comes back
- refetchOnMount: true, // ✅ Fresh data on component mount
+ refetchOnWindowFocus: false, // ⚡ Don't refetch on tab switch - staleTime handles freshness
+ refetchOnMount: false, // ⚡ Don't refetch on mount if data is fresh
  refetchOnReconnect: true, // ✅ Refetch when internet reconnects
  retry: 1, // ⚡ Retry once (not infinite, not zero)
  staleTime: 2 * 60 * 1000, // ⚡ Cache 2 minutes - balance performance & freshness

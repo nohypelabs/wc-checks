@@ -10,9 +10,10 @@ type InspectionRecord = Tables<'inspection_records'>;
  * Fetch current user's inspections via BACKEND API
  * Users can only see their own inspections
  */
-export function useInspections() {
+export function useInspections(enabled = true) {
   return useQuery({
     queryKey: ['inspections', 'my-inspections'],
+    enabled,
     queryFn: async () => {
       const {
         data: { session },
@@ -45,9 +46,10 @@ export function useInspections() {
  * Fetch all inspections via ADMIN API
  * Only admins can access this endpoint - returns all users' inspections
  */
-export function useAdminInspections(limit: number = 5000) {
+export function useAdminInspections(limit: number = 5000, enabled = true) {
   return useQuery({
     queryKey: ['admin-inspections', limit],
+    enabled,
     queryFn: async () => {
       const {
         data: { session },

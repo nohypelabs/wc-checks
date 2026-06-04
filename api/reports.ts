@@ -427,8 +427,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         inspection_date,
         inspection_time,
         overall_status,
-        responses,
-        photo_urls,
         notes,
         location:locations!inner(
           id,

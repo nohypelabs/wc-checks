@@ -66,9 +66,9 @@ export const Dashboard = () => {
  willSeeAllUsers: isAdmin,
  });
 
- // Fetch inspections via API - admin or user endpoint
- const { data: userInspections, isLoading: userInspectionsLoading } = useInspections();
- const { data: adminInspections, isLoading: adminInspectionsLoading } = useAdminInspections(5000);
+ // Fetch inspections via API - conditional based on role (only fire the one we need)
+ const { data: userInspections, isLoading: userInspectionsLoading } = useInspections(!isAdmin);
+ const { data: adminInspections, isLoading: adminInspectionsLoading } = useAdminInspections(5000, isAdmin);
 
  // Use admin data if admin, otherwise use user data
  const inspections = isAdmin ? adminInspections : userInspections;

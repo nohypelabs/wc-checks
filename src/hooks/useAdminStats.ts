@@ -45,32 +45,7 @@ export function useAdminStats() {
       const data = result.data as AdminStats;
       console.log('[useAdminStats] Stats retrieved:', data);
 
-      // If API didn't return 7d/30d, fetch directly from Supabase
-      if (!data.inspections7d && !data.inspections30d) {
-        console.log('[useAdminStats] API missing 7d/30d, fetching directly...');
-        const now = new Date();
-        const weekAgo = dateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
-        const monthAgo = dateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30));
-
-        const [r7, r30] = await Promise.all([
-          supabase.from('inspection_records').select('*', { count: 'exact', head: true }).gte('inspection_date', weekAgo),
-          supabase.from('inspection_records').select('*', { count: 'exact', head: true }).gte('inspection_date', monthAgo),
-        ]);
-
-        data.inspections7d = r7.count || 0;
-        data.inspections30d = r30.count || 0;
-        console.log('[useAdminStats] Fallback 7d:', data.inspections7d, '30d:', data.inspections30d);
-      }
-
-      // Also fetch totalUsers/totalLocations if API returned 0
-      if (!data.totalUsers) {
-        const [u, l] = await Promise.all([
-          supabase.from('users').select('*', { count: 'exact', head: true }).eq('is_active', true),
-          supabase.from('locations').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        ]);
-        data.totalUsers = u.count || 0;
-        data.totalLocations = l.count || 0;
-      }
+      // Fallback client-side queries removed — API should always return complete data
 
       return data;
     },
