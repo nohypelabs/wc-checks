@@ -243,7 +243,6 @@ export const UserManagement = () => {
      </div>
    </div>
  </div>
- </div>
 
  {/* Kill Switch Confirmation Modal */}
  {showKillSwitchConfirm && (
