@@ -140,6 +140,7 @@ export const UserManagement = () => {
   return (
     <div className="min-h-screen bg-slate-900 pb-24 lg:pb-6">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="max-w-3xl mx-auto">
 
       {/* Header */}
       <div className="bg-gradient-to-br from-purple-600 to-purple-800 px-4 py-5">
@@ -376,6 +377,7 @@ export const UserManagement = () => {
 
       {/* Bottom Navigation */}
       <div className="lg:hidden"><BottomNav /></div>
+      </div>
 
       {/* Kill Switch Confirmation Modal */}
       {showKillSwitchConfirm && (
