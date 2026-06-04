@@ -162,7 +162,27 @@ async function handleAnalytics(
       query = query.eq('locations.building_id', buildingIdStr);
     }
 
-    const { data: inspections, error: fetchError } = await query;
+    // Get previous month dates
+    const prevMonthNum = parseInt(month) - 1;
+    const prevYear = prevMonthNum === 0 ? (parseInt(year) - 1).toString() : year;
+    const prevMonthStr = prevMonthNum === 0 ? '12' : prevMonthNum.toString().padStart(2, '0');
+    const prevStartDate = `${prevYear}-${prevMonthStr}-01`;
+    const prevLastDay = new Date(parseInt(prevYear), parseInt(prevMonthStr), 0).getDate();
+    const prevEndDate = `${prevYear}-${prevMonthStr}-${prevLastDay.toString().padStart(2, '0')}`;
+
+    // Build previous month query
+    let prevQuery = supabase
+      .from('inspection_records')
+      .select('id, responses, locations!inner(id, organization_id, building_id)')
+      .gte('inspection_date', prevStartDate)
+      .lte('inspection_date', prevEndDate)
+      .range(0, 4999);
+
+    if (targetUserId) prevQuery = prevQuery.eq('user_id', targetUserId);
+    if (buildingIdStr) prevQuery = prevQuery.eq('locations.building_id', buildingIdStr);
+
+    // Run both queries in PARALLEL
+    const [{ data: inspections, error: fetchError }, { data: prevInspections }] = await Promise.all([query, prevQuery]);
 
     if (fetchError) {
       console.error('[analytics] Query error:', fetchError);
@@ -179,39 +199,6 @@ async function handleAnalytics(
       ? Math.round(records.reduce((sum: number, i: InspectionRecord) => sum + calculateScore(i.responses), 0) / totalInspections)
       : 0;
 
-    // Get previous month for trend comparison
-    const prevMonthNum = parseInt(month) - 1;
-    const prevYear = prevMonthNum === 0 ? (parseInt(year) - 1).toString() : year;
-    const prevMonthStr = prevMonthNum === 0 ? '12' : prevMonthNum.toString().padStart(2, '0');
-    const prevStartDate = `${prevYear}-${prevMonthStr}-01`;
-    const prevLastDay = new Date(parseInt(prevYear), parseInt(prevMonthStr), 0).getDate();
-    const prevEndDate = `${prevYear}-${prevMonthStr}-${prevLastDay.toString().padStart(2, '0')}`;
-
-    let prevQuery = supabase
-      .from('inspection_records')
-      .select(`
-        id,
-        responses,
-        locations!inner (
-          id,
-          organization_id,
-          building_id
-        )
-      `)
-      .gte('inspection_date', prevStartDate)
-      .lte('inspection_date', prevEndDate)
-      .range(0, 4999); // Fetch up to 5000 records (bypass Supabase 1000 row limit)
-
-    if (targetUserId) {
-      prevQuery = prevQuery.eq('user_id', targetUserId);
-    }
-
-    // Apply building filter for previous month too
-    if (buildingIdStr) {
-      prevQuery = prevQuery.eq('locations.building_id', buildingIdStr);
-    }
-
-    const { data: prevInspections } = await prevQuery;
     const prevRecords = prevInspections as InspectionRecord[] || [];
     const prevTotalInspections = prevRecords.length;
     const prevAvgScore = prevTotalInspections > 0

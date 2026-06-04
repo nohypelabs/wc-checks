@@ -136,11 +136,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .gte('last_login_at', weekAgo)
         .eq('is_active', true),
 
-      // Recent inspections for score calculation
+      // Recent inspections for score calculation (sample only)
       supabase
         .from('inspection_records')
         .select('responses')
-        .limit(100),
+        .limit(20),
 
       // Daily trend — configurable period
       supabase
