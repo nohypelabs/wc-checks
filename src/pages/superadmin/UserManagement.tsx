@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   ShieldX,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Lock,
   Unlock,
 } from 'lucide-react';
@@ -22,6 +24,8 @@ import { Sidebar } from '../../components/mobile/Sidebar';
 import { BottomNav } from '../../components/mobile/BottomNav';
 import { format } from 'date-fns';
 
+const USERS_PER_PAGE = 10;
+
 export const UserManagement = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -29,6 +33,7 @@ export const UserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
   const [showKillSwitchConfirm, setShowKillSwitchConfirm] = useState(false);
   const [killSwitchAction, setKillSwitchAction] = useState<'block' | 'unblock'>('block');
   const [resultModal, setResultModal] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -42,7 +47,7 @@ export const UserManagement = () => {
   const blockAllMutation = useBlockAllSubmit();
   const unblockAllMutation = useUnblockAllSubmit();
 
-  // Derive kill switch state from users data
+  // Derive kill switch state
   const killSwitchState = useMemo(() => {
     if (!users || users.length === 0) return { active: false, blockedCount: 0, totalNonSuperadmin: 0 };
     const nonSuperadmin = users.filter(u => !u.role || u.role.level < 100);
@@ -54,7 +59,7 @@ export const UserManagement = () => {
     };
   }, [users]);
 
-  // Security check: Only superadmin can access
+  // Security check
   useEffect(() => {
     if (authLoading || roleLoading) return;
     if (!user?.id) { navigate('/login'); return; }
@@ -62,22 +67,32 @@ export const UserManagement = () => {
   }, [user, isSuperAdmin, authLoading, roleLoading, navigate]);
 
   // Filter users
-  const filteredUsers = users?.filter((u) => {
-    const matchesSearch =
-      u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole =
-      roleFilter === 'all' ||
-      (roleFilter === 'none' && !u.role) ||
-      u.role?.id === roleFilter;
-    const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'active' && u.is_active) ||
-      (statusFilter === 'inactive' && !u.is_active) ||
-      (statusFilter === 'blocked' && u.can_submit === false) ||
-      (statusFilter === 'can_submit' && u.can_submit !== false);
-    return matchesSearch && matchesRole && matchesStatus;
-  });
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    return users.filter((u) => {
+      const matchesSearch =
+        u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRole =
+        roleFilter === 'all' ||
+        (roleFilter === 'none' && !u.role) ||
+        u.role?.id === roleFilter;
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && u.is_active) ||
+        (statusFilter === 'inactive' && !u.is_active) ||
+        (statusFilter === 'blocked' && u.can_submit === false) ||
+        (statusFilter === 'can_submit' && u.can_submit !== false);
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchQuery, roleFilter, statusFilter]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+  const paginatedUsers = filteredUsers.slice((page - 1) * USERS_PER_PAGE, page * USERS_PER_PAGE);
+
+  // Reset page when filters change
+  useEffect(() => { setPage(1); }, [searchQuery, roleFilter, statusFilter]);
 
   const handleRoleChange = (userId: string, roleId: string) => {
     if (!user?.id) return;
@@ -98,18 +113,10 @@ export const UserManagement = () => {
         });
       },
       onError: (error: any) => {
-        setResultModal({
-          type: 'error',
-          message: error?.message || 'Terjadi kesalahan. Coba lagi.',
-        });
+        setResultModal({ type: 'error', message: error?.message || 'Terjadi kesalahan. Coba lagi.' });
       },
     });
     setShowKillSwitchConfirm(false);
-  };
-
-  const openKillSwitchConfirm = (action: 'block' | 'unblock') => {
-    setKillSwitchAction(action);
-    setShowKillSwitchConfirm(true);
   };
 
   const getRoleBadgeColor = (level: number | undefined) => {
@@ -120,13 +127,13 @@ export const UserManagement = () => {
     return 'bg-white/10 text-white/50 border-white/10';
   };
 
-  // Loading state
+  // Loading
   if (authLoading || !user || roleLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-purple-500 border-t-transparent mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-500 border-t-transparent mx-auto mb-3"></div>
           <p className="text-white/50 text-sm">
             {authLoading ? 'Loading auth...' : !user ? 'Loading user...' : 'Verifying access...'}
           </p>
@@ -143,24 +150,23 @@ export const UserManagement = () => {
       <div className="max-w-3xl mx-auto">
 
       {/* Header */}
-      <div className="bg-gradient-to-br from-purple-600 to-purple-800 px-4 py-5">
-        <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-white/70 hover:text-white text-sm mb-3 transition-colors">
+      <div className="bg-slate-800 border-b border-white/10 px-4 py-5">
+        <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-white/50 hover:text-white text-sm mb-3 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span>Dashboard</span>
         </button>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/15 rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-blue-500/15 rounded-lg flex items-center justify-center">
+              <Shield className="w-5 h-5 text-blue-400" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">User Management</h1>
-              <p className="text-purple-200 text-xs">{users?.length || 0} users</p>
+              <p className="text-white/40 text-xs">{users?.length || 0} users</p>
             </div>
           </div>
 
-          {/* Kill Switch Badge */}
           <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
             killSwitchState.active
               ? 'bg-red-500/20 text-red-300 border border-red-500/30'
@@ -175,20 +181,18 @@ export const UserManagement = () => {
       {/* Kill Switch Card */}
       <div className="px-4 -mt-3 relative z-10">
         <div className={`rounded-xl p-4 border transition-colors ${
-          killSwitchState.active
-            ? 'bg-red-500/10 border-red-500/20'
-            : 'bg-white/5 border-white/10'
+          killSwitchState.active ? 'bg-red-500/10 border-red-500/20' : 'bg-slate-800 border-white/10'
         }`}>
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                killSwitchState.active ? 'bg-red-500/20' : 'bg-white/10'
+                killSwitchState.active ? 'bg-red-500/20' : 'bg-white/5'
               }`}>
-                <Power className={`w-4.5 h-4.5 ${killSwitchState.active ? 'text-red-400' : 'text-white/50'}`} />
+                <Power className={`w-4 h-4 ${killSwitchState.active ? 'text-red-400' : 'text-white/40'}`} />
               </div>
               <div className="min-w-0">
                 <h3 className="text-sm font-semibold text-white">Kill Switch</h3>
-                <p className="text-xs text-white/50 truncate">
+                <p className="text-xs text-white/40 truncate">
                   {killSwitchState.active
                     ? `${killSwitchState.blockedCount} user diblokir`
                     : `${killSwitchState.totalNonSuperadmin} user aktif`}
@@ -197,7 +201,7 @@ export const UserManagement = () => {
             </div>
             <div className="flex gap-2 flex-shrink-0">
               <button
-                onClick={() => openKillSwitchConfirm('block')}
+                onClick={() => { setKillSwitchAction('block'); setShowKillSwitchConfirm(true); }}
                 disabled={blockAllMutation.isPending || killSwitchState.active}
                 className="flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
@@ -205,7 +209,7 @@ export const UserManagement = () => {
                 {blockAllMutation.isPending ? 'Blocking...' : 'Block All'}
               </button>
               <button
-                onClick={() => openKillSwitchConfirm('unblock')}
+                onClick={() => { setKillSwitchAction('unblock'); setShowKillSwitchConfirm(true); }}
                 disabled={unblockAllMutation.isPending || !killSwitchState.active}
                 className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
@@ -226,14 +230,14 @@ export const UserManagement = () => {
             placeholder="Cari nama atau email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+            className="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
         <div className="flex gap-2">
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="flex-1 px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors appearance-none"
+            className="flex-1 px-3 py-2.5 bg-slate-800 border border-white/10 rounded-lg text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none"
           >
             <option value="all">Semua Role</option>
             <option value="none">Tanpa Role</option>
@@ -244,7 +248,7 @@ export const UserManagement = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="flex-1 px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors appearance-none"
+            className="flex-1 px-3 py-2.5 bg-slate-800 border border-white/10 rounded-lg text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none"
           >
             <option value="all">Semua Status</option>
             <option value="active">Aktif</option>
@@ -253,9 +257,9 @@ export const UserManagement = () => {
             <option value="blocked">Diblokir</option>
           </select>
         </div>
-        {filteredUsers && (
+        {filteredUsers.length > 0 && (
           <p className="text-xs text-white/30 px-1">
-            Menampilkan {filteredUsers.length} dari {users?.length || 0} user
+            Menampilkan {Math.min((page - 1) * USERS_PER_PAGE + 1, filteredUsers.length)}–{Math.min(page * USERS_PER_PAGE, filteredUsers.length)} dari {filteredUsers.length} user
           </p>
         )}
       </div>
@@ -264,35 +268,28 @@ export const UserManagement = () => {
       <div className="px-4 mt-3 space-y-2">
         {usersLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-500 border-t-transparent mx-auto mb-2"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-2"></div>
             <p className="text-white/40 text-sm">Loading users...</p>
           </div>
-        ) : filteredUsers && filteredUsers.length > 0 ? (
-          filteredUsers.map((u) => {
+        ) : paginatedUsers.length > 0 ? (
+          paginatedUsers.map((u) => {
             const isExpanded = expandedUser === u.id;
             return (
               <div key={u.id} className={`rounded-xl border transition-colors ${
-                u.can_submit === false
-                  ? 'bg-red-500/5 border-red-500/15'
-                  : 'bg-white/5 border-white/10'
+                u.can_submit === false ? 'bg-red-500/5 border-red-500/15' : 'bg-slate-800 border-white/10'
               }`}>
-                {/* User Row - Always Visible */}
                 <button
                   onClick={() => setExpandedUser(isExpanded ? null : u.id)}
                   className="w-full flex items-center gap-3 p-3 text-left"
                 >
-                  {/* Avatar */}
                   <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                    u.role?.level && u.role.level >= 100
-                      ? 'bg-purple-500/20 text-purple-300'
-                      : u.role?.level && u.role.level >= 80
-                        ? 'bg-blue-500/20 text-blue-300'
-                        : 'bg-white/10 text-white/50'
+                    u.role?.level && u.role.level >= 100 ? 'bg-purple-500/20 text-purple-300'
+                    : u.role?.level && u.role.level >= 80 ? 'bg-blue-500/20 text-blue-300'
+                    : 'bg-white/10 text-white/50'
                   }`}>
                     {u.full_name.charAt(0).toUpperCase()}
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-white truncate">{u.full_name}</span>
@@ -303,7 +300,6 @@ export const UserManagement = () => {
                     <p className="text-xs text-white/40 truncate">{u.email}</p>
                   </div>
 
-                  {/* Badges */}
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {u.role && (
                       <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getRoleBadgeColor(u.role.level)}`}>
@@ -319,17 +315,15 @@ export const UserManagement = () => {
                   </div>
                 </button>
 
-                {/* Expanded Actions */}
                 {isExpanded && (
                   <div className="px-3 pb-3 pt-1 border-t border-white/5 space-y-2">
                     <div className="grid grid-cols-2 gap-2">
-                      {/* Role Selector */}
                       <div>
                         <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Role</label>
                         <select
                           value={u.role?.id || ''}
                           onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                          className="w-full px-2.5 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+                          className="w-full px-2.5 py-2 bg-slate-700 border border-white/10 rounded-lg text-xs text-white focus:ring-1 focus:ring-blue-500 disabled:opacity-50 appearance-none"
                           disabled={assignRoleMutation.isPending}
                         >
                           <option value="">No Role</option>
@@ -338,8 +332,6 @@ export const UserManagement = () => {
                           ))}
                         </select>
                       </div>
-
-                      {/* Status Toggle */}
                       <div>
                         <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Status</label>
                         <button
@@ -355,8 +347,6 @@ export const UserManagement = () => {
                         </button>
                       </div>
                     </div>
-
-                    {/* Meta */}
                     <div className="flex items-center gap-4 text-[10px] text-white/30 pt-1">
                       <span>Joined {u.created_at ? format(new Date(u.created_at), 'dd MMM yyyy') : 'N/A'}</span>
                       {u.last_login_at && <span>Login {format(new Date(u.last_login_at), 'dd MMM HH:mm')}</span>}
@@ -374,6 +364,43 @@ export const UserManagement = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="px-4 mt-4 flex items-center justify-between">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="flex items-center gap-1 px-3 py-2 bg-slate-800 border border-white/10 rounded-lg text-xs text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            Prev
+          </button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
+                  p === page
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-800 text-white/50 border border-white/10 hover:bg-slate-700'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="flex items-center gap-1 px-3 py-2 bg-slate-800 border border-white/10 rounded-lg text-xs text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+          >
+            Next
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <div className="lg:hidden"><BottomNav /></div>
