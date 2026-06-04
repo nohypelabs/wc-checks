@@ -175,12 +175,10 @@ export const UserManagement = () => {
  return (
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
  {/* Header */}
  <div className="bg-gradient-to-br from-purple-600 to-purple-800 text-white p-6">
- <button
- onClick={() => navigate('/')}
- className="flex items-center gap-2 text-white/90 hover:text-white mb-4 transition-colors"
- >
+ <button onClick={() => navigate('/')} className="flex items-center gap-2 text-white/90 hover:text-white mb-4 transition-colors">
  <ArrowLeft className="w-5 h-5" />
  <span>Back to Dashboard</span>
  </button>
@@ -202,90 +200,87 @@ export const UserManagement = () => {
  <div className="text-xs text-purple-100">Total Users</div>
  </div>
  <div>
- <div className="text-2xl font-bold">
- {users?.filter((u) => u.is_active).length || 0}
- </div>
+ <div className="text-2xl font-bold">{users?.filter((u) => u.is_active).length || 0}</div>
  <div className="text-xs text-purple-100">Active</div>
  </div>
  <div>
- <div className="text-2xl font-bold">
- {users?.filter((u) => u.role && u.role.level >= 80).length || 0}
- </div>
+ <div className="text-2xl font-bold">{users?.filter((u) => u.role && u.role.level >= 80).length || 0}</div>
  <div className="text-xs text-purple-100">Admins</div>
+ </div>
+ </div>
  </div>
  </div>
 
  {/* Kill Switch */}
- <div className="bg-white/8 backdrop-blur-sm rounded-xl p-4 mt-4">
-   <div className="flex items-center justify-between">
-     <div className="flex items-center gap-3">
-       <Power className="w-5 h-5 text-red-400" />
-       <div>
-         <h3 className="text-sm font-semibold text-white">Kill Switch</h3>
-         <p className="text-xs text-white/60">Block semua user kecuali superadmin</p>
-       </div>
-     </div>
-     <div className="flex gap-2">
-       <button
-         onClick={() => openKillSwitchConfirm('block')}
-         disabled={blockAllMutation.isPending}
-         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-       >
-         {blockAllMutation.isPending ? 'Blocking...' : 'Block All'}
-       </button>
-       <button
-         onClick={() => openKillSwitchConfirm('unblock')}
-         disabled={unblockAllMutation.isPending}
-         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-       >
-         {unblockAllMutation.isPending ? 'Unblocking...' : 'Unblock All'}
-       </button>
-     </div>
-   </div>
+ <div className="p-4">
+ <div className="bg-white/8 backdrop-blur-sm rounded-xl p-4">
+ <div className="flex items-center justify-between">
+ <div className="flex items-center gap-3">
+ <Power className="w-5 h-5 text-red-400" />
+ <div>
+ <h3 className="text-sm font-semibold text-white">Kill Switch</h3>
+ <p className="text-xs text-white/60">Block semua user kecuali superadmin</p>
+ </div>
+ </div>
+ <div className="flex gap-2">
+ <button
+ onClick={() => openKillSwitchConfirm('block')}
+ disabled={blockAllMutation.isPending}
+ className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+ >
+ {blockAllMutation.isPending ? 'Blocking...' : 'Block All'}
+ </button>
+ <button
+ onClick={() => openKillSwitchConfirm('unblock')}
+ disabled={unblockAllMutation.isPending}
+ className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+ >
+ {unblockAllMutation.isPending ? 'Unblocking...' : 'Unblock All'}
+ </button>
+ </div>
+ </div>
+ </div>
  </div>
 
  {/* Kill Switch Confirmation Modal */}
  {showKillSwitchConfirm && (
-   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-     <div className="bg-slate-800 rounded-2xl p-6 max-w-sm w-full border border-white/10">
-       <div className="text-center">
-         <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${killSwitchAction === 'block' ? 'bg-red-500/20' : 'bg-green-500/20'}`}>
-           <Power className={`w-8 h-8 ${killSwitchAction === 'block' ? 'text-red-400' : 'text-green-400'}`} />
-         </div>
-         <h3 className="text-lg font-bold text-white mb-2">
-           {killSwitchAction === 'block' ? 'Aktifkan Kill Switch?' : 'Nonaktifkan Kill Switch?'}
-         </h3>
-         <p className="text-white/60 text-sm mb-6">
-           {killSwitchAction === 'block'
-             ? 'Semua user kecuali superadmin akan diblokir dari submit inspection.'
-             : 'Semua user akan bisa submit inspection lagi.'}
-         </p>
-         <div className="flex gap-3">
-           <button
-             onClick={() => setShowKillSwitchConfirm(false)}
-             className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
-           >
-             Batal
-           </button>
-           <button
-             onClick={handleKillSwitch}
-             className={`flex-1 px-4 py-3 text-white rounded-xl font-medium transition-colors ${
-               killSwitchAction === 'block'
-                 ? 'bg-red-600 hover:bg-red-700'
-                 : 'bg-green-600 hover:bg-green-700'
-             }`}
-           >
-             {killSwitchAction === 'block' ? 'Block Semua' : 'Unblock Semua'}
-           </button>
-         </div>
-       </div>
-     </div>
-   </div>
+ <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+ <div className="bg-slate-800 rounded-2xl p-6 max-w-sm w-full border border-white/10">
+ <div className="text-center">
+ <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${killSwitchAction === 'block' ? 'bg-red-500/20' : 'bg-green-500/20'}`}>
+ <Power className={`w-8 h-8 ${killSwitchAction === 'block' ? 'text-red-400' : 'text-green-400'}`} />
+ </div>
+ <h3 className="text-lg font-bold text-white mb-2">
+ {killSwitchAction === 'block' ? 'Aktifkan Kill Switch?' : 'Nonaktifkan Kill Switch?'}
+ </h3>
+ <p className="text-white/60 text-sm mb-6">
+ {killSwitchAction === 'block'
+ ? 'Semua user kecuali superadmin akan diblokir dari submit inspection.'
+ : 'Semua user akan bisa submit inspection lagi.'}
+ </p>
+ <div className="flex gap-3">
+ <button
+ onClick={() => setShowKillSwitchConfirm(false)}
+ className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+ >
+ Batal
+ </button>
+ <button
+ onClick={handleKillSwitch}
+ className={`flex-1 px-4 py-3 text-white rounded-xl font-medium transition-colors ${
+ killSwitchAction === 'block' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+ }`}
+ >
+ {killSwitchAction === 'block' ? 'Block Semua' : 'Unblock Semua'}
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
  )}
 
  {/* Filters */}
  <div className="p-4 space-y-3">
- {/* Search */}
  <div className="relative">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
  <input
@@ -296,8 +291,6 @@ export const UserManagement = () => {
  className="w-full pl-10 pr-4 py-3 border border-white/15 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
  />
  </div>
-
- {/* Role Filter */}
  <select
  value={roleFilter}
  onChange={(e) => setRoleFilter(e.target.value)}
@@ -306,9 +299,7 @@ export const UserManagement = () => {
  <option value="all">All Roles</option>
  <option value="none">No Role Assigned</option>
  {roles?.map((role) => (
- <option key={role.id} value={role.id}>
- {role.name} (Level {role.level})
- </option>
+ <option key={role.id} value={role.id}>{role.name} (Level {role.level})</option>
  ))}
  </select>
  </div>
@@ -322,17 +313,11 @@ export const UserManagement = () => {
  </div>
  ) : filteredUsers && filteredUsers.length > 0 ? (
  filteredUsers.map((user) => (
- <div
- key={user.id}
- className="bg-white/8 rounded-2xl shadow-sm border border-white/10 backdrop-blur-sm p-4"
- >
- {/* User Info */}
+ <div key={user.id} className="bg-white/8 rounded-2xl shadow-sm border border-white/10 backdrop-blur-sm p-4">
  <div className="flex items-start justify-between mb-3">
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
- <h3 className="font-semibold text-white truncate">
- {user.full_name}
- </h3>
+ <h3 className="font-semibold text-white truncate">{user.full_name}</h3>
  {user.is_active ? (
  <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
  ) : (
@@ -340,31 +325,19 @@ export const UserManagement = () => {
  )}
  </div>
  <p className="text-sm text-white/60 truncate">{user.email}</p>
- {user.phone && (
- <p className="text-xs text-white/50 mt-0.5">{user.phone}</p>
- )}
+ {user.phone && <p className="text-xs text-white/50 mt-0.5">{user.phone}</p>}
  <p className="text-xs text-white/40 mt-1">
  Joined {user.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : 'N/A'}
  </p>
  </div>
-
- {/* Current Role Badge */}
  {user.role && (
- <span
- className={`px-3 py-1 rounded-full text-xs font-semibold border ${getRoleBadgeColor(
- user.role.level
- )}`}
- >
+ <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getRoleBadgeColor(user.role.level)}`}>
  {user.role.name}
  </span>
  )}
  </div>
-
- {/* Role Selector */}
  <div className="space-y-2">
- <label className="text-xs font-medium text-white/80">
- Assign Role
- </label>
+ <label className="text-xs font-medium text-white/80">Assign Role</label>
  <select
  value={user.role?.id || ''}
  onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -373,23 +346,17 @@ export const UserManagement = () => {
  >
  <option value="">No Role</option>
  {roles?.map((role) => (
- <option key={role.id} value={role.id}>
- {role.name} (Level {role.level})
- </option>
+ <option key={role.id} value={role.id}>{role.name} (Level {role.level})</option>
  ))}
  </select>
  </div>
-
- {/* Status Toggle */}
  <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
  <span className="text-sm text-white/80">User Status</span>
  <button
  onClick={() => handleToggleStatus(user.id, user.is_active ?? true)}
  disabled={toggleStatusMutation.isPending}
  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
- user.is_active
- ? 'bg-red-50 text-red-700 hover:bg-red-100'
- : 'bg-green-50 text-green-300 hover:bg-green-100'
+ user.is_active ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-green-50 text-green-300 hover:bg-green-100'
  }`}
  >
  {user.is_active ? 'Deactivate' : 'Activate'}
@@ -401,9 +368,7 @@ export const UserManagement = () => {
  <div className="text-center py-12">
  <Users className="w-12 h-12 text-white/30 mx-auto mb-3" />
  <p className="text-white/60 font-medium">No users found</p>
- <p className="text-white/50 text-sm mt-1">
- Try adjusting your search or filters
- </p>
+ <p className="text-white/50 text-sm mt-1">Try adjusting your search or filters</p>
  </div>
  )}
  </div>
@@ -413,9 +378,7 @@ export const UserManagement = () => {
  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
  <AlertCircle className="w-5 h-5 text-blue-300 flex-shrink-0 mt-0.5" />
  <div className="flex-1">
- <h4 className="font-semibold text-blue-200 text-sm mb-1">
- Role Level Guide
- </h4>
+ <h4 className="font-semibold text-blue-200 text-sm mb-1">Role Level Guide</h4>
  <ul className="text-xs text-blue-800 space-y-1">
  <li>• <strong>Level 100:</strong> System Admin - Full system control</li>
  <li>• <strong>Level 90:</strong> Super Admin - User management access</li>
@@ -428,7 +391,7 @@ export const UserManagement = () => {
  </div>
 
  {/* Bottom Navigation */}
- <div className="lg:hidden"><div className="lg:hidden"><BottomNav /></div></div>
+ <div className="lg:hidden"><BottomNav /></div>
  </div>
  );
 };
