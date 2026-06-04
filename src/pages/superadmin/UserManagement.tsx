@@ -150,7 +150,7 @@ export const UserManagement = () => {
       <div className="max-w-3xl mx-auto">
 
       {/* Header */}
-      <div className="bg-slate-800 border-b border-white/10 px-4 py-5">
+      <div className="bg-slate-800 border-b border-white/10 px-4 py-5 rounded-b-3xl">
         <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-white/50 hover:text-white text-sm mb-3 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span>Dashboard</span>
@@ -179,7 +179,7 @@ export const UserManagement = () => {
       </div>
 
       {/* Kill Switch Card */}
-      <div className="px-4 mt-2 relative z-10">
+      <div className="px-4 mt-4 relative z-10">
         <div className={`rounded-xl p-4 border transition-colors ${
           killSwitchState.active ? 'bg-red-500/10 border-red-500/20' : 'bg-slate-800 border-white/10'
         }`}>
