@@ -557,6 +557,7 @@ export type Database = {
       }
       users: {
         Row: {
+          can_submit: boolean | null
           created_at: string | null
           email: string
           full_name: string
@@ -570,6 +571,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          can_submit?: boolean | null
           created_at?: string | null
           email: string
           full_name: string
@@ -583,6 +585,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          can_submit?: boolean | null
           created_at?: string | null
           email?: string
           full_name?: string

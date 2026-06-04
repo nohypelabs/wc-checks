@@ -15,8 +15,11 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
 /**
  * GET /api/admin/users - List all users with roles (superadmin only)
  * GET /api/admin/users?roles=true - List all roles (admin+)
- * POST /api/admin/users/assign-role - Assign role to user (superadmin only)
- * POST /api/admin/users/toggle-status - Toggle user active status (admin+)
+ * POST /api/admin/users?action=assign-role - Assign role to user (superadmin only)
+ * POST /api/admin/users?action=toggle-status - Toggle user active status (admin+)
+ * POST /api/admin/users?action=toggle-submit - Toggle user can_submit (superadmin only)
+ * POST /api/admin/users?action=block-all-submit - Block ALL users except superadmin (superadmin only)
+ * POST /api/admin/users?action=unblock-all-submit - Unblock ALL users (superadmin only)
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('[admin/users] 🔍 Request received:', { method: req.method, query: req.query });
@@ -316,6 +319,164 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res,
         { userId, isActive, userName: targetUser.full_name },
         `User "${targetUser.full_name}" ${isActive ? 'activated' : 'deactivated'} successfully`
+      );
+    } catch (error: any) {
+      return errorResponse(res, 500, 'Internal server error: ' + error.message);
+    }
+  }
+
+  // POST /api/admin/users?action=toggle-submit - Toggle user can_submit (superadmin only)
+  if (req.method === 'POST' && actionParam === 'toggle-submit') {
+    const auth = await validateAuth(req, 100); // Superadmin only
+
+    if (!auth || !supabase) {
+      return errorResponse(res, 403, 'Forbidden: Superadmin access required');
+    }
+
+    const { userId, canSubmit } = req.body;
+
+    if (!userId || typeof canSubmit !== 'boolean') {
+      return errorResponse(res, 400, 'Missing or invalid fields: userId (string) and canSubmit (boolean) required');
+    }
+
+    try {
+      const { data: targetUser, error: userError } = await supabase
+        .from('users')
+        .select('id, email, full_name, can_submit')
+        .eq('id', userId)
+        .single();
+
+      if (userError || !targetUser) {
+        return errorResponse(res, 404, 'User not found');
+      }
+
+      if (targetUser.can_submit === canSubmit) {
+        return successResponse(
+          res,
+          { userId, canSubmit, unchanged: true },
+          `User submit status is already ${canSubmit ? 'enabled' : 'disabled'}`
+        );
+      }
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          can_submit: canSubmit,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      await createAuditLog(
+        auth.userId,
+        'TOGGLE_SUBMIT',
+        'user',
+        userId,
+        {
+          targetUserEmail: targetUser.email,
+          targetUserName: targetUser.full_name,
+          previousStatus: targetUser.can_submit,
+          newStatus: canSubmit,
+        },
+        true
+      );
+
+      return successResponse(
+        res,
+        { userId, canSubmit, userName: targetUser.full_name },
+        `Submit ${canSubmit ? 'enabled' : 'disabled'} for "${targetUser.full_name}"`
+      );
+    } catch (error: any) {
+      return errorResponse(res, 500, 'Internal server error: ' + error.message);
+    }
+  }
+
+  // POST /api/admin/users?action=block-all-submit - Block ALL users except superadmin (superadmin only)
+  if (req.method === 'POST' && actionParam === 'block-all-submit') {
+    const auth = await validateAuth(req, 100); // Superadmin only
+
+    if (!auth || !supabase) {
+      return errorResponse(res, 403, 'Forbidden: Superadmin access required');
+    }
+
+    try {
+      // Get superadmin email to preserve
+      const { data: superadminUser, error: superadminError } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('id', auth.userId)
+        .single();
+
+      if (superadminError || !superadminUser) {
+        return errorResponse(res, 404, 'Superadmin user not found');
+      }
+
+      // Block all users except current superadmin
+      const { count, error: updateError } = await supabase
+        .from('users')
+        .update({ can_submit: false, updated_at: new Date().toISOString() })
+        .neq('id', auth.userId)
+        .select('id', { count: 'exact', head: true });
+
+      if (updateError) throw updateError;
+
+      await createAuditLog(
+        auth.userId,
+        'BLOCK_ALL_SUBMIT',
+        'user',
+        undefined,
+        {
+          superadminEmail: superadminUser.email,
+          blockedCount: count || 0,
+          action: 'block-all',
+        },
+        true
+      );
+
+      return successResponse(
+        res,
+        { blockedCount: count || 0, preservedEmail: superadminUser.email },
+        `Submit diblokir untuk ${count || 0} user. Hanya superadmin yang bisa submit.`
+      );
+    } catch (error: any) {
+      return errorResponse(res, 500, 'Internal server error: ' + error.message);
+    }
+  }
+
+  // POST /api/admin/users?action=unblock-all-submit - Unblock ALL users (superadmin only)
+  if (req.method === 'POST' && actionParam === 'unblock-all-submit') {
+    const auth = await validateAuth(req, 100); // Superadmin only
+
+    if (!auth || !supabase) {
+      return errorResponse(res, 403, 'Forbidden: Superadmin access required');
+    }
+
+    try {
+      const { count, error: updateError } = await supabase
+        .from('users')
+        .update({ can_submit: true, updated_at: new Date().toISOString() })
+        .neq('can_submit', true)
+        .select('id', { count: 'exact', head: true });
+
+      if (updateError) throw updateError;
+
+      await createAuditLog(
+        auth.userId,
+        'UNBLOCK_ALL_SUBMIT',
+        'user',
+        undefined,
+        {
+          unblockedCount: count || 0,
+          action: 'unblock-all',
+        },
+        true
+      );
+
+      return successResponse(
+        res,
+        { unblockedCount: count || 0 },
+        `Submit diaktifkan kembali untuk ${count || 0} user.`
       );
     } catch (error: any) {
       return errorResponse(res, 500, 'Internal server error: ' + error.message);

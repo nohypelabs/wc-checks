@@ -38,6 +38,7 @@ export interface AuthContext {
     name: string;
     level: number;
   };
+  canSubmit: boolean;
 }
 
 /**
@@ -97,6 +98,7 @@ export async function validateAuth(
         id,
         email,
         is_active,
+        can_submit,
         user_roles!user_roles_user_id_fkey (
           role_id,
           roles!user_roles_role_id_fkey (
@@ -148,6 +150,7 @@ export async function validateAuth(
         name: roleName,
         level: roleLevel,
       },
+      canSubmit: userData.can_submit !== false, // default true if column missing
     };
   } catch (error) {
     console.error('[validateAuth] Unexpected error:', error);

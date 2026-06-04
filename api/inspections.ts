@@ -56,6 +56,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // POST - Create inspection
     if (req.method === 'POST') {
+      // Server-side billing gate — block if user can't submit
+      if (!auth.canSubmit) {
+        console.warn('[inspections] Submit blocked - user can_submit=false:', userId);
+        return errorResponse(res, 403, 'Submit diblokir. Silakan perpanjang langganan Anda.');
+      }
+
       const {
         location_id,
         template_id,
