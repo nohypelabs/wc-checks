@@ -131,19 +131,23 @@ export const useMonthlyInspections = (
  * @param date - The specific date to fetch data for
  * @param enabled - Whether to enable the query (default true)
  * @param buildingId - Optional. Filter by building
+ * @param page - Page number (default 1)
+ * @param limit - Items per page (default 10)
  */
 export const useDateInspections = (
   userId: string | undefined,
   date: string,
   enabled: boolean = true,
-  buildingId?: string
+  buildingId?: string,
+  page: number = 1,
+  limit: number = 10
 ) => {
   return useQuery({
-    queryKey: ['date-inspections', userId || 'all', date, buildingId],
+    queryKey: ['date-inspections', userId || 'all', date, buildingId, page, limit],
     queryFn: async () => {
       if (!date) {
         console.warn('⚠️ Missing date');
-        return [];
+        return { inspections: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } };
       }
 
       console.log('📅 Fetching inspections for date:', {
@@ -161,7 +165,7 @@ export const useDateInspections = (
       }
 
       // Build API URL
-      let apiUrl = `/api/reports?date=${date}`;
+      let apiUrl = `/api/reports?date=${date}&page=${page}&limit=${limit}`;
       if (userId) {
         apiUrl += `&userId=${userId}`;
       }
@@ -184,11 +188,12 @@ export const useDateInspections = (
       }
 
       const result = await response.json();
-      const inspections: InspectionReport[] = result.data;
+      const inspections: InspectionReport[] = result.data.inspections || [];
+      const pagination = result.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 };
 
-      console.log('✅ Fetched date inspections:', inspections.length);
+      console.log('✅ Fetched date inspections:', inspections.length, 'page:', pagination.page, 'total:', pagination.total);
 
-      return inspections;
+      return { inspections, pagination };
     },
     // ✅ FIX: Wait for admin check to complete AND date to be selected
     enabled: enabled && !!date,

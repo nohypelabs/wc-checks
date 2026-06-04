@@ -33,6 +33,7 @@ export const ReportsPage = () => {
  const [selectedDate, setSelectedDate] = useState<string | null>(null);
  const [selectedInspection, setSelectedInspection] = useState<InspectionReport | null>(null);
  const [sidebarOpen, setSidebarOpen] = useState(false);
+ const [datePage, setDatePage] = useState(1);
  const [exportMenuOpen, setExportMenuOpen] = useState(false);
  const exportMenuRef = useRef<HTMLDivElement>(null);
 
@@ -91,15 +92,20 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  buildingId: selectedBuildingId || 'ALL',
  });
 
- const { data: dateInspections } = useDateInspections(
+ const { data: dateInspectionsData } = useDateInspections(
  dateFilterUserId,
  selectedDate || '',
  true,
- selectedBuildingId || undefined
+ selectedBuildingId || undefined,
+ datePage,
+ 10
  );
+ const dateInspections = dateInspectionsData?.inspections || [];
+ const datePagination = dateInspectionsData?.pagination;
 
  const handleDateClick = (date: string) => {
  setSelectedDate(date);
+ setDatePage(1);
  };
 
  const handleCloseDrawer = () => {
@@ -589,6 +595,8 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  onClose={handleCloseDrawer}
  inspections={dateInspections || []}
  selectedDate={selectedDate || ''}
+ pagination={datePagination}
+ onPageChange={setDatePage}
  onInspectionClick={handleInspectionClick}
  />
 

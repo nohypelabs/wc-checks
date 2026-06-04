@@ -1,11 +1,18 @@
 // src/components/reports/InspectionDrawer.tsx
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Clock } from 'lucide-react';
+import { X, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { slideUp, backdropFade, slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
 import { useHaptic } from '../../hooks/useHaptic';
+
+interface PaginationInfo {
+ page: number;
+ limit: number;
+ total: number;
+ totalPages: number;
+}
 
 interface InspectionDrawerProps {
  isOpen: boolean;
@@ -13,6 +20,8 @@ interface InspectionDrawerProps {
  inspections: InspectionReport[];
  selectedDate: string;
  onInspectionClick: (inspection: InspectionReport) => void;
+ pagination?: PaginationInfo;
+ onPageChange?: (page: number) => void;
 }
 
 const getScoreColor = (score: number) => {
@@ -33,6 +42,8 @@ export const InspectionDrawer = ({
  inspections,
  selectedDate,
  onInspectionClick,
+ pagination,
+ onPageChange,
 }: InspectionDrawerProps) => {
  const haptic = useHaptic();
  const scrollRef = useRef<HTMLDivElement>(null);
@@ -280,6 +291,31 @@ export const InspectionDrawer = ({
  </motion.button>
  );
  })}
+
+ {/* Pagination */}
+ {pagination && pagination.totalPages > 1 && (
+ <div className="flex items-center justify-between pt-4 pb-2 border-t border-white/10">
+ <button
+ onClick={() => onPageChange?.(pagination.page - 1)}
+ disabled={pagination.page <= 1}
+ className="flex items-center gap-1 px-3 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+ >
+ <ChevronLeft className="w-3.5 h-3.5" />
+ Prev
+ </button>
+ <span className="text-xs text-white/50">
+ {pagination.page} / {pagination.totalPages}
+ </span>
+ <button
+ onClick={() => onPageChange?.(pagination.page + 1)}
+ disabled={pagination.page >= pagination.totalPages}
+ className="flex items-center gap-1 px-3 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+ >
+ Next
+ <ChevronRight className="w-3.5 h-3.5" />
+ </button>
+ </div>
+ )}
  </div>
  </motion.div>
  </>

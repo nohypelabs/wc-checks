@@ -333,12 +333,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return errorResponse(res, 401, 'Authentication required');
   }
 
-  const { month, date, userId, analytics, buildingId } = req.query;
+  const { month, date, userId, analytics, buildingId, page, limit } = req.query;
   const monthStr = Array.isArray(month) ? month[0] : month;
   const dateStr = Array.isArray(date) ? date[0] : date;
   const userIdStr = Array.isArray(userId) ? userId[0] : userId;
   const analyticsStr = Array.isArray(analytics) ? analytics[0] : analytics;
   const buildingIdStr = Array.isArray(buildingId) ? buildingId[0] : buildingId;
+  const pageStr = Array.isArray(page) ? page[0] : page;
+  const limitStr = Array.isArray(limit) ? limit[0] : limit;
+  const pageNum = Math.max(1, parseInt(pageStr || '1', 10));
+  const limitNum = Math.min(50, Math.max(1, parseInt(limitStr || '10', 10)));
+  const offset = (pageNum - 1) * limitNum;
 
   const isAdmin = auth.userRole.level >= 80;
   const currentUserId = auth.userId;
@@ -463,14 +468,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`[reports] Filtering by month: ${startDate} to ${endDate}`);
       query = query.gte('inspection_date', startDate).lte('inspection_date', endDate);
     } else if (dateStr) {
-      // Specific date: yyyy-MM-dd
-      console.log(`[reports] Filtering by date: ${dateStr}`);
+      // Specific date: yyyy-MM-dd (with pagination)
+      console.log(`[reports] Filtering by date: ${dateStr}, page: ${pageNum}, limit: ${limitNum}`);
       query = query.eq('inspection_date', dateStr);
+
+      // Get total count for pagination
+      const { count: totalCount } = await supabase
+        .from('inspection_records')
+        .select('id', { count: 'exact', head: true })
+        .eq('inspection_date', dateStr)
+        .eq('user_id', targetUserId || '');
+
+      // Apply pagination
+      query = query.range(offset, offset + limitNum - 1);
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('[reports] Error fetching inspections:', error);
+        throw error;
+      }
+
+      const inspections = (data || []).map((item: any) => ({
+        id: item.id,
+        inspection_date: item.inspection_date,
+        inspection_time: item.inspection_time,
+        overall_status: item.overall_status,
+        responses: item.responses,
+        notes: item.notes,
+        photo_urls: item.photo_urls || [],
+        location: item.location || {},
+        user: item.user || {},
+      }));
+
+      return successResponse(res, {
+        inspections,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total: totalCount || 0,
+          totalPages: Math.ceil((totalCount || 0) / limitNum),
+        },
+      }, 'Date inspections retrieved');
     } else {
       return errorResponse(res, 400, 'Missing required parameter: month or date');
     }
 
-    // Execute query
+    // Execute query (month mode - no pagination needed for calendar)
     const { data, error } = await query;
 
     if (error) {
