@@ -23,8 +23,10 @@ interface UseAuthReturn {
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  sessionExpired: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  clearSessionExpired: () => void;
 }
 
 // ⚡ PERFORMANCE: Cache profile in memory (profile rarely changes)
@@ -37,6 +39,7 @@ export function useAuth(): UseAuthReturn {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const initRef = useRef(false); // ✅ Prevent double init
 
   // ⚡ Fast profile fetch with cache (profile data rarely changes)
@@ -112,11 +115,15 @@ export function useAuth(): UseAuthReturn {
     const initAuth = async () => {
       console.log('🔐 Initializing auth...');
 
-      // ✅ TIMEOUT protection: Force complete after 3 seconds
+      // ✅ TIMEOUT protection: Force complete after 5 seconds
       const timeoutId = setTimeout(() => {
-        console.warn('⚠️ Auth timeout - proceeding anyway');
-        setLoading(false); // ✅ Always set loading false on timeout
-      }, 3000);
+        console.warn('⚠️ Auth timeout - session may have expired');
+        setLoading(false);
+        // If we timed out and have no user, likely session expired
+        if (!user) {
+          setSessionExpired(true);
+        }
+      }, 5000);
 
       try {
         console.log('[useAuth] Calling supabase.auth.getSession()...');
@@ -207,6 +214,10 @@ export function useAuth(): UseAuthReturn {
           authStorage.clear();
           cachedProfile = null; // Clear cache
           cacheTimestamp = 0;
+          // Only show session expired if user was previously authenticated (not manual sign out)
+          if (user) {
+            setSessionExpired(true);
+          }
           setUser(null);
           setProfile(null);
           console.log('🗑️ Signed out');
@@ -234,14 +245,18 @@ export function useAuth(): UseAuthReturn {
     }
   }, []);
 
+  const clearSessionExpired = useCallback(() => setSessionExpired(false), []);
+
   return {
     user,
     profile,
     loading,
     error,
     isAuthenticated: !!user,
+    sessionExpired,
     signOut,
     refreshProfile,
+    clearSessionExpired,
   };
 }
 

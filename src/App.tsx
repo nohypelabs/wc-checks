@@ -10,6 +10,7 @@ import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { UpdateNotification } from './components/common/UpdateNotification';
 import { PageTransition } from './components/layout/PageTransition';
 import { IncomingFeaturesModal } from './components/common/IncomingFeaturesModal';
+import { SessionExpiredModal } from './components/modals/SessionExpiredModal';
 import { FeatureTour } from './components/tour/FeatureTour';
 import { useAuth } from './hooks/useAuth';
 import { useIsAdmin } from './hooks/useIsAdmin';
@@ -149,7 +150,7 @@ const NotFoundPage = () => (
 );
 
 function AppContent() {
- const { user, loading } = useAuth();
+ const { user, loading, sessionExpired, clearSessionExpired, signOut } = useAuth();
 
  // DEBUG: Log auth state
  console.log('[AppContent] render:', JSON.stringify({ loading, hasUser: !!user, userId: user?.id }));
@@ -304,6 +305,12 @@ function AppContent() {
   {user && <UpdateNotification />}
   {user && <IncomingFeaturesModal />}
   {user && <FeatureTour />}
+  {sessionExpired && (
+    <SessionExpiredModal
+      onLogin={() => { clearSessionExpired(); signOut(); window.location.href = '/login'; }}
+      onRefresh={() => { clearSessionExpired(); window.location.reload(); }}
+    />
+  )}
  </>
  );
 }
