@@ -20,6 +20,7 @@ export interface UserWithRole {
   full_name: string;
   phone: string | null;
   is_active: boolean | null;
+  can_submit: boolean | null;
   created_at: string | null;
   last_login_at: string | null;
   role: {

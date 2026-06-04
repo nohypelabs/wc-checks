@@ -71,7 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Fetch all users
       const { data: users, error: usersError } = await supabase
         .from('users')
-        .select('id, email, full_name, phone, is_active, created_at, last_login_at')
+        .select('id, email, full_name, phone, is_active, can_submit, created_at, last_login_at')
         .order('created_at', { ascending: false });
 
       if (usersError) throw usersError;
