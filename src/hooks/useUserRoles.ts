@@ -197,6 +197,82 @@ export function useToggleUserStatus() {
   });
 }
 
+// Block ALL users except superadmin (KILL SWITCH)
+export function useBlockAllSubmit() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+
+      const response = await fetch('/api/admin/users?action=block-all-submit', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to block users' }));
+        throw new Error(error.error || 'Failed to block users');
+      }
+
+      return safeJsonParse(response);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
+      toast.success(data.message || 'Kill switch activated!');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to activate kill switch');
+    },
+  });
+}
+
+// Unblock ALL users (KILL SWITCH OFF)
+export function useUnblockAllSubmit() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+
+      const response = await fetch('/api/admin/users?action=unblock-all-submit', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to unblock users' }));
+        throw new Error(error.error || 'Failed to unblock users');
+      }
+
+      return safeJsonParse(response);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
+      toast.success(data.message || 'Kill switch deactivated!');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to deactivate kill switch');
+    },
+  });
+}
+
 /**
  * ✅ REMOVED: getUserRoleLevel() has been deleted
  *

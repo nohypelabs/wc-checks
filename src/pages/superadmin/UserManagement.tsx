@@ -9,10 +9,11 @@ import {
  CheckCircle2,
  XCircle,
  ArrowLeft,
+ Power,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
-import { useUsers, useRoles, useAssignRole, useToggleUserStatus } from '../../hooks/useUserRoles';
+import { useUsers, useRoles, useAssignRole, useToggleUserStatus, useBlockAllSubmit, useUnblockAllSubmit } from '../../hooks/useUserRoles';
 import { Sidebar } from '../../components/mobile/Sidebar';
 import { BottomNav } from '../../components/mobile/BottomNav';
 import { format } from 'date-fns';
@@ -46,6 +47,10 @@ export const UserManagement = () => {
  const { data: roles } = useRoles();
  const assignRoleMutation = useAssignRole();
  const toggleStatusMutation = useToggleUserStatus();
+ const blockAllMutation = useBlockAllSubmit();
+ const unblockAllMutation = useUnblockAllSubmit();
+ const [showKillSwitchConfirm, setShowKillSwitchConfirm] = useState(false);
+ const [killSwitchAction, setKillSwitchAction] = useState<'block' | 'unblock'>('block');
 
  // Security check: Only superadmin can access
  useEffect(() => {
@@ -113,6 +118,20 @@ export const UserManagement = () => {
  userId,
  isActive: !currentStatus,
  });
+ };
+
+ const handleKillSwitch = () => {
+   if (killSwitchAction === 'block') {
+     blockAllMutation.mutate();
+   } else {
+     unblockAllMutation.mutate();
+   }
+   setShowKillSwitchConfirm(false);
+ };
+
+ const openKillSwitchConfirm = (action: 'block' | 'unblock') => {
+   setKillSwitchAction(action);
+   setShowKillSwitchConfirm(true);
  };
 
  const getRoleBadgeColor = (level: number | undefined) => {
@@ -195,8 +214,75 @@ export const UserManagement = () => {
  <div className="text-xs text-purple-100">Admins</div>
  </div>
  </div>
+
+ {/* Kill Switch */}
+ <div className="bg-white/8 backdrop-blur-sm rounded-xl p-4 mt-4">
+   <div className="flex items-center justify-between">
+     <div className="flex items-center gap-3">
+       <Power className="w-5 h-5 text-red-400" />
+       <div>
+         <h3 className="text-sm font-semibold text-white">Kill Switch</h3>
+         <p className="text-xs text-white/60">Block semua user kecuali superadmin</p>
+       </div>
+     </div>
+     <div className="flex gap-2">
+       <button
+         onClick={() => openKillSwitchConfirm('block')}
+         disabled={blockAllMutation.isPending}
+         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+       >
+         {blockAllMutation.isPending ? 'Blocking...' : 'Block All'}
+       </button>
+       <button
+         onClick={() => openKillSwitchConfirm('unblock')}
+         disabled={unblockAllMutation.isPending}
+         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+       >
+         {unblockAllMutation.isPending ? 'Unblocking...' : 'Unblock All'}
+       </button>
+     </div>
+   </div>
  </div>
  </div>
+
+ {/* Kill Switch Confirmation Modal */}
+ {showKillSwitchConfirm && (
+   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+     <div className="bg-slate-800 rounded-2xl p-6 max-w-sm w-full border border-white/10">
+       <div className="text-center">
+         <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${killSwitchAction === 'block' ? 'bg-red-500/20' : 'bg-green-500/20'}`}>
+           <Power className={`w-8 h-8 ${killSwitchAction === 'block' ? 'text-red-400' : 'text-green-400'}`} />
+         </div>
+         <h3 className="text-lg font-bold text-white mb-2">
+           {killSwitchAction === 'block' ? 'Aktifkan Kill Switch?' : 'Nonaktifkan Kill Switch?'}
+         </h3>
+         <p className="text-white/60 text-sm mb-6">
+           {killSwitchAction === 'block'
+             ? 'Semua user kecuali superadmin akan diblokir dari submit inspection.'
+             : 'Semua user akan bisa submit inspection lagi.'}
+         </p>
+         <div className="flex gap-3">
+           <button
+             onClick={() => setShowKillSwitchConfirm(false)}
+             className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+           >
+             Batal
+           </button>
+           <button
+             onClick={handleKillSwitch}
+             className={`flex-1 px-4 py-3 text-white rounded-xl font-medium transition-colors ${
+               killSwitchAction === 'block'
+                 ? 'bg-red-600 hover:bg-red-700'
+                 : 'bg-green-600 hover:bg-green-700'
+             }`}
+           >
+             {killSwitchAction === 'block' ? 'Block Semua' : 'Unblock Semua'}
+           </button>
+         </div>
+       </div>
+     </div>
+   </div>
+ )}
 
  {/* Filters */}
  <div className="p-4 space-y-3">
