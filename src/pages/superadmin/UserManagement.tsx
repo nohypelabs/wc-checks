@@ -179,7 +179,7 @@ export const UserManagement = () => {
       </div>
 
       {/* Kill Switch Card */}
-      <div className="px-4 -mt-3 relative z-10">
+      <div className="px-4 mt-2 relative z-10">
         <div className={`rounded-xl p-4 border transition-colors ${
           killSwitchState.active ? 'bg-red-500/10 border-red-500/20' : 'bg-slate-800 border-white/10'
         }`}>
@@ -222,7 +222,7 @@ export const UserManagement = () => {
       </div>
 
       {/* Filters */}
-      <div className="px-4 mt-4 space-y-2">
+      <div className="px-4 mt-5 space-y-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
@@ -265,7 +265,7 @@ export const UserManagement = () => {
       </div>
 
       {/* User List */}
-      <div className="px-4 mt-3 space-y-2">
+      <div className="px-4 mt-4 space-y-2">
         {usersLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-2"></div>
