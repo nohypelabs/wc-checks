@@ -49,16 +49,34 @@ function parseInvoiceDate(dateStr: string): { day: number; month: number; year: 
   return { day, month, year };
 }
 
-/** Compute due date as the 1st of the same month as the invoice (e.g. 6 Juni 2026 -> 1 Juni 2026).
- * This supports monthly auto-update: pass '6 Juli 2026' → due becomes 1 Juli 2026, etc.
+/**
+ * Returns the correct invoiceDate and dueDate for a billing period.
+ * - No argument (or first call): special first invoice on 6 Juni 2026, due 1 Juni 2026
+ * - For July 2026 and onwards: both invoice date and due date are on the 1st of the month
+ *   (e.g. pass '6 Juli 2026' or '15 Juli 2026' → invoice: '1 Juli 2026', due: '1 Juli 2026')
  */
-function computeDueDate(invoiceDateStr: string): string {
-  const parsed = parseInvoiceDate(invoiceDateStr);
-  if (!parsed) {
-    return '1 Juni 2026';
+function getBillingDates(input?: string): { invoiceDate: string; dueDate: string } {
+  const parsed = input ? parseInvoiceDate(input) : null;
+
+  // Special first invoice: 6 Juni 2026 (invoice date), due 1 Juni 2026
+  // This applies when no date passed, OR when explicitly asking for Juni 2026
+  const isFirstInvoicePeriod =
+    !parsed || (parsed.month === 5 && parsed.year === 2026); // month 5 = Juni (0-indexed)
+
+  if (isFirstInvoicePeriod) {
+    return {
+      invoiceDate: '6 Juni 2026',
+      dueDate: '1 Juni 2026',
+    };
   }
-  const { month, year } = parsed;
-  return `1 ${MONTHS_ID[month]} ${year}`;
+
+  // July 2026 and onwards: both invoice date and jatuh tempo on the 1st of the month
+  const { month, year } = parsed!;
+  const firstOfMonth = `1 ${MONTHS_ID[month]} ${year}`;
+  return {
+    invoiceDate: firstOfMonth,
+    dueDate: firstOfMonth,
+  };
 }
 
 const generateInvoiceNumber = (): string => {
@@ -340,8 +358,8 @@ function buildInvoice(data: InvoiceData): jsPDF {
 
 // ── Shared data ──
 const INVOICE_DEFAULTS = {
-  invoiceDate: '6 Juni 2026',
-  dueDate: '1 Juni 2026',
+  // Dates are dynamically provided by getBillingDates() for each period
+  // (special 6 Juni for first invoice, 1st of month for July+)
   billFrom: {
     name: 'NoHype Labs',
     address: 'Kota Bandung, Jawa Barat, Indonesia',
@@ -379,14 +397,15 @@ const INVOICE_DEFAULTS = {
 };
 
 /** Generate unpaid invoice — used on PaymentMethodPage.
- * Pass optional invoiceDate (e.g. '6 Juli 2026') to auto-compute due date as the 1st of that month.
+ * - No arg → first invoice (6 Juni 2026 invoice date, 1 Juni due)
+ * - Pass date for July+ (e.g. '6 Juli 2026') → both invoice and due date become 1 Juli 2026
  */
 export function generateInvoice(invoiceDate?: string): void {
-  const invDate = invoiceDate ?? INVOICE_DEFAULTS.invoiceDate;
+  const billing = getBillingDates(invoiceDate);
   const data: InvoiceData = {
     ...INVOICE_DEFAULTS,
-    invoiceDate: invDate,
-    dueDate: computeDueDate(invDate),
+    invoiceDate: billing.invoiceDate,
+    dueDate: billing.dueDate,
     invoiceNumber: generateInvoiceNumber(),
     paidDate: null,
   };
@@ -395,14 +414,15 @@ export function generateInvoice(invoiceDate?: string): void {
 }
 
 /** Generate paid/lunas invoice — ready to enable when payment confirmed.
- * Pass optional invoiceDate to auto-compute due date as the 1st of that month.
+ * - No arg → first invoice (6 Juni 2026 invoice date, 1 Juni due)
+ * - Pass date for July+ → invoice + due date set to the 1st of that month
  */
 export function generatePaidInvoice(paidDate: string, invoiceDate?: string): void {
-  const invDate = invoiceDate ?? INVOICE_DEFAULTS.invoiceDate;
+  const billing = getBillingDates(invoiceDate);
   const data: InvoiceData = {
     ...INVOICE_DEFAULTS,
-    invoiceDate: invDate,
-    dueDate: computeDueDate(invDate),
+    invoiceDate: billing.invoiceDate,
+    dueDate: billing.dueDate,
     invoiceNumber: generateInvoiceNumber(),
     paidDate,
   };
