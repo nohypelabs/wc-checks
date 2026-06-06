@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Copy, Check, CreditCard, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Copy, Check, CreditCard, MessageCircle, Download } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { generateInvoice } from '../lib/invoiceGenerator';
 
 const WHATSAPP_NUMBER = '6281221575053';
 const WHATSAPP_TEXT = 'saya sudah bayar, silahkan cek saldo untuk memeriksa/verifikasi';
@@ -24,6 +25,15 @@ export const PaymentMethodPage = () => {
   const handleWhatsApp = () => {
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_TEXT)}`;
     window.open(url, '_blank');
+  };
+
+  const handleDownloadInvoice = () => {
+    try {
+      generateInvoice();
+      toast.success('Invoice berhasil diunduh!');
+    } catch {
+      toast.error('Gagal mengunduh invoice');
+    }
   };
 
   return (
@@ -104,6 +114,17 @@ export const PaymentMethodPage = () => {
             4. Setelah diverifikasi, fitur unlimited aktif otomatis
           </p>
         </div>
+
+        {/* Download Invoice Button */}
+        <button
+          onClick={handleDownloadInvoice}
+          className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg shadow-blue-500/20"
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Download className="w-5 h-5" />
+            Download Invoice
+          </div>
+        </button>
 
         {/* Sudah Bayar Button */}
         <button
