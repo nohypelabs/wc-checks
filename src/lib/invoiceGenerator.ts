@@ -29,6 +29,38 @@ const formatRupiah = (amount: number): string => {
   }).format(amount);
 };
 
+const MONTHS_ID = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+] as const;
+
+function getMonthIndex(name: string): number {
+  const lower = name.toLowerCase().trim();
+  return MONTHS_ID.findIndex((m) => m.toLowerCase() === lower);
+}
+
+function parseInvoiceDate(dateStr: string): { day: number; month: number; year: number } | null {
+  const parts = dateStr.trim().split(/\s+/);
+  if (parts.length !== 3) return null;
+  const day = parseInt(parts[0], 10);
+  const month = getMonthIndex(parts[1]);
+  const year = parseInt(parts[2], 10);
+  if (isNaN(day) || month === -1 || isNaN(year)) return null;
+  return { day, month, year };
+}
+
+/** Compute due date as the 1st of the same month as the invoice (e.g. 6 Juni 2026 -> 1 Juni 2026).
+ * This supports monthly auto-update: pass '6 Juli 2026' → due becomes 1 Juli 2026, etc.
+ */
+function computeDueDate(invoiceDateStr: string): string {
+  const parsed = parseInvoiceDate(invoiceDateStr);
+  if (!parsed) {
+    return '1 Juni 2026';
+  }
+  const { month, year } = parsed;
+  return `1 ${MONTHS_ID[month]} ${year}`;
+}
+
 const generateInvoiceNumber = (): string => {
   const now = new Date();
   const y = now.getFullYear();
@@ -152,7 +184,7 @@ function buildInvoice(data: InvoiceData): jsPDF {
     head: [['Deskripsi', 'Qty', 'Harga Satuan', 'Total']],
     body: [
       [
-        `Subscription System Monitoring Toilet\nPaket: ${data.planName} — Bulanan`,
+        `Subscription System Monitoring Toilet\nPaket: ${data.planName} — Bulanan\nPembayaran ke-1 dari 12 bulan`,
         '1',
         formatRupiah(data.price),
         formatRupiah(data.price),
@@ -309,7 +341,7 @@ function buildInvoice(data: InvoiceData): jsPDF {
 // ── Shared data ──
 const INVOICE_DEFAULTS = {
   invoiceDate: '6 Juni 2026',
-  dueDate: '6 Juli 2026',
+  dueDate: '1 Juni 2026',
   billFrom: {
     name: 'NoHype Labs',
     address: 'Kota Bandung, Jawa Barat, Indonesia',
@@ -336,17 +368,25 @@ const INVOICE_DEFAULTS = {
     'PWA (Progressive Web App)',
   ],
   terms: [
+    'Jatuh tempo setiap tanggal 1 setiap bulan.',
+    'Invoice ini adalah pembayaran pertama dari 12 bulan subscription.',
     'Pembayaran dilakukan sebelum atau pada tanggal jatuh tempo.',
+    'Setiap bulan, tanggal invoice dan jatuh tempo akan diperbarui otomatis.',
     'Layanan aktif setelah pembayaran dikonfirmasi.',
     'Dukungan teknis tersedia Senin - Sabtu, 08:00 - 17:00 WIB.',
     'Pembaruan dan pemeliharaan sistem dilakukan secara berkala tanpa downtime.',
   ],
 };
 
-/** Generate unpaid invoice — used on PaymentMethodPage */
-export function generateInvoice(): void {
+/** Generate unpaid invoice — used on PaymentMethodPage.
+ * Pass optional invoiceDate (e.g. '6 Juli 2026') to auto-compute due date as the 1st of that month.
+ */
+export function generateInvoice(invoiceDate?: string): void {
+  const invDate = invoiceDate ?? INVOICE_DEFAULTS.invoiceDate;
   const data: InvoiceData = {
     ...INVOICE_DEFAULTS,
+    invoiceDate: invDate,
+    dueDate: computeDueDate(invDate),
     invoiceNumber: generateInvoiceNumber(),
     paidDate: null,
   };
@@ -354,10 +394,15 @@ export function generateInvoice(): void {
   doc.save(`${data.invoiceNumber}.pdf`);
 }
 
-/** Generate paid/lunas invoice — ready to enable when payment confirmed */
-export function generatePaidInvoice(paidDate: string): void {
+/** Generate paid/lunas invoice — ready to enable when payment confirmed.
+ * Pass optional invoiceDate to auto-compute due date as the 1st of that month.
+ */
+export function generatePaidInvoice(paidDate: string, invoiceDate?: string): void {
+  const invDate = invoiceDate ?? INVOICE_DEFAULTS.invoiceDate;
   const data: InvoiceData = {
     ...INVOICE_DEFAULTS,
+    invoiceDate: invDate,
+    dueDate: computeDueDate(invDate),
     invoiceNumber: generateInvoiceNumber(),
     paidDate,
   };
