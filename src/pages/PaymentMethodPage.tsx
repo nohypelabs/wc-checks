@@ -52,8 +52,7 @@ export const PaymentMethodPage = () => {
             </div>
             <div className="text-right">
               <p className="text-white/60 text-sm">Total</p>
-              <p className="text-sm text-white/40 line-through">Rp 5.000.000</p>
-              <p className="text-white font-extrabold text-xl">Rp 2.999.000</p>
+              <p className="text-white font-extrabold text-xl">Rp 700.000</p>
             </div>
           </div>
         </div>
@@ -96,7 +95,7 @@ export const PaymentMethodPage = () => {
         {/* Instructions */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
           <p className="text-white/70 text-sm leading-relaxed">
-            1. Transfer <span className="font-bold text-white">Rp 2.999.000</span> ke rekening di atas
+            1. Transfer <span className="font-bold text-white">Rp 700.000</span> ke rekening di atas
             <br />
             2. Klik tombol <span className="font-bold text-white">"Sudah Bayar"</span> di bawah
             <br />
