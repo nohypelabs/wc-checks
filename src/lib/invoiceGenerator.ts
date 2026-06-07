@@ -265,6 +265,22 @@ function buildInvoice(data: InvoiceData): jsPDF {
   doc.setFont('helvetica', 'normal');
   doc.text('/bulan', totalBoxX + 64, finalY + 15, { align: 'right' });
 
+  // ── Payment Info (Rekening) ──
+  const payInfoY = finalY + 26;
+
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(margin, payInfoY, contentW, 18, 2, 2, 'F');
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(100, 116, 139);
+  doc.text('INFORMASI PEMBAYARAN', margin + 6, payInfoY + 6);
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.text('BNI  1988595892  a.n. Abdul Gofur', margin + 6, payInfoY + 13);
+
   // ── Paid stamp watermark ──
   if (isPaid) {
     doc.setFontSize(60);
