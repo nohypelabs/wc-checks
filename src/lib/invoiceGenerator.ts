@@ -298,7 +298,7 @@ function buildInvoice(data: InvoiceData): jsPDF {
   }
 
   // ── Features section ──
-  let featY = finalY + 30;
+  let featY = payInfoY + 24;
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
