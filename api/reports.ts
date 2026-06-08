@@ -102,7 +102,8 @@ async function handleAnalytics(
   currentUserId: string,
   targetUserId: string | undefined,
   monthStr: string | undefined,
-  buildingIdStr?: string
+  buildingIdStr?: string,
+  organizationIdStr?: string
 ): Promise<void> {
   if (!supabase) {
     errorResponse(res, 500, 'Database not initialized');
@@ -162,6 +163,11 @@ async function handleAnalytics(
       query = query.eq('locations.building_id', buildingIdStr);
     }
 
+    // Apply organization filter
+    if (organizationIdStr) {
+      query = query.eq('locations.organization_id', organizationIdStr);
+    }
+
     // Get previous month dates
     const prevMonthNum = parseInt(month) - 1;
     const prevYear = prevMonthNum === 0 ? (parseInt(year) - 1).toString() : year;
@@ -180,6 +186,7 @@ async function handleAnalytics(
 
     if (targetUserId) prevQuery = prevQuery.eq('user_id', targetUserId);
     if (buildingIdStr) prevQuery = prevQuery.eq('locations.building_id', buildingIdStr);
+    if (organizationIdStr) prevQuery = prevQuery.eq('locations.organization_id', organizationIdStr);
 
     // Run both queries in PARALLEL
     const [{ data: inspections, error: fetchError }, { data: prevInspections }] = await Promise.all([query, prevQuery]);
@@ -333,12 +340,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return errorResponse(res, 401, 'Authentication required');
   }
 
-  const { month, date, userId, analytics, buildingId, page, limit } = req.query;
+  const { month, date, userId, analytics, buildingId, organizationId, page, limit } = req.query;
   const monthStr = Array.isArray(month) ? month[0] : month;
   const dateStr = Array.isArray(date) ? date[0] : date;
   const userIdStr = Array.isArray(userId) ? userId[0] : userId;
   const analyticsStr = Array.isArray(analytics) ? analytics[0] : analytics;
   const buildingIdStr = Array.isArray(buildingId) ? buildingId[0] : buildingId;
+  const organizationIdStr = Array.isArray(organizationId) ? organizationId[0] : organizationId;
   const pageStr = Array.isArray(page) ? page[0] : page;
   const limitStr = Array.isArray(limit) ? limit[0] : limit;
   const pageNum = Math.max(1, parseInt(pageStr || '1', 10));
@@ -405,7 +413,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ===== ANALYTICS MODE =====
     if (analyticsStr === 'true') {
-      await handleAnalytics(res, isAdmin, currentUserId, targetUserId, monthStr, buildingIdStr);
+      await handleAnalytics(res, isAdmin, currentUserId, targetUserId, monthStr, buildingIdStr, organizationIdStr);
       return; // handleAnalytics handles response
     }
 
@@ -456,6 +464,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`[reports] Filtering by building: ${buildingIdStr}`);
     }
 
+    // Apply organization filter via locations table
+    if (organizationIdStr) {
+      query = query.eq('location.organization_id', organizationIdStr);
+      console.log(`[reports] Filtering by organization: ${organizationIdStr}`);
+    }
+
     // Filter by month or date
     if (monthStr) {
       // Month format: yyyy-MM
@@ -487,6 +501,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Apply building filter via locations join if needed
       if (buildingIdStr) {
         countQuery = countQuery.eq('location.building_id', buildingIdStr);
+      }
+
+      // Apply organization filter via locations join if needed
+      if (organizationIdStr) {
+        countQuery = countQuery.eq('location.organization_id', organizationIdStr);
       }
       
       const { count: totalCount } = await countQuery;

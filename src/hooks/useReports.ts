@@ -66,17 +66,19 @@ export const useMonthlyInspections = (
   userId: string | undefined,
   currentDate: Date,
   enabled: boolean = true,
-  buildingId?: string
+  buildingId?: string,
+  organizationId?: string
 ) => {
   return useQuery({
-    queryKey: ['monthly-inspections', userId || 'all', format(currentDate, 'yyyy-MM'), buildingId],
+    queryKey: ['monthly-inspections', userId || 'all', format(currentDate, 'yyyy-MM'), buildingId, organizationId],
     queryFn: async () => {
       const month = format(currentDate, 'yyyy-MM');
 
       console.log('📅 Fetching monthly inspections:', {
         userId: userId || 'ALL',
         month,
-        buildingId: buildingId || 'ALL'
+        buildingId: buildingId || 'ALL',
+        organizationId: organizationId || 'ALL'
       });
 
       // Get auth token
@@ -94,6 +96,9 @@ export const useMonthlyInspections = (
       }
       if (buildingId) {
         apiUrl += `&buildingId=${buildingId}`;
+      }
+      if (organizationId) {
+        apiUrl += `&organizationId=${organizationId}`;
       }
       // If no userId provided, admin will see ALL, regular users will see their own (backend handles this)
 
@@ -139,11 +144,12 @@ export const useDateInspections = (
   date: string,
   enabled: boolean = true,
   buildingId?: string,
+  organizationId?: string,
   page: number = 1,
   limit: number = 10
 ) => {
   return useQuery({
-    queryKey: ['date-inspections', userId || 'all', date, buildingId, page, limit],
+    queryKey: ['date-inspections', userId || 'all', date, buildingId, organizationId, page, limit],
     queryFn: async () => {
       if (!date) {
         console.warn('⚠️ Missing date');
@@ -153,7 +159,8 @@ export const useDateInspections = (
       console.log('📅 Fetching inspections for date:', {
         userId: userId || 'ALL',
         date,
-        buildingId: buildingId || 'ALL'
+        buildingId: buildingId || 'ALL',
+        organizationId: organizationId || 'ALL'
       });
 
       // Get auth token
@@ -171,6 +178,9 @@ export const useDateInspections = (
       }
       if (buildingId) {
         apiUrl += `&buildingId=${buildingId}`;
+      }
+      if (organizationId) {
+        apiUrl += `&organizationId=${organizationId}`;
       }
       // If no userId provided, admin will see ALL, regular users will see their own (backend handles this)
 

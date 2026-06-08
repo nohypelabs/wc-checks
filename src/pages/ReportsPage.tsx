@@ -15,7 +15,7 @@ import { generateMonthlyReport } from '../lib/pdfGenerator';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import { useBuildings } from '../hooks/useBuildings';
+import { useOrganizations } from '../hooks/useOrganizations';
 
 export const ReportsPage = () => {
  const { user } = useAuth();
@@ -47,26 +47,24 @@ export const ReportsPage = () => {
  return () => document.removeEventListener('mousedown', handleClickOutside);
  }, []);
  useEffect(() => {
-  const handleClickOutside = (e: MouseEvent) => {
-   if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
-    setExportMenuOpen(false);
-   }
-   if (buildingDropdownRef.current && !buildingDropdownRef.current.contains(e.target as Node)) {
-    setBuildingDropdownOpen(false);
-   }
-  };
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => document.removeEventListener('mousedown', handleClickOutside);
- }, []);
+   const handleClickOutside = (e: MouseEvent) => {
+    if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+     setExportMenuOpen(false);
+    }
+    if (organizationDropdownRef.current && !organizationDropdownRef.current.contains(e.target as Node)) {
+     setOrganizationDropdownOpen(false);
+    }
+   };
+   document.addEventListener('mousedown', handleClickOutside);
+   return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
 
- const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
-const [buildingDropdownOpen, setBuildingDropdownOpen] = useState(false);
-const buildingDropdownRef = useRef<HTMLDivElement>(null);
+ const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>('');
+ const [organizationDropdownOpen, setOrganizationDropdownOpen] = useState(false);
+ const organizationDropdownRef = useRef<HTMLDivElement>(null);
 
- const { data: buildings, isLoading: buildingsLoading } = useBuildings({
- enabled: true,
- });
+ const { data: organizations, isLoading: organizationsLoading } = useOrganizations();
 
  const filterUserId = isAdmin ? undefined : user?.id;
 
@@ -76,29 +74,31 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  });
 
  const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
- filterUserId,
- currentDate,
- true,
- selectedBuildingId || undefined
+   filterUserId,
+   currentDate,
+   true,
+   undefined,
+   selectedOrganizationId || undefined
  );
 
  const dateFilterUserId = isAdmin ? undefined : user?.id;
 
  console.log('📊 [ReportsPage] Fetching date inspections with filter:', {
- isAdmin,
- adminLoading,
- dateFilterUserId: dateFilterUserId || 'ALL USERS',
- selectedDate,
- buildingId: selectedBuildingId || 'ALL',
+   isAdmin,
+   adminLoading,
+   dateFilterUserId: dateFilterUserId || 'ALL USERS',
+   selectedDate,
+   organizationId: selectedOrganizationId || 'ALL',
  });
 
  const { data: dateInspectionsData } = useDateInspections(
- dateFilterUserId,
- selectedDate || '',
- true,
- selectedBuildingId || undefined,
- datePage,
- 10
+   dateFilterUserId,
+   selectedDate || '',
+   true,
+   undefined,
+   selectedOrganizationId || undefined,
+   datePage,
+   10
  );
  const dateInspections = dateInspectionsData?.inspections || [];
  const datePagination = dateInspectionsData?.pagination;
@@ -199,34 +199,34 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  };
 
  const handleExportPDF = async () => {
- if (!user?.id) return;
+   if (!user?.id) return;
 
- const loadingToast = toast.loading('Membuat laporan PDF...');
+   const loadingToast = toast.loading('Membuat laporan PDF...');
 
- try {
- if (!monthlyData || monthlyData.length === 0) {
- toast.dismiss(loadingToast);
- toast.error('Tidak ada data untuk diekspor');
- return;
- }
+   try {
+     if (!monthlyData || monthlyData.length === 0) {
+       toast.dismiss(loadingToast);
+       toast.error('Tidak ada data untuk diekspor');
+       return;
+     }
 
- const selectedBuilding = buildings?.find(b => b.id === selectedBuildingId);
- const siteName = selectedBuilding?.name || 'Semua Lokasi';
+     const selectedOrganization = organizations?.find(o => o.id === selectedOrganizationId);
+     const siteName = selectedOrganization?.name || 'Semua Organisasi';
 
- await generateMonthlyReport(
- monthlyData,
- currentDate,
- 'PT Prenacons Internusa',
- siteName
- );
+     await generateMonthlyReport(
+       monthlyData,
+       currentDate,
+       'PT Prenacons Internusa',
+       siteName
+     );
 
- toast.dismiss(loadingToast);
- toast.success('✅ Laporan PDF berhasil dibuat!');
- } catch (error: any) {
- toast.dismiss(loadingToast);
- console.error('PDF Export error:', error);
- toast.error('Gagal membuat PDF: ' + error.message);
- }
+     toast.dismiss(loadingToast);
+     toast.success('✅ Laporan PDF berhasil dibuat!');
+   } catch (error: any) {
+     toast.dismiss(loadingToast);
+     console.error('PDF Export error:', error);
+     toast.error('Gagal membuat PDF: ' + error.message);
+   }
  };
 
  const handleExportAllUsers = async () => {
@@ -425,56 +425,56 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
 
  {/* Filter + Stats Section */}
  <div className="mt-3 lg:mt-4">
- {/* Building Filter */}
+ {/* Organization Filter */}
  <div className="mb-3 lg:mb-4">
- <div className="relative max-w-xs" ref={buildingDropdownRef}>
- <button
- onClick={() => setBuildingDropdownOpen(prev => !prev)}
- disabled={buildingsLoading}
- className="w-full flex items-center gap-2 pl-9 pr-8 py-2.5 text-sm font-semibold bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20"
- >
- <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
- <span className="flex-1 text-left truncate">
- {buildings?.find(b => b.id === selectedBuildingId)?.name || 'Semua Gedung'}
- </span>
- <ChevronDown className={`w-3.5 h-3.5 text-blue-400 transition-transform duration-200 ${buildingDropdownOpen ? 'rotate-180' : ''}`} />
- </button>
- <AnimatePresence>
- {buildingDropdownOpen && (
- <motion.div
- initial={{ opacity: 0, y: -8, scale: 0.95 }}
- animate={{ opacity: 1, y: 0, scale: 1 }}
- exit={{ opacity: 0, y: -8, scale: 0.95 }}
- transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
- className="absolute left-0 right-0 top-full mt-2 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50 max-h-60 overflow-y-auto"
- >
- <div className="p-1.5">
- <button
- onClick={() => { setSelectedBuildingId(''); setBuildingDropdownOpen(false); }}
- className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
- selectedBuildingId === '' ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
- }`}
- >
- <Building2 className="w-4 h-4 flex-shrink-0" />
- <span className="font-medium">Semua Gedung</span>
- </button>
- {buildings?.filter(b => b.is_active).map((building) => (
- <button
- key={building.id}
- onClick={() => { setSelectedBuildingId(building.id); setBuildingDropdownOpen(false); }}
- className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
- selectedBuildingId === building.id ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
- }`}
- >
- <Building2 className="w-4 h-4 flex-shrink-0" />
- <span className="font-medium truncate">{building.name}</span>
- </button>
- ))}
- </div>
- </motion.div>
- )}
- </AnimatePresence>
- </div>
+   <div className="relative max-w-xs" ref={organizationDropdownRef}>
+     <button
+       onClick={() => setOrganizationDropdownOpen(prev => !prev)}
+       disabled={organizationsLoading}
+       className="w-full flex items-center gap-2 pl-9 pr-8 py-2.5 text-sm font-semibold bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20"
+     >
+       <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
+       <span className="flex-1 text-left truncate">
+         {organizations?.find(o => o.id === selectedOrganizationId)?.name || 'Semua Organisasi'}
+       </span>
+       <ChevronDown className={`w-3.5 h-3.5 text-blue-400 transition-transform duration-200 ${organizationDropdownOpen ? 'rotate-180' : ''}`} />
+     </button>
+     <AnimatePresence>
+       {organizationDropdownOpen && (
+         <motion.div
+           initial={{ opacity: 0, y: -8, scale: 0.95 }}
+           animate={{ opacity: 1, y: 0, scale: 1 }}
+           exit={{ opacity: 0, y: -8, scale: 0.95 }}
+           transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+           className="absolute left-0 right-0 top-full mt-2 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50 max-h-60 overflow-y-auto"
+         >
+           <div className="p-1.5">
+             <button
+               onClick={() => { setSelectedOrganizationId(''); setOrganizationDropdownOpen(false); }}
+               className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
+                 selectedOrganizationId === '' ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
+               }`}
+             >
+               <Building2 className="w-4 h-4 flex-shrink-0" />
+               <span className="font-medium">Semua Organisasi</span>
+             </button>
+             {organizations?.filter(o => o.is_active).map((org) => (
+               <button
+                 key={org.id}
+                 onClick={() => { setSelectedOrganizationId(org.id); setOrganizationDropdownOpen(false); }}
+                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
+                   selectedOrganizationId === org.id ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
+                 }`}
+               >
+                 <Building2 className="w-4 h-4 flex-shrink-0" />
+                 <span className="font-medium truncate">{org.name}</span>
+               </button>
+             ))}
+           </div>
+         </motion.div>
+       )}
+     </AnimatePresence>
+   </div>
  </div>
  {/* Stats Cards */}
  <div className="grid grid-cols-3 gap-2 lg:gap-3">
