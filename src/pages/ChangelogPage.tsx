@@ -114,7 +114,7 @@ export const ChangelogPage = () => {
       </header>
 
       {/* Content */}
-      <main className="max-w-3xl mx-auto p-4 space-y-4">
+      <main className="max-w-2xl mx-auto p-4 space-y-4">
         {changelog.map((entry) => (
           <motion.div
             key={entry.version}

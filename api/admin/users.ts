@@ -71,7 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Fetch all users
       const { data: users, error: usersError } = await supabase
         .from('users')
-        .select('id, email, full_name, phone, is_active, can_submit, created_at, last_login_at')
+        .select('id, email, full_name, phone, is_active, can_submit, organization_id, approval_status, created_at, last_login_at')
         .order('created_at', { ascending: false });
 
       if (usersError) throw usersError;
@@ -90,12 +90,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (rolesError) throw rolesError;
 
+      // Fetch organizations for org names
+      const { data: orgs } = await supabase
+        .from('organizations')
+        .select('id, name, short_code');
+
       // Combine the data
       const combined = users.map((user: any) => {
         const userRole = userRoles?.find((ur: any) => ur.user_id === user.id);
+        const org = orgs?.find((o: any) => o.id === user.organization_id);
         return {
           ...user,
           role: userRole?.roles || null,
+          organization: org || null,
         };
       });
 
@@ -477,6 +484,189 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res,
         { unblockedCount: count || 0 },
         `Submit diaktifkan kembali untuk ${count || 0} user.`
+      );
+    } catch (error: any) {
+      return errorResponse(res, 500, 'Internal server error: ' + error.message);
+    }
+  }
+
+  // POST /api/admin/users?action=update-org - Assign user to organization (superadmin only)
+  if (req.method === 'POST' && actionParam === 'update-org') {
+    const auth = await validateAuth(req, 100);
+
+    if (!auth || !supabase) {
+      return errorResponse(res, 403, 'Forbidden: Superadmin access required');
+    }
+
+    const { userId, organizationId } = req.body;
+
+    if (!userId) {
+      return errorResponse(res, 400, 'Missing required field: userId');
+    }
+
+    try {
+      const { data: targetUser, error: userError } = await supabase
+        .from('users')
+        .select('id, email, full_name, organization_id')
+        .eq('id', userId)
+        .single();
+
+      if (userError || !targetUser) {
+        return errorResponse(res, 404, 'User not found');
+      }
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          organization_id: organizationId || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      let orgName = 'None';
+      if (organizationId) {
+        const { data: org } = await supabase
+          .from('organizations')
+          .select('name')
+          .eq('id', organizationId)
+          .single();
+        orgName = org?.name || 'Unknown';
+      }
+
+      await createAuditLog(
+        auth.userId,
+        'UPDATE_USER_ORG',
+        'user',
+        userId,
+        {
+          targetUserEmail: targetUser.email,
+          previousOrg: targetUser.organization_id,
+          newOrg: organizationId,
+          orgName,
+        },
+        true
+      );
+
+      return successResponse(
+        res,
+        { userId, organizationId, orgName },
+        `User "${targetUser.full_name}" assigned to "${orgName}"`
+      );
+    } catch (error: any) {
+      return errorResponse(res, 500, 'Internal server error: ' + error.message);
+    }
+  }
+
+  // POST /api/admin/users?action=update-approval - Update approval status (superadmin only)
+  if (req.method === 'POST' && actionParam === 'update-approval') {
+    const auth = await validateAuth(req, 100);
+
+    if (!auth || !supabase) {
+      return errorResponse(res, 403, 'Forbidden: Superadmin access required');
+    }
+
+    const { userId, approvalStatus } = req.body;
+
+    if (!userId || !approvalStatus) {
+      return errorResponse(res, 400, 'Missing required fields: userId and approvalStatus');
+    }
+
+    if (!['pending', 'approved', 'rejected'].includes(approvalStatus)) {
+      return errorResponse(res, 400, 'Invalid approvalStatus. Must be: pending, approved, rejected');
+    }
+
+    try {
+      const { data: targetUser, error: userError } = await supabase
+        .from('users')
+        .select('id, email, full_name, approval_status')
+        .eq('id', userId)
+        .single();
+
+      if (userError || !targetUser) {
+        return errorResponse(res, 404, 'User not found');
+      }
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          approval_status: approvalStatus,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      await createAuditLog(
+        auth.userId,
+        'UPDATE_APPROVAL_STATUS',
+        'user',
+        userId,
+        {
+          targetUserEmail: targetUser.email,
+          previousStatus: targetUser.approval_status,
+          newStatus: approvalStatus,
+        },
+        true
+      );
+
+      return successResponse(
+        res,
+        { userId, approvalStatus, userName: targetUser.full_name },
+        `User "${targetUser.full_name}" status changed to "${approvalStatus}"`
+      );
+    } catch (error: any) {
+      return errorResponse(res, 500, 'Internal server error: ' + error.message);
+    }
+  }
+
+  // POST /api/admin/users?action=set-all-pending - Set all non-admin users to pending (superadmin only)
+  if (req.method === 'POST' && actionParam === 'set-all-pending') {
+    const auth = await validateAuth(req, 100);
+
+    if (!auth || !supabase) {
+      return errorResponse(res, 403, 'Forbidden: Superadmin access required');
+    }
+
+    try {
+      // Get all admin+ user IDs to exclude
+      const { data: adminRoles } = await supabase
+        .from('user_roles')
+        .select('user_id, roles!user_roles_role_id_fkey(level)')
+        .gte('roles.level', 80);
+
+      const adminIds = (adminRoles || [])
+        .map((ur: any) => ur.user_id)
+        .filter(Boolean);
+
+      // Set all non-admin users to pending
+      let query = supabase
+        .from('users')
+        .update({ approval_status: 'pending', updated_at: new Date().toISOString() })
+        .eq('approval_status', 'approved');
+
+      if (adminIds.length > 0) {
+        query = query.not('id', 'in', `(${adminIds.join(',')})`);
+      }
+
+      const { count, error: updateError } = await query.select('id', { count: 'exact', head: true });
+
+      if (updateError) throw updateError;
+
+      await createAuditLog(
+        auth.userId,
+        'SET_ALL_PENDING',
+        'user',
+        undefined,
+        { affectedCount: count || 0 },
+        true
+      );
+
+      return successResponse(
+        res,
+        { affectedCount: count || 0 },
+        `${count || 0} user diubah ke pending.`
       );
     } catch (error: any) {
       return errorResponse(res, 500, 'Internal server error: ' + error.message);

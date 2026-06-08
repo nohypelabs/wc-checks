@@ -106,40 +106,37 @@ export const LocationInspectionPage = () => {
  return (
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
  {/* Header */}
- <div className="bg-slate-800/90 backdrop-blur-xl border-b border-white/15 sticky top-0 z-10">
- <div className="max-w-4xl mx-auto px-4 py-4">
- <div className="flex items-center justify-between">
- <div className="flex items-center space-x-4">
- <Button
- variant="outline"
- onClick={() => navigate(-1)}
- className="flex items-center space-x-2"
- >
- <ArrowLeft className="w-4 h-4" />
- <span style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.15)' }}>Kembali</span>
- </Button>
- <div>
- <h1 className="text-2xl font-bold text-white">Inspeksi Toilet</h1>
- <p className="text-white/60">Lengkapi inspeksi untuk lokasi ini</p>
- </div>
- </div>
- 
- {/* User Info Badge */}
- {user && (
- <div className="hidden md:flex items-center space-x-2 text-sm text-white/60">
- <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
- <span className="text-blue-300 font-semibold">
- {user.email?.charAt(0).toUpperCase()}
- </span>
- </div>
- <span className="font-medium">{user.email}</span>
- </div>
- )}
- </div>
- </div>
+       <div className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
+         <div className="max-w-2xl mx-auto">
+           <div className="flex items-center justify-between">
+             <div className="flex items-center gap-3">
+               <button
+                 onClick={() => navigate(-1)}
+                 className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+               >
+                 <ArrowLeft className="w-5 h-5 text-white/60" />
+               </button>
+               <div>
+                 <h1 className="text-xl font-bold text-white">Inspeksi Toilet</h1>
+                 <p className="text-sm text-white/50">Lengkapi inspeksi untuk lokasi ini</p>
+               </div>
+             </div>
+             {/* User Info Badge */}
+             {user && (
+               <div className="hidden md:flex items-center gap-2">
+                 <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                   <span className="text-sm font-bold text-blue-300">
+                     {user.email?.charAt(0).toUpperCase()}
+                   </span>
+                 </div>
+               </div>
+             )}
+           </div>
+         </div>
+       </div>
  </div>
 
- <div className="max-w-4xl mx-auto p-4 space-y-6">
+ <div className="max-w-2xl mx-auto p-4 space-y-6">
  {/* Location Info Card */}
  <Card className="p-6">
  <div className="flex items-start space-x-4">

@@ -12,23 +12,25 @@ export const AboutPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  {/* Header */}
- <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 shadow-lg">
- <div className="flex items-center gap-3 mb-4">
- <button
- onClick={() => setSidebarOpen(true)}
- className="w-10 h-10 bg-white/8 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/10 transition-all border border-white/10"
- >
- <Menu className="w-5 h-5 text-white" />
- </button>
- <div>
- <h1 className="text-xl font-bold text-white">Tentang Aplikasi</h1>
- <p className="text-sm text-blue-100">Dokumentasi Sistem Lengkap</p>
- </div>
- </div>
- </div>
+       <div className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
+         <div className="flex items-center justify-between">
+           <div className="flex items-center gap-3">
+             <button
+               onClick={() => setSidebarOpen(true)}
+               className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+             >
+               <Menu className="w-5 h-5 text-white/60" />
+             </button>
+             <div>
+               <h1 className="text-xl font-bold text-white">Tentang Aplikasi</h1>
+               <p className="text-sm text-white/50">Dokumentasi Sistem Lengkap</p>
+             </div>
+           </div>
+         </div>
+       </div>
 
  {/* Main Content */}
- <main className="p-5 space-y-5">
+         <main className="max-w-2xl mx-auto p-5 space-y-5">
  {/* App Logo & Version */}
  <Card>
  <div className="text-center py-6">

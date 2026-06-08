@@ -30,7 +30,7 @@ export const SettingsPage = () => {
  </div>
 
  {/* Main Content */}
- <main className="p-5 space-y-4">
+         <main className="max-w-2xl mx-auto p-5 space-y-4">
  {/* Appearance */}
  <Card>
  <h2 className="font-bold text-white mb-3">Tampilan</h2>

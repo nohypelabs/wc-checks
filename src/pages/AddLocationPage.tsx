@@ -370,8 +370,8 @@ export const AddLocationPage = () => {
  </div>
 
  {/* Form */}
- <div className="p-6">
- <form onSubmit={handleSubmit} className="space-y-5">
+         <div className="max-w-2xl mx-auto p-6">
+           <form onSubmit={handleSubmit} className="space-y-5">
  {/* Organization Dropdown */}
  <div>
  <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-2">

@@ -19,7 +19,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
-import { useUsers, useRoles, useAssignRole, useToggleUserStatus, useBlockAllSubmit, useUnblockAllSubmit } from '../../hooks/useUserRoles';
+import { useUsers, useRoles, useAssignRole, useToggleUserStatus, useBlockAllSubmit, useUnblockAllSubmit, useUpdateUserOrg, useUpdateApproval, useSetAllPending } from '../../hooks/useUserRoles';
+import { useOrganizations } from '../../hooks/useOrganizations';
 import { Sidebar } from '../../components/mobile/Sidebar';
 import { BottomNav } from '../../components/mobile/BottomNav';
 import { format } from 'date-fns';
@@ -46,6 +47,10 @@ export const UserManagement = () => {
   const toggleStatusMutation = useToggleUserStatus();
   const blockAllMutation = useBlockAllSubmit();
   const unblockAllMutation = useUnblockAllSubmit();
+  const updateOrgMutation = useUpdateUserOrg();
+  const updateApprovalMutation = useUpdateApproval();
+  const setAllPendingMutation = useSetAllPending();
+  const { data: organizations } = useOrganizations();
 
   // Derive kill switch state
   const killSwitchState = useMemo(() => {
@@ -147,7 +152,7 @@ export const UserManagement = () => {
   return (
     <div className="min-h-screen bg-slate-900 pb-24 lg:pb-6">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-2xl mx-auto">
 
       {/* Header */}
       <div className="bg-slate-800 border-b border-white/10 px-4 py-5 rounded-b-3xl">
@@ -217,6 +222,29 @@ export const UserManagement = () => {
                 {unblockAllMutation.isPending ? 'Unblocking...' : 'Unblock All'}
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bulk Approval Action */}
+      <div className="px-4 mt-3 relative z-10">
+        <div className="rounded-xl p-4 border bg-slate-800 border-white/10">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-white">Bulk Approval</h3>
+              <p className="text-xs text-white/40">Set semua non-admin ke pending untuk review</p>
+            </div>
+            <button
+              onClick={() => {
+                if (confirm('Set semua non-admin user ke pending? Admin & superadmin tidak terpengaruh.')) {
+                  setAllPendingMutation.mutate();
+                }
+              }}
+              disabled={setAllPendingMutation.isPending}
+              className="flex items-center gap-1.5 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-medium rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {setAllPendingMutation.isPending ? 'Processing...' : 'Set All Pending'}
+            </button>
           </div>
         </div>
       </div>
@@ -298,12 +326,23 @@ export const UserManagement = () => {
                       )}
                     </div>
                     <p className="text-xs text-white/40 truncate">{u.email}</p>
+                    {u.organization && (
+                      <p className="text-[10px] text-blue-400/70 truncate">{u.organization.name}</p>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {u.role && (
                       <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getRoleBadgeColor(u.role.level)}`}>
                         {u.role.name}
+                      </span>
+                    )}
+                    {u.approval_status && u.approval_status !== 'approved' && (
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${
+                        u.approval_status === 'pending' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                        : 'bg-red-500/20 text-red-300 border-red-500/30'
+                      }`}>
+                        {u.approval_status}
                       </span>
                     )}
                     {u.is_active ? (
@@ -347,6 +386,38 @@ export const UserManagement = () => {
                         </button>
                       </div>
                     </div>
+
+                    {/* Organization + Approval */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Organisasi</label>
+                        <select
+                          value={u.organization_id || ''}
+                          onChange={(e) => updateOrgMutation.mutate({ userId: u.id, organizationId: e.target.value || null })}
+                          className="w-full px-2.5 py-2 bg-slate-700 border border-white/10 rounded-lg text-xs text-white focus:ring-1 focus:ring-blue-500 disabled:opacity-50 appearance-none"
+                          disabled={updateOrgMutation.isPending}
+                        >
+                          <option value="">Belum di-assign</option>
+                          {organizations?.map((org) => (
+                            <option key={org.id} value={org.id}>{org.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Approval</label>
+                        <select
+                          value={u.approval_status || 'pending'}
+                          onChange={(e) => updateApprovalMutation.mutate({ userId: u.id, approvalStatus: e.target.value })}
+                          className="w-full px-2.5 py-2 bg-slate-700 border border-white/10 rounded-lg text-xs text-white focus:ring-1 focus:ring-blue-500 disabled:opacity-50 appearance-none"
+                          disabled={updateApprovalMutation.isPending}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="approved">Approved</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
+                    </div>
+
                     <div className="flex items-center gap-4 text-[10px] text-white/30 pt-1">
                       <span>Joined {u.created_at ? format(new Date(u.created_at), 'dd MMM yyyy') : 'N/A'}</span>
                       {u.last_login_at && <span>Login {format(new Date(u.last_login_at), 'dd MMM HH:mm')}</span>}

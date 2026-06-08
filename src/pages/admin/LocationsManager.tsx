@@ -330,9 +330,9 @@ export const LocationsManager = () => {
  </div>
  </div>
 
- <div className="p-4 space-y-4">
- {/* User Info for Mobile */}
- {user && (
+ <div className="max-w-2xl mx-auto p-4 space-y-4">
+         {/* User Info for Mobile */}
+         {user && (
  <Card className="sm:hidden p-3 bg-slate-800/80 border-white/15">
  <div className="flex items-center space-x-2">
  <User className="w-4 h-4 text-white/60" />

@@ -207,7 +207,7 @@ export const Dashboard = () => {
  </div>
 
  {/* Main Content */}
- <main className="p-5 space-y-5">
+         <main className="max-w-2xl mx-auto p-5 space-y-5">
  {/* Stats Cards - 2x2 Grid */}
  {statsLoading ? (
  <SkeletonStats />

@@ -21,12 +21,19 @@ export interface UserWithRole {
   phone: string | null;
   is_active: boolean | null;
   can_submit: boolean | null;
+  organization_id: string | null;
+  approval_status: string | null;
   created_at: string | null;
   last_login_at: string | null;
   role: {
     id: string;
     name: string;
     level: number;
+  } | null;
+  organization?: {
+    id: string;
+    name: string;
+    short_code: string;
   } | null;
 }
 
@@ -270,6 +277,101 @@ export function useUnblockAllSubmit() {
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to deactivate kill switch');
+    },
+  });
+}
+
+// Assign user to organization (superadmin only)
+export function useUpdateUserOrg() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, organizationId }: { userId: string; organizationId: string | null }) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('No authentication token');
+
+      const response = await fetch('/api/admin/users?action=update-org', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, organizationId }),
+      });
+
+      if (!response.ok) {
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to update org' }));
+        throw new Error(error.error || 'Failed to update organization');
+      }
+
+      return safeJsonParse(response);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
+      toast.success(data.message || 'Organization updated');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update organization');
+    },
+  });
+}
+
+// Update approval status (superadmin only)
+export function useUpdateApproval() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, approvalStatus }: { userId: string; approvalStatus: string }) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('No authentication token');
+
+      const response = await fetch('/api/admin/users?action=update-approval', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, approvalStatus }),
+      });
+
+      if (!response.ok) {
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed to update approval' }));
+        throw new Error(error.error || 'Failed to update approval status');
+      }
+
+      return safeJsonParse(response);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
+      toast.success(data.message || 'Approval status updated');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update approval status');
+    },
+  });
+}
+
+// Set all non-admin users to pending (superadmin only)
+export function useSetAllPending() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('No authentication token');
+
+      const response = await fetch('/api/admin/users?action=set-all-pending', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        const error = await safeJsonParse(response).catch(() => ({ error: 'Failed' }));
+        throw new Error(error.error || 'Failed to set all pending');
+      }
+
+      return safeJsonParse(response);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
+      toast.success(data.message || 'All users set to pending');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed');
     },
   });
 }

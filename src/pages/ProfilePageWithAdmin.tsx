@@ -240,20 +240,28 @@ export const ProfilePageWithAdmin = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6">
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
  {/* Header */}
- <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 pt-12 pb-24 px-6">
- <div className="flex items-center justify-between text-white mb-6">
- <h1 className="text-2xl font-bold">Profile</h1>
- <button
- onClick={() => navigate('/settings')}
- className="p-2 hover:bg-white/10 rounded-xl transition-colors"
- >
- <Settings className="w-6 h-6" />
- </button>
- </div>
- </div>
+       <div className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
+         <div className="flex items-center justify-between">
+           <div className="flex items-center gap-3">
+             <button
+               onClick={() => setSidebarOpen(true)}
+               className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+             >
+               <Menu className="w-5 h-5 text-white/60" />
+             </button>
+             <h1 className="text-xl font-bold text-white">Profile</h1>
+           </div>
+           <button
+             onClick={() => navigate('/settings')}
+             className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+           >
+             <Settings className="w-5 h-5 text-white/60" />
+           </button>
+         </div>
+       </div>
 
- <div className="px-6 -mt-16">
- <Card className="relative">
+ <div className="max-w-2xl mx-auto px-6 -mt-16">
+         <Card className="relative">
  {/* Profile Photo */}
  <div className="flex justify-center -mt-16 mb-4">
  <div className="relative">

@@ -217,20 +217,22 @@ export const ProfilePage = () => {
  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
  {/* Simple Header - White */}
- <div className="bg-white/8 backdrop-blur-md pt-12 pb-8 px-6 border-b border-white/10">
- <div className="flex items-center gap-3">
- <button
- onClick={() => setSidebarOpen(true)}
- className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
- >
- <Menu className="w-5 h-5" />
- </button>
- <h1 className="text-xl font-bold text-white">Profil</h1>
- </div>
- </div>
+         <div className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
+           <div className="flex items-center justify-between">
+             <div className="flex items-center gap-3">
+               <button
+                 onClick={() => setSidebarOpen(true)}
+                 className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+               >
+                 <Menu className="w-5 h-5 text-white/60" />
+               </button>
+               <h1 className="text-xl font-bold text-white">Profil</h1>
+             </div>
+           </div>
+         </div>
 
  {/* Profile Card */}
- <div className="px-6 py-6">
+         <div className="max-w-2xl mx-auto px-6 py-6">
  <div className="bg-white/8 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/5 p-6">
  {/* Profile Photo */}
  <div className="flex justify-center mb-6">

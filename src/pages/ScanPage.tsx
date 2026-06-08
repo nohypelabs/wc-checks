@@ -187,9 +187,9 @@ export const ScanPage = () => {
  </div>
  </div>
 
- <div className="p-5 space-y-5">
- {/* Scan Button - Big with 3D Shadow */}
- <button
+ <div className="max-w-2xl mx-auto p-5 space-y-5">
+           {/* Scan Button - Big with 3D Shadow */}
+           <button
  onClick={() => setShowScanner(true)}
  className="w-full bg-white/8 backdrop-blur-md rounded-3xl p-8 shadow-lg active:shadow-[0_8px_30px_rgb(0,0,0,0.1)] active:translate-y-1 transition-all border border-white/10"
  >
