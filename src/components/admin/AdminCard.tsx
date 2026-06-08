@@ -6,10 +6,11 @@ interface AdminCardProps {
  icon: LucideIcon;
  title: string;
  description: string;
- path: string;
+ path?: string;
  color?: string;
  count?: number;
  badge?: string;
+ disabled?: boolean;
 }
 
 export const AdminCard = ({
@@ -19,7 +20,8 @@ export const AdminCard = ({
  path,
  color = 'blue',
  count,
- badge
+ badge,
+ disabled
 }: AdminCardProps) => {
  const navigate = useNavigate();
 
@@ -53,13 +55,14 @@ export const AdminCard = ({
 
  return (
  <button
- onClick={() => navigate(path)}
- className="
+ onClick={() => !disabled && path && navigate(path)}
+ disabled={disabled}
+ className={`
  relative w-full p-2.5 lg:p-4 bg-white/8 backdrop-blur-md border border-white/10 shadow-lg shadow-blue-500/5 ring-1 ring-white/5
- rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
- transition-all duration-200
+ rounded-xl transition-all duration-200
  text-left group
- "
+ ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'}
+ `}
  >
  {/* Badge */}
  {badge && (
@@ -90,11 +93,11 @@ export const AdminCard = ({
  )}
  <div className={`
  ml-auto flex items-center gap-0.5 text-[10px] lg:text-xs font-medium
- text-white/60 ${desktopManage[color] || desktopManage.blue}
- group-hover:gap-1.5 transition-all
+ ${disabled ? 'text-white/30' : `text-white/60 ${desktopManage[color] || desktopManage.blue} group-hover:gap-1.5`}
+ transition-all
  `}>
- <span>Manage</span>
- <ChevronRight className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white/40" />
+ <span>{disabled ? 'Superadmin' : 'Manage'}</span>
+ {!disabled && <ChevronRight className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-white/40" />}
  </div>
  </div>
  </button>

@@ -27,7 +27,7 @@ import { InspectionTrendChart } from '../../components/dashboard/InspectionTrend
 export const AdminDashboard = () => {
  usePerformance('HomePage');
  const { profile } = useAuth();
- const { isAdmin } = useIsAdmin();
+ const { isAdmin, isSuperAdmin } = useIsAdmin();
  const navigate = useNavigate();
  const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -151,9 +151,10 @@ export const AdminDashboard = () => {
  icon={Users}
  title="Users"
  description="Manage users & roles"
- path="/admin/users"
+ path="/superadmin/users"
  color="blue"
  count={stats?.totalUsers}
+ disabled={!isSuperAdmin}
  />
  <AdminCard
  icon={MapPin}
