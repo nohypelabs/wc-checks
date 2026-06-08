@@ -232,7 +232,7 @@ export const ProfilePage = () => {
          </div>
 
  {/* Profile Card */}
-         <div className="max-w-2xl mx-auto px-6 py-6">
+         <div className="px-6 py-6">
  <div className="bg-white/8 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/5 p-6">
  {/* Profile Photo */}
  <div className="flex justify-center mb-6">

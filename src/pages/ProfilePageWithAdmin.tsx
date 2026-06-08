@@ -260,7 +260,7 @@ export const ProfilePageWithAdmin = () => {
          </div>
        </div>
 
- <div className="max-w-2xl mx-auto px-6 -mt-16">
+ <div className="px-6 -mt-16">
          <Card className="relative">
  {/* Profile Photo */}
  <div className="flex justify-center -mt-16 mb-4">

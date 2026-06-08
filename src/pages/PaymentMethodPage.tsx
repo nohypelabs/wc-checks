@@ -54,7 +54,7 @@ export const PaymentMethodPage = () => {
       </div>
 
       {/* Content */}
-              <div className="max-w-2xl mx-auto p-4 space-y-6">
+              <div className="p-4 space-y-6">
         {/* Plan Summary */}
         <div className="bg-white/10 border border-white/15 rounded-2xl p-4">
           <div className="flex items-center justify-between">

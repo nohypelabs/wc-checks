@@ -114,6 +114,47 @@ SUPABASE_URL=
 SUPABASE_SERVICE_KEY=
 ```
 
+## Multi-Tenant Architecture (Organization Scoping)
+
+The system uses multi-tenant isolation via organizations. Each tenant (DKI, ABN01, PTPN, GDG01) is an organization. Data is isolated per org via RLS.
+
+### Data Model
+
+```
+organizations (tenants)
+├── buildings (physical buildings, optional)
+│   └── locations (toilet/inspection areas)
+│       └── inspection_records
+└── users (staff per org)
+```
+
+### User Approval Flow
+
+New registrations default to `approval_status = 'pending'`. Superadmin assigns organization + sets approval to `approved` from `/superadmin/users`.
+
+| Status | Access |
+|--------|--------|
+| `pending` | Login only, see own profile |
+| `approved` | Full access (scoped to org if assigned) |
+| `rejected` | Blocked |
+
+### RLS Strategy
+
+- **Users with org:** see only their org's data
+- **Users without org (approved):** see all data (backward compatible)
+- **Pending users:** see only own profile
+- **Backend API (service role):** full access, bypasses RLS
+- **Superadmin:** manages all users/roles from `/superadmin/users`
+
+Helper function `get_user_org_id()` uses `SECURITY DEFINER` to avoid infinite recursion between RLS policies.
+
+### Key Migrations
+
+- `20260609_01` through `20260609_06` — organization scoping, RLS, approval flow
+- `20260609_rollback.sql` — undo all migrations
+
+Full documentation: `docs/ORGANIZATION_SCOPING.md`
+
 ## Database Migrations
 
 Migrations live in `supabase/migrations/`. Apply them manually in the Supabase SQL editor. The numbered migrations (`20250128_*.sql`) are the canonical ones; the uppercase SQL files are one-off diagnostic/fix scripts and are not part of the migration sequence.

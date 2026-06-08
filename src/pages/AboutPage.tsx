@@ -30,7 +30,7 @@ export const AboutPage = () => {
        </div>
 
  {/* Main Content */}
-         <main className="max-w-2xl mx-auto p-5 space-y-5">
+         <main className="p-5 space-y-5">
  {/* App Logo & Version */}
  <Card>
  <div className="text-center py-6">

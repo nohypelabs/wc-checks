@@ -107,8 +107,8 @@ export const LocationInspectionPage = () => {
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
  {/* Header */}
        <div className="bg-white/8 backdrop-blur-xl px-3 py-5 shadow-xl border-b border-white/10 lg:py-5 lg:px-4">
-         <div className="max-w-2xl mx-auto">
-           <div className="flex items-center justify-between">
+               <div className="px-4">
+                 <div className="flex items-center justify-between">
              <div className="flex items-center gap-3">
                <button
                  onClick={() => navigate(-1)}
@@ -136,7 +136,7 @@ export const LocationInspectionPage = () => {
        </div>
  </div>
 
- <div className="max-w-2xl mx-auto p-4 space-y-6">
+ <div className="p-4 space-y-6">
  {/* Location Info Card */}
  <Card className="p-6">
  <div className="flex items-start space-x-4">

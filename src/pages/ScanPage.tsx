@@ -187,7 +187,7 @@ export const ScanPage = () => {
  </div>
  </div>
 
- <div className="max-w-2xl mx-auto p-5 space-y-5">
+ <div className="p-5 space-y-5">
            {/* Scan Button - Big with 3D Shadow */}
            <button
  onClick={() => setShowScanner(true)}
