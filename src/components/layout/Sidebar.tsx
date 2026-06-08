@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { backdropFade, TAP_TRANSITION, SPRINGS } from '../../lib/animations';
+import { LogoutModal } from '../modals/LogoutModal';
 
 interface NavItem {
  id: string;
@@ -43,6 +44,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
  const { isAdmin, isSuperAdmin } = useIsAdmin();
  const [isOpen, setIsOpen] = useState(false);
  const [isCollapsed, setIsCollapsed] = useState(false);
+ const [showLogoutModal, setShowLogoutModal] = useState(false);
 
  // Show admin items only if user is admin or superadmin
  const showAdminItems = isAdmin || isSuperAdmin;
@@ -78,7 +80,12 @@ export const Sidebar = ({ className }: SidebarProps) => {
  navigate(path);
  };
 
- const handleSignOut = async () => {
+ const handleSignOut = () => {
+ setShowLogoutModal(true);
+ };
+
+ const confirmSignOut = async () => {
+ setShowLogoutModal(false);
  await signOut();
  navigate('/login');
  };
@@ -495,6 +502,14 @@ export const Sidebar = ({ className }: SidebarProps) => {
  mass: 0.8,
  }}
  />
+
+ {/* Logout Modal */}
+ <LogoutModal
+ isOpen={showLogoutModal}
+ onClose={() => setShowLogoutModal(false)}
+ onConfirm={confirmSignOut}
+ userName={profile?.full_name}
+ />
  </>
  );
-};
+ };
