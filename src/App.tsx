@@ -2,6 +2,8 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { AnimatePresence } from 'framer-motion';
 import { Wifi, WifiOff } from 'lucide-react';
 import { CustomToaster } from './lib/toast';
@@ -93,24 +95,30 @@ const PaymentMethodPage = lazy(() =>
 // ⚡ React Query - OPTIMIZED for performance + freshness balance
 const queryClient = new QueryClient({
  defaultOptions: {
- queries: {
- refetchOnWindowFocus: false, // ⚡ Don't refetch on tab switch - staleTime handles freshness
- refetchOnMount: false, // ⚡ Don't refetch on mount if data is fresh
- refetchOnReconnect: true, // ✅ Refetch when internet reconnects
- retry: 1, // ⚡ Retry once (not infinite, not zero)
- staleTime: 2 * 60 * 1000, // ⚡ Cache 2 minutes - balance performance & freshness
- gcTime: 5 * 60 * 1000, // ⚡ Keep in memory 5 minutes - reduce re-fetching
- onError: (error: any) => {
- logger.error('React Query error', error);
+   queries: {
+     refetchOnWindowFocus: false, // ⚡ Don't refetch on tab switch - staleTime handles freshness
+     refetchOnMount: false, // ⚡ Don't refetch on mount if data is fresh
+     refetchOnReconnect: true, // ✅ Refetch when internet reconnects
+     retry: 1, // ⚡ Retry once (not infinite, not zero)
+     staleTime: 2 * 60 * 1000, // ⚡ Cache 2 minutes - balance performance & freshness
+     gcTime: 5 * 60 * 1000, // ⚡ Keep in memory 5 minutes - reduce re-fetching
+     onError: (error: any) => {
+       logger.error('React Query error', error);
+     },
+   },
+   mutations: {
+     retry: 0, // ❌ No retry for mutations
+     onError: (error: any) => {
+       logger.error('React Query mutation error', error);
+     },
+   },
  },
- },
- mutations: {
- retry: 0, // ❌ No retry for mutations
- onError: (error: any) => {
- logger.error('React Query mutation error', error);
- },
- },
- },
+});
+
+// ⚡ React Query Persistence - Simpan cache ke localStorage
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+  key: 'wc-checks-query-cache', // Unique key untuk app ini
 });
 
 // Loading component
@@ -373,15 +381,18 @@ export default function App() {
  });
 
  return (
- <QueryClientProvider client={queryClient}>
- <Router>
- <ErrorBoundary>
- <AppContent />
- <PWAInstallPrompt />
- <DebugPanel />
- <CustomToaster />
- </ErrorBoundary>
- </Router>
- </QueryClientProvider>
+ <PersistQueryClientProvider
+       client={queryClient}
+       persistOptions={{ persister }}
+     >
+       <Router>
+         <ErrorBoundary>
+           <AppContent />
+           <PWAInstallPrompt />
+           <DebugPanel />
+           <CustomToaster />
+         </ErrorBoundary>
+       </Router>
+     </PersistQueryClientProvider>
  );
 }
