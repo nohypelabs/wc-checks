@@ -426,7 +426,7 @@ export const ReportsPage = () => {
  {/* Filter + Stats Section */}
  <div className="mt-3 lg:mt-4">
  {/* Organization Filter */}
- <div className="mb-3 lg:mb-4">
+ <div className="mb-3 lg:mb-4 relative z-10">
    <div className="relative max-w-xs" ref={organizationDropdownRef}>
      <button
        onClick={() => setOrganizationDropdownOpen(prev => !prev)}
