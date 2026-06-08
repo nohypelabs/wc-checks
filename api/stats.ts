@@ -76,80 +76,98 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const trendStartDate = (() => { const d = new Date(now); d.setDate(d.getDate() - trendDays); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
 
     // Parallel queries for better performance
-    const [
-      usersCount,
-      locationsCount,
-      inspectionsCount,
-      todayInspectionsCount,
-      yesterdayInspectionsCount,
-      inspections7dCount,
-      inspections30dCount,
-      activeUsersCount,
-      recentInspections,
-      dailyTrendData,
-    ] = await Promise.all([
-      // Total active users
-      supabase
-        .from('users')
-        .select('id', { count: 'exact', head: true })
-        .eq('is_active', true),
+    // Check if user is admin (level >= 80)
+      const isAdmin = auth.userRole.level >= 80;
+    
+      // For non-admin users, filter by their own user_id
+      const userIdFilter = isAdmin ? {} : { user_id: auth.userId };
 
-      // Total active locations
-      supabase
-        .from('locations')
-        .select('id', { count: 'exact', head: true })
-        .eq('is_active', true),
+      // Parallel queries for better performance
+      const [
+        usersCount,
+        locationsCount,
+        inspectionsCount,
+        todayInspectionsCount,
+        yesterdayInspectionsCount,
+        inspections7dCount,
+        inspections30dCount,
+        activeUsersCount,
+        recentInspections,
+        dailyTrendData,
+      ] = await Promise.all([
+        // Total active users (admin only, otherwise just count current user)
+        isAdmin
+          ? supabase
+              .from('users')
+              .select('id', { count: 'exact', head: true })
+              .eq('is_active', true)
+          : Promise.resolve({ count: 1, error: null }),
 
-      // Total inspections
-      supabase
-        .from('inspection_records')
-        .select('id', { count: 'exact', head: true }),
+        // Total active locations (all users can see)
+        supabase
+          .from('locations')
+          .select('id', { count: 'exact', head: true })
+          .eq('is_active', true),
 
-      // Today's inspections
-      supabase
-        .from('inspection_records')
-        .select('id', { count: 'exact', head: true })
-        .eq('inspection_date', today),
+        // Total inspections (filtered by user if not admin)
+        supabase
+          .from('inspection_records')
+          .select('id', { count: 'exact', head: true })
+          .match(userIdFilter),
 
-      // Yesterday's inspections
-      supabase
-        .from('inspection_records')
-        .select('id', { count: 'exact', head: true })
-        .eq('inspection_date', yesterday),
+        // Today's inspections (filtered by user if not admin)
+        supabase
+          .from('inspection_records')
+          .select('id', { count: 'exact', head: true })
+          .eq('inspection_date', today)
+          .match(userIdFilter),
 
-      // 7-day inspections
-      supabase
-        .from('inspection_records')
-        .select('id', { count: 'exact', head: true })
-        .gte('inspection_date', weekAgo),
+        // Yesterday's inspections (filtered by user if not admin)
+        supabase
+          .from('inspection_records')
+          .select('id', { count: 'exact', head: true })
+          .eq('inspection_date', yesterday)
+          .match(userIdFilter),
 
-      // 30-day inspections
-      supabase
-        .from('inspection_records')
-        .select('id', { count: 'exact', head: true })
-        .gte('inspection_date', monthAgo),
+        // 7-day inspections (filtered by user if not admin)
+        supabase
+          .from('inspection_records')
+          .select('id', { count: 'exact', head: true })
+          .gte('inspection_date', weekAgo)
+          .match(userIdFilter),
 
-      // Active users (logged in last 7 days)
-      supabase
-        .from('users')
-        .select('id', { count: 'exact', head: true })
-        .gte('last_login_at', weekAgo)
-        .eq('is_active', true),
+        // 30-day inspections (filtered by user if not admin)
+        supabase
+          .from('inspection_records')
+          .select('id', { count: 'exact', head: true })
+          .gte('inspection_date', monthAgo)
+          .match(userIdFilter),
 
-      // Recent inspections for score calculation (sample only)
-      supabase
-        .from('inspection_records')
-        .select('responses')
-        .limit(20),
+        // Active users (admin only, otherwise just count current user)
+        isAdmin
+          ? supabase
+              .from('users')
+              .select('id', { count: 'exact', head: true })
+              .gte('last_login_at', weekAgo)
+              .eq('is_active', true)
+          : Promise.resolve({ count: 1, error: null }),
 
-      // Daily trend — configurable period
-      supabase
-        .from('inspection_records')
-        .select('inspection_date')
-        .gte('inspection_date', trendStartDate)
-        .order('inspection_date', { ascending: true })
-        .range(0, 9999),
-    ]);
+        // Recent inspections for score calculation (filtered by user if not admin)
+        supabase
+          .from('inspection_records')
+          .select('responses')
+          .match(userIdFilter)
+          .limit(20),
+
+        // Daily trend — configurable period (filtered by user if not admin)
+        supabase
+          .from('inspection_records')
+          .select('inspection_date')
+          .gte('inspection_date', trendStartDate)
+          .match(userIdFilter)
+          .order('inspection_date', { ascending: true })
+          .range(0, 9999),
+      ]);
 
     // Calculate average score
     const calculateScore = (responses: any): number => {

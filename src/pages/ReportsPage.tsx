@@ -349,18 +349,19 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  </div>
  </div>
 
- {/* Right: Export dropdown */}
+ {/* Right: Export dropdown - Admin only */}
+ {isAdmin && (
  <div className="relative" ref={exportMenuRef}>
- <motion.button
- onClick={() => setExportMenuOpen(prev => !prev)}
- className="flex items-center gap-1.5 px-3.5 py-2 bg-white/10 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm shadow-lg text-xs font-semibold whitespace-nowrap"
- whileHover={{ scale: 1.02 }}
- whileTap={{ scale: 0.98 }}
- >
- <Download className="w-3.5 h-3.5" />
- <span>Export</span>
- <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
- </motion.button>
+   <motion.button
+     onClick={() => setExportMenuOpen(prev => !prev)}
+     className="flex items-center gap-1.5 px-3.5 py-2 bg-white/10 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm shadow-lg text-xs font-semibold whitespace-nowrap"
+     whileHover={{ scale: 1.02 }}
+     whileTap={{ scale: 0.98 }}
+   >
+     <Download className="w-3.5 h-3.5" />
+     <span>Export</span>
+     <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
+   </motion.button>
 
  <AnimatePresence>
  {exportMenuOpen && (
@@ -417,6 +418,7 @@ const buildingDropdownRef = useRef<HTMLDivElement>(null);
  )}
  </AnimatePresence>
  </div>
+ )}
  </div>
 
  {/* Filter + Stats Section */}
