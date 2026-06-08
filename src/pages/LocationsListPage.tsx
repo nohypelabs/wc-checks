@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useIsAdmin } from '../hooks/useIsAdmin';
+import toast from 'react-hot-toast';
 import { Sidebar } from '../components/mobile/Sidebar';
 import { BottomNav } from '../components/mobile/BottomNav';
 import {
@@ -109,8 +110,17 @@ export const LocationsListPage = () => {
    // Regular users must use QR scan button
    if (isAdmin) {
      navigate(`/inspect/${locationId}`);
+   } else {
+     // Show toast message for non-admin users
+     toast('Gunakan QR scan untuk inspeksi', {
+       icon: '📷',
+       style: {
+         background: '#1e293b',
+         color: '#fff',
+         border: '1px solid rgba(255,255,255,0.1)',
+       },
+     });
    }
-   // For non-admin, do nothing (view only)
  };
 
  if (authLoading) {
