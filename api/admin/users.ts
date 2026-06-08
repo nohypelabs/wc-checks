@@ -204,6 +204,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         operation = 'assigned';
       }
 
+      // Auto-activate user when role is assigned
+      await supabase
+        .from('users')
+        .update({ is_active: true, updated_at: new Date().toISOString() })
+        .eq('id', userId)
+        .eq('is_active', false);
+
       await createAuditLog(
         auth.userId,
         'ASSIGN_ROLE',
