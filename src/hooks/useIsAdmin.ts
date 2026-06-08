@@ -39,30 +39,15 @@ export function useIsAdmin() {
       }
 
       try {
-        // ✅ BACKEND API ONLY - No direct database queries
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-        const projectId = supabaseUrl.split('//')[1]?.split('.')[0];
+        // ✅ BACKEND API ONLY - Use supabase.auth.getSession() (reliable)
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        if (!projectId) {
-          console.error('[useIsAdmin] Invalid Supabase URL');
+        if (sessionError || !session?.access_token) {
+          console.error('[useIsAdmin] No session or token:', sessionError?.message);
           return { isAdmin: false, isSuperAdmin: false };
         }
 
-        const storageKey = `sb-${projectId}-auth-token`;
-        const sessionStr = localStorage.getItem(storageKey);
-
-        if (!sessionStr) {
-          console.error('[useIsAdmin] No session in localStorage');
-          return { isAdmin: false, isSuperAdmin: false };
-        }
-
-        const sessionData = JSON.parse(sessionStr);
-        const token = sessionData?.access_token;
-
-        if (!token) {
-          console.error('[useIsAdmin] No access token');
-          return { isAdmin: false, isSuperAdmin: false };
-        }
+        const token = session.access_token;
 
         // Call backend API for server-side role verification
         const response = await fetch('/api/auth/verify-role', {

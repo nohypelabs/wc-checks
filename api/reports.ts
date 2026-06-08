@@ -472,12 +472,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`[reports] Filtering by date: ${dateStr}, page: ${pageNum}, limit: ${limitNum}`);
       query = query.eq('inspection_date', dateStr);
 
-      // Get total count for pagination
-      const { count: totalCount } = await supabase
+      // Get total count for pagination (with proper filters)
+      let countQuery = supabase
         .from('inspection_records')
         .select('id', { count: 'exact', head: true })
-        .eq('inspection_date', dateStr)
-        .eq('user_id', targetUserId || '');
+        .eq('inspection_date', dateStr);
+      
+      // Only filter by user if targetUserId is set (non-admin)
+      if (targetUserId) {
+        countQuery = countQuery.eq('user_id', targetUserId);
+      }
+      
+      // Apply building filter via locations join if needed
+      if (buildingIdStr) {
+        countQuery = countQuery.eq('location.building_id', buildingIdStr);
+      }
+      
+      const { count: totalCount } = await countQuery;
 
       // Apply pagination
       query = query.range(offset, offset + limitNum - 1);
