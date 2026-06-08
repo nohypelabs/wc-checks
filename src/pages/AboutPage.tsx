@@ -1,6 +1,6 @@
 import { useState } from 'react';
 // src/pages/AboutPage.tsx
-import { Menu, CheckCircle, Github, Globe, Mail, Database, Lock, Server, Smartphone, Code, BarChart3, Shield, Users, QrCode, FileText, TrendingUp } from 'lucide-react';
+import { Menu, CheckCircle, Github, Globe, Mail, Database, Lock, Server, Smartphone, Code, BarChart3, Shield, Users, QrCode, FileText, TrendingUp, Tag } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { BottomNav } from '../components/mobile/BottomNav';
 import { Sidebar } from '../components/mobile/Sidebar';
@@ -721,6 +721,39 @@ export const AboutPage = () => {
  </div>
  </a>
  </div>
+ </Card>
+
+ {/* Changelog */}
+ <Card>
+   <div className="flex items-start gap-3 mb-4">
+     <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+       <Tag className="w-5 h-5 text-purple-300" />
+     </div>
+     <div>
+       <h3 className="font-bold text-white">Changelog</h3>
+       <p className="text-sm text-white/50">Riwayat pembaruan aplikasi</p>
+     </div>
+   </div>
+  
+   <div className="space-y-4">
+     {/* Version 4.0.1 */}
+     <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+       <div className="flex items-center justify-between mb-2">
+         <div className="flex items-center gap-2">
+           <span className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded">v4.0.1</span>
+           <span className="text-white/50 text-xs">3 Juni 2026</span>
+         </div>
+       </div>
+       <h4 className="font-semibold text-white text-sm mb-2">UI/UX Overhaul - Dark Navy Theme</h4>
+       <ul className="text-xs text-white/60 space-y-1">
+         <li>• Dark navy background di semua halaman</li>
+         <li>• Glassmorphism cards dengan efek blur</li>
+         <li>• Semua emoji diganti Lucide React icons</li>
+         <li>• Header 30% lebih tinggi di semua page</li>
+         <li>• Form inspeksi lebih compact dan clean</li>
+       </ul>
+     </div>
+   </div>
  </Card>
 
  {/* Legal */}

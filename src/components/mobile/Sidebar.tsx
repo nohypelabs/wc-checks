@@ -52,7 +52,6 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { icon: Settings, label: 'Pengaturan', path: '/settings', description: 'Preferensi aplikasi' },
     { icon: HelpCircle, label: 'Bantuan & FAQ', path: '/help', description: 'Panduan penggunaan' },
     { icon: Info, label: 'Tentang Aplikasi', path: '/about', description: 'Versi & informasi' },
-  { icon: Tag, label: 'Changelog', path: '/changelog', description: 'Riwayat pembaruan' },
   ];
 
   const adminMenuItems = [
