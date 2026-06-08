@@ -152,7 +152,7 @@ export const UserManagement = () => {
   return (
     <div className="min-h-screen bg-slate-900 pb-24 lg:pb-6">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="max-w-2xl mx-auto">
+      <div className="">
 
       {/* Header */}
       <div className="bg-slate-800 border-b border-white/10 px-4 py-5 rounded-b-3xl">
@@ -345,11 +345,25 @@ export const UserManagement = () => {
                         {u.approval_status}
                       </span>
                     )}
-                    {u.is_active ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    ) : (
-                      <XCircle className="w-4 h-4 text-red-400" />
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleStatus(u.id, u.is_active ?? true);
+                      }}
+                      disabled={toggleStatusMutation.isPending}
+                      className={`p-1 rounded-lg transition-colors ${
+                        u.is_active
+                          ? 'hover:bg-emerald-500/20 text-emerald-400'
+                          : 'hover:bg-red-500/20 text-red-400'
+                      } disabled:opacity-40`}
+                      title={u.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                    >
+                      {u.is_active ? (
+                        <CheckCircle2 className="w-4 h-4" />
+                      ) : (
+                        <XCircle className="w-4 h-4" />
+                      )}
+                    </button>
                     <ChevronDown className={`w-4 h-4 text-white/30 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                   </div>
                 </button>
