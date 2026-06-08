@@ -46,8 +46,8 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/', description: 'Beranda utama' },
-    { icon: MapPin, label: 'Lokasi', path: '/locations', description: 'Daftar semua lokasi' },
     { icon: FileText, label: 'Laporan', path: '/reports', description: 'Riwayat inspeksi' },
+    { icon: MapPin, label: 'Lokasi', path: '/locations', description: 'Daftar semua lokasi' },
     { icon: BarChart3, label: 'Analitik', path: '/analytics', description: 'Statistik & wawasan' },
     { icon: Settings, label: 'Pengaturan', path: '/settings', description: 'Preferensi aplikasi' },
     { icon: HelpCircle, label: 'Bantuan & FAQ', path: '/help', description: 'Panduan penggunaan' },
