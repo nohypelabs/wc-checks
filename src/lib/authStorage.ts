@@ -13,6 +13,10 @@ import type { Session } from '@supabase/supabase-js';
  * - Use authStorage.isValid() to check before auth operations
  */
 
+// ✅ Add retry logic for storage operations
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
 export const authStorage = {
   /**
    * Save session to storage

@@ -41,6 +41,8 @@ export function useAuth(): UseAuthReturn {
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const initRef = useRef(false); // ✅ Prevent double init
+  const retryCountRef = useRef(0); // ✅ Track retry attempts
+  const maxRetries = 3; // ✅ Maximum retry attempts
 
   // ⚡ Fast profile fetch with cache (profile data rarely changes)
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
@@ -104,6 +106,23 @@ export function useAuth(): UseAuthReturn {
     setProfile(profileData);
   }, [user?.id]);
 
+  // ✅ Retry logic for failed auth attempts
+  const retryAuth = useCallback(async (): Promise<boolean> => {
+    if (retryCountRef.current >= maxRetries) {
+      console.error('❌ Max retry attempts reached');
+      return false;
+    }
+
+    retryCountRef.current++;
+    console.log(`🔄 Retrying auth attempt ${retryCountRef.current}/${maxRetries}`);
+
+    // Wait before retry (exponential backoff)
+    const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 5000);
+    await new Promise(resolve => setTimeout(resolve, delay));
+
+    return true;
+  }, []);
+
   // ✅ Initialize ONCE with timeout protection
   useEffect(() => {
     if (initRef.current) {
@@ -115,7 +134,7 @@ export function useAuth(): UseAuthReturn {
     const initAuth = async () => {
       console.log('🔐 Initializing auth...');
 
-      // ✅ TIMEOUT protection: Force complete after 5 seconds
+      // ✅ TIMEOUT protection: Force complete after 10 seconds (increased from 5)
       const timeoutId = setTimeout(() => {
         console.warn('⚠️ Auth timeout - session may have expired');
         setLoading(false);
@@ -123,7 +142,7 @@ export function useAuth(): UseAuthReturn {
         if (!user) {
           setSessionExpired(true);
         }
-      }, 5000);
+      }, 10000); // Increased to 10 seconds
 
       try {
         console.log('[useAuth] Calling supabase.auth.getSession()...');
@@ -138,6 +157,16 @@ export function useAuth(): UseAuthReturn {
           setUser(null);
           setProfile(null);
           setLoading(false);
+          
+          // ✅ If there's an error, try to retry
+          if (sessionError) {
+            const shouldRetry = await retryAuth();
+            if (shouldRetry) {
+              // Retry auth initialization
+              initAuth();
+              return;
+            }
+          }
           return;
         }
 
@@ -163,9 +192,16 @@ export function useAuth(): UseAuthReturn {
         });
       } catch (err) {
         console.error('❌ Auth init error:', err);
+        clearTimeout(timeoutId);
         setUser(null);
         setProfile(null);
         setLoading(false);
+        
+        // ✅ Retry on catch
+        const shouldRetry = await retryAuth();
+        if (shouldRetry) {
+          initAuth();
+        }
       }
     };
 

@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
+import { Wifi, WifiOff } from 'lucide-react';
 import { CustomToaster } from './lib/toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
@@ -15,6 +16,8 @@ import { FeatureTour } from './components/tour/FeatureTour';
 import { useAuth } from './hooks/useAuth';
 // import { useIsAdmin } from './hooks/useIsAdmin';
 import { logger } from './lib/logger';
+import { supabase } from './lib/supabase';
+import { useNetworkStatus } from './hooks/useNetworkStatus';
 import './App.css';
 
 // EAGER LOAD: Critical pages (login flow only)
@@ -151,6 +154,7 @@ const NotFoundPage = () => (
 
 function AppContent() {
  const { user, loading, sessionExpired, clearSessionExpired, signOut } = useAuth();
+ const { isOnline, isReconnecting } = useNetworkStatus();
 
  // DEBUG: Log auth state
  console.log('[AppContent] render:', JSON.stringify({ loading, hasUser: !!user, userId: user?.id }));
@@ -163,6 +167,9 @@ function AppContent() {
 
  console.log('[AppContent] Auth loaded, rendering routes');
  const location = useLocation();
+
+  // Network status indicator
+  const showNetworkStatus = !isOnline || isReconnecting;
 
  return (
  <>
@@ -307,9 +314,52 @@ function AppContent() {
   {user && <FeatureTour />}
   {sessionExpired && (
     <SessionExpiredModal
-      onLogin={() => { clearSessionExpired(); signOut(); window.location.href = '/login'; }}
-      onRefresh={() => { clearSessionExpired(); window.location.reload(); }}
+       onLogin={() => { 
+         clearSessionExpired(); 
+         signOut(); 
+         // Small delay to ensure signOut completes
+         setTimeout(() => {
+           window.location.href = '/login';
+         }, 100);
+       }}
+       onRefresh={() => { 
+         clearSessionExpired(); 
+         // Try to refresh session first, then reload
+         supabase.auth.getSession().then(({ data: { session } }) => {
+           if (session) {
+             // Session is still valid, just reload
+             window.location.reload();
+           } else {
+             // Session expired, redirect to login
+             signOut();
+             setTimeout(() => {
+               window.location.href = '/login';
+             }, 100);
+           }
+         }).catch(() => {
+           // On error, reload anyway
+           window.location.reload();
+         });
+       }}
     />
+    )}
+
+  {/* Network Status Indicator */}
+  {showNetworkStatus && (
+    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[90] px-4 py-2 rounded-full shadow-lg transition-all duration-300 ${
+      isOnline ? 'bg-yellow-500/90 text-yellow-900' : 'bg-red-500/90 text-white'
+    }`}>
+      <div className="flex items-center gap-2">
+        {isOnline ? (
+          <Wifi className="w-4 h-4" />
+        ) : (
+          <WifiOff className="w-4 h-4" />
+        )}
+        <span className="text-sm font-medium">
+          {isOnline ? 'Menghubungkan...' : 'Tidak ada koneksi internet'}
+        </span>
+      </div>
+    </div>
   )}
  </>
  );
