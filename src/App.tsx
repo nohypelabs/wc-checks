@@ -7,13 +7,13 @@ import { CustomToaster } from './lib/toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DebugPanel } from './components/DebugPanel';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
-import { UpdateNotification } from './components/common/UpdateNotification';
+// import { UpdateNotification } from './components/common/UpdateNotification';
 import { PageTransition } from './components/layout/PageTransition';
-import { IncomingFeaturesModal } from './components/common/IncomingFeaturesModal';
+// import { IncomingFeaturesModal } from './components/common/IncomingFeaturesModal';
 import { SessionExpiredModal } from './components/modals/SessionExpiredModal';
 import { FeatureTour } from './components/tour/FeatureTour';
 import { useAuth } from './hooks/useAuth';
-import { useIsAdmin } from './hooks/useIsAdmin';
+// import { useIsAdmin } from './hooks/useIsAdmin';
 import { logger } from './lib/logger';
 import './App.css';
 
@@ -302,8 +302,8 @@ function AppContent() {
  </Routes>
  </Suspense>
  </AnimatePresence>
-  {user && <UpdateNotification />}
-  {user && <IncomingFeaturesModal />}
+  
+  
   {user && <FeatureTour />}
   {sessionExpired && (
     <SessionExpiredModal
