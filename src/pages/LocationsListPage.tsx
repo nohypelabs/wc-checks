@@ -24,11 +24,11 @@ import {
 interface Location {
  id: string;
  name: string;
- building: string | null;
  floor: string | null;
  code: string | null;
  is_active: boolean;
- building_id: string | null;
+ organization_id: string | null;
+ organization_name: string | null;
 }
 
 export const LocationsListPage = () => {
@@ -38,7 +38,7 @@ export const LocationsListPage = () => {
 
  const [sidebarOpen, setSidebarOpen] = useState(false);
  const [searchQuery, setSearchQuery] = useState('');
- const [expandedBuildings, setExpandedBuildings] = useState<Set<string>>(new Set());
+ const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
 
  const isReady = !authLoading && !!user?.id;
 
@@ -53,8 +53,8 @@ export const LocationsListPage = () => {
  floor,
  code,
  is_active,
- building_id,
- buildings!building_id (
+ organization_id,
+ organizations!organization_id (
  name
  )
  `)
@@ -69,8 +69,8 @@ export const LocationsListPage = () => {
  floor: loc.floor,
  code: loc.code,
  is_active: loc.is_active,
- building_id: loc.building_id,
- building: loc.buildings?.name || null,
+ organization_id: loc.organization_id,
+ organization_name: loc.organizations?.name || null,
  })) as Location[];
  },
  enabled: isReady,
@@ -78,28 +78,28 @@ export const LocationsListPage = () => {
 
  const filteredLocations = locations?.filter(loc =>
  loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
- (loc.building?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+ (loc.organization_name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
  (loc.floor?.toLowerCase() || '').includes(searchQuery.toLowerCase())
  ) || [];
 
  const groupedLocations = filteredLocations.reduce((acc, loc) => {
- const buildingKey = loc.building || 'No Building';
- if (!acc[buildingKey]) {
- acc[buildingKey] = [];
+ const orgKey = loc.organization_name || 'No Organization';
+ if (!acc[orgKey]) {
+ acc[orgKey] = [];
  }
- acc[buildingKey].push(loc);
+ acc[orgKey].push(loc);
  return acc;
  }, {} as Record<string, Location[]>);
 
- const buildingCount = Object.keys(groupedLocations).length;
+ const orgCount = Object.keys(groupedLocations).length;
 
- const toggleBuilding = (building: string) => {
- setExpandedBuildings(prev => {
+ const toggleOrg = (org: string) => {
+ setExpandedOrgs(prev => {
  const next = new Set(prev);
- if (next.has(building)) {
- next.delete(building);
+ if (next.has(org)) {
+ next.delete(org);
  } else {
- next.add(building);
+ next.add(org);
  }
  return next;
  });
@@ -211,7 +211,7 @@ export const LocationsListPage = () => {
  <div className="flex items-center gap-3 text-[10px] lg:text-xs text-white/60 font-medium">
  <span>{filteredLocations.length} lokasi</span>
  <span className="w-1 h-1 rounded-full bg-white/30 lg:bg-white/30" />
- <span>{buildingCount} gedung</span>
+ <span>{orgCount} organisasi</span>
  </div>
  )}
  </div>
@@ -242,20 +242,20 @@ export const LocationsListPage = () => {
  </motion.div>
  ) : (
  <div className="space-y-2 lg:space-y-2.5">
- {Object.entries(groupedLocations).map(([building, locs], groupIdx) => {
- const isExpanded = expandedBuildings.has(building);
+ {Object.entries(groupedLocations).map(([org, locs], groupIdx) => {
+ const isExpanded = expandedOrgs.has(org);
 
  return (
  <motion.div
- key={building}
+ key={org}
  initial={{ opacity: 0, y: 10 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ delay: groupIdx * 0.05, duration: 0.3 }}
  className="bg-white/8 backdrop-blur-sm border border-white/15 rounded-2xl overflow-hidden"
  >
- {/* Building header — clickable */}
+ {/* Organization header — clickable */}
  <button
- onClick={() => toggleBuilding(building)}
+ onClick={() => toggleOrg(org)}
  className="w-full flex items-center justify-between px-3 py-2.5 lg:px-4 lg:py-3 hover:bg-white/10 transition-colors"
  >
  <div className="flex items-center gap-2">
@@ -263,7 +263,7 @@ export const LocationsListPage = () => {
  <Building2 className="w-3.5 h-3.5 text-white" />
  </div>
  <div className="text-left">
- <span className="text-sm font-semibold text-white">{building}</span>
+ <span className="text-sm font-semibold text-white">{org}</span>
  <span className="text-[10px] text-white/50 ml-1.5">({locs.length})</span>
  </div>
  </div>

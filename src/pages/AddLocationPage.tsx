@@ -132,44 +132,54 @@ export const AddLocationPage = () => {
  console.log('🔵 Mutation starting', { data, userId: user?.id });
 
  if (!user?.id) throw new Error('User not authenticated');
- if (!data.organization_id || !data.building_id) {
- throw new Error('Organization and Building are required');
+ if (!data.organization_id) {
+ throw new Error('Organization is required');
  }
 
- console.log('🔵 Fetching building info for QR code generation...');
- // Fetch building to generate QR code
- const { data: building, error: buildingError } = await supabase
- .from('buildings')
- .select('short_code, organizations(short_code)')
- .eq('id', data.building_id)
+ console.log('🔵 Generating QR code...');
+
+ // Fetch organization code
+ const { data: org, error: orgError } = await supabase
+ .from('organizations')
+ .select('short_code')
+ .eq('id', data.organization_id)
  .single();
 
- if (buildingError || !building) {
- console.error('❌ Building not found:', buildingError);
- throw new Error('Building not found');
+ if (orgError || !org) {
+ console.error('❌ Organization not found:', orgError);
+ throw new Error('Organization not found');
  }
 
- console.log('✅ Building found:', building);
-
- // Generate QR code
- const orgCode = (building.organizations as any).short_code;
- const buildingCode = building.short_code;
+ const orgCode = org.short_code;
  const locationCode = data.code || 'LOC';
  const uniqueId = Date.now().toString(36).slice(-4);
 
- const qrCode = `${orgCode}-${buildingCode}-${locationCode}-${uniqueId}`.toUpperCase();
+ // QR code: org-building-location-unique or org-location-unique
+ let qrCode: string;
+ if (data.building_id) {
+ const { data: building } = await supabase
+ .from('buildings')
+ .select('short_code')
+ .eq('id', data.building_id)
+ .single();
+ const buildingCode = building?.short_code || 'BLD';
+ qrCode = `${orgCode}-${buildingCode}-${locationCode}-${uniqueId}`.toUpperCase();
+ } else {
+ qrCode = `${orgCode}-${locationCode}-${uniqueId}`.toUpperCase();
+ }
+
  console.log('✅ Generated QR code:', qrCode);
 
  // Create location object
  const newLocation: LocationInsert = {
  name: data.name.trim(),
- code: data.code.trim() || null,
+ code: data.code?.trim() || null,
  organization_id: data.organization_id,
- building_id: data.building_id,
- floor: data.floor.trim() || null,
+ building_id: data.building_id || null,
+ floor: data.floor?.trim() || null,
  area: data.area || null,
- section: data.section.trim() || null,
- description: data.description.trim() || null,
+ section: data.section?.trim() || null,
+ description: data.description?.trim() || null,
  qr_code: qrCode,
  is_active: true,
  created_by: user.id,
@@ -213,10 +223,7 @@ export const AddLocationPage = () => {
  toast.error('Please select an organization');
  return;
  }
- if (!formData.building_id) {
- toast.error('Please select a building');
- return;
- }
+ // building_id is optional (buildings table is for physical buildings)
  if (!formData.name.trim()) {
  toast.error('Location name is required');
  return;

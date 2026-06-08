@@ -5,9 +5,9 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
 import { useLocations, useDeleteLocation } from '../../hooks/useLocations';
-import { useBuildings } from '../../hooks/useBuildings';
+import { useOrganizations } from '../../hooks/useOrganizations';
 import { Tables, TablesInsert } from '../../types/database.types';
-import { Plus, Edit2, Trash2, MapPin, QrCode, Search, MoreVertical, Copy, User, ShieldAlert, Menu, CheckSquare, Square, Download, BarChart3, X, Check, Power, PowerOff, Building2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, MapPin, QrCode, Search, MoreVertical, Copy, User, ShieldAlert, Menu, CheckSquare, Square, Download, BarChart3, X, Power, PowerOff, Building2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { QRCodeGenerator } from './QRCodeGenerator';
@@ -25,6 +25,7 @@ export const LocationsManager = () => {
  const navigate = useNavigate();
  const { user, loading: authLoading } = useAuth();
  const { isAdmin, loading: adminLoading } = useIsAdmin();
+ const queryClient = useQueryClient();
 
  console.log('🟢 LocationsManager: Auth state', {
  hasUser: !!user,
@@ -42,24 +43,23 @@ export const LocationsManager = () => {
  const [sidebarOpen, setSidebarOpen] = useState(false);
  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
  const [showAnalytics, setShowAnalytics] = useState(false);
- const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
+ const [selectedOrgId, setSelectedOrgId] = useState<string>('');
 
  // Fetch locations via BACKEND API
  const { data: locations, isLoading } = useLocations({});
 
- // Fetch buildings for filter dropdown
- const { data: buildings } = useBuildings({});
+ // Fetch organizations for filter dropdown
+ const { data: organizations } = useOrganizations();
 
- // Filter locations by search term and building
+ // Filter locations by search term and organization
  const filteredLocations = locations?.filter(loc => {
  const matchesSearch =
  loc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
- loc.building?.toLowerCase().includes(searchTerm.toLowerCase()) ||
  loc.code?.toLowerCase().includes(searchTerm.toLowerCase());
 
- const matchesBuilding = !selectedBuildingId || loc.building_id === selectedBuildingId;
+ const matchesOrg = !selectedOrgId || loc.organization_id === selectedOrgId;
 
- return matchesSearch && matchesBuilding;
+ return matchesSearch && matchesOrg;
  });
 
  // Backend API hook for delete
@@ -89,7 +89,7 @@ export const LocationsManager = () => {
 
  const handleBulkQR = () => {
  if (!filteredLocations || filteredLocations.length === 0) {
- toast.error('No locations available for selected building');
+ toast.error('Tidak ada lokasi untuk filter ini');
  return;
  }
  setQrLocations(filteredLocations);
@@ -184,7 +184,7 @@ export const LocationsManager = () => {
  */
  };
 
- const handleBulkActivate = (isActive: boolean) => {
+ const handleBulkActivate = (_isActive: boolean) => {
  toast.error('Bulk operations not yet implemented');
  /*
  if (selectedIds.size === 0) {
@@ -358,18 +358,18 @@ export const LocationsManager = () => {
  />
  </div>
 
- {/* Building Filter */}
+ {/* Organization Filter */}
  <div className="relative">
  <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5" />
  <select
- value={selectedBuildingId}
- onChange={(e) => setSelectedBuildingId(e.target.value)}
+ value={selectedOrgId}
+ onChange={(e) => setSelectedOrgId(e.target.value)}
  className="w-full pl-10 pr-4 py-3 text-white bg-slate-800/80 border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-md placeholder-white/40"
  >
- <option value="">Semua Gedung</option>
- {buildings?.map((building) => (
- <option key={building.id} value={building.id}>
- {building.name}
+ <option value="">Semua Organisasi</option>
+ {organizations?.map((org) => (
+ <option key={org.id} value={org.id}>
+ {org.name}
  </option>
  ))}
  </select>
@@ -721,7 +721,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  const [organizations, setOrganizations] = useState<any[]>([]);
  const [buildings, setBuildings] = useState<any[]>([]);
  const [loading, setLoading] = useState(false);
- const [loadingOrganizations, setLoadingOrganizations] = useState(true);
+ const [_loadingOrganizations, setLoadingOrganizations] = useState(true);
 
  const [formData, setFormData] = useState<Partial<LocationInsert>>({
  name: location?.name || '',
@@ -793,8 +793,8 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  const saveMutation = useMutation({
  mutationFn: async (data: Partial<LocationInsert>) => {
  // Validasi UUID
- if (!data.organization_id || !data.building_id) {
- throw new Error('Organization and Building are required');
+ if (!data.organization_id) {
+ throw new Error('Organization is required');
  }
 
  if (location) {
@@ -818,30 +818,35 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
 
  if (error) throw error;
  } else {
- // INSERT new location using TablesInsert type
- const { data: building, error: buildingError } = await supabase
- .from('buildings')
- .select('short_code, organizations(short_code)')
- .eq('id', data.building_id)
+ // Generate QR code
+ const { data: org } = await supabase
+ .from('organizations')
+ .select('short_code')
+ .eq('id', data.organization_id)
  .single();
 
- if (buildingError || !building) {
- throw new Error('Building not found');
- }
-
- // Generate QR code
- const orgCode = (building.organizations as any).short_code;
- const buildingCode = building.short_code;
+ const orgCode = org?.short_code || 'ORG';
  const locationCode = data.code || 'LOC';
  const uniqueId = Date.now().toString(36).slice(-4);
- 
- const qrCode = orgCode + '-' + buildingCode + '-' + locationCode + '-' + uniqueId;
+
+ let qrCode: string;
+ if (data.building_id) {
+ const { data: building } = await supabase
+ .from('buildings')
+ .select('short_code')
+ .eq('id', data.building_id)
+ .single();
+ const buildingCode = building?.short_code || 'BLD';
+ qrCode = orgCode + '-' + buildingCode + '-' + locationCode + '-' + uniqueId;
+ } else {
+ qrCode = orgCode + '-' + locationCode + '-' + uniqueId;
+ }
 
  const newLocation: LocationInsert = {
  name: data.name!,
  code: data.code,
  organization_id: data.organization_id!,
- building_id: data.building_id!,
+ building_id: data.building_id || null,
  floor: data.floor,
  area: data.area,
  section: data.section,
@@ -881,10 +886,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  return;
  }
 
- if (!formData.building_id) {
- toast.error('Building is required');
- return;
- }
+ // building_id is optional now (buildings table is for physical buildings)
 
  saveMutation.mutate(formData);
  };
@@ -925,22 +927,22 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  </select>
  </div>
 
- {/* Building Dropdown */}
+ {/* Building Dropdown (optional) */}
  <div>
  <label className="block text-sm font-medium text-white/80 mb-1">
- Building *
+ Building (opsional)
  </label>
  <select
  value={formData.building_id || ''}
- onChange={(e) => setFormData({ ...formData, building_id: e.target.value })}
+ onChange={(e) => setFormData({ ...formData, building_id: e.target.value || null })}
  className="w-full px-4 py-2 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
- required
  disabled={!formData.organization_id || loading || saveMutation.isPending}
  >
  <option value="">
- {loading ? 'Loading buildings...' : 
- !formData.organization_id ? 'Select organization first' : 
- 'Select Building'}
+ {loading ? 'Loading...' :
+ !formData.organization_id ? 'Pilih organisasi dulu' :
+ buildings.length === 0 ? 'Belum ada gedung' :
+ 'Pilih Gedung'}
  </option>
  {buildings.map((building) => (
  <option key={building.id} value={building.id}>
@@ -1060,7 +1062,7 @@ const LocationFormModal = ({ location, onClose, onSuccess }: LocationFormModalPr
  <Button
  type="submit"
  className="flex-1"
- disabled={saveMutation.isPending || !formData.name || !formData.organization_id || !formData.building_id}
+ disabled={saveMutation.isPending || !formData.name || !formData.organization_id}
  >
  {saveMutation.isPending ? 'Saving...' : location ? 'Update' : 'Create'}
  </Button>

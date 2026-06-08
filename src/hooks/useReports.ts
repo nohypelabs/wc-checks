@@ -12,10 +12,10 @@ export interface InspectionReport {
   location: {
     id: string;
     name: string;
-    building: string;
-    floor: string;
+    building: string | null;
+    floor: string | null;
     organization_id: string;
-    building_id: string;
+    building_id: string | null;
     organization?: {
       id: string;
       name: string;

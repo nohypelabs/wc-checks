@@ -16,6 +16,8 @@ export interface LocationCoordinates {
 
 export interface LocationFormData {
   name: string;
+  organization_id: string;
+  building_id?: string | null;
   code?: string | null;
   building?: string | null;
   floor?: string | null;
@@ -50,6 +52,8 @@ export const createLocation = async (
     const insertData: TablesInsert<'locations'> = {
       id: locationId,
       name: locationData.name,
+      organization_id: locationData.organization_id,
+      building_id: locationData.building_id || null,
       code: locationData.code || null,
       building: locationData.building || null,
       floor: locationData.floor || null,
@@ -76,6 +80,13 @@ export const createLocation = async (
     console.error('Error creating location:', error);
     throw error;
   }
+};
+
+export const validateLocationData = (data: { name: string; organization_id?: string; building_id?: string | null }): { valid: boolean; errors: Record<string, string> } => {
+  const errors: Record<string, string> = {};
+  if (!data.name?.trim()) errors.name = 'Name is required';
+  if (!data.organization_id) errors.organization_id = 'Organization is required';
+  return { valid: Object.keys(errors).length === 0, errors };
 };
 
 export const updateLocation = async (

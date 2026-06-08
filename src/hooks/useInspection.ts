@@ -21,7 +21,7 @@ interface LocationWithDetails {
   floor: string | null;
   area: string | null;
   code: string | null;
-  building_id: string;
+  building_id: string | null;
   organization_id: string;
   qr_code: string;
   is_active: boolean | null;

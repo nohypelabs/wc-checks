@@ -35,7 +35,7 @@ pnpm test:coverage
 
 ## Architecture
 
-**WC-Checks** is a toilet inspection management PWA. React 18 + TypeScript SPA built with Vite, Vercel serverless functions for the backend API, and Supabase (PostgreSQL + auth) as the database.
+**WC-Checks** is a toilet inspection management app. React 18 + TypeScript SPA built with Vite, Vercel serverless functions for the backend API, and Supabase (PostgreSQL + auth) as the database.
 
 ### Key Layer Separation
 
@@ -50,7 +50,7 @@ Pages → Custom Hooks → Backend API (/api/*) → Supabase (service key)
 
 ### State Management
 
-Server state lives in TanStack Query (2-minute stale time, 5-minute gc). Zustand is available (`^5.0.8`) but only used sparingly — server data goes through TanStack Query, not Zustand stores. Local UI state uses `useState`/`useReducer`. Auth state comes from `useAuth` (wraps Supabase auth listener with PKCE flow, session in localStorage).
+Server state lives in TanStack Query (global `staleTime: 0` — always considered stale for real-time feel). Individual hooks override this (e.g., `useInspections` uses 30s, `useIsAdmin` uses 30min). `gcTime` is 5 minutes globally. Data is persisted to localStorage via `createSyncStoragePersister`. Zustand is available (`^5.0.8`) but only used sparingly — server data goes through TanStack Query, not Zustand stores. Local UI state uses `useState`/`useReducer`. Auth state comes from `useAuth` (wraps Supabase auth listener with PKCE flow, session in localStorage).
 
 ### Routing
 
@@ -79,13 +79,21 @@ Exports a typed `db` helper object (`db.users`, `db.buildings`, `db.locations`, 
 
 Vitest configures `@` → `./src` for test imports. **tsconfig.json does not have this alias** — use relative imports (`../lib/supabase`) in source code, `@/lib/supabase` only in tests.
 
+### Forms
+
+Forms use React Hook Form 7 with Zod schemas for validation (via `@hookform/resolvers/zod`). Zod schemas define both form validation and runtime type inference.
+
 ### Image Handling
 
 Photos are compressed client-side via `browser-image-compression` (max 1 MB) before upload to Cloudinary. The Cloudinary cloud name and upload preset come from `VITE_CLOUDINARY_*` env vars.
 
+### QR Codes & PDF
+
+QR scanning uses `html5-qrcode`. QR generation uses `qrcode` (data URLs) and `qrcode.react` (React components). PDF reports are generated client-side with `jspdf` + `jspdf-autotable`.
+
 ### Build
 
-Vite splits vendor chunks explicitly (react, router, supabase, query, lucide, framer-motion, jspdf, qr) plus page-level chunks (admin, reports, inspection). PWA/service worker is intentionally **disabled**. Console statements are dropped in production (`drop_console: mode === 'production'`).
+Vite splits vendor chunks explicitly (react, router, supabase, query, lucide, framer-motion, jspdf, qr) plus page-level chunks (admin, reports, inspection). PWA/service worker is intentionally **disabled** (unregistered on startup in `main.tsx`). Console statements are dropped in production (`drop_console: mode === 'production'`).
 
 ### Testing
 

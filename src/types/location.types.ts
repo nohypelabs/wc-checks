@@ -16,7 +16,7 @@ export interface LocationFormData {
   // Required fields
   name: string;
   organization_id: string;
-  building_id: string;
+  building_id?: string | null; // Optional: building may not exist yet
 
   // Optional location details
   floor?: string;
@@ -60,7 +60,7 @@ export interface QRCodeData {
   locationId: string;
   locationName: string;
   organizationCode: string;
-  buildingCode: string;
+  buildingCode?: string; // Optional: building may not exist
   locationCode?: string;
 }
 

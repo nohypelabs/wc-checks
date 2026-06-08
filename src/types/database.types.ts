@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          error_message: string | null
+          id: string
+          resource_id: string | null
+          resource_type: string | null
+          success: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          success?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          success?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buildings: {
         Row: {
           address: string | null
@@ -212,7 +256,7 @@ export type Database = {
         Row: {
           area: string | null
           building: string | null
-          building_id: string
+          building_id: string | null
           code: string | null
           coordinates: Json | null
           created_at: string | null
@@ -231,7 +275,7 @@ export type Database = {
         Insert: {
           area?: string | null
           building?: string | null
-          building_id: string
+          building_id?: string | null
           code?: string | null
           coordinates?: Json | null
           created_at?: string | null
@@ -250,7 +294,7 @@ export type Database = {
         Update: {
           area?: string | null
           building?: string | null
-          building_id?: string
+          building_id?: string | null
           code?: string | null
           coordinates?: Json | null
           created_at?: string | null
@@ -533,13 +577,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "user_roles_assigned_by_fkey"
-            columns: ["assigned_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "user_roles_role_id_fkey"
             columns: ["role_id"]
             isOneToOne: false
@@ -557,6 +594,7 @@ export type Database = {
       }
       users: {
         Row: {
+          approval_status: string | null
           can_submit: boolean | null
           created_at: string | null
           email: string
@@ -565,12 +603,14 @@ export type Database = {
           is_active: boolean | null
           last_login_at: string | null
           occupation_id: string | null
+          organization_id: string | null
           password_hash: string | null
           phone: string | null
           profile_photo_url: string | null
           updated_at: string | null
         }
         Insert: {
+          approval_status?: string | null
           can_submit?: boolean | null
           created_at?: string | null
           email: string
@@ -579,12 +619,14 @@ export type Database = {
           is_active?: boolean | null
           last_login_at?: string | null
           occupation_id?: string | null
+          organization_id?: string | null
           password_hash?: string | null
           phone?: string | null
           profile_photo_url?: string | null
           updated_at?: string | null
         }
         Update: {
+          approval_status?: string | null
           can_submit?: boolean | null
           created_at?: string | null
           email?: string
@@ -593,6 +635,7 @@ export type Database = {
           is_active?: boolean | null
           last_login_at?: string | null
           occupation_id?: string | null
+          organization_id?: string | null
           password_hash?: string | null
           phone?: string | null
           profile_photo_url?: string | null
@@ -604,6 +647,13 @@ export type Database = {
             columns: ["occupation_id"]
             isOneToOne: false
             referencedRelation: "user_occupations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "users_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -661,6 +711,18 @@ export type Database = {
       }
     }
     Functions: {
+      create_audit_log: {
+        Args: {
+          p_action: string
+          p_details?: Json
+          p_error_message?: string
+          p_resource_id?: string
+          p_resource_type: string
+          p_success?: boolean
+          p_user_id: string
+        }
+        Returns: string
+      }
       get_user_role_level: { Args: never; Returns: number }
       is_admin: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
@@ -669,8 +731,8 @@ export type Database = {
         Returns: boolean
       }
       user_has_role_level:
-        | { Args: { required_level: string }; Returns: boolean }
         | { Args: { min_level: number }; Returns: boolean }
+        | { Args: { required_level: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
