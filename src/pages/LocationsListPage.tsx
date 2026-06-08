@@ -105,7 +105,12 @@ export const LocationsListPage = () => {
  };
 
  const handleSelectLocation = (locationId: string) => {
- navigate(`/inspect/${locationId}`);
+   // Only allow admin to inspect from locations page
+   // Regular users must use QR scan button
+   if (isAdmin) {
+     navigate(`/inspect/${locationId}`);
+   }
+   // For non-admin, do nothing (view only)
  };
 
  if (authLoading) {
