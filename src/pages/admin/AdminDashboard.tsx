@@ -71,10 +71,10 @@ export const AdminDashboard = () => {
  Selamat datang, {isAdmin ? 'Admin' : 'User'} <span className="font-semibold text-white">{profile?.full_name?.split(' ')[0] || ''}</span>
  </span>
  <button
- onClick={() => navigate('/profile')}
- className="p-1.5 hover:bg-white/15 rounded-lg transition-colors"
+   onClick={() => navigate('/settings')}
+   className="p-1.5 hover:bg-white/15 rounded-lg transition-colors"
  >
- <Settings className="w-4 h-4" />
+   <Settings className="w-4 h-4" />
  </button>
  </div>
  </div>
