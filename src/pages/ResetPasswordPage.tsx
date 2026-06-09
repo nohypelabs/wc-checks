@@ -30,15 +30,21 @@ export function ResetPasswordPage() {
         code = hashParams.get('code');
       }
 
-      console.log('[ResetPassword] code found:', !!code);
+      console.log('[ResetPassword] code found:', !!code, code?.substring(0, 8));
 
       if (code) {
         // Exchange code for session (one-time, no retry)
+        console.log('[ResetPassword] exchanging code...');
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        console.log('[ResetPassword] exchange result:', JSON.stringify({
+          hasSession: !!data.session,
+          error: exchangeError?.message,
+          status: exchangeError?.status,
+        }));
 
         if (exchangeError) {
-          console.error('[ResetPassword] exchange error:', exchangeError.message);
-          setError('Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
+          console.error('[ResetPassword] full error:', JSON.stringify(exchangeError));
+          setError(`Gagal verifikasi link: ${exchangeError.message}`);
           setChecking(false);
           return;
         }
