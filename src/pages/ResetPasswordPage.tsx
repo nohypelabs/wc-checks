@@ -94,13 +94,16 @@ export function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
+      console.log('[ResetPassword] updating password...');
       const { error: updateError } = await supabase.auth.updateUser({ password });
+      console.log('[ResetPassword] update result:', updateError?.message || 'success');
 
       if (updateError) throw updateError;
 
       setSuccess(true);
       setTimeout(() => navigate('/login'), 3000);
     } catch (err: unknown) {
+      console.error('[ResetPassword] update error:', err);
       const message = err instanceof Error ? err.message : 'Gagal mengubah kata sandi';
       setError(message);
     } finally {
