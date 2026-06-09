@@ -17,21 +17,44 @@ export function ResetPasswordPage() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    // Listen for PASSWORD_RECOVERY event (Supabase triggers this on reset link click)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[ResetPassword] Auth event:', event, !!session);
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        setIsValidSession(true);
+        setChecking(false);
+      }
+    });
+
     const initSession = async () => {
-      // First, try to exchange the code from URL for a session
-      const code = searchParams.get('code');
+      // Try to get code from query params OR hash fragment
+      let code = searchParams.get('code');
+
+      if (!code) {
+        const hash = window.location.hash.substring(1);
+        const hashParams = new URLSearchParams(hash);
+        code = hashParams.get('code');
+      }
+
+      console.log('[ResetPassword] code found:', !!code);
 
       if (code) {
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        console.log('[ResetPassword] exchange result:', { session: !!data.session, error: exchangeError?.message });
         if (exchangeError) {
-          console.error('Code exchange error:', exchangeError);
+          console.error('[ResetPassword] Code exchange error:', exchangeError);
           setError('Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
+          setChecking(false);
+          return;
+        }
+        if (data.session) {
+          setIsValidSession(true);
           setChecking(false);
           return;
         }
       }
 
-      // Now check if we have a valid session
+      // Check existing session
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsValidSession(true);
@@ -42,6 +65,8 @@ export function ResetPasswordPage() {
     };
 
     initSession();
+
+    return () => subscription.unsubscribe();
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
