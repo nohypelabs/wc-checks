@@ -1,0 +1,169 @@
+// src/pages/ResetPasswordPage.tsx
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+
+export function ResetPasswordPage() {
+  const navigate = useNavigate();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isValidSession, setIsValidSession] = useState(false);
+
+  useEffect(() => {
+    // Check if user has a valid recovery session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsValidSession(true);
+      } else {
+        setError('Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
+      }
+    };
+    checkSession();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (password.length < 6) {
+      setError('Kata sandi minimal 6 karakter');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Kata sandi tidak cocok');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({ password });
+
+      if (updateError) throw updateError;
+
+      setSuccess(true);
+      setTimeout(() => navigate('/login'), 3000);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Gagal mengubah kata sandi';
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-white mb-2">Reset Kata Sandi</h1>
+          <p className="text-white/50 text-sm">Masukkan kata sandi baru Anda</p>
+        </div>
+
+        <div className="bg-white/8 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <p className="text-sm text-red-300">{error}</p>
+            </div>
+          )}
+
+          {success ? (
+            <div className="text-center py-8">
+              <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-white mb-2">Berhasil!</h2>
+              <p className="text-white/60 text-sm mb-4">
+                Kata sandi Anda telah diubah. Anda akan dialihkan ke halaman login.
+              </p>
+              <button
+                onClick={() => navigate('/login')}
+                className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
+              >
+                Ke Login
+              </button>
+            </div>
+          ) : !isValidSession ? (
+            <div className="text-center py-8">
+              <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-white mb-2">Link Tidak Valid</h2>
+              <p className="text-white/60 text-sm mb-4">
+                Link reset kata sandi tidak valid atau sudah kedaluwarsa.
+              </p>
+              <button
+                onClick={() => navigate('/login')}
+                className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
+              >
+                Kembali ke Login
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-1.5">
+                  Kata Sandi Baru
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Minimal 6 karakter"
+                    className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-1.5">
+                  Konfirmasi Kata Sandi
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Ulangi kata sandi"
+                    className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Mengubah...
+                  </>
+                ) : (
+                  'Ubah Kata Sandi'
+                )}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

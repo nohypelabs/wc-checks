@@ -67,6 +67,9 @@ const QRCodeGeneratorInner = lazy(() =>
 const UserManagement = lazy(() =>
  import('./pages/superadmin/UserManagement').then(module => ({ default: module.UserManagement }))
 );
+const ResetPasswordPage = lazy(() =>
+ import('./pages/ResetPasswordPage').then(module => ({ default: module.ResetPasswordPage }))
+);
 const OccupationManagerPage = lazy(() =>
  import('./pages/admin/OccupationManagerPage').then(module => ({ default: module.OccupationManagerPage }))
 );
@@ -206,9 +209,13 @@ function AppContent() {
  path="/login" 
  element={!user ? <LoginPage /> : <Navigate to="/" replace />} 
  />
- <Route 
- path="/register" 
- element={!user ? <RegisterPage /> : <Navigate to="/" replace />} 
+ <Route
+ path="/register"
+ element={!user ? <RegisterPage /> : <Navigate to="/" replace />}
+ />
+ <Route
+ path="/reset-password"
+ element={<ResetPasswordPage />}
  />
 
  {/* Protected Routes - Main */}
