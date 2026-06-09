@@ -1,12 +1,11 @@
 // src/pages/ResetPasswordPage.tsx
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 export function ResetPasswordPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -15,46 +14,44 @@ export function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [isValidSession, setIsValidSession] = useState(false);
   const [checking, setChecking] = useState(true);
+  const initDone = useRef(false);
 
   useEffect(() => {
-    // Listen for PASSWORD_RECOVERY event (Supabase triggers this on reset link click)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[ResetPassword] Auth event:', event, !!session);
-      if (event === 'PASSWORD_RECOVERY' && session) {
-        setIsValidSession(true);
-        setChecking(false);
-      }
-    });
+    if (initDone.current) return;
+    initDone.current = true;
 
     const initSession = async () => {
-      // Try to get code from query params OR hash fragment
-      let code = searchParams.get('code');
+      // Get code from URL query or hash
+      const url = new URL(window.location.href);
+      let code = url.searchParams.get('code');
 
       if (!code) {
-        const hash = window.location.hash.substring(1);
-        const hashParams = new URLSearchParams(hash);
+        const hashParams = new URLSearchParams(url.hash.substring(1));
         code = hashParams.get('code');
       }
 
       console.log('[ResetPassword] code found:', !!code);
 
       if (code) {
+        // Exchange code for session (one-time, no retry)
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-        console.log('[ResetPassword] exchange result:', { session: !!data.session, error: exchangeError?.message });
+
         if (exchangeError) {
-          console.error('[ResetPassword] Code exchange error:', exchangeError);
+          console.error('[ResetPassword] exchange error:', exchangeError.message);
           setError('Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
           setChecking(false);
           return;
         }
+
         if (data.session) {
+          console.log('[ResetPassword] session created');
           setIsValidSession(true);
           setChecking(false);
           return;
         }
       }
 
-      // Check existing session
+      // Fallback: check existing session
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsValidSession(true);
@@ -65,9 +62,7 @@ export function ResetPasswordPage() {
     };
 
     initSession();
-
-    return () => subscription.unsubscribe();
-  }, [searchParams]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
