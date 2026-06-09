@@ -9,6 +9,7 @@ import { InspectionDrawer } from '../components/reports/InspectionDrawer';
 import { InspectionDetailModal } from '../components/reports/InspectionDetailModal';
 // PageLayout removed - using inline layout
 import { TrendingUp, FileText, Download, Users, FileDown, Building2, ChevronDown, BarChart3, Info } from 'lucide-react';
+import { BottomNav } from '../components/mobile';
 import { exportToCSV, type ExportInspectionData } from '../lib/exportUtils';
 import { generateMonthlyReport } from '../lib/pdfGenerator';
 import { supabase } from '../lib/supabase';
@@ -585,6 +586,11 @@ export const ReportsPage = () => {
  onClose={handleCloseDetail}
  inspection={selectedInspection}
  />
+
+ {/* Mobile Bottom Nav */}
+ <div className="lg:hidden">
+ <BottomNav />
+ </div>
  </div>
  </div>
  );
