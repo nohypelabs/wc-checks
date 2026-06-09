@@ -1,7 +1,7 @@
 // src/components/forms/RatingSelector.tsx
 import { useState } from 'react';
 import { InspectionComponentConfig, RatingChoice } from '../../types/inspection.types';
-import { Camera, MessageSquare } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 interface RatingSelectorProps {

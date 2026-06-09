@@ -16,7 +16,6 @@ import { z } from 'zod';
 
 type Building = Tables<'buildings'>;
 type BuildingInsert = TablesInsert<'buildings'>;
-type Organization = Tables<'organizations'>;
 
 // Zod validation schema for building
 // ⚠️ IMPORTANT: DB expects NULL for optional fields, not undefined!
@@ -160,7 +159,7 @@ export const BuildingsManager = () => {
  });
  } else {
  // Create new building
- createBuilding.mutate(validatedData, {
+ createBuilding.mutate(validatedData as any, {
  onSuccess: () => {
  setIsFormOpen(false);
  resetForm();

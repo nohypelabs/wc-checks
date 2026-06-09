@@ -19,7 +19,7 @@ export const supabase = new Proxy(baseClient, {
         const endTimer = logger.startTimer(`Supabase query: ${table}`);
         logger.debug(`Supabase: from('${table}')`);
 
-        const query = original.call(target, table);
+        const query = (original as Function).call(target, table);
 
         // Wrap query methods
         return new Proxy(query, {
@@ -94,7 +94,7 @@ export const supabase = new Proxy(baseClient, {
               const startTime = performance.now();
               
               try {
-                const result = await authOriginal.apply(authTarget, args);
+                const result = await (authOriginal as Function).apply(authTarget, args);
                 const duration = performance.now() - startTime;
 
                 if (result.error) {

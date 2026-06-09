@@ -1,5 +1,5 @@
-// Fix for photoService.ts uploaded_by field
-// Error di line 41: 'uploaded_by' does not exist
+// Fix for photoService.ts created_by field
+// Error di line 41: 'created_by' does not exist
 
 // src/lib/photoService.ts (FIXED VERSION)
 
@@ -33,8 +33,8 @@ export const uploadPhoto = async (
       field_reference: photoData.field_reference || null,
       inspection_id: photoData.inspection_id || null,
       location_id: photoData.location_id || null,
-      uploaded_by: userId, // ✅ This field exists in TablesInsert<'photos'>
-      uploaded_at: new Date().toISOString(),
+      created_by: userId, // ✅ This field exists in TablesInsert<'photos'>
+      created_at: new Date().toISOString(),
       is_deleted: false,
     };
 
@@ -78,7 +78,7 @@ export const getPhotosByInspection = async (inspectionId: string) => {
       .select('*')
       .eq('inspection_id', inspectionId)
       .eq('is_deleted', false)
-      .order('uploaded_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data;
@@ -95,7 +95,7 @@ export const getPhotosByLocation = async (locationId: string) => {
       .select('*')
       .eq('location_id', locationId)
       .eq('is_deleted', false)
-      .order('uploaded_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data;

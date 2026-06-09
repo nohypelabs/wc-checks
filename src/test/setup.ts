@@ -24,6 +24,9 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
+  root = null;
+  rootMargin = "";
+  thresholds: number[] = [];
   constructor() {}
   disconnect() {}
   observe() {}
@@ -31,7 +34,7 @@ global.IntersectionObserver = class IntersectionObserver {
     return []
   }
   unobserve() {}
-}
+} as any
 
 // Mock navigator.vibrate
 Object.defineProperty(navigator, 'vibrate', {

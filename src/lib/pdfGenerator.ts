@@ -802,7 +802,7 @@ function addScoreLegend(pdf: jsPDF, x: number, y: number): void {
 /**
  * Helper: Convert hex color to RGB array
  */
-function hexToRgb(hex: string): number[] {
+function hexToRgb(hex: string): [number, number, number] {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? [

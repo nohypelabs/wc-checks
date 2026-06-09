@@ -77,7 +77,7 @@ export function initSentry() {
     enabled: import.meta.env.PROD,
 
     // Privacy: Filter sensitive data before sending
-    beforeSend(event, _hint) {
+    beforeSend(event: any, _hint: any) {
       // Remove sensitive headers
       if (event.request?.headers) {
         delete event.request.headers['Authorization'];

@@ -10,7 +10,6 @@ import {
  RatingChoice,
  INSPECTION_COMPONENTS,
  calculateWeightedScore,
- getScoreStatus,
  PhotoWithMetadata,
 } from '../../types/inspection.types';
 import { RatingSelector } from './RatingSelector';

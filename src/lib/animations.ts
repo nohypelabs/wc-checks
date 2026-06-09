@@ -9,7 +9,7 @@
  * - Consistent across the app
  */
 
-import { Transition } from 'framer-motion';
+import { Transition, Easing } from 'framer-motion';
 
 // ============================================
 // TIMING CONSTANTS
@@ -40,7 +40,7 @@ export const DURATIONS = {
  */
 export const EASINGS = {
   /** Smooth deceleration - best for exits and fades */
-  easeOut: [0.16, 1, 0.3, 1],
+  easeOut: [0.16, 1, 0.3, 1] as number[],
 
   /** Smooth acceleration - best for entrances */
   easeIn: [0.4, 0, 1, 1],
@@ -220,8 +220,8 @@ export const createSpring = (
  */
 export const createTween = (
   duration = DURATIONS.normal,
-  ease: number[] = EASINGS.easeOut
+  ease: number[] | Easing = EASINGS.easeOut as unknown as Easing
 ): Transition => ({
   duration,
-  ease,
+  ease: ease as Easing,
 });

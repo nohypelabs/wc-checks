@@ -166,7 +166,7 @@ export function useLocationByCode(
       const locations = result.data as Location[];
 
       // Client-side filter by short_code
-      const location = locations.find((l) => l.short_code === shortCode);
+      const location = locations.find((l) => (l as any).short_code === shortCode);
       return location || null;
     },
     enabled: !!shortCode,

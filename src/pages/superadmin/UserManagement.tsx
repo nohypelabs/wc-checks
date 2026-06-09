@@ -269,7 +269,7 @@ export const UserManagement = () => {
           >
             <option value="all">Semua Role</option>
             <option value="none">Tanpa Role</option>
-            {roles?.map((role) => (
+            {roles?.map((role: { id: string; name: string; level: number }) => (
               <option key={role.id} value={role.id}>{role.name} (Lv.{role.level})</option>
             ))}
           </select>
@@ -380,7 +380,7 @@ export const UserManagement = () => {
                           disabled={assignRoleMutation.isPending}
                         >
                           <option value="">No Role</option>
-                          {roles?.map((role) => (
+                          {roles?.map((role: { id: string; name: string; level: number }) => (
                             <option key={role.id} value={role.id}>{role.name} (Lv.{role.level})</option>
                           ))}
                         </select>

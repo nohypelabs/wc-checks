@@ -391,7 +391,7 @@ export const getScoreStatus = (
 export interface PhotoWithMetadata {
   file: File;
   preview: string;
-  componentId: InspectionComponent;
+  componentId?: InspectionComponent;
   timestamp: string;
   geolocation?: {
     latitude: number;

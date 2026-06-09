@@ -307,7 +307,6 @@ describe('Function Utilities', () => {
 
 describe('Device Detection', () => {
   describe('isMobileDevice', () => {
-    const originalNavigator = global.navigator
 
     beforeEach(() => {
       Object.defineProperty(global, 'navigator', {

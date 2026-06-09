@@ -291,7 +291,7 @@ function buildInvoice(data: InvoiceData): jsPDF {
     const stampY = finalY - 15;
     doc.text('LUNAS', stampX, stampY, { align: 'center', angle: 25, renderingMode: 'stroke' });
     doc.setLineWidth(1.5);
-    doc.setStrokeColor(34, 197, 94);
+    doc.setDrawColor(34, 197, 94);
     doc.setFontSize(60);
     doc.setFont('helvetica', 'bold');
     doc.text('LUNAS', stampX, stampY, { align: 'center', angle: 25, renderingMode: 'stroke' });

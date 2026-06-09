@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { Camera, X, Clock, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import { PhotoWithMetadata } from '../../types/inspection.types';
+import { PhotoWithMetadata, InspectionComponent } from '../../types/inspection.types';
 
 interface GeneralPhotoUploadProps {
  photos: PhotoWithMetadata[];
@@ -471,7 +471,7 @@ const addWatermarkToPhoto = async (
  const _startTime = Date.now();
 
  // Skip EXIF for faster processing
- const orientation = 1;
+ const orientation: number = 1;
 
  return new Promise((resolve, reject) => {
  const timeoutId = setTimeout(() => {

@@ -7,12 +7,12 @@ import { useAuth } from '../hooks/useAuth';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { 
- Camera, 
- Edit2, 
- LogOut, 
- Mail, 
- Phone, 
+import {
+ Camera,
+ Edit2,
+ LogOut,
+ Mail,
+ Phone,
  Calendar,
  Clock,
  CheckCircle2,
@@ -20,7 +20,8 @@ import {
  Award,
  Settings,
  User as UserIcon,
- Shield // for admin button
+ Shield,
+ Menu // for header menu button
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -47,7 +48,8 @@ export const ProfilePageWithAdmin = () => {
  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
  // ✅ FIXED: Use backend API for role check
- const { isAdmin, isSuperAdmin: userRole } = useIsAdmin();
+ const { isAdmin, isSuperAdmin } = useIsAdmin();
+const userRole = isSuperAdmin;
 
  // Fetch user stats
  const { data: stats, isLoading: statsLoading } = useQuery({
@@ -322,7 +324,7 @@ export const ProfilePageWithAdmin = () => {
  <div className="flex items-center justify-center gap-2">
  <div className="inline-flex items-center gap-1 px-3 py-1 bg-white/10 rounded-full text-sm text-white/60">
  <UserIcon className="w-4 h-4" />
- <span>{userRole?.name || 'Member'}</span>
+ <span>{userRole ? "Admin" : "Member"}</span>
  </div>
  {(isAdmin || isSuperAdmin) && (
  <div className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 rounded-full text-sm text-purple-300">

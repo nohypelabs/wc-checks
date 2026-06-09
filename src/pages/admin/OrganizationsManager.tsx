@@ -385,7 +385,7 @@ export const OrganizationsManager = () => {
  </label>
  <input
  type="email"
- value={formData.email}
+ value={formData.email ?? ""}
  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  />
@@ -397,7 +397,7 @@ export const OrganizationsManager = () => {
  </label>
  <input
  type="tel"
- value={formData.phone}
+ value={formData.phone ?? ""}
  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  />
@@ -408,7 +408,7 @@ export const OrganizationsManager = () => {
  Address
  </label>
  <textarea
- value={formData.address}
+ value={formData.address ?? ""}
  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500"
  rows={3}

@@ -64,7 +64,7 @@ const retryWithBackoff = async <T>(
   maxRetries: number = MAX_RETRIES,
   baseDelay: number = RETRY_DELAY
 ): Promise<T> => {
-  let lastError: Error;
+  let lastError: Error | undefined;
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {

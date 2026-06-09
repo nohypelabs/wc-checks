@@ -13,7 +13,6 @@ import {
   Info,
   BarChart3,
   Users,
-  Tag,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
