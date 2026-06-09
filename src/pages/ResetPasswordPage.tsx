@@ -44,22 +44,29 @@ export function ResetPasswordPage() {
 
         if (exchangeError) {
           console.error('[ResetPassword] full error:', JSON.stringify(exchangeError));
-          setError(`Gagal verifikasi link: ${exchangeError.message}`);
+          // Code might already be consumed — check if we have a session anyway
+          const { data: { session: existingSession } } = await supabase.auth.getSession();
+          if (existingSession) {
+            console.log('[ResetPassword] code consumed but session exists');
+            setIsValidSession(true);
+          } else {
+            setError(`Gagal verifikasi link: ${exchangeError.message}`);
+          }
           setChecking(false);
           return;
         }
 
-        if (data.session) {
-          console.log('[ResetPassword] session created');
-          setIsValidSession(true);
-          setChecking(false);
-          return;
-        }
+        // Exchange succeeded — show form regardless of session object
+        console.log('[ResetPassword] exchange succeeded');
+        setIsValidSession(true);
+        setChecking(false);
+        return;
       }
 
-      // Fallback: check existing session
+      // No code — check existing session (e.g. user refreshed after exchange)
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        console.log('[ResetPassword] existing session found');
         setIsValidSession(true);
       } else {
         setError('Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
