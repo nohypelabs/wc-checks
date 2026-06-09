@@ -31,7 +31,7 @@ interface VerifyRoleResponse {
 export function useIsAdmin() {
   const { user, loading: authLoading } = useAuth();
 
-  const { data, isLoading, isFetching, error, dataUpdatedAt, fetchStatus } = useQuery({
+  const { data, isLoading, isFetching, error, dataUpdatedAt } = useQuery({
     queryKey: ['verify-role', user?.id],
     queryFn: async (): Promise<{ isAdmin: boolean; isSuperAdmin: boolean }> => {
       if (!user?.id) {

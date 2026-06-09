@@ -6,7 +6,7 @@ export interface DailyTrend {
   count: number;
 }
 
-export function useInspectionTrend(days: number = 30) {
+export function useInspectionTrend(_days: number = 30) {
   // Reuse the admin stats query which already includes dailyTrend
   const { data, isLoading, error } = useAdminStats();
 

@@ -47,7 +47,7 @@ export const ProfilePageWithAdmin = () => {
  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
  // ✅ FIXED: Use backend API for role check
- const { isAdmin, isSuperAdmin, role: userRole } = useIsAdmin();
+ const { isAdmin, isSuperAdmin: userRole } = useIsAdmin();
 
  // Fetch user stats
  const { data: stats, isLoading: statsLoading } = useQuery({

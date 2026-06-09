@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Save, CheckCircle2, AlertCircle, Camera, SkipForward, AlertTriangle, XCircle, Droplet } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, Camera, SkipForward, AlertTriangle, XCircle, Droplet } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import {
  InspectionComponent,
@@ -14,7 +14,7 @@ import {
  PhotoWithMetadata,
 } from '../../types/inspection.types';
 import { RatingSelector } from './RatingSelector';
-import { EnhancedPhotoUpload } from './EnhancedPhotoUpload'; // Per-component photos
+
 import { GeneralPhotoUpload } from './GeneralPhotoUpload'; // General photos
 import { InspectionSuccessModal } from './InspectionSuccessModal'; // Success modal
 import { InspectionFailedModal } from './InspectionFailedModal'; // Failed modal
@@ -144,7 +144,7 @@ export const ComprehensiveInspectionForm = ({
  }
  };
 
- const handlePhotosChange = (
+ const _handlePhotosChange = (
  componentId: InspectionComponent,
  newPhotos: PhotoWithMetadata[]
  ) => {
@@ -409,7 +409,7 @@ const handleSubmit = async () => {
  );
  }
 
- const scoreStatus = getScoreStatus(currentScore);
+
  const completedCount = ratings.size;
  const totalRequired = INSPECTION_COMPONENTS.filter((c) => c.required).length;
  const progress = (completedCount / INSPECTION_COMPONENTS.length) * 100;

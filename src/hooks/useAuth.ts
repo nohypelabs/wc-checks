@@ -38,7 +38,7 @@ export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<AppUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, _setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const initRef = useRef(false); // ✅ Prevent double init
   const retryCountRef = useRef(0); // ✅ Track retry attempts

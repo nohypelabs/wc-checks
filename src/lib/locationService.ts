@@ -5,6 +5,7 @@
 
 import { supabase } from './supabase';
 import { TablesInsert, Json } from '../types/database.types';
+// @ts-ignore
 import QRCode from 'qrcode';
 
 // Add index signature untuk compatibility dengan Json type

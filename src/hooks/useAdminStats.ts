@@ -16,7 +16,7 @@ export interface AdminStats {
   dailyTrend: Array<{ date: string; count: number }>;
 }
 
-function dateStr(d: Date) {
+function _dateStr(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 

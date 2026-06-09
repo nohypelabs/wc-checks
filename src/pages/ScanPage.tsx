@@ -19,12 +19,12 @@ import { toast } from 'react-hot-toast';
 
 export const ScanPage = () => {
  const navigate = useNavigate();
- const { user, authLoading } = useAuth();
+ const { user, loading } = useAuth();
  const [showScanner, setShowScanner] = useState(false);
  const [sidebarOpen, setSidebarOpen] = useState(false);
 
  // ✅ Wait for auth to complete before querying
- const isReady = !authLoading && !!user?.id;
+ const isReady = !loading && !!user?.id;
 
  // Fetch recent inspections
  const { data: recentInspections, isLoading: loadingInspections } = useQuery({
@@ -129,7 +129,7 @@ export const ScanPage = () => {
  };
 
  // Show loading while auth completes
- if (authLoading) {
+ if (loading) {
  return (
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
  <div className="text-center">

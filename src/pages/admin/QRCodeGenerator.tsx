@@ -46,7 +46,7 @@ export const QRCodeGenerator = ({ locations, onClose }: QRCodeGeneratorProps) =>
  }
  }
  `,
- onBeforeGetContent: () => {
+ onBeforePrint: () => {
  console.log('🖨️ Preparing to print...', { locations: locations.length });
  return Promise.resolve();
  },

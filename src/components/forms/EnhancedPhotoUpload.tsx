@@ -288,7 +288,7 @@ const createPhotoWithOverlay = async (
  file: File,
  metadata: { timestamp: string; location?: { lat: number; lng: number; address?: string } }
 ): Promise<string> => {
- return new Promise((resolve, reject) => {
+ return new Promise((resolve, _reject) => {
  const img = new Image();
  const reader = new FileReader();
 

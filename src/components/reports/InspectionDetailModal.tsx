@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
 import { INSPECTION_COMPONENTS, calculateWeightedScore, getScoreStatus, ComponentRating } from '../../types/inspection.types';
 import { PhotoReviewModal } from './PhotoReviewModal';
-import { scaleIn, backdropFade, slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
+import { slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
 import { useHaptic } from '../../hooks/useHaptic';
 
 const getScoreTextColor = (score: number) => {

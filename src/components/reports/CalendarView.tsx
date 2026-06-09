@@ -11,7 +11,7 @@ import {
  subMonths
 } from 'date-fns';
 import { DateInspections } from '../../hooks/useReports';
-import { TAP_TRANSITION, HOVER_TRANSITION } from '../../lib/animations';
+import { TAP_TRANSITION } from '../../lib/animations';
 import { useHaptic } from '../../hooks/useHaptic';
 
 interface CalendarViewProps {
@@ -21,6 +21,7 @@ interface CalendarViewProps {
  onDateClick: (date: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getScoreColor = (score: number) => {
  if (score >= 85) return 'bg-green-500';
  if (score >= 70) return 'bg-yellow-500';
@@ -137,7 +138,7 @@ export const CalendarView = ({
  <div key={`empty-${index}`} className="aspect-square" />
  ))}
 
- {daysInMonth.map((day, idx) => {
+ {daysInMonth.map((day, _idx) => {
  const dateData = getDateData(day);
  const hasInspections = dateData && dateData.count > 0;
  const dayIsToday = isToday(day);

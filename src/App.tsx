@@ -1,7 +1,7 @@
 // src/App.tsx - FIXED: Handle named exports for lazy loading
-import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { lazy, Suspense, useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { AnimatePresence } from 'framer-motion';
@@ -61,7 +61,7 @@ const BuildingsManager = lazy(() =>
 const AdminDashboard = lazy(() =>
  import('./pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard }))
 );
-const QRCodeGenerator = lazy(() =>
+const QRCodeGeneratorInner = lazy(() =>
  import('./pages/admin/QRCodeGenerator').then(module => ({ default: module.QRCodeGenerator }))
 );
 const UserManagement = lazy(() =>
@@ -102,15 +102,9 @@ const queryClient = new QueryClient({
       retry: 1, // ⚡ Retry once (not infinite, not zero)
       staleTime: 0, // ⚡ Real-time: always consider data stale
       gcTime: 5 * 60 * 1000, // ⚡ Keep in memory 5 minutes - reduce re-fetching
-      onError: (error: any) => {
-        logger.error('React Query error', error);
-      },
     },
     mutations: {
       retry: 0, // ❌ No retry for mutations
-      onError: (error: any) => {
-        logger.error('React Query mutation error', error);
-      },
     },
   },
 });
@@ -130,6 +124,29 @@ const PageLoader = () => (
  </div>
  </div>
 );
+
+// Wrapper for QRCodeGenerator to provide required props
+function QRCodeGenerator() {
+  const navigate = useNavigate();
+  const [locations, setLocations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const { data, error } = await supabase.from('locations').select('*');
+        if (!error && data) setLocations(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLocations();
+  }, []);
+
+  if (loading) return <PageLoader />;
+
+  return <QRCodeGeneratorInner locations={locations} onClose={() => navigate(-1)} />;
+}
 
 // Auth loading component
 const AuthLoader = () => (

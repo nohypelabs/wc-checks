@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionReport } from '../../hooks/useReports';
-import { slideUp, backdropFade, slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
+import { slideInLeft, TAP_TRANSITION, STAGGER_DELAY } from '../../lib/animations';
 import { useHaptic } from '../../hooks/useHaptic';
 
 interface PaginationInfo {
@@ -145,7 +145,7 @@ export const InspectionDrawer = ({
  drag="y"
  dragConstraints={{ top: 0, bottom: 0 }}
  dragElastic={{ top: 0, bottom: 0.5 }}
- onDragEnd={(e, { offset, velocity }) => {
+ onDragEnd={(_e, { offset, velocity }) => {
  if (offset.y > 100 || velocity.y > 500) {
  onClose();
  }

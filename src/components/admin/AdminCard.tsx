@@ -124,7 +124,7 @@ export const AdminCardCompact = ({
 
  return (
  <button
- onClick={() => navigate(path)}
+ onClick={() => navigate(path || '/')}
  className="
  w-full p-4 bg-white/8 backdrop-blur-md rounded-xl shadow-lg border border-white/10 shadow-blue-500/5 ring-1 ring-white/5
  hover:shadow-md hover:scale-105 active:scale-95

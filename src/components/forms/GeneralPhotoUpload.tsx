@@ -364,6 +364,7 @@ export const GeneralPhotoUpload = ({
 };
 
 // ✅ Helper: Extract EXIF orientation from image file (SAFE - never fails)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getOrientation = (file: File): Promise<number> => {
  return new Promise((resolve) => {
  // Timeout protection - default to 1 after 3 seconds
@@ -467,7 +468,7 @@ const addWatermarkToPhoto = async (
  }
 ): Promise<Blob> => {
  console.log(`🏷️ [WATERMARK] Starting watermark for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
- const startTime = Date.now();
+ const _startTime = Date.now();
 
  // Skip EXIF for faster processing
  const orientation = 1;
@@ -671,7 +672,8 @@ const addWatermarkToPhoto = async (
 };
 
 // Compress image to target size in MB
-const compressImage = async (file: File, targetMB: number): Promise<File> => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const compressImage = async (file: File, _targetMB: number): Promise<File> => {
  return new Promise((resolve, reject) => {
  const reader = new FileReader();
 

@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
 import { useOrganizations, useCreateOrganization, useUpdateOrganization, useDeleteOrganization } from '../../hooks/useOrganizations';
 import { Tables, TablesInsert } from '../../types/database.types';
-import { Plus, Edit2, Trash2, Search, MoreVertical, Building2, QrCode, Menu, ShieldAlert, User } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, MoreVertical, Building2, Menu, ShieldAlert, User } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Sidebar } from '../../components/mobile/Sidebar';

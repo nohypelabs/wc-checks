@@ -7,7 +7,7 @@ import { useMonthlyInspections, useDateInspections, InspectionReport } from '../
 import { CalendarView } from '../components/reports/CalendarView';
 import { InspectionDrawer } from '../components/reports/InspectionDrawer';
 import { InspectionDetailModal } from '../components/reports/InspectionDetailModal';
-import { PageLayout } from '../components/layout/PageLayout';
+// PageLayout removed - using inline layout
 import { TrendingUp, FileText, Download, Users, FileDown, Building2, ChevronDown, BarChart3, Info } from 'lucide-react';
 import { exportToCSV, type ExportInspectionData } from '../lib/exportUtils';
 import { generateMonthlyReport } from '../lib/pdfGenerator';

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowRight, Wifi, Users, Cpu, Zap, Lock } from 'lucide-react';
+import { X, ArrowRight, Wifi, Users, Cpu, Lock } from 'lucide-react';
 
 const STORAGE_KEY = 'wc-checks-incoming-features-minimized';
 

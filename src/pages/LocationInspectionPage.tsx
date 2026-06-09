@@ -134,7 +134,6 @@ export const LocationInspectionPage = () => {
            </div>
          </div>
        </div>
- </div>
 
  <div className="p-4 space-y-6">
  {/* Location Info Card */}
