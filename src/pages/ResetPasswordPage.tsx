@@ -33,9 +33,29 @@ export function ResetPasswordPage() {
       console.log('[ResetPassword] code found:', !!code, code?.substring(0, 8));
 
       if (code) {
-        // Exchange code for session (one-time, no retry)
+        // Exchange code for session (one-time, no retry) with timeout
         console.log('[ResetPassword] exchanging code...');
-        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        const exchangePromise = supabase.auth.exchangeCodeForSession(code);
+        const exchangeTimeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('exchange timeout')), 10000)
+        );
+
+        let data, exchangeError;
+        try {
+          const result = await Promise.race([exchangePromise, exchangeTimeout]);
+          data = result.data;
+          exchangeError = result.error;
+        } catch (timeoutErr) {
+          console.warn('[ResetPassword] exchange timed out, checking existing session');
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            setIsValidSession(true);
+          } else {
+            setError('Server lambat, silakan refresh halaman ini.');
+          }
+          setChecking(false);
+          return;
+        }
         console.log('[ResetPassword] exchange result:', JSON.stringify({
           hasSession: !!data.session,
           error: exchangeError?.message,
