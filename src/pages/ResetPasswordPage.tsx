@@ -95,7 +95,14 @@ export function ResetPasswordPage() {
 
     try {
       console.log('[ResetPassword] updating password...');
-      const { error: updateError } = await supabase.auth.updateUser({ password });
+
+      // Add timeout — don't hang forever
+      const updatePromise = supabase.auth.updateUser({ password });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout: server tidak merespons dalam 15 detik')), 15000)
+      );
+
+      const { error: updateError } = await Promise.race([updatePromise, timeoutPromise]) as Awaited<ReturnType<typeof supabase.auth.updateUser>>;
       console.log('[ResetPassword] update result:', updateError?.message || 'success');
 
       if (updateError) throw updateError;
