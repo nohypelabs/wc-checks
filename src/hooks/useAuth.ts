@@ -250,10 +250,8 @@ export function useAuth(): UseAuthReturn {
           authStorage.clear();
           cachedProfile = null; // Clear cache
           cacheTimestamp = 0;
-          // Only show session expired if user was previously authenticated (not manual sign out)
-          if (user) {
-            setSessionExpired(true);
-          }
+          // ✅ FIX: Don't set sessionExpired on manual sign out — only on unexpected session loss
+          // Manual signOut() already cleared user state, so we skip the expired modal
           setUser(null);
           setProfile(null);
           console.log('🗑️ Signed out');
@@ -266,18 +264,21 @@ export function useAuth(): UseAuthReturn {
     };
   }, []); // ✅ Empty deps - setup ONCE
 
-  // Sign out
+  // Sign out — always clear local state even if Supabase call fails
   const signOut = useCallback(async (): Promise<void> => {
+    // ✅ Clear local state FIRST for instant UI feedback
+    setUser(null);
+    setProfile(null);
+    cachedProfile = null;
+    cacheTimestamp = 0;
+    authStorage.clear();
+
     try {
       await supabase.auth.signOut();
-      authStorage.clear();
-      cachedProfile = null; // Clear cache
-      cacheTimestamp = 0;
-      setUser(null);
-      setProfile(null);
-      console.log('✅ Signed out');
+      console.log('✅ Signed out (Supabase confirmed)');
     } catch (err) {
-      console.error('❌ Sign out error:', err);
+      // Supabase signout failed, but local state is already cleared
+      console.warn('⚠️ Supabase signOut failed, local state already cleared:', err);
     }
   }, []);
 
