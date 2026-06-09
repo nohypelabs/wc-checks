@@ -186,6 +186,17 @@ const NotFoundPage = () => (
 function AppContent() {
  const { user, loading, sessionExpired, clearSessionExpired, signOut } = useAuth();
  const { isOnline, isReconnecting } = useNetworkStatus();
+ const location = useLocation();
+
+ // Skip session expired modal on public routes
+ const isPublicRoute = ['/login', '/register', '/forgot-password', '/reset-password'].includes(location.pathname);
+
+ // Auto-clear session expired on public routes
+ useEffect(() => {
+   if (isPublicRoute && sessionExpired) {
+     clearSessionExpired();
+   }
+ }, [isPublicRoute, sessionExpired, clearSessionExpired]);
 
  // DEBUG: Log auth state
  console.log('[AppContent] render:', JSON.stringify({ loading, hasUser: !!user, userId: user?.id }));
@@ -197,7 +208,6 @@ function AppContent() {
  }
 
  console.log('[AppContent] Auth loaded, rendering routes');
- const location = useLocation();
 
   // Network status indicator
   const showNetworkStatus = !isOnline || isReconnecting;
@@ -351,7 +361,7 @@ function AppContent() {
   
   
   {user && <FeatureTour />}
-  {sessionExpired && (
+  {sessionExpired && !isPublicRoute && (
     <SessionExpiredModal
        onLogin={() => { 
          clearSessionExpired(); 
