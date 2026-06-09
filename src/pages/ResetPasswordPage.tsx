@@ -1,11 +1,12 @@
 // src/pages/ResetPasswordPage.tsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 export function ResetPasswordPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -13,19 +14,35 @@ export function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isValidSession, setIsValidSession] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Check if user has a valid recovery session
-    const checkSession = async () => {
+    const initSession = async () => {
+      // First, try to exchange the code from URL for a session
+      const code = searchParams.get('code');
+
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (exchangeError) {
+          console.error('Code exchange error:', exchangeError);
+          setError('Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
+          setChecking(false);
+          return;
+        }
+      }
+
+      // Now check if we have a valid session
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsValidSession(true);
       } else {
         setError('Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
       }
+      setChecking(false);
     };
-    checkSession();
-  }, []);
+
+    initSession();
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +91,12 @@ export function ResetPasswordPage() {
             </div>
           )}
 
-          {success ? (
+          {checking ? (
+            <div className="text-center py-8">
+              <Loader2 className="w-12 h-12 text-blue-400 mx-auto mb-4 animate-spin" />
+              <p className="text-white/60 text-sm">Memverifikasi link reset...</p>
+            </div>
+          ) : success ? (
             <div className="text-center py-8">
               <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-white mb-2">Berhasil!</h2>
