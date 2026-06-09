@@ -67,30 +67,6 @@ export function LoginPage() {
  }
 };
 
- // Handle forgot password
- const handleForgotPassword = async () => {
- if (!email) {
- setError('Harap masukkan alamat email Anda terlebih dahulu');
- return;
- }
-
- setIsLoading(true);
- setError(null);
-
- try {
- const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
- redirectTo: `${window.location.origin}/reset-password`,
- });
-
- if (resetError) throw resetError;
-
- setSuccessMessage('Tautan reset kata sandi telah dikirim! Periksa email Anda.');
- } catch (err: any) {
- setError(err.message || 'Gagal mengirim email reset');
- } finally {
- setIsLoading(false);
- }
- };
 
  return (
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
@@ -219,9 +195,8 @@ export function LoginPage() {
  <div className="flex items-center justify-end">
  <button
  type="button"
- onClick={handleForgotPassword}
+ onClick={() => navigate('/forgot-password')}
  className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
- disabled={isLoading}
  >
  Lupa Kata Sandi?
  </button>

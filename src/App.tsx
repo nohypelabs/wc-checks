@@ -70,6 +70,9 @@ const UserManagement = lazy(() =>
 const ResetPasswordPage = lazy(() =>
  import('./pages/ResetPasswordPage').then(module => ({ default: module.ResetPasswordPage }))
 );
+const ForgotPasswordPage = lazy(() =>
+ import('./pages/ForgotPasswordPage').then(module => ({ default: module.ForgotPasswordPage }))
+);
 const OccupationManagerPage = lazy(() =>
  import('./pages/admin/OccupationManagerPage').then(module => ({ default: module.OccupationManagerPage }))
 );
@@ -216,6 +219,10 @@ function AppContent() {
  <Route
  path="/reset-password"
  element={<ResetPasswordPage />}
+ />
+ <Route
+ path="/forgot-password"
+ element={<ForgotPasswordPage />}
  />
 
  {/* Protected Routes - Main */}
