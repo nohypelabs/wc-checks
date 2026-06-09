@@ -31,6 +31,12 @@ pnpm test src/lib/utils.test.ts
 
 # Coverage
 pnpm test:coverage
+
+# Vitest browser UI
+pnpm test:ui
+
+# Serve production build locally
+pnpm preview
 ```
 
 ## Architecture
@@ -73,7 +79,18 @@ Helper functions `errorResponse()` and `successResponse()` in `role-guard.ts` fo
 
 ### Supabase Client (`src/lib/supabase.ts`)
 
-Exports a typed `db` helper object (`db.users`, `db.buildings`, `db.locations`, `db.inspectionRecords`, `db.inspectionTemplates`, `db.photos`) that wraps common queries with logging and retry logic. Connection test is opt-in (`initializeConnection()`) — it does not auto-run on import.
+Exports a typed `db` helper object (`db.users`, `db.buildings`, `db.locations`, `db.inspectionRecords`, `db.inspectionTemplates`, `db.photos`) that wraps common queries with logging and retry logic. Every query gets automatic timing and error logging via `withLogging`. Connection test is opt-in (`initializeConnection()`) — it does not auto-run on import. `handleSupabaseError()` maps common Supabase error messages to user-friendly Indonesian strings.
+
+### Shared Utilities (`src/lib/`)
+
+- **`logger.ts`** — Singleton logger that intercepts `window.error`, `unhandledrejection`, and `popstate`. Stores last 100 logs in memory, persists 20 to localStorage.
+- **`authStorage.ts`** — Validates and manages Supabase auth tokens in localStorage. Handles corrupt token detection and auto-cleanup on startup (called in `main.tsx`). Exposes `window.authStorage.debug()` for console debugging.
+- **`animations.ts`** — Animation constants (`DURATIONS`, `EASINGS`, `SPRINGS`) and preset transitions (`MODAL_TRANSITION`, `DRAWER_TRANSITION`, etc.) for consistent Framer Motion usage.
+- **`sentry.ts`** — Optional Sentry integration (production only). Privacy-safe: masks all text in replays, blocks media, filters Authorization headers. Requires `VITE_SENTRY_DSN`.
+
+### UI Components (`src/components/ui/`)
+
+Reusable components with barrel export via `index.ts`: `Button`, `Badge` (with `StatusBadge`, `ScoreBadge` variants), `Card`, `StatCard`, `ActionButton`, `LoadingSpinner`, `Skeleton`, `Input`, `CameraUpload`.
 
 ### Path Alias
 
@@ -95,6 +112,12 @@ QR scanning uses `html5-qrcode`. QR generation uses `qrcode` (data URLs) and `qr
 
 Vite splits vendor chunks explicitly (react, router, supabase, query, lucide, framer-motion, jspdf, qr) plus page-level chunks (admin, reports, inspection). PWA/service worker is intentionally **disabled** (unregistered on startup in `main.tsx`). Console statements are dropped in production (`drop_console: mode === 'production'`).
 
+API routes use a separate `tsconfig.api.json` that extends the main tsconfig but overrides to CommonJS module output for Vercel serverless compatibility.
+
+### Language
+
+UI text and error messages use **Indonesian (Bahasa Indonesia)**. Date formatting uses `date-fns/locale/id`. Keep user-facing strings in Indonesian unless the existing code uses English for that specific context.
+
 ### Testing
 
 Vitest with jsdom environment. Test setup (`src/test/setup.ts`) mocks `window.matchMedia`, `IntersectionObserver`, and `navigator.vibrate`. Coverage uses v8 provider. React Testing Library + user-event for component tests.
@@ -112,6 +135,11 @@ VITE_CLOUDINARY_FOLDER=
 # Backend API only (Vercel serverless — no VITE_ prefix)
 SUPABASE_URL=
 SUPABASE_SERVICE_KEY=
+
+# Optional
+VITE_SENTRY_DSN=        # Sentry error tracking
+VITE_APP_VERSION=       # Sentry release tracking
+VITE_APP_URL=           # Dev QR code URLs (default: http://localhost:5173)
 ```
 
 ## Multi-Tenant Architecture (Organization Scoping)
