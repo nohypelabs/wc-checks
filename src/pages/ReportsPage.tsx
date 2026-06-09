@@ -7,15 +7,14 @@ import { useMonthlyInspections, useDateInspections, InspectionReport } from '../
 import { CalendarView } from '../components/reports/CalendarView';
 import { InspectionDrawer } from '../components/reports/InspectionDrawer';
 import { InspectionDetailModal } from '../components/reports/InspectionDetailModal';
-import { Sidebar } from '../components/mobile/Sidebar';
-import { BottomNav } from '../components/mobile/BottomNav';
-import { TrendingUp, FileText, Menu, Download, Users, FileDown, Building2, ChevronDown, BarChart3, Info } from 'lucide-react';
+import { PageLayout } from '../components/layout/PageLayout';
+import { TrendingUp, FileText, Download, Users, FileDown, Building2, ChevronDown, BarChart3, Info } from 'lucide-react';
 import { exportToCSV, type ExportInspectionData } from '../lib/exportUtils';
 import { generateMonthlyReport } from '../lib/pdfGenerator';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import { useOrganizations } from '../hooks/useOrganizations';
+import { useQuery } from '@tanstack/react-query';
 
 export const ReportsPage = () => {
  const { user } = useAuth();
@@ -32,39 +31,42 @@ export const ReportsPage = () => {
  const [currentDate, setCurrentDate] = useState(new Date());
  const [selectedDate, setSelectedDate] = useState<string | null>(null);
  const [selectedInspection, setSelectedInspection] = useState<InspectionReport | null>(null);
- const [sidebarOpen, setSidebarOpen] = useState(false);
  const [datePage, setDatePage] = useState(1);
  const [exportMenuOpen, setExportMenuOpen] = useState(false);
  const exportMenuRef = useRef<HTMLDivElement>(null);
 
- useEffect(() => {
- const handleClickOutside = (e: MouseEvent) => {
- if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
- setExportMenuOpen(false);
- }
- };
- document.addEventListener('mousedown', handleClickOutside);
- return () => document.removeEventListener('mousedown', handleClickOutside);
- }, []);
- useEffect(() => {
-   const handleClickOutside = (e: MouseEvent) => {
-    if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
-     setExportMenuOpen(false);
-    }
-    if (organizationDropdownRef.current && !organizationDropdownRef.current.contains(e.target as Node)) {
-     setOrganizationDropdownOpen(false);
-    }
-   };
-   document.addEventListener('mousedown', handleClickOutside);
-   return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-
  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>('');
- const [organizationDropdownOpen, setOrganizationDropdownOpen] = useState(false);
- const organizationDropdownRef = useRef<HTMLDivElement>(null);
+ const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
+ const orgDropdownRef = useRef<HTMLDivElement>(null);
 
- const { data: organizations, isLoading: organizationsLoading } = useOrganizations();
+ useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+   if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+    setExportMenuOpen(false);
+   }
+   if (orgDropdownRef.current && !orgDropdownRef.current.contains(e.target as Node)) {
+    setOrgDropdownOpen(false);
+   }
+  };
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+ }, []);
+
+ // Fetch organizations for filter dropdown
+ const { data: organizations = [], isLoading: orgsLoading } = useQuery({
+ queryKey: ['organizations-list'],
+ queryFn: async () => {
+   const { data: { session } } = await supabase.auth.getSession();
+   const token = session?.access_token;
+   if (!token) throw new Error('No auth token');
+   const res = await fetch('/api/admin/resources?type=organizations', {
+     headers: { Authorization: `Bearer ${token}` },
+   });
+   if (!res.ok) throw new Error('Failed to fetch organizations');
+   const result = await res.json();
+   return (result.data || []).filter((o: any) => o.is_active);
+ },
+ });
 
  const filterUserId = isAdmin ? undefined : user?.id;
 
@@ -74,31 +76,29 @@ export const ReportsPage = () => {
  });
 
  const { data: monthlyData, isLoading: monthlyLoading } = useMonthlyInspections(
-   filterUserId,
-   currentDate,
-   true,
-   undefined,
-   selectedOrganizationId || undefined
+ filterUserId,
+ currentDate,
+ true,
+ selectedOrganizationId || undefined
  );
 
  const dateFilterUserId = isAdmin ? undefined : user?.id;
 
  console.log('📊 [ReportsPage] Fetching date inspections with filter:', {
-   isAdmin,
-   adminLoading,
-   dateFilterUserId: dateFilterUserId || 'ALL USERS',
-   selectedDate,
-   organizationId: selectedOrganizationId || 'ALL',
+ isAdmin,
+ adminLoading,
+ dateFilterUserId: dateFilterUserId || 'ALL USERS',
+ selectedDate,
+ organizationId: selectedOrganizationId || 'ALL',
  });
 
  const { data: dateInspectionsData } = useDateInspections(
-   dateFilterUserId,
-   selectedDate || '',
-   true,
-   undefined,
-   selectedOrganizationId || undefined,
-   datePage,
-   10
+ dateFilterUserId,
+ selectedDate || '',
+ true,
+ selectedOrganizationId || undefined,
+ datePage,
+ 10
  );
  const dateInspections = dateInspectionsData?.inspections || [];
  const datePagination = dateInspectionsData?.pagination;
@@ -199,34 +199,34 @@ export const ReportsPage = () => {
  };
 
  const handleExportPDF = async () => {
-   if (!user?.id) return;
+ if (!user?.id) return;
 
-   const loadingToast = toast.loading('Membuat laporan PDF...');
+ const loadingToast = toast.loading('Membuat laporan PDF...');
 
-   try {
-     if (!monthlyData || monthlyData.length === 0) {
-       toast.dismiss(loadingToast);
-       toast.error('Tidak ada data untuk diekspor');
-       return;
-     }
+ try {
+ if (!monthlyData || monthlyData.length === 0) {
+ toast.dismiss(loadingToast);
+ toast.error('Tidak ada data untuk diekspor');
+ return;
+ }
 
-     const selectedOrganization = organizations?.find(o => o.id === selectedOrganizationId);
-     const siteName = selectedOrganization?.name || 'Semua Organisasi';
+ const selectedOrg = organizations?.find((o: any) => o.id === selectedOrganizationId);
+ const siteName = selectedOrg?.name || 'Semua Lokasi';
 
-     await generateMonthlyReport(
-       monthlyData,
-       currentDate,
-       'PT Prenacons Internusa',
-       siteName
-     );
+ await generateMonthlyReport(
+ monthlyData,
+ currentDate,
+ 'PT Prenacons Internusa',
+ siteName
+ );
 
-     toast.dismiss(loadingToast);
-     toast.success('✅ Laporan PDF berhasil dibuat!');
-   } catch (error: any) {
-     toast.dismiss(loadingToast);
-     console.error('PDF Export error:', error);
-     toast.error('Gagal membuat PDF: ' + error.message);
-   }
+ toast.dismiss(loadingToast);
+ toast.success('✅ Laporan PDF berhasil dibuat!');
+ } catch (error: any) {
+ toast.dismiss(loadingToast);
+ console.error('PDF Export error:', error);
+ toast.error('Gagal membuat PDF: ' + error.message);
+ }
  };
 
  const handleExportAllUsers = async () => {
@@ -315,167 +315,140 @@ export const ReportsPage = () => {
    );
  }
 
- return (
- <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-24 lg:pb-6" data-tour="reports-page">
- {/* Sidebar */}
- <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
- {/* Header */}
- <header className="bg-white/8 backdrop-blur-xl px-4 py-5 shadow-xl border-b border-white/10 lg:py-5">
- <div className="max-w-7xl mx-auto">
- <div className="flex items-center justify-between text-white">
- {/* Left: Menu + Title */}
- <div className="flex items-center gap-3">
- <button
- onClick={() => setSidebarOpen(true)}
- className="p-2 hover:bg-white/10 rounded-xl transition-colors"
- >
- <Menu className="w-5 h-5" />
- </button>
-
- {/* Mobile title */}
- <div className="lg:hidden">
- <h1 className="text-lg font-bold">Laporan</h1>
- <p className="text-xs text-blue-100">Riwayat & analitik inspeksi</p>
- </div>
-
- {/* Desktop: Logo + Title */}
- <div className="hidden lg:flex items-center gap-2.5">
- <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center p-1">
- <BarChart3 className="w-5 h-5 text-white" />
- </div>
- <div>
- <h1 className="text-sm font-bold leading-tight text-white">Laporan</h1>
- <p className="text-[11px] text-white/50">Riwayat & analitik inspeksi</p>
- </div>
- </div>
- </div>
-
- {/* Right: Export dropdown - Admin only */}
- {isAdmin && (
- <div className="relative" ref={exportMenuRef}>
-   <motion.button
-     onClick={() => setExportMenuOpen(prev => !prev)}
-     className="flex items-center gap-1.5 px-3.5 py-2 bg-white/10 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm shadow-lg text-xs font-semibold whitespace-nowrap"
-     whileHover={{ scale: 1.02 }}
-     whileTap={{ scale: 0.98 }}
-   >
-     <Download className="w-3.5 h-3.5" />
-     <span>Export</span>
-     <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
-   </motion.button>
-
- <AnimatePresence>
- {exportMenuOpen && (
- <motion.div
- initial={{ opacity: 0, y: -8, scale: 0.95 }}
- animate={{ opacity: 1, y: 0, scale: 1 }}
- exit={{ opacity: 0, y: -8, scale: 0.95 }}
- transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
- className="absolute right-0 top-full mt-2 w-52 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50"
- >
- <div className="p-1.5">
- <button
- onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
- disabled={totalInspections === 0}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
- >
- <div className="w-7 h-7 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
- <FileDown className="w-3.5 h-3.5 text-red-400" />
- </div>
- <div className="text-left">
- <span className="font-semibold block">Export PDF</span>
- <span className="text-[10px] text-white/60 font-normal">Laporan bulanan</span>
- </div>
- </button>
- <button
- onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
- disabled={totalInspections === 0}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
- >
- <div className="w-7 h-7 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
- <Download className="w-3.5 h-3.5 text-green-400" />
- </div>
- <div className="text-left">
- <span className="font-semibold block">Data Saya (CSV)</span>
- <span className="text-[10px] text-white/60 font-normal">Inspeksi bulan ini</span>
- </div>
- </button>
- {isAdmin && (
- <button
- onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
- className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors"
- >
- <div className="w-7 h-7 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
- <Users className="w-3.5 h-3.5 text-blue-400" />
- </div>
- <div className="text-left">
- <span className="font-semibold block">Semua Pengguna</span>
- <span className="text-[10px] text-white/60 font-normal">Admin only</span>
- </div>
- </button>
- )}
- </div>
- </motion.div>
- )}
- </AnimatePresence>
- </div>
- )}
- </div>
-
- {/* Filter + Stats Section */}
- <div className="mt-3 lg:mt-4">
- {/* Organization Filter */}
- <div className="mb-3 lg:mb-4 relative z-10">
-   <div className="relative max-w-xs" ref={organizationDropdownRef}>
-     <button
-       onClick={() => setOrganizationDropdownOpen(prev => !prev)}
-       disabled={organizationsLoading}
-       className="w-full flex items-center gap-2 pl-9 pr-8 py-2.5 text-sm font-semibold bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20"
-     >
-       <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
-       <span className="flex-1 text-left truncate">
-         {organizations?.find(o => o.id === selectedOrganizationId)?.name || 'Semua Organisasi'}
-       </span>
-       <ChevronDown className={`w-3.5 h-3.5 text-blue-400 transition-transform duration-200 ${organizationDropdownOpen ? 'rotate-180' : ''}`} />
-     </button>
-     <AnimatePresence>
-       {organizationDropdownOpen && (
-         <motion.div
-           initial={{ opacity: 0, y: -8, scale: 0.95 }}
-           animate={{ opacity: 1, y: 0, scale: 1 }}
-           exit={{ opacity: 0, y: -8, scale: 0.95 }}
-           transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-           className="absolute left-0 right-0 top-full mt-2 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50 max-h-60 overflow-y-auto"
-         >
-           <div className="p-1.5">
-             <button
-               onClick={() => { setSelectedOrganizationId(''); setOrganizationDropdownOpen(false); }}
-               className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
-                 selectedOrganizationId === '' ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
-               }`}
-             >
-               <Building2 className="w-4 h-4 flex-shrink-0" />
-               <span className="font-medium">Semua Organisasi</span>
-             </button>
-             {organizations?.filter(o => o.is_active).map((org) => (
+ // headerRight: building filter + export dropdown
+ const headerRightContent = (
+   <div className="flex items-center gap-2">
+     {/* Organization Filter */}
+     <div className="relative" ref={orgDropdownRef}>
+       <button
+         onClick={() => setOrgDropdownOpen(prev => !prev)}
+         disabled={orgsLoading}
+         className="flex items-center gap-1.5 pl-8 pr-3 py-2 text-xs font-semibold bg-slate-800/80 text-white border border-white/15 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 cursor-pointer backdrop-blur-md transition-all shadow-lg shadow-black/20"
+       >
+         <Building2 className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400 pointer-events-none" />
+         <span className="flex-1 text-left truncate max-w-[8rem]">
+           {organizations?.find((o: any) => o.id === selectedOrganizationId)?.name || 'Semua Organisasi'}
+         </span>
+         <ChevronDown className={`w-3.5 h-3.5 text-blue-400 transition-transform duration-200 ${orgDropdownOpen ? 'rotate-180' : ''}`} />
+       </button>
+       <AnimatePresence>
+         {orgDropdownOpen && (
+           <motion.div
+             initial={{ opacity: 0, y: -8, scale: 0.95 }}
+             animate={{ opacity: 1, y: 0, scale: 1 }}
+             exit={{ opacity: 0, y: -8, scale: 0.95 }}
+             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+             className="absolute left-0 right-0 top-full mt-2 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50 max-h-60 overflow-y-auto"
+           >
+             <div className="p-1.5">
                <button
-                 key={org.id}
-                 onClick={() => { setSelectedOrganizationId(org.id); setOrganizationDropdownOpen(false); }}
+                 onClick={() => { setSelectedOrganizationId(''); setOrgDropdownOpen(false); }}
                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
-                   selectedOrganizationId === org.id ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
+                   selectedOrganizationId === '' ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
                  }`}
                >
                  <Building2 className="w-4 h-4 flex-shrink-0" />
-                 <span className="font-medium truncate">{org.name}</span>
+                 <span className="font-medium">Semua Organisasi</span>
                </button>
-             ))}
-           </div>
-         </motion.div>
-       )}
-     </AnimatePresence>
+               {organizations?.map((org: any) => (
+                 <button
+                   key={org.id}
+                   onClick={() => { setSelectedOrganizationId(org.id); setOrgDropdownOpen(false); }}
+                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-xl transition-colors ${
+                     selectedOrganizationId === org.id ? 'bg-blue-500/20 text-blue-400' : 'text-white/90 hover:bg-white/10'
+                   }`}
+                 >
+                   <Building2 className="w-4 h-4 flex-shrink-0" />
+                   <span className="font-medium truncate">{org.name}</span>
+                 </button>
+               ))}
+             </div>
+           </motion.div>
+         )}
+       </AnimatePresence>
+     </div>
+
+     {/* Export dropdown - Admin only */}
+     {isAdmin && (
+       <div className="relative" ref={exportMenuRef}>
+         <motion.button
+           onClick={() => setExportMenuOpen(prev => !prev)}
+           className="flex items-center gap-1.5 px-3.5 py-2 bg-white/10 lg:bg-blue-600 text-white rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm shadow-lg text-xs font-semibold whitespace-nowrap"
+           whileHover={{ scale: 1.02 }}
+           whileTap={{ scale: 0.98 }}
+         >
+           <Download className="w-3.5 h-3.5" />
+           <span>Export</span>
+           <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exportMenuOpen ? 'rotate-180' : ''}`} />
+         </motion.button>
+
+         <AnimatePresence>
+           {exportMenuOpen && (
+             <motion.div
+               initial={{ opacity: 0, y: -8, scale: 0.95 }}
+               animate={{ opacity: 1, y: 0, scale: 1 }}
+               exit={{ opacity: 0, y: -8, scale: 0.95 }}
+               transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+               className="absolute right-0 top-full mt-2 w-52 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden z-50"
+             >
+               <div className="p-1.5">
+                 <button
+                   onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}
+                   disabled={totalInspections === 0}
+                   className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                 >
+                   <div className="w-7 h-7 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                     <FileDown className="w-3.5 h-3.5 text-red-400" />
+                   </div>
+                   <div className="text-left">
+                     <span className="font-semibold block">Export PDF</span>
+                     <span className="text-[10px] text-white/60 font-normal">Laporan bulanan</span>
+                   </div>
+                 </button>
+                 <button
+                   onClick={() => { handleExportMonth(); setExportMenuOpen(false); }}
+                   disabled={totalInspections === 0}
+                   className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                 >
+                   <div className="w-7 h-7 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                     <Download className="w-3.5 h-3.5 text-green-400" />
+                   </div>
+                   <div className="text-left">
+                     <span className="font-semibold block">Data Saya (CSV)</span>
+                     <span className="text-[10px] text-white/60 font-normal">Inspeksi bulan ini</span>
+                   </div>
+                 </button>
+                 {isAdmin && (
+                   <button
+                     onClick={() => { handleExportAllUsers(); setExportMenuOpen(false); }}
+                     className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-white/90 hover:bg-white/10 rounded-xl transition-colors"
+                   >
+                     <div className="w-7 h-7 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                       <Users className="w-3.5 h-3.5 text-blue-400" />
+                     </div>
+                     <div className="text-left">
+                       <span className="font-semibold block">Semua Pengguna</span>
+                       <span className="text-[10px] text-white/60 font-normal">Admin only</span>
+                     </div>
+                   </button>
+                 )}
+               </div>
+             </motion.div>
+           )}
+         </AnimatePresence>
+       </div>
+     )}
    </div>
- </div>
+ );
+
+ return (
+ <PageLayout
+   title="Laporan"
+   subtitle="Riwayat & analitik inspeksi"
+   headerRight={headerRightContent}
+   maxWidth="max-w-7xl"
+   data-tour="reports-page"
+ >
  {/* Stats Cards */}
  <div className="grid grid-cols-3 gap-2 lg:gap-3">
  {/* Total Inspections */}
@@ -529,12 +502,7 @@ export const ReportsPage = () => {
  <div className="text-[10px] text-white/70 font-medium mt-0.5">Hari Aktif</div>
  </motion.div>
  </div>
- </div>
- </div>
- </header>
 
- {/* Content */}
- <div className="max-w-7xl mx-auto px-3 lg:px-6 pt-4 lg:pt-5 space-y-3 lg:space-y-4">
  {/* Instructions Tip */}
  <motion.div
  initial={{ opacity: 0, y: 10 }}
@@ -591,7 +559,6 @@ export const ReportsPage = () => {
  </p>
  </motion.div>
  )}
- </div>
 
  {/* Bottom Drawer */}
  <InspectionDrawer
@@ -610,11 +577,6 @@ export const ReportsPage = () => {
  onClose={handleCloseDetail}
  inspection={selectedInspection}
  />
-
- {/* Bottom Navigation - mobile only */}
- <div className="lg:hidden">
- <BottomNav />
- </div>
- </div>
+ </PageLayout>
  );
 };
